@@ -1,0 +1,121 @@
+#' Class that extends ShinyDriver from \code{shinytes}t package for load testing.
+#'
+#' @section Usage:
+#' app <- ShinyLoadDriver$new(url, connectionId)
+#' app$snapshotInit("myloadtest")
+#' app$setInputs(...)
+#' app$snapshot()
+#' app$stop()
+#' app$getTimeline()
+#'
+#' @section Arguments:
+#' \describe{
+#'   \item{path}{The url of a deployed Shiny app starting
+#'    with 'http://' or https://'}
+#'   \item{connectionId}{Identifies the current connection,
+#'   typically a sequential id}
+#'   \item{...}{\code{ShinyLoadDriver} inherits the other
+#'   arguments from \code{ShinyDriver}}
+#'  }
+#'
+#' @section Details:
+#'
+#' \code{app$new()} creates a \code{ShinyLoadDriver} object. It opens
+#' a session in phantomJS connected to the Shiny app deployed at \code{path}.
+#' Because ShinyLoadDriver connects to a deployed application, not all of the
+#' methods from \code{ShinyDriver} are available.
+#'
+#' \code{app$setInputs()} sets an input value in the Shiny app and
+#' records the amount of time before either an output is updated or a timeout
+#' occurs. The timeout value, in milliseconds, can be specified using
+#' \code{setInputs(..., timeout_ = 3000)}. \code{setInputs()} accepts at most 1
+#' input at a time. setInputs updates the timeline, see \code{getTimeline}.
+#'
+#' \code{app$snapshot} takes a screenshot of the application and saves it to
+#' a sub-directory of the current working directory. The subdirectory is named
+#' based on \code{app$snapshotInit("directoryName")}. Screenshots are named
+#' \code{connectionId_snapshotCount.png} where \code{snapshotCount} is a counter
+#' incrementing with each screenshot taken by the \code{ShinyLoadDriver}.
+#'
+#' \code{app$getTimeline} returns a data frame containing timing information
+#' for every time an input was updated and timing for the initial page load.
+#'
+#'
+#' @importFrom shinytest ShinyDriver
+#' @importFrom R6 R6Class
+#' @export
+ShinyLoadDriver <- R6Class("ShinyLoadDriver",
+
+  inherit = ShinyDriver,
+
+  public = list(
+
+    ## define a new initializer that accepts a
+    ## connection id and assigns it to the object
+    initialize = function(path = ".", loadTimeout = 5000, checkNames = TRUE,
+      debug = c("none", "all", shinytest::ShinyDriver$debugLogTypes),
+      connectionId = 1)
+
+      {
+        sld_initialize(self, private, super, path = path,
+          loadTimeout = loadTimeout, checkNames = checkNames,
+          debug = debug, connectionId = connectionId )
+      },
+
+    ## add stubs for non-supported functions
+
+    getAllValues = function(...)
+      stop("Exporting all values is not supported for deployed apps"),
+
+    snapshotUpdate = function(...)
+      stop("Snapshots are not supported for deployed apps"),
+
+    snapshotCompare = function(...)
+      stop("Snapshots are not supported for deployed apps"),
+
+
+    ## Overload some of the functions
+
+    ## over writes choices for timing_ and values_
+    ## and handles timing info
+    setInputs = function(..., wait_ = TRUE, values_ = FALSE, timeout_ = 3000,
+                         timing_ = TRUE)
+      sld_setInputs(self, private, super, ..., wait_ = TRUE, values_ = FALSE,
+                    timeout_ = timeout_, timing_ = TRUE),
+
+
+    ## takes a screenshot instead of a true snapshot
+    snapshot = function()
+      sld_snapshot(self, private),
+
+    ## new functions
+
+    ## Convert the timeline to a dataframe
+    getTimeline = function(){
+      timeline <- do.call(rbind, lapply(private$timeline,
+        data.frame, stringsAsFactors = FALSE))
+
+      timeline$connection_id <- rep(private$connection_id, nrow(timeline))
+
+      timeline
+    },
+
+    ## returns a directory with the same name
+    ## as the test file in the current working dir
+    getSnapshotDir = function(){
+      private$snapshotDir
+    }
+
+  ),
+
+  private = list(
+    connection_id = NULL,        # connection id used for screenshot filename
+    timeline = list(),            # list to hold timing info
+
+    addTimeline = function(event){
+      sld_addTimeline(self, private, event)
+    }
+  )
+
+)
+
