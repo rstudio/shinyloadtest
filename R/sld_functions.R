@@ -76,8 +76,8 @@ sld_setInputs = function(self, private, super, ..., wait_, values_,
               timeout_ = timeout_, timing_ = timing_)$timing
 
   ## log additional info about input
-  timing$input = names(inputs)[1]
-  timing$inputValue = inputs[[1]]
+  timing$input <- names(inputs)[1]
+  timing$inputValue <- list(inputs[[1]])
 
   ## append timing data to the private variable
   private$addTimeline(timing)
