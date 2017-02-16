@@ -54,12 +54,15 @@ ShinyLoadDriver <- R6Class("ShinyLoadDriver",
     ## connection id and assigns it to the object
     initialize = function(path = ".", loadTimeout = 5000, checkNames = TRUE,
       debug = c("none", "all", shinytest::ShinyDriver$debugLogTypes),
+      phantomTimeout = 10000,
       connectionId = 1)
 
     {
       sld_initialize(self, private, super, path = path,
         loadTimeout = loadTimeout, checkNames = checkNames,
-        debug = debug, connectionId = connectionId )
+        debug = debug, phantomTimeout = phantomTimeout,
+        connectionId = connectionId
+      )
     },
 
     ## add stubs for non-supported functions

@@ -14,14 +14,14 @@ sld_addTimeline <- function(self, private, event){
 
 sld_initialize <- function(self, private, super, path,
                            loadTimeout, checkNames, debug,
-                           connectionId) {
+                           phantomTimeout, connectionId) {
 
   private$connection_id <- connectionId
 
   time_start <- Sys.time()
 
   super$initialize(path = path, loadTimeout = loadTimeout,
-    checkNames = checkNames, debug = debug)
+    checkNames = checkNames, debug = debug, phantomTimeout = phantomTimeout)
 
   time_end <- Sys.time()
 
