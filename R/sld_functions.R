@@ -20,8 +20,8 @@ sld_initialize <- function(self, private, super, path,
 
   time_start <- Sys.time()
 
-  super$initialize(path = path, loadTimeout = loadTimeout, checkNames = checkNames,
-                                       debug = debug)
+  super$initialize(path = path, loadTimeout = loadTimeout,
+    checkNames = checkNames, debug = debug)
 
   time_end <- Sys.time()
 
@@ -57,6 +57,8 @@ sld_snapshot <- function(self, private) {
 
   self$takeScreenshot(file.path(current_dir, filename))
 
+  invisible(self)
+
 }
 
 
@@ -67,11 +69,11 @@ sld_setInputs = function(self, private, super, ..., wait_, values_,
   ## one input being changed at a time
   inputs = list(...)
 
-  if (length(inputs) > 2)
+  if (length(inputs) > 1)
     stop("Only one input should be changed at a time during a load test")
 
   timing <- super$setInputs(..., wait_ = wait_, values_ = values_,
-                            timeout_ = timeout_, timing_ = timing_)$timing
+              timeout_ = timeout_, timing_ = timing_)$timing
 
   ## log additional info about input
   timing$input = names(inputs)[1]
@@ -79,6 +81,8 @@ sld_setInputs = function(self, private, super, ..., wait_, values_,
 
   ## append timing data to the private variable
   private$addTimeline(timing)
+
+  invisible(self)
 
 }
 

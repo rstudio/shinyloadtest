@@ -43,8 +43,8 @@ loadTest <- function(testFile = "./tests/myloadtest.R",
 
 
   ## Create Workers
-  message(paste0('=======Initializing PSOCK Cluster with ',
-                 numConcurrent, ' Workers ========'))
+  message(paste0('====== Initializing PSOCK Cluster with ',
+                 numConcurrent, ' Workers ======'))
 
   cl <- parallel::makePSOCKcluster(numConcurrent)
   on.exit(parallel::stopCluster(cl))
@@ -53,7 +53,7 @@ loadTest <- function(testFile = "./tests/myloadtest.R",
 
   ## Loop Through Connections
 
-  message(paste0('========Begining Load Test======'))
+  message(paste0('====== Begining Load Test ======'))
 
   results <- foreach::foreach(i = 1:numTotal,
     .errorhandling = 'pass',
@@ -73,8 +73,7 @@ loadTest <- function(testFile = "./tests/myloadtest.R",
   ## that includes the error message AND issue a warning
   tryCatch(
     {
-      results <- do.call(rbind,
-        lapply(results, data.frame, stringsAsFactors = FALSE))
+      results <- listToDF(results)
     },
     error = function(e) { results;
       warning("One or more child processes encountered an error.", call. = FALSE)

@@ -56,45 +56,49 @@ ShinyLoadDriver <- R6Class("ShinyLoadDriver",
       debug = c("none", "all", shinytest::ShinyDriver$debugLogTypes),
       connectionId = 1)
 
-      {
-        sld_initialize(self, private, super, path = path,
-          loadTimeout = loadTimeout, checkNames = checkNames,
-          debug = debug, connectionId = connectionId )
-      },
+    {
+      sld_initialize(self, private, super, path = path,
+        loadTimeout = loadTimeout, checkNames = checkNames,
+        debug = debug, connectionId = connectionId )
+    },
 
     ## add stubs for non-supported functions
 
-    getAllValues = function(...)
-      stop("Exporting all values is not supported for deployed apps"),
+    getAllValues = function(...) {
+      stop("Exporting all values is not supported for deployed apps")
+    },
 
-    snapshotUpdate = function(...)
-      stop("Snapshots are not supported for deployed apps"),
+    snapshotUpdate = function(...) {
+      stop("Snapshots are not supported for deployed apps")
+    },
 
-    snapshotCompare = function(...)
-      stop("Snapshots are not supported for deployed apps"),
-
+    snapshotCompare = function(...) {
+      stop("Snapshots are not supported for deployed apps")
+    },
 
     ## Overload some of the functions
 
     ## over writes choices for timing_ and values_
     ## and handles timing info
     setInputs = function(..., wait_ = TRUE, values_ = FALSE, timeout_ = 3000,
-                         timing_ = TRUE)
+      timing_ = TRUE)
+    {
       sld_setInputs(self, private, super, ..., wait_ = TRUE, values_ = FALSE,
-                    timeout_ = timeout_, timing_ = TRUE),
-
+        timeout_ = timeout_, timing_ = TRUE)
+    },
 
     ## takes a screenshot instead of a true snapshot
-    snapshot = function()
-      sld_snapshot(self, private),
+    snapshot = function(){
+      sld_snapshot(self, private)
+    },
 
     ## new functions
 
     ## Convert the timeline to a dataframe
     getTimeline = function(){
-      timeline <- do.call(rbind, lapply(private$timeline,
-        data.frame, stringsAsFactors = FALSE))
+      timeline <- listToDF(private$timeline)
 
+      ## add a connecton id
       timeline$connection_id <- rep(private$connection_id, nrow(timeline))
 
       timeline
@@ -109,7 +113,7 @@ ShinyLoadDriver <- R6Class("ShinyLoadDriver",
   ),
 
   private = list(
-    connection_id = NULL,        # connection id used for screenshot filename
+    connection_id = NULL,         # connection id used for screenshot filename
     timeline = list(),            # list to hold timing info
 
     addTimeline = function(event){
