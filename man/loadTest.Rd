@@ -4,18 +4,29 @@
 \alias{loadTest}
 \title{Run load tests for a Shiny application}
 \usage{
-loadTest(testFile = "./tests/myloadtest.R", numConcurrent = 4,
-  numTotal = numConcurrent, url = NULL)
+loadTest(testFile = "./tests/myloadtest.R", url = NULL, numConcurrent = 4,
+  numTotal = numConcurrent, stagger = 5)
 }
 \arguments{
 \item{testFile}{The file containing a test script to run. Test script can be
 generated from \code{recordTest(load_mode = TRUE)}.}
 
+\item{url}{Web address of the deployed Shiny application.}
+
 \item{numConcurrent}{Number of concurrent connections to simulate.}
 
 \item{numTotal}{Total number of connections to simulation.}
 
-\item{url}{Web address of the deployed Shiny application.}
+\item{stagger}{Concurrent connections are staggered by pausing for a random,
+uniformally distributed period of time before starting the connection. This
+parameter is the maximum amount of time (sec) to wait. A value of 0 means
+that no staggering will occur.}
+}
+\value{
+If all of the child processes complete successfully this function
+  returns a dataframe containing timing and event information. If not all of
+  the child processes suceed, a list is returned containing timing for
+  successful tests and error messages for failed tests.
 }
 \description{
 Run load tests for a Shiny application
