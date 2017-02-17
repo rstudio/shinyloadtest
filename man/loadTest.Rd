@@ -43,4 +43,3 @@ This function simulates load against a deployed Shiny app. The
    will be recycled to complete remaining tests.The phantomJS process is
   reused, but a new browser session is started for each test.
 }
-

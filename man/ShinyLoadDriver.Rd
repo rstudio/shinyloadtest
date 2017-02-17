@@ -18,7 +18,7 @@ app$snapshotInit("myloadtest")
 app$setInputs(...)
 app$snapshot()
 app$stop()
-app$getTimeline()
+app$getEventLog()
 }
 
 \section{Arguments}{
@@ -45,7 +45,7 @@ methods from \code{ShinyDriver} are available.
 records the amount of time before either an output is updated or a timeout
 occurs. The timeout value, in milliseconds, can be specified using
 \code{setInputs(..., timeout_ = 3000)}. \code{setInputs()} accepts at most 1
-input at a time. setInputs updates the timeline, see \code{getTimeline}.
+input at a time.
 
 \code{app$snapshot} takes a screenshot of the application and saves it to
 a sub-directory of the current working directory. The subdirectory is named
@@ -56,5 +56,5 @@ incrementing with each screenshot taken by the \code{ShinyLoadDriver}.
 \code{app$getTimeline} returns a data frame containing timing information
 for every time an input was updated and timing for the initial page load.
 }
-\keyword{datasets}
 
+\keyword{datasets}

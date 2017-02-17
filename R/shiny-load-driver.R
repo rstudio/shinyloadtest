@@ -6,7 +6,7 @@
 #' app$setInputs(...)
 #' app$snapshot()
 #' app$stop()
-#' app$getTimeline()
+#' app$getEventLog()
 #'
 #' @section Arguments:
 #' \describe{
@@ -29,7 +29,7 @@
 #' records the amount of time before either an output is updated or a timeout
 #' occurs. The timeout value, in milliseconds, can be specified using
 #' \code{setInputs(..., timeout_ = 3000)}. \code{setInputs()} accepts at most 1
-#' input at a time. setInputs updates the timeline, see \code{getTimeline}.
+#' input at a time.
 #'
 #' \code{app$snapshot} takes a screenshot of the application and saves it to
 #' a sub-directory of the current working directory. The subdirectory is named
@@ -52,11 +52,11 @@ ShinyLoadDriver <- R6Class("ShinyLoadDriver",
 
     ## define a new initializer that accepts a
     ## connection id and assigns it to the object
-    initialize = function(path = ".", loadTimeout = 5000, checkNames = TRUE,
+    initialize = function(path = getOption("target.url"),
+      loadTimeout = 5000, checkNames = TRUE,
       debug = c("none", "all", shinytest::ShinyDriver$debugLogTypes),
       phantomTimeout = 10000,
-      connectionId = 1)
-
+      connectionId = getOption("connection.id", 1))
     {
       sld_initialize(self, private, super, path = path,
         loadTimeout = loadTimeout, checkNames = checkNames,
@@ -81,13 +81,13 @@ ShinyLoadDriver <- R6Class("ShinyLoadDriver",
 
     ## Overload some of the functions
 
-    ## over writes choices for timing_ and values_
+    ## over writes choices for values_
     ## and handles timing info
     setInputs = function(..., wait_ = TRUE, values_ = FALSE, timeout_ = 3000,
       timing_ = TRUE)
     {
       sld_setInputs(self, private, super, ..., wait_ = TRUE, values_ = FALSE,
-        timeout_ = timeout_, timing_ = TRUE)
+        timeout_ = timeout_)
     },
 
     ## takes a screenshot instead of a true snapshot
@@ -96,16 +96,6 @@ ShinyLoadDriver <- R6Class("ShinyLoadDriver",
     },
 
     ## new functions
-
-    ## Convert the timeline to a dataframe
-    getTimeline = function(){
-      timeline <- listToDF(private$timeline)
-
-      ## add a connecton id
-      timeline$connection_id <- rep(private$connection_id, nrow(timeline))
-
-      timeline
-    },
 
     ## returns a directory with the same name
     ## as the test file in the current working dir
@@ -116,12 +106,7 @@ ShinyLoadDriver <- R6Class("ShinyLoadDriver",
   ),
 
   private = list(
-    connection_id = NULL,         # connection id used for screenshot filename
-    timeline = list(),            # list to hold timing info
-
-    addTimeline = function(event){
-      sld_addTimeline(self, private, event)
-    }
+    connection_id = NULL          # connection id used for screenshot filename
   )
 
 )
