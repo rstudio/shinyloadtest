@@ -86,11 +86,19 @@ loadTest <- function(testFile = "./tests/myloadtest.R",
   ## that includes the error message AND issue a warning
   tryCatch(
     {
-      results <- listToDF(results)
+      # Extract the event log data frame and add the connection number
+      results <- lapply(seq_along(results), function(i) {
+        df <- results[[i]]$value
+        df$connection <- i
+        df
+      })
+
+      do.call(rbind, results)
     },
     error = function(e) { results;
       warning("One or more child processes encountered an error.", call. = FALSE)
-    })
+    }
+  )
 
   results
 }
