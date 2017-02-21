@@ -47,14 +47,13 @@ occurs. The timeout value, in milliseconds, can be specified using
 \code{setInputs(..., timeout_ = 3000)}. \code{setInputs()} accepts at most 1
 input at a time.
 
-\code{app$snapshot} takes a screenshot of the application and saves it to
+\code{app$snapshot()} takes a screenshot of the application and saves it to
 a sub-directory of the current working directory. The subdirectory is named
 based on \code{app$snapshotInit("directoryName")}. Screenshots are named
 \code{connectionId_snapshotCount.png} where \code{snapshotCount} is a counter
 incrementing with each screenshot taken by the \code{ShinyLoadDriver}.
 
-\code{app$getTimeline} returns a data frame containing timing information
-for every time an input was updated and timing for the initial page load.
+\code{app$getEventLog()} returns an event log with information on the test.
 }
 \keyword{datasets}
 

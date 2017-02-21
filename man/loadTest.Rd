@@ -5,7 +5,7 @@
 \title{Run load tests for a Shiny application}
 \usage{
 loadTest(testFile = "./tests/myloadtest.R", url = NULL, numConcurrent = 4,
-  numTotal = numConcurrent, stagger = 5)
+  numTotal = numConcurrent, stagger = 5, phantomTimeout = 10)
 }
 \arguments{
 \item{testFile}{The file containing a test script to run. Test script can be
@@ -22,7 +22,7 @@ uniformally distributed period of time before starting the connection. This
 parameter is the maximum amount of time (sec) to wait. A value of 0 means
 that no staggering will occur.}
 
-\item{phantomTimeout}{Number of milliseconds to wait for the slave phantomJS
+\item{phantomTimeout}{Number of seconds to wait for the slave phantomJS
 processes to start. Default to 10 seconds.}
 }
 \value{
