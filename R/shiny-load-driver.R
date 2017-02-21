@@ -95,6 +95,14 @@ ShinyLoadDriver <- R6Class("ShinyLoadDriver",
       sld_snapshot(self, private)
     },
 
+    ## adds the connection id
+    getEventLog = function(){
+      log <- super$getEventLog()
+      log$connection <- private$connection_id
+      log$process <- Sys.getpid()
+      log
+    },
+
     ## new functions
 
     ## returns a directory with the same name

@@ -22,10 +22,9 @@ sld_snapshot <- function(self, private) {
                 private$snapshotCount)
 
   if (private$snapshotCount == 1) {
-    if (dir_exists(current_dir)) {
-      unlink(current_dir, recursive = TRUE)
+    if (!dir_exists(current_dir)) {
+      dir.create(current_dir, recursive = TRUE)
     }
-    dir.create(current_dir, recursive = TRUE)
   }
 
   self$takeScreenshot(file.path(current_dir, filename))
