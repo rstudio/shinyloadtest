@@ -21,6 +21,9 @@ generated from \code{recordTest(load_mode = TRUE)}.}
 uniformally distributed period of time before starting the connection. This
 parameter is the maximum amount of time (sec) to wait. A value of 0 means
 that no staggering will occur.}
+
+\item{phantomTimeout}{Number of milliseconds to wait for the slave phantomJS
+processes to start. Default to 10 seconds.}
 }
 \value{
 If all of the child processes complete successfully this function
@@ -39,7 +42,8 @@ This function simulates load against a deployed Shiny app. The
   that calls the URL and drives the app through the test. Tests should be
   generated using the \code{recordTest} function with \code{load_mode =
   TRUE}. Timing information is aggregated and returned as a data frame. If
-  the number of total tests > number of concurrent tests, then finished workers
-   will be recycled to complete remaining tests.The phantomJS process is
-  reused, but a new browser session is started for each test.
+  the number of total tests > number of concurrent tests, then finished
+  workers will be recycled to complete remaining tests.The phantomJS process
+  is reused, but a new browser session is started for each test.
 }
+

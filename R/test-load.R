@@ -9,6 +9,8 @@
 #'   uniformally distributed period of time before starting the connection. This
 #'   parameter is the maximum amount of time (sec) to wait. A value of 0 means
 #'   that no staggering will occur.
+#' @param phantomTimeout Number of seconds to wait for the slave phantomJS
+#'   processes to start. Default to 10 seconds.
 #'
 #' @details This function simulates load against a deployed Shiny app. The
 #'   function creates a cluster of workers using the parallel function
@@ -17,9 +19,9 @@
 #'   that calls the URL and drives the app through the test. Tests should be
 #'   generated using the \code{recordTest} function with \code{load_mode =
 #'   TRUE}. Timing information is aggregated and returned as a data frame. If
-#'   the number of total tests > number of concurrent tests, then finished workers
-#'    will be recycled to complete remaining tests.The phantomJS process is
-#'   reused, but a new browser session is started for each test.
+#'   the number of total tests > number of concurrent tests, then finished
+#'   workers will be recycled to complete remaining tests.The phantomJS process
+#'   is reused, but a new browser session is started for each test.
 #'
 #' @return If all of the child processes complete successfully this function
 #'   returns a dataframe containing timing and event information. If not all of
@@ -34,7 +36,8 @@ loadTest <- function(testFile = "./tests/myloadtest.R",
                      url = NULL,
                      numConcurrent = 4,
                      numTotal = numConcurrent,
-                     stagger = 5
+                     stagger = 5,
+                     phantomTimeout = 10
                      ) {
 
   assert_that(file.exists(testFile))
@@ -70,7 +73,8 @@ loadTest <- function(testFile = "./tests/myloadtest.R",
     .errorhandling = 'pass',
     .packages = 'shinytest') %dopar% {
       withr::with_options(
-        list(target.url = url, connection.id = i), {
+        list(target.url = url, connection.id = i,
+             phantom.timeout = phantomTimeout*1000), {
           env <- new.env(parent = .GlobalEnv)
 
           Sys.sleep(runif(1, 0, stagger))
@@ -78,27 +82,27 @@ loadTest <- function(testFile = "./tests/myloadtest.R",
           ## The test file will return a data frame
           ## with the relevant timing information.
           source(testFile, local = env)
-        })
-    }
+      })
+  }
 
   ## If there was not an error, we can flatten the results
   ## If there was an error, return the results as a list
   ## that includes the error message AND issue a warning
-  tryCatch(
-    {
-      # Extract the event log data frame
-      results <- lapply(seq_along(results), function(i) {
-        df <- results[[i]]$value
-        df
-      })
 
-      results <- do.call(rbind, results)
-      results
-    },
-    error = function(e) { results;
-      warning("One or more child processes encountered an error.", call. = FALSE)
+  log <- lapply(seq_along(results), function(i) {
+    if (is.null(results[[i]]$value)) {
+      df <- results[[i]]
+    } else {
+      df <- results[[i]]$value
     }
-  )
+    df
+  })
 
-  results
+  tryCatch({
+    log <- do.call(rbind, log) }, error = function(e) {
+    warning("One or more child processes failed")
+    log
+  })
+
+  log
 }

@@ -56,5 +56,5 @@ incrementing with each screenshot taken by the \code{ShinyLoadDriver}.
 \code{app$getTimeline} returns a data frame containing timing information
 for every time an input was updated and timing for the initial page load.
 }
-
 \keyword{datasets}
+

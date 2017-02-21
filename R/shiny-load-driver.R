@@ -55,7 +55,7 @@ ShinyLoadDriver <- R6Class("ShinyLoadDriver",
     initialize = function(path = getOption("target.url"),
       loadTimeout = 5000, checkNames = TRUE,
       debug = c("none", "all", shinytest::ShinyDriver$debugLogTypes),
-      phantomTimeout = 10000,
+      phantomTimeout = getOption("phantom.timeout", 10000),
       connectionId = getOption("connection.id", 1))
     {
       sld_initialize(self, private, super, path = path,
