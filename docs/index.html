@@ -119,7 +119,7 @@ app$<span class="kw">getEventLog</span>()            <span class="co"># returns 
 <h2 class="hasAnchor">
 <a href="#running-load-test-reports" class="anchor"> </a>Running Load Test Reports</h2>
 <p>The package includes a R Markdown report. The report is located at:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">path.expand</span>(<span class="kw">paste0</span>(<span class="kw">path.package</span>(<span class="st">"shinyloadtest"</span>), <span class="st">"/inst/load_test_template.Rmd"</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">path.expand</span>(<span class="kw">paste0</span>(<span class="kw">path.package</span>(<span class="st">"shinyloadtest"</span>), <span class="st">"/loadTestReport/load_test_template.Rmd"</span>))</code></pre></div>
 <p>The report is parameterized. To run the report, open the report and then select <code>Knit with Parameters</code> from within RStudio:</p>
 <p><img src="img/knit_with_params.png"></p>
 <p>You will be prompted to enter the parameters for your load test:</p>
@@ -127,7 +127,7 @@ app$<span class="kw">getEventLog</span>()            <span class="co"># returns 
 <p><strong>WARNING</strong> This report can take a long time to render and will generate multiple processes on the client machine. Use with caution. In addition to running the load test, this report will sequentially run a baseline test. This baseline test runs the test script in sequence and can take time if each individual test is lengthy.</p>
 <p>An alternatvie approach is to update the parameters in the YAML, change the output format to <code>html_notebook</code>, and to interactively run each code chunk. Once done, you can preview the notebook which generates an html report from the interactively run code, wihout compiling the report all at once.</p>
 <p>For an example report, run:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setwd</span>(<span class="kw">path.expand</span>(<span class="kw">paste0</span>(<span class="kw">path.package</span>(<span class="st">"shinyloadtest"</span>),<span class="st">"/inst/inst/"</span>)))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setwd</span>(<span class="kw">path.expand</span>(<span class="kw">paste0</span>(<span class="kw">path.package</span>(<span class="st">"shinyloadtest"</span>),<span class="st">"/loadTestReport/"</span>)))
 rmarkdown::<span class="kw">render</span>(<span class="st">"load_test_template.Rmd"</span>)</code></pre></div>
 <p>which should generate a <a href="https://beta.rstudioconnect.com/content/2552/load_test_template.html">report like this</a>.</p>
 </div>
