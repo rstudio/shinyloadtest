@@ -25,7 +25,7 @@ library(shinytest)
 recordTest("path/to/app", load_mode = TRUE)
 ```
 
-![](./examples/img/recorder_screenshot_superzip.png)
+![](./inst/examples/img/recorder_screenshot_superzip.png)
 
 The recorder will save interactions with the application and timing information into a R file. For example, the following script is a test script for the [superzip application](http://shiny.rstudio.com/gallery/superzip-example.html).
 
@@ -108,11 +108,11 @@ path.expand(paste0(path.package("shinyloadtest"), "/loadTestReport/load_test_tem
 ```
 The report is parameterized. To run the report, open the report and then select `Knit with Parameters` from within RStudio:
 
-![](./examples/img/knit_with_params.png)
+![](./inst/examples/img/knit_with_params.png)
 
 You will be prompted to enter the parameters for your load test:
 
-![](./examples/img/params.png)
+![](./inst/examples/img/params.png)
 
 **WARNING** This report can take a long time to render and will generate multiple processes on the client machine. Use with caution. In addition to running the load test, this report will sequentially run a baseline test. This baseline test runs the test script in sequence and can take time if each individual test is lengthy.
 
