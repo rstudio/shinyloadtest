@@ -47,14 +47,14 @@ loadTestLog <- loadTest(testFile = params$testFile,
                         phantomTimeout = params$phantomTimeout)
 ```
 
-A baseline test was run with **`r min(params$total,30)` total visits** occuring sequentially, one at a time.
+A baseline test was run with **`r min(params$total,10)` total visits** occuring sequentially, one at a time.
 
 ```{r}
 baselineLog <- loadTest(testFile = params$testFile, 
                         url = params$url,
                         numConcurrent = 1,
                         loadTimeout = params$loadTimeout,
-                        numTotal = params$total, 
+                        numTotal = min(params$total,10), 
                         stagger = 0)
 ```
 
