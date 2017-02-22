@@ -29,10 +29,9 @@ that no staggering will occur.}
 processes to start. Default to 10 seconds.}
 }
 \value{
-If all of the child processes complete successfully this function
-  returns a dataframe containing timing and event information. If not all of
-  the child processes suceed, a list is returned containing timing for
-  successful tests and error messages for failed tests.
+Returns a list with the results from each child process. The results
+  will either be a data frame with the event log from the test or an error
+  message.
 }
 \description{
 Run load tests for a Shiny application
@@ -49,4 +48,3 @@ This function simulates load against a deployed Shiny app. The
   workers will be recycled to complete remaining tests.The phantomJS process
   is reused, but a new browser session is started for each test.
 }
-

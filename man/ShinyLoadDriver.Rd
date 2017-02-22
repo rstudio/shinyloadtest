@@ -55,5 +55,5 @@ incrementing with each screenshot taken by the \code{ShinyLoadDriver}.
 
 \code{app$getEventLog()} returns an event log with information on the test.
 }
-\keyword{datasets}
 
+\keyword{datasets}

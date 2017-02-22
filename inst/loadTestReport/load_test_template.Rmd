@@ -15,7 +15,7 @@ params:
     value: 4
   testFile:
     label: "Path to Load Test Script"
-    value: '../examples/example_loadTest_superzip.R'
+    value: '../examples/example_load_test_superzip.R'
   stagger: 
     label: "Maximum Delay in Staggering Concurrent Connections (sec)"
     value: 5
@@ -29,10 +29,8 @@ params:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE)
-source("analyzeLog.R")
 library(shinyloadtest)
 library(ggplot2)
-library(dplyr)
 ```
 
 Load test run against `r params$url`. The load test target was **`r params$total` total visits** with **`r params$concurrent` concurrent users** at a time. Concurrent user sessions were staggered, with a max delay of `r params$stagger` seconds. Each "user" ran a series of actions against the application as recorded in `r params$testFile`.
@@ -62,38 +60,47 @@ baselineLog <- loadTest(testFile = params$testFile,
 ## Results
 
 ```{r}
-if (!is.data.frame(loadTestLog)) {
-  errors <- getErrors(loadTestLog)
-  loadTestLog <- getSuccesses(loadTestLog)
-}
+errors <- getErrors(loadTestLog)
+loadTestLog <- getSuccesses(loadTestLog)
+
+baseline_errors <- getErrors(baselineLog)
+baselineLog <- getSuccesses(baselineLog)
+
 ```
 
 
 Of the targetted `r params$total` visits, `r length(unique(loadTestLog$connection))` were successful. 
 
 ```{r}
-if (exists("errors")) {
+if (length(errors) > 0) {
   print("The following errors occured in the unsuccessful visits:")
   print(errors)
 }
+
+if (length(baseline_errors) > 0) {
+  print("The following errors occured in the baseline test:")
+  print(baseline_errors)
+}
+
 ```
 
 A maximum `r getMaxConcurrent(loadTestLog)` concurrent connections were achieved, compared to the target of `r params$concurrent`.
 
-`r if ( !exists("errors") && (getMaxConcurrent(loadTestLog) < params$concurrent)) {message("Because all visits were successful, but the number of concurrent connections did not meet the target, consider lowering the stagger parameter or checking the server settings.")}`
+`r if ( length(errors) > 0 && (getMaxConcurrent(loadTestLog) < params$concurrent)) {message("Because all visits were successful, but the number of concurrent connections did not meet the target, consider lowering the stagger parameter or checking the server settings.")}`
 
 
 ## Comparison to Baseline
 
 ```{r}
-load <- getPageLoadTime(loadTestLog) %>% 
-  mutate(type = "Under Load")
-base <- getPageLoadTime(baselineLog) %>% 
-  mutate(type = "Baseline")
+load <- getPageLoadTimes(loadTestLog) 
+load$type = "Under Load"
+
+base <- getPageLoadTimes(baselineLog)
+base$type = "Baseline"
 
 results <- rbind(load, base)
 
-ggplot(results, aes(loadTime_s, fill = type)) + 
+ggplot(results, aes(load_time_sec, fill = type)) + 
   geom_density(alpha = 0.4) +
   theme_minimal() +
   labs(
@@ -105,22 +112,22 @@ ggplot(results, aes(loadTime_s, fill = type)) +
   )
 ```
 
-The average page load time under load was `r mean(load$loadTime_s)` seconds compared to `r mean(base$loadTime_s)` seconds with no concurrent load.
+The average page load time under load was `r mean(load$load_time_sec)` seconds compared to `r mean(base$load_time_sec)` seconds with no concurrent load.
 
 The following graph shows the response time for specific events taken after page load.
 
 ```{r}
-load <- getSetInputTime(loadTestLog)
-base <- getSetInputTime(baselineLog)
+load <- getSetInputTimes(loadTestLog)
+base <- getSetInputTimes(baselineLog)
 
 load$type = "Under Load"
 base$type = "Basline"
 
 results <- rbind(load, base)
 
-ggplot(results, aes(time_s, fill =  type)) +
+ggplot(results, aes(event_time_sec, fill =  type)) +
   geom_density(alpha = 0.4)  +
-  facet_wrap(~input, scales = "free") +
+  facet_wrap(~input_id, scales = "free") +
   labs(
     title = "Application Usage",
     y = "",

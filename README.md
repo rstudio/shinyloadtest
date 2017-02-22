@@ -125,7 +125,7 @@ setwd(path.expand(paste0(path.package("shinyloadtest"),"/loadTestReport/")))
 rmarkdown::render("load_test_template.Rmd")
 ```
 
-which should generate a [report like this](https://beta.rstudioconnect.com/content/2552/load_test_template.html).
+which should generate a [report like this](https://beta.rstudioconnect.com/content/2554/load_test_template.html).
 
 ## Use Cases
 

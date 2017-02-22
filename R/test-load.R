@@ -24,10 +24,9 @@
 #'   workers will be recycled to complete remaining tests.The phantomJS process
 #'   is reused, but a new browser session is started for each test.
 #'
-#' @return If all of the child processes complete successfully this function
-#'   returns a dataframe containing timing and event information. If not all of
-#'   the child processes suceed, a list is returned containing timing for
-#'   successful tests and error messages for failed tests.
+#' @return Returns a list with the results from each child process. The results
+#'   will either be a data frame with the event log from the test or an error
+#'   message.
 #'
 #' @importFrom foreach %dopar% foreach
 #' @importFrom assertthat assert_that
@@ -88,9 +87,7 @@ loadTest <- function(testFile = "./tests/myloadtest.R",
       })
   }
 
-  ## If there was not an error, we can flatten the results
-  ## If there was an error, return the results as a list
-  ## that includes the error message AND issue a warning
+  ## Return a list with the results from the load test
 
   log <- lapply(seq_along(results), function(i) {
     if (is.null(results[[i]]$value)) {
@@ -100,17 +97,6 @@ loadTest <- function(testFile = "./tests/myloadtest.R",
     }
     df
   })
-
-  tryCatch({
-    log_df <- do.call(rbind, log)
-    if (!is.data.frame(log_df))
-      stop("Not a data frame")
-    log <- log_df
-    }, error = function(e) {
-    warning("One or more child processes failed")
-    log
-    }
-  )
 
   log
 }

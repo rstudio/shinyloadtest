@@ -5,14 +5,21 @@ Authors@R: c(person("Sean", "Lopp", email = "sean@rstudio.com",
   role = c("aut", "cre")),
   person("Winston", "Chang", email = "winston@rstudio.com", 
   role = "aut"))
-Description: This package extends the shinytest package to enable users to load test deployed Shiny applications. Load testing is executed using parallel phantomJS sessions. 
+Description: This package extends the shinytest package to enable users to
+    load test deployed Shiny applications. Load testing is executed using parallel
+    phantomJS sessions.
 Encoding: UTF-8
 License: GPL-3
 LazyData: true
 RoxygenNote: 6.0.1
-Imports: assertthat,
+Imports:
+    assertthat,
     foreach,
     doParallel,
     shinytest,
     R6,
     withr
+Suggests: rmarkdown,
+    dplyr,
+    ggplot2,
+    lubridate
