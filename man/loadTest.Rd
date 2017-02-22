@@ -5,7 +5,8 @@
 \title{Run load tests for a Shiny application}
 \usage{
 loadTest(testFile = "./tests/myloadtest.R", url = NULL, numConcurrent = 4,
-  numTotal = numConcurrent, stagger = 5, phantomTimeout = 10)
+  numTotal = numConcurrent, loadTimeout = 5, stagger = 5,
+  phantomTimeout = 10)
 }
 \arguments{
 \item{testFile}{The file containing a test script to run. Test script can be
@@ -16,6 +17,8 @@ generated from \code{recordTest(load_mode = TRUE)}.}
 \item{numConcurrent}{Number of concurrent connections to simulate.}
 
 \item{numTotal}{Total number of connections to simulation.}
+
+\item{loadTimeout}{Maximum time to wait to connect to the Shiny app (sec)}
 
 \item{stagger}{Concurrent connections are staggered by pausing for a random,
 uniformally distributed period of time before starting the connection. This

@@ -52,7 +52,7 @@ ShinyLoadDriver <- R6Class("ShinyLoadDriver",
     ## define a new initializer that accepts a
     ## connection id and assigns it to the object
     initialize = function(path = getOption("target.url"),
-      loadTimeout = 5000, checkNames = TRUE,
+      loadTimeout = getOption("load.timeout", 5000), checkNames = TRUE,
       debug = c("none", "all", shinytest::ShinyDriver$debugLogTypes),
       phantomTimeout = getOption("phantom.timeout", 10000),
       connectionId = getOption("connection.id", 1))

@@ -5,6 +5,7 @@
 #' @param url Web address of the deployed Shiny application.
 #' @param numConcurrent Number of concurrent connections to simulate.
 #' @param numTotal Total number of connections to simulation.
+#' @param loadTimeout Maximum time to wait to connect to the Shiny app (sec)
 #' @param stagger  Concurrent connections are staggered by pausing for a random,
 #'   uniformally distributed period of time before starting the connection. This
 #'   parameter is the maximum amount of time (sec) to wait. A value of 0 means
@@ -36,6 +37,7 @@ loadTest <- function(testFile = "./tests/myloadtest.R",
                      url = NULL,
                      numConcurrent = 4,
                      numTotal = numConcurrent,
+                     loadTimeout = 5,
                      stagger = 5,
                      phantomTimeout = 10
                      ) {
@@ -74,7 +76,8 @@ loadTest <- function(testFile = "./tests/myloadtest.R",
     .packages = 'shinytest') %dopar% {
       withr::with_options(
         list(target.url = url, connection.id = i,
-             phantom.timeout = phantomTimeout*1000), {
+             phantom.timeout = phantomTimeout*1000,
+             load.timeout = loadTimeout*1000), {
           env <- new.env(parent = .GlobalEnv)
 
           Sys.sleep(runif(1, 0, stagger))
