@@ -102,10 +102,15 @@ loadTest <- function(testFile = "./tests/myloadtest.R",
   })
 
   tryCatch({
-    log <- do.call(rbind, log) }, error = function(e) {
+    log_df <- do.call(rbind, log)
+    if (!is.data.frame(log_df))
+      stop("Not a data frame")
+    log <- log_df
+    }, error = function(e) {
     warning("One or more child processes failed")
     log
-  })
+    }
+  )
 
   log
 }
