@@ -61,7 +61,7 @@
 <p>To get started, record a test using the <code>shinytest</code> package’s recorder with <code>load_mode</code> enabled. The test should be reflective of expected application use. For more details, see the <a href="https://rstudio.github.io/shinytest/"><code>shinytest</code> documentation</a>. Tests must be recorded against a local copy of the deployed application.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shinytest)
 <span class="kw">recordTest</span>(<span class="st">"path/to/app"</span>, <span class="dt">load_mode =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<p><img src="../examples/img/recorder_screenshot_superzip.png"></p>
+<p><img src="img/recorder_screenshot_superzip.png"></p>
 <p>The recorder will save interactions with the application and timing information into a R file. For example, the following script is a test script for the <a href="http://shiny.rstudio.com/gallery/superzip-example.html">superzip application</a>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">app &lt;-<span class="st"> </span>ShinyLoadDriver$<span class="kw">new</span>()
 app$<span class="kw">snapshotInit</span>(<span class="st">"myloadtest"</span>)
@@ -121,9 +121,9 @@ app$<span class="kw">getEventLog</span>()            <span class="co"># returns 
 <p>The package includes a R Markdown report. The report is located at:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">path.expand</span>(<span class="kw">paste0</span>(<span class="kw">path.package</span>(<span class="st">"shinyloadtest"</span>), <span class="st">"/inst/load_test_template.Rmd"</span>))</code></pre></div>
 <p>The report is parameterized. To run the report, open the report and then select <code>Knit with Parameters</code> from within RStudio:</p>
-<p><img src="../examples/img/knit_with_params.png"></p>
+<p><img src="img/knit_with_params.png"></p>
 <p>You will be prompted to enter the parameters for your load test:</p>
-<p><img src="../examples/img/params.png"></p>
+<p><img src="img/params.png"></p>
 <p><strong>WARNING</strong> This report can take a long time to render and will generate multiple processes on the client machine. Use with caution. In addition to running the load test, this report will sequentially run a baseline test. This baseline test runs the test script in sequence and can take time if each individual test is lengthy.</p>
 <p>An alternatvie approach is to update the parameters in the YAML, change the output format to <code>html_notebook</code>, and to interactively run each code chunk. Once done, you can preview the notebook which generates an html report from the interactively run code, wihout compiling the report all at once.</p>
 <p>For an example report, run:</p>
