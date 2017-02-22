@@ -104,7 +104,7 @@ The `loadTest` function returns an event log that contains timing and event info
 The package includes a R Markdown report. The report is located at:
 
 ```r
-path.expand(paste0(path.package("shinyloadtest"), "/inst/load_test_template.Rmd"))
+path.expand(paste0(path.package("shinyloadtest"), "/loadTestReport/load_test_template.Rmd"))
 ```
 The report is parameterized. To run the report, open the report and then select `Knit with Parameters` from within RStudio:
 
@@ -121,7 +121,7 @@ An alternatvie approach is to update the parameters in the YAML, change the outp
 For an example report, run:
 
 ```r
-setwd(path.expand(paste0(path.package("shinyloadtest"),"/inst/inst/")))
+setwd(path.expand(paste0(path.package("shinyloadtest"),"/loadTestReport/")))
 rmarkdown::render("load_test_template.Rmd")
 ```
 
