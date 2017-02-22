@@ -1,0 +1,22 @@
+app <- ShinyLoadDriver$new(path = 'https://beta.rstudioconnect.com/content/2551/')
+app$snapshotInit("myloadtest")
+
+app$setInputs(size = "college")
+Sys.sleep(3.1)
+app$setInputs(threshold = 6)
+Sys.sleep(0.5)
+app$setInputs(threshold = 7)
+Sys.sleep(1.4)
+app$setInputs(threshold = 8)
+Sys.sleep(0.0)
+app$setInputs(threshold = 7)
+Sys.sleep(8.4)
+app$setInputs(nav = "Data explorer")
+Sys.sleep(0.4)
+app$setInputs(states = "CO")
+Sys.sleep(1.5)
+
+
+app$snapshot()
+app$stop()
+app$getEventLog()
