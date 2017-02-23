@@ -71,18 +71,59 @@
     </div>
 
     <div class="contents">
-      <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-      <p class="section-desc"></p>
+      <h2 id="section-shiny-load-driver-object" class="hasAnchor"><a href="#section-shiny-load-driver-object" class="anchor"></a>Shiny Load Driver Object</h2>
+      <p class="section-desc"><p>Main R6 Class that drives a test using phantomJS.</p></p>
+
+      
+      <p><a href="ShinyLoadDriver.html">Class that extends ShinyDriver from </a></p>
+      <ul>
+        <li><code><a href="ShinyLoadDriver.html">ShinyLoadDriver</a></code></li>
+      </ul>
+          <h2 id="section-load-test" class="hasAnchor"><a href="#section-load-test" class="anchor"></a>Load Test</h2>
+      <p class="section-desc"><p>Main function that conducts a load test.</p></p>
 
       
       <p><a href="loadTest.html">Run load tests for a Shiny application</a></p>
       <ul>
         <li><code><a href="loadTest.html">loadTest</a></code></li>
       </ul>
+          <h2 id="section-analyze-event-logs" class="hasAnchor"><a href="#section-analyze-event-logs" class="anchor"></a>Analyze Event Logs</h2>
+      <p class="section-desc"><p>A load test will return a series of event logs. These functions help analzye the logs.</p></p>
+
       
-      <p><a href="ShinyLoadDriver.html">Class that extends ShinyDriver from </a></p>
+      <p><a href="getErrors.html">Get errofs from event log</a></p>
       <ul>
-        <li><code><a href="ShinyLoadDriver.html">ShinyLoadDriver</a></code></li>
+        <li><code><a href="getErrors.html">getErrors</a></code></li>
+      </ul>
+      
+      <p><a href="getEventInterval.html">Get duration for simple event pairs</a></p>
+      <ul>
+        <li><code><a href="getEventInterval.html">getEventInterval</a></code></li>
+      </ul>
+      
+      <p><a href="getMaxConcurrent.html">Return the number of concurrent connections</a></p>
+      <ul>
+        <li><code><a href="getMaxConcurrent.html">getMaxConcurrent</a></code></li>
+      </ul>
+      
+      <p><a href="getPageLoadTimes.html">Get page load times</a></p>
+      <ul>
+        <li><code><a href="getPageLoadTimes.html">getPageLoadTimes</a></code></li>
+      </ul>
+      
+      <p><a href="getSetInputTimes.html">Get event duration for user interactions with inputs</a></p>
+      <ul>
+        <li><code><a href="getSetInputTimes.html">getSetInputTimes</a></code></li>
+      </ul>
+      
+      <p><a href="getSuccesses.html">Get successes from event log</a></p>
+      <ul>
+        <li><code><a href="getSuccesses.html">getSuccesses</a></code></li>
+      </ul>
+      
+      <p><a href="getTestDurations.html">Get test duration</a></p>
+      <ul>
+        <li><code><a href="getTestDurations.html">getTestDurations</a></code></li>
       </ul>
     
     </div>
@@ -91,7 +132,9 @@
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#section-all-functions">All functions</a></li>
+      <li><a href="#section-shiny-load-driver-object">Shiny Load Driver Object</a></li>
+      <li><a href="#section-load-test">Load Test</a></li>
+      <li><a href="#section-analyze-event-logs">Analyze Event Logs</a></li>
     </ul>
   </div>
 </div>

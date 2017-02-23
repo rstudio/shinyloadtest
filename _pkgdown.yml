@@ -1,0 +1,16 @@
+reference:
+  - title: "Shiny Load Driver Object"
+    desc: >
+      Main R6 Class that drives a test using phantomJS.
+    contents:
+      - ShinyLoadDriver
+  - title: "Load Test"
+    desc: >
+      Main function that conducts a load test.
+    contents:
+      - loadTest
+  - title: "Analyze Event Logs"
+    desc: >
+      A load test will return a series of event logs. These functions help analzye the logs.
+    contents:
+      - starts_with("get")

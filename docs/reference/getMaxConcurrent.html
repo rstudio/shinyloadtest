@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Run load tests for a Shiny application — loadTest • shinyloadtest</title>
+<title>Return the number of concurrent connections — getMaxConcurrent • shinyloadtest</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -66,58 +66,29 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Run load tests for a Shiny application</h1>
+    <h1>Return the number of concurrent connections</h1>
     </div>
 
     
-    <p>Run load tests for a Shiny application</p>
+    <p>Return the number of concurrent connections</p>
     
 
-    <pre><span class='fu'>loadTest</span>(<span class='kw'>testFile</span> <span class='kw'>=</span> <span class='st'>"./tests/myloadtest.R"</span>, <span class='kw'>url</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>numConcurrent</span> <span class='kw'>=</span> <span class='fl'>4</span>,
-  <span class='kw'>numTotal</span> <span class='kw'>=</span> <span class='no'>numConcurrent</span>, <span class='kw'>loadTimeout</span> <span class='kw'>=</span> <span class='fl'>5</span>, <span class='kw'>stagger</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>phantomTimeout</span> <span class='kw'>=</span> <span class='fl'>10</span>)</pre>
+    <pre><span class='fu'>getMaxConcurrent</span>(<span class='no'>eventLog</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <dl class="dl-horizontal">
-      <dt>testFile</dt>
-      <dd>The file containing a test script to run. Test script can be
-generated from <code>recordTest(load_mode = TRUE)</code>.</dd>
-      <dt>url</dt>
-      <dd>Web address of the deployed Shiny application.</dd>
-      <dt>numConcurrent</dt>
-      <dd>Number of concurrent connections to simulate.</dd>
-      <dt>numTotal</dt>
-      <dd>Total number of connections to simulation.</dd>
-      <dt>loadTimeout</dt>
-      <dd>Maximum time to wait to connect to the Shiny app (sec)</dd>
-      <dt>stagger</dt>
-      <dd>Concurrent connections are staggered by pausing for a random,
-uniformally distributed period of time before starting the connection. This
-parameter is the maximum amount of time (sec) to wait. A value of 0 means
-that no staggering will occur.</dd>
-      <dt>phantomTimeout</dt>
-      <dd>Number of seconds to wait for the slave phantomJS
-processes to start. Default to 10 seconds.</dd>
+      <dt>eventLog</dt>
+      <dd>Data frame of events returned from either
+<code><a href='loadTest.html'>loadTest</a></code> or <code><a href='getSuccesses.html'>getSuccesses</a></code></dd>
     </dl>
-    
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>Returns a list with the results from each child process. The results
-  will either be a data frame with the event log from the test or an error
-  message.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>This function simulates load against a deployed Shiny app. The
-  function creates a cluster of workers using the parallel function
-  <code>makePSOCKcluster</code>. The number of works is equal to the number of
-  desired concurrent connections. Each worker launches a phantomJS process
-  that calls the URL and drives the app through the test. Tests should be
-  generated using the <code>recordTest</code> function with <code>load_mode =
-  TRUE</code>. Timing information is aggregated and returned as a data frame. If
-  the number of total tests &gt; number of concurrent tests, then finished
-  workers will be recycled to complete remaining tests.The phantomJS process
-  is reused, but a new browser session is started for each test.</p>
+    <p>The actual number of concurrent connections for a load test can vary
+  from the target. This function uses the conenct and disconnect events from
+  the log to determine the interval when each connection was open. The
+  maximum number of overlapping intervals is returned as the maxiumum number
+  of concurrent connections achieved during the test.</p>
     
 
   </div>
@@ -126,8 +97,6 @@ processes to start. Default to 10 seconds.</dd>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#value">Value</a></li>
-
       <li><a href="#details">Details</a></li>
           </ul>
 
