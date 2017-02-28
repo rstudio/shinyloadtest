@@ -14,3 +14,6 @@ reference:
       A load test will return a series of event logs. These functions help analzye the logs.
     contents:
       - starts_with("get")
+  - title: "Load Test Report"
+    contents:
+      - createLoadTestReport

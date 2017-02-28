@@ -40,7 +40,7 @@
 </div>
 <!--/.navbar -->
 
-
+      
       </header><div class="row">
   <div class="contents col-md-9">
     <div id="shinyloadtest" class="section level1">
@@ -62,7 +62,7 @@
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shinytest)
 <span class="kw">recordTest</span>(<span class="st">"path/to/app"</span>, <span class="dt">load_mode =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p><img src="img/recorder_screenshot_superzip.png"></p>
-<p>The recorder will save interactions with the application and timing information into a R file. For example, the following script is a test script for the <a href="http://shiny.rstudio.com/gallery/superzip-example.html">superzip application</a>.</p>
+<p>The recorder will save interactions with the application and timing information into a R file. For example, the following script was generated for the <a href="http://shiny.rstudio.com/gallery/superzip-example.html">superzip application</a>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">app &lt;-<span class="st"> </span>ShinyLoadDriver$<span class="kw">new</span>()
 app$<span class="kw">snapshotInit</span>(<span class="st">"myloadtest"</span>)
 
@@ -85,8 +85,8 @@ app$<span class="kw">setInputs</span>(<span class="dt">states =</span> <span cla
 app$<span class="kw">snapshot</span>()
 app$<span class="kw">stop</span>()
 app$<span class="kw">getEventLog</span>()</code></pre></div>
-<p>The key components of the test script that are unique to <code>load_mode</code> are the lines:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">app &lt;-<span class="st"> </span>ShinyLoadDriver$<span class="kw">new</span>() <span class="co"># instructs the load test to use a LoadDriver</span>
+<p>The components of the test script unique to <code>load_mode</code> are:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">app &lt;-<span class="st"> </span>ShinyLoadDriver$<span class="kw">new</span>() <span class="co"># enables the load test of a deployed app</span>
 
 <span class="kw">Sys.sleep</span>()                  <span class="co"># records user pauses between inputs</span>
 
@@ -98,13 +98,13 @@ app$<span class="kw">getEventLog</span>()            <span class="co"># returns 
 <h2 class="hasAnchor">
 <a href="#running-load-tests" class="anchor"> </a>Running Load Tests</h2>
 <p>One way to run a load test against the deployed application is to use the <code>loadTest</code> function.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shinyloadtest)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shinyloadtest)  
 <span class="kw"><a href="reference/loadTest.html">loadTest</a></span>(<span class="dt">testFile =</span> <span class="st">'myloadTest.R'</span>,
          <span class="dt">url =</span> <span class="st">'https://beta.rstudioconnect.com/content/2551'</span>,
          <span class="dt">numConcurrent =</span> <span class="dv">8</span>,
          <span class="dt">numTotal =</span> <span class="dv">16</span>,
          <span class="dt">loadTimeout =</span> <span class="dv">5</span>,
-         <span class="dt">stagger =</span> <span class="dv">4</span>,
+         <span class="dt">stagger =</span> <span class="dv">4</span>, 
          <span class="dt">phantomTimeout =</span> <span class="dv">20</span>)</code></pre></div>
 <p>This function uses the <code>parallel</code> and <code>foreach</code> packages to open concurrent R processes. Each R process uses phantomJS to run the recorded test against the deployed application.</p>
 <p><code>numConcurrent</code> is the number of concurrent connections to the application.</p>
@@ -113,23 +113,30 @@ app$<span class="kw">getEventLog</span>()            <span class="co"># returns 
 <p><code>stagger</code> adds a random delay of up to <code>stagger</code> seconds to the concurrent connections.</p>
 <p><code>phantomTimeout</code> is the maximum seconds to wait for the phantomJS process to start.</p>
 <p><strong>WARNING</strong> Load testing a large number of concurrent connections will open a large number of processes on the client computer. Use with caution.</p>
-<p>The <code>loadTest</code> function returns an event log that contains timing and event information for each visit to the application.</p>
+<p>The <code>loadTest</code> function returns an event log that contains timing and event information for each visit to the application. The package includes functions for analyzing the event log such as <code>getSuccesses</code>, <code>getErrors</code>, <code>getMaxConcurrent</code>, <code>getPageLoadTimes</code>, and others.</p>
 </div>
 <div id="running-load-test-reports" class="section level2">
 <h2 class="hasAnchor">
 <a href="#running-load-test-reports" class="anchor"> </a>Running Load Test Reports</h2>
-<p>The package includes a R Markdown report. The report is located at:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">path.expand</span>(<span class="kw">paste0</span>(<span class="kw">path.package</span>(<span class="st">"shinyloadtest"</span>), <span class="st">"/loadTestReport/load_test_template.Rmd"</span>))</code></pre></div>
-<p>The report is parameterized. To run the report, open the report and then select <code>Knit with Parameters</code> from within RStudio:</p>
+<p>The package includes a R Markdown report that runs a load test and a baseline test and compares the results. To access the report, use:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="reference/createLoadTestReport.html">createLoadTestReport</a></span>(<span class="st">"/directory/for/report"</span>, <span class="st">"nameOfReport.Rmd"</span>)</code></pre></div>
+<p>The report is parameterized to accept inputs such as the application URL and the desired number of concurrent connections. To run the report, open the report and then select <code>Knit with Parameters</code> from within RStudio:</p>
 <p><img src="img/knit_with_params.png"></p>
+<p>Alternatively, use the R Markdown <code>knit_params_ask</code> function. For example:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">report &lt;-<span class="st"> </span><span class="kw"><a href="reference/createLoadTestReport.html">createLoadTestReport</a></span>(<span class="st">"/directory/for/report"</span>, <span class="st">"nameOfReport.Rmd"</span>)
+report %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">knit_params_ask</span>() %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">render</span>(report, <span class="dt">params =</span> .)</code></pre></div>
 <p>You will be prompted to enter the parameters for your load test:</p>
 <p><img src="img/params.png"></p>
-<p><strong>WARNING</strong> This report can take a long time to render and will generate multiple processes on the client machine. Use with caution. In addition to running the load test, this report will sequentially run a baseline test. This baseline test runs the test script in sequence and can take time if each individual test is lengthy.</p>
-<p>An alternatvie approach is to update the parameters in the YAML, change the output format to <code>html_notebook</code>, and to interactively run each code chunk. Once done, you can preview the notebook which generates an html report from the interactively run code, wihout compiling the report all at once.</p>
-<p>For an example report, run:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">setwd</span>(<span class="kw">path.expand</span>(<span class="kw">paste0</span>(<span class="kw">path.package</span>(<span class="st">"shinyloadtest"</span>),<span class="st">"/loadTestReport/"</span>)))
-rmarkdown::<span class="kw">render</span>(<span class="st">"load_test_template.Rmd"</span>)</code></pre></div>
-<p>which should generate a <a href="https://beta.rstudioconnect.com/content/2554/load_test_template.html">report like this</a>.</p>
+<p><strong>WARNING</strong> This report can take a long time to render and will generate multiple processes on the client machine. Use with caution.</p>
+<p>In addition to running the load test, this report will establish a baseline by running the test script for 1 concurrent connection multiple times. The report can be edited as necessary. The logs for the baseline test and the load test are saved to RDS files alongside the R Markdown file and HTML output.</p>
+</div>
+<div id="example-report-output" class="section level2">
+<h2 class="hasAnchor">
+<a href="#example-report-output" class="anchor"> </a>
+<a href="https://beta.rstudioconnect.com/content/2554/load_test_template.html">Example Report Output</a>
+</h2>
 </div>
 <div id="use-cases" class="section level2">
 <h2 class="hasAnchor">

@@ -27,7 +27,7 @@ recordTest("path/to/app", load_mode = TRUE)
 
 ![](./inst/examples/img/recorder_screenshot_superzip.png)
 
-The recorder will save interactions with the application and timing information into a R file. For example, the following script is a test script for the [superzip application](http://shiny.rstudio.com/gallery/superzip-example.html).
+The recorder will save interactions with the application and timing information into a R file. For example, the following script was generated for the [superzip application](http://shiny.rstudio.com/gallery/superzip-example.html).
 
 ```r
 app <- ShinyLoadDriver$new()
@@ -55,10 +55,10 @@ app$getEventLog()
 
 ```
 
-The key components of the test script that are unique to `load_mode` are the lines:
+The components of the test script unique to `load_mode` are:
 
 ```r
-app <- ShinyLoadDriver$new() # instructs the load test to use a LoadDriver
+app <- ShinyLoadDriver$new() # enables the load test of a deployed app
 
 Sys.sleep()                  # records user pauses between inputs
 
@@ -96,36 +96,44 @@ This function uses the `parallel` and `foreach` packages to open concurrent R pr
 
 **WARNING** Load testing a large number of concurrent connections will open a large number of processes on the client computer. Use with caution.
 
-The `loadTest` function returns an event log that contains timing and event information for each visit to the application.
+The `loadTest` function returns an event log that contains timing and event information for each visit to the application. The package includes functions for analyzing the event log such as `getSuccesses`, `getErrors`, `getMaxConcurrent`, `getPageLoadTimes`, and others. 
 
 
 ## Running Load Test Reports
 
-The package includes a R Markdown report. The report is located at:
+The package includes a R Markdown report that runs a load test and a baseline test and compares the results. To access the report, use:
 
 ```r
-path.expand(paste0(path.package("shinyloadtest"), "/loadTestReport/load_test_template.Rmd"))
+createLoadTestReport("/directory/for/report", "nameOfReport.Rmd")
 ```
-The report is parameterized. To run the report, open the report and then select `Knit with Parameters` from within RStudio:
+
+The report is parameterized to accept inputs such as the application URL and the desired number of concurrent connections.  To run the report, open the report and then select `Knit with Parameters` from within RStudio:
 
 ![](./inst/examples/img/knit_with_params.png)
+
+
+
+Alternatively, use the R Markdown `knit_params_ask` function. For example:
+
+```r
+report <- createLoadTestReport("/directory/for/report", "nameOfReport.Rmd")
+report %>% 
+  knit_params_ask() %>% 
+  render(report, params = .)
+```
 
 You will be prompted to enter the parameters for your load test:
 
 ![](./inst/examples/img/params.png)
 
-**WARNING** This report can take a long time to render and will generate multiple processes on the client machine. Use with caution. In addition to running the load test, this report will sequentially run a baseline test. This baseline test runs the test script in sequence and can take time if each individual test is lengthy.
 
-An alternatvie approach is to update the parameters in the YAML, change the output format to `html_notebook`, and to interactively run each code chunk. Once done, you can preview the notebook which generates an html report from the interactively run code, wihout compiling the report all at once.
+**WARNING** This report can take a long time to render and will generate multiple processes on the client machine. Use with caution. 
 
-For an example report, run:
+In addition to running the load test, this report will establish a baseline by running the test script for 1 concurrent connection multiple times. The report can be edited as necessary. The logs for the baseline test and the load test are saved to RDS files alongside the R Markdown file and HTML output.
 
-```r
-setwd(path.expand(paste0(path.package("shinyloadtest"),"/loadTestReport/")))
-rmarkdown::render("load_test_template.Rmd")
-```
 
-which should generate a [report like this](https://beta.rstudioconnect.com/content/2554/load_test_template.html).
+## [Example Report Output](https://beta.rstudioconnect.com/content/2554/load_test_template.html)
+
 
 ## Use Cases
 

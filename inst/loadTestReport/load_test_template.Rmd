@@ -15,7 +15,7 @@ params:
     value: 4
   testFile:
     label: "Path to Load Test Script"
-    value: '../examples/example_load_test_superzip.R'
+    value: !r system.file("/examples/example_load_test_superzip.R", package = "shinyloadtest")
   stagger: 
     label: "Maximum Delay in Staggering Concurrent Connections (sec)"
     value: 5
@@ -43,6 +43,7 @@ loadTestLog <- loadTest(testFile = params$testFile,
                         loadTimeout = params$loadTimeout,
                         stagger = params$stagger,
                         phantomTimeout = params$phantomTimeout)
+saveRDS(loadTestLog, file = "loadTestLog.Rds")
 ```
 
 A baseline test was run with **`r min(params$total,10)` total visits** occuring sequentially, one at a time.
@@ -54,6 +55,7 @@ baselineLog <- loadTest(testFile = params$testFile,
                         loadTimeout = params$loadTimeout,
                         numTotal = min(params$total,10), 
                         stagger = 0)
+saveRDS(baselineLog, file = "baselineLog.Rds")
 ```
 
 
