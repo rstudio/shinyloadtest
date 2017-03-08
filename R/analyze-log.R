@@ -177,7 +177,7 @@ getSetInputTimes <- function(eventLog) {
 
   result$event_time_sec <- suppressMessages({as.numeric(result$interval)})
 
-  result$input_id <- paste0("Action ", result$inputId + 1 , ": ", result$input)
+  result$input_id <- paste0("Action ", ifelse(result$inputId == 0, numInputs, result$inputId), ": ", result$input)
 
   desired_col <- c("connection", "input_id", "event_time_sec")
 
