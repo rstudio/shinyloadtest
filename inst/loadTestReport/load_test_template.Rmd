@@ -2,20 +2,22 @@
 title: "Load Test Results"
 output: 
   html_document: default
-  html_notebook: default
 params: 
   url:
     label: "Deployed URL"
-    value: "https://beta.rstudioconnect.com/content/2551/"
+    value: "https://"
   concurrent:
-    label: "Number of Concurrent Connections"
+    label: "Load Test: Number of Concurrent Connections"
     value: 4
   total: 
-    label: "Total Number of Connections"
+    label: "Load Test: Total Number of Connections"
+    value: 4
+  baseline:
+    label: "Baseline Test: Total Number Sequential Connections"
     value: 4
   testFile:
     label: "Path to Load Test Script"
-    value: !r system.file("/examples/example_load_test_superzip.R", package = "shinyloadtest")
+    value: "./tests/myloadtest.R"
   stagger: 
     label: "Maximum Delay in Staggering Concurrent Connections (sec)"
     value: 5
@@ -46,14 +48,14 @@ loadTestLog <- loadTest(testFile = params$testFile,
 saveRDS(loadTestLog, file = "loadTestLog.Rds")
 ```
 
-A baseline test was run with **`r min(params$total,10)` total visits** occuring sequentially, one at a time.
+A baseline test was run with **`r params$baseline` total visits** occuring sequentially, one at a time.
 
 ```{r}
 baselineLog <- loadTest(testFile = params$testFile, 
                         url = params$url,
                         numConcurrent = 1,
                         loadTimeout = params$loadTimeout,
-                        numTotal = min(params$total,10), 
+                        numTotal = params$baseline, 
                         stagger = 0)
 saveRDS(baselineLog, file = "baselineLog.Rds")
 ```
