@@ -179,7 +179,7 @@ getSetInputTimes <- function(eventLog) {
 
   result$input_id <- paste0("Action ", ifelse(result$inputId == 0, numInputs, result$inputId), ": ", result$input)
 
-  desired_col <- c("connection", "input_id", "event_time_sec")
+  desired_col <- c("connection", "input_id", "event_time_sec", "interval", "timedout")
 
   result[, names(result) %in% desired_col]
 
