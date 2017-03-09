@@ -1,7 +1,8 @@
 ---
 title: "Load Test Results"
 output: 
-  html_document: default
+  html_document:
+    df_print: paged
 params: 
   url:
     label: "Deployed URL"
@@ -133,7 +134,7 @@ results <- rbind(load, base)
 timeout <- aggregate(results$timedout, by = list(id  = results$input_id), FUN = sum)
 n <- length(unique(load$connection)) + length(unique(base$connection))
 
-message <- paste0(timeout$id, ": ", timeout$x, " of ", n, " Timed Out")
+message <- paste0(timeout$id, " - ", timeout$x, " of ", n, " Timed Out")
 data.frame(Warning = message, stringsAsFactors = FALSE)
 ```
 
