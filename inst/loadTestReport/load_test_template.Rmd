@@ -90,7 +90,7 @@ if (length(baseline_errors) > 0) {
 
 A maximum `r getMaxConcurrent(loadTestLog)` concurrent connections were achieved, compared to the target of `r params$concurrent`.
 
-`r if ( length(errors) > 0 && (getMaxConcurrent(loadTestLog) < params$concurrent)) {message("Because all visits were successful, but the number of concurrent connections did not meet the target, consider lowering the stagger parameter or checking the server settings.")}`
+`r if ( length(errors) == 0 && (getMaxConcurrent(loadTestLog) < params$concurrent)) {message("Because all visits were successful, but the number of concurrent connections did not meet the target, consider lowering the stagger parameter or checking the server settings.")}`
 
 
 ## Comparison to Baseline
@@ -118,7 +118,7 @@ ggplot(results, aes(load_time_sec, fill = type)) +
 
 The average page load time under load was `r mean(load$load_time_sec)` seconds compared to `r mean(base$load_time_sec)` seconds with no concurrent load.
 
-The following graph shows the response time for specific events taken after page load. The table lists any events that may have timed out. For events that do not update an input, timeouts are expected. The distribution plots for these events should not be interpretted.
+The following graph shows the response time for specific events taken after page load. The table lists any events that may have timed out. Timeouts are expected for events that do not update an input. 
 
 ```{r}
 load <- getSetInputTimes(loadTestLog)
@@ -131,20 +131,19 @@ results <- rbind(load, base)
 
 ## look for timeouts
 timeout <- aggregate(results$timedout, by = list(id  = results$input_id), FUN = sum)
-n <- length(unique(results$connection))
+n <- length(unique(load$coennection)) + length(unique(base$connection))
 
 message <- paste0(timeout$id, ": ", timeout$x, " of ", n, " Timed Out")
-message
+data.frame(Warning = message, stringsAsFactors = FALSE)
 ```
 
-
+**The distribution plots for events with timeouts should not be interpretted!**
 
 ```{r}
 ## plot the distributions
 ggplot(results, aes(event_time_sec, fill =  type)) +
   geom_density(alpha = 0.4)  +
   facet_wrap(~input_id, scales = "free") +
-  geom_label(data = timeout, aes(label = message, x = ))
   labs(
     title = "Application Usage",
     y = "",
