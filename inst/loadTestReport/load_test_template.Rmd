@@ -131,7 +131,7 @@ results <- rbind(load, base)
 
 ## look for timeouts
 timeout <- aggregate(results$timedout, by = list(id  = results$input_id), FUN = sum)
-n <- length(unique(load$coennection)) + length(unique(base$connection))
+n <- length(unique(load$connection)) + length(unique(base$connection))
 
 message <- paste0(timeout$id, ": ", timeout$x, " of ", n, " Timed Out")
 data.frame(Warning = message, stringsAsFactors = FALSE)
