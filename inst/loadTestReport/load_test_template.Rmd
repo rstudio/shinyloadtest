@@ -74,7 +74,7 @@ baselineLog <- getSuccesses(baselineLog)
 ```
 
 
-Of the targetted `r params$total` visits, `r length(unique(loadTestLog$connection))` were successful. 
+The load test was started at `r min(loadTestLog$time)` and ended at `r max(loadTestLog$time)`. Of the targetted `r params$total` visits, `r length(unique(loadTestLog$connection))` were successful. 
 
 ```{r}
 if (length(errors) > 0) {
@@ -105,21 +105,22 @@ base$type = "Baseline"
 
 results <- rbind(load, base)
 
-ggplot(results, aes(load_time_sec, fill = type)) + 
-  geom_density(alpha = 0.4) +
+ggplot(results, aes(type, load_time_sec)) + 
+  geom_boxplot(aes(fill = type), alpha = 0.3) +
   theme_minimal() +
   labs(
     title = "Page Load Time",
     subtitle = paste(params$concurrent, "Concurrent Targetted"),
-    x = "Load Time (sec)",
-    y = "", 
+    y = "Load Time (sec)",
+    x = "",
     fill = ""
-  )
+  ) +
+  guides(fill = FALSE)
 ```
 
 The average page load time under load was `r mean(load$load_time_sec)` seconds compared to `r mean(base$load_time_sec)` seconds with no concurrent load.
 
-The following graph shows the response time for specific events taken after page load. The table lists any events that may have timed out. Timeouts are expected for events that do not update an input. 
+The following graph shows the response time for specific events taken after page load. The table lists any events that did not trigger an update pior to the default timeout. For inputs that do not trigger an output (i.e. applications that use action buttons) this is expected behavior.
 
 ```{r}
 load <- getSetInputTimes(loadTestLog)
@@ -134,23 +135,28 @@ results <- rbind(load, base)
 timeout <- aggregate(results$timedout, by = list(id  = results$input_id), FUN = sum)
 n <- length(unique(load$connection)) + length(unique(base$connection))
 
-message <- paste0(timeout$id, " - ", timeout$x, " of ", n, " Timed Out")
-data.frame(Warning = message, stringsAsFactors = FALSE)
+message <- paste0(
+  timeout$id, " - ",
+  timeout$x, " of ", n, " timed out ",
+  ifelse(timeout$x == n, " as expected. This input appears to be isolated from outputs.", 
+         ifelse(timeout$x > 0, ". Warning! Some outputs did not return before the timeout.", "as expected.")))
+
+data.frame(Results = message, stringsAsFactors = FALSE)
 ```
 
-**The distribution plots for events with timeouts should not be interpretted!**
 
 ```{r}
 ## plot the distributions
-ggplot(results, aes(event_time_sec, fill =  type)) +
-  geom_density(alpha = 0.4)  +
+ggplot(results, aes(type, event_time_sec)) +
+  geom_boxplot(aes(fill = type), alpha = 0.4)  +
   facet_wrap(~input_id, scales = "free") +
   labs(
     title = "Application Usage",
-    y = "",
-    x = paste0("Event Time (sec)"),
+    x = "",
+    y = paste0("Event Time (sec)"),
     fill = ""
   ) +
-  theme_minimal()
+  theme_minimal() + 
+  guides(fill = FALSE)
 ```
 
