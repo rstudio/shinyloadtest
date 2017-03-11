@@ -1,3 +1,4 @@
+
 #' Class that extends ShinyDriver from \code{shinytes}t package for load testing.
 #'
 #' @section Usage:
@@ -85,7 +86,10 @@ ShinyLoadDriver <- R6Class("ShinyLoadDriver",
     setInputs = function(..., wait_ = TRUE, values_ = FALSE, timeout_ = 3000,
       timing_ = TRUE)
     {
-      sld_setInputs(self, private, super, ..., wait_ = TRUE, values_ = FALSE,
+      if (values_) {
+        warning("Values can not be returned for deployed apps. Ignoring values_ = TRUE")
+      }
+      sld_setInputs(self, private, super, ..., wait_ = wait_, values_ = FALSE,
         timeout_ = timeout_)
     },
 
