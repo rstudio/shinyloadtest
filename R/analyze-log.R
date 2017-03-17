@@ -22,7 +22,7 @@ getSuccesses <- function(eventLog) {
   successes
 }
 
-#' Get errofs from event log
+#' Get errors from event log
 #'
 #' @param eventLog Returned from \code{\link{loadTest}}. The \code{eventLog} is
 #'   a list composed of data frames (from successful tests) and potnetially errors.
@@ -53,11 +53,12 @@ getErrors <- function(eventLog){
 #'   \code{\link{loadTest}} or \code{\link{getSuccesses}}
 #' @param startEvent The first event in the pair, i.e. "Navigating to Shiny app"
 #' @param endEvent The second event in the pair, i.e. "Shiny app started"
+#' @param workerId Should the returned data frame include the worker id
 #'
 #' @return  A data frame containing the duration of the event pair per connection
 #' @importFrom assertthat assert_that
 #' @export
-getEventInterval <- function(eventLog, startEvent, endEvent) {
+getEventInterval <- function(eventLog, startEvent, endEvent, workerId = TRUE) {
 
   if (!requireNamespace("lubridate", quietly = TRUE)) {
     stop("lubridate needed for this function to work. Please install it.",
@@ -82,6 +83,12 @@ getEventInterval <- function(eventLog, startEvent, endEvent) {
         end = lubridate::ymd_hms(result$end_time)
       )
   })
+
+  if (workerId) {
+    worker <- eventLog[which(eventLog$event == startEvent),
+                       c("workerid", "connection")]
+    result <- merge(worker, result)
+  }
 
   result
 }
@@ -186,3 +193,33 @@ getSetInputTimes <- function(eventLog) {
 }
 
 
+#' Get connections per R process
+#'
+#' @param eventLog A data frame with event information as returned from
+#'   \code{getSuccesses}
+#'
+#' @return A data frame with 2 columns: \code{connection} and
+#'   \code{other_connections}, the number of other connections sharing the R
+#'   process along with \code{connection}.
+#'
+#' @details This function is useful to help determine if connections per R
+#'   process is contributing to latency which is an indicator the utilization
+#'   scheduler should be updated.
+#' @export
+getConnectionsPerR <- function(eventLog) {
+  ids <- unique(eventLog$workerid)
+  result <- getEventInterval(eventLog, "Shiny app started",
+                             "Closing PhantomJS session", workerId = TRUE)
+
+  result$other_connections <- 0
+  for (i in 1:nrow(result)) {
+    cur <- result[i,]
+    othr <- result[-i,]
+    othr_same_proc <- othr[othr$workerid == cur$workerid,]
+    othr_same_proc_interval <- sum(lubridate::int_overlaps(cur$interval, othr_same_proc$interval))
+    result$other_connections[i] <- othr_same_proc_interval
+  }
+  desired_cols <- c("connection", "other_connections")
+  result <- result[, names(result) %in% desired_cols]
+  result
+}

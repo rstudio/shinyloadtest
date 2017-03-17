@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get errors from event log — getErrors • shinyloadtest</title>
+<title>Guess Test Duration — guessTestDuration • shinyloadtest</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -66,27 +66,29 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get errors from event log</h1>
+    <h1>Guess Test Duration</h1>
     </div>
 
     
-    <p>Get errors from event log</p>
+    <p>Guess Test Duration</p>
     
 
-    <pre><span class='fu'>getErrors</span>(<span class='no'>eventLog</span>)</pre>
+    <pre><span class='fu'>guessTestDuration</span>(<span class='no'>test_file</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <dl class="dl-horizontal">
-      <dt>eventLog</dt>
-      <dd>Returned from <code><a href='loadTest.html'>loadTest</a></code>. The <code>eventLog</code> is
-a list composed of data frames (from successful tests) and potnetially errors.</dd>
+      <dt>test_file</dt>
+      <dd>full path and filename for .R file containing the load test
+script, generated from <code>shinytest::recordTest(load_mode = TRUE)</code>.</dd>
     </dl>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Expected run time for a single connection in seconds.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Given an <code>eventLog</code> containing successesful test results (data
-  frames) and error messages, this function returns the error messages in a
-  list. See <code><a href='getSuccesses.html'>getSuccesses</a></code></p>
+    <p>Parses the <code>test_file</code> to determine the run time for a single connection.</p>
     
 
   </div>
@@ -95,6 +97,8 @@ a list composed of data frames (from successful tests) and potnetially errors.</
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       
+      <li><a href="#value">Value</a></li>
+
       <li><a href="#details">Details</a></li>
           </ul>
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/analyze-log.R
 \name{getErrors}
 \alias{getErrors}
-\title{Get errofs from event log}
+\title{Get errors from event log}
 \usage{
 getErrors(eventLog)
 }
@@ -11,7 +11,7 @@ getErrors(eventLog)
 a list composed of data frames (from successful tests) and potnetially errors.}
 }
 \description{
-Get errofs from event log
+Get errors from event log
 }
 \details{
 Given an \code{eventLog} containing successesful test results (data

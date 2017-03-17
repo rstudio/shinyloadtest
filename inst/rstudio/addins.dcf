@@ -1,0 +1,4 @@
+Name: Load Test Shiny App
+Description: Help setup and run a load test for a deployed Shiny app
+Binding: addinLoadTest
+Interactive: true

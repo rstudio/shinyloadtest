@@ -14,8 +14,6 @@ devtools::install_github("rstudio/shinyloadtest")
 
 You will also need to install `shinytest` and `phantomJS`. `shinytest` includes a helper function to install the latest version of `phantomJS`.
 
-
-
 ## Record Test
 
 To get started, record a test using the `shinytest` package's recorder with `load_mode` enabled. The test should be reflective of expected application use. For more details, see the [`shinytest` documentation](https://rstudio.github.io/shinytest/). Tests must be recorded against a local copy of the deployed application.
@@ -25,51 +23,27 @@ library(shinytest)
 recordTest("path/to/app", load_mode = TRUE)
 ```
 
-![](./inst/examples/img/recorder_screenshot_superzip.png)
+![](./inst/img/recorder_screenshot_superzip.png)
 
-The recorder will save interactions with the application and timing information into a R file. For example, the following script was generated for the [superzip application](http://shiny.rstudio.com/gallery/superzip-example.html).
+The recorder will save interactions with the application and timing information into a R file. In `load_mode` the recorded timing includes user pauses. This infomration is used to simulate a realistic user experience while load testing the application.
 
-```r
-app <- ShinyLoadDriver$new()
-app$snapshotInit("myloadtest")
+## Performing a Load Test
 
-app$setInputs(size = "college")
-Sys.sleep(3.1)
-app$setInputs(threshold = 6)
-Sys.sleep(0.5)
-app$setInputs(threshold = 7)
-Sys.sleep(1.4)
-app$setInputs(threshold = 8)
-Sys.sleep(0.0)
-app$setInputs(threshold = 7)
-Sys.sleep(8.4)
-app$setInputs(nav = "Data explorer")
-Sys.sleep(0.4)
-app$setInputs(states = "CO")
-Sys.sleep(1.5)
+The easiest way to use the package is through the included addin. From within RStudio, navigate to the application file and then click `Load Test Shiny App` from the Addins menu.
+
+![](./inst/img/addin.png)
+
+The addin will walk through the parameters for defining a load test and will help pick useful defaults. Clicking `Run` will begin the load test. The load test includes running the application at load and a baseline test composed of a series of sequential tests, each executed 1 at a time. At the end of the load test an HTML report is created containing useful information about the result of the test. Detailed logs are also generated and written to the current working directory.
+
+**WARNING** The load test can take a long time to run. The addin includes an estimate of the total test duration. The load test will generate multiple processes on the client machine. Use with caution. 
 
 
-app$snapshot()
-app$stop()
-app$getEventLog()
+## [Example Report Output](https://beta.rstudioconnect.com/content/2612/addinTest.html)
 
-```
 
-The components of the test script unique to `load_mode` are:
+## The `loadTest` function
 
-```r
-app <- ShinyLoadDriver$new() # enables the load test of a deployed app
-
-Sys.sleep()                  # records user pauses between inputs
-
-app$snapshot()               # takes a screenshot of the application
-app$stop()                   # disconnects from the application
-app$getEventLog()            # returns the event log with timing information
-```
-
-## Running Load Tests
-
-One way to run a load test against the deployed application is to use the `loadTest` function.
+The addin uses the `loadTest` function to run the load test.
 
 ```r
 library(shinyloadtest)  
@@ -97,43 +71,6 @@ This function uses the `parallel` and `foreach` packages to open concurrent R pr
 **WARNING** Load testing a large number of concurrent connections will open a large number of processes on the client computer. Use with caution.
 
 The `loadTest` function returns an event log that contains timing and event information for each visit to the application. The package includes functions for analyzing the event log such as `getSuccesses`, `getErrors`, `getMaxConcurrent`, `getPageLoadTimes`, and others. 
-
-
-## Running Load Test Reports
-
-The package includes a R Markdown report that runs a load test and a baseline test and compares the results. To access the report, use:
-
-```r
-createLoadTestReport("/directory/for/report", "nameOfReport.Rmd")
-```
-
-The report is parameterized to accept inputs such as the application URL and the desired number of concurrent connections.  To run the report, open the report and then select `Knit with Parameters` from within RStudio:
-
-![](./inst/examples/img/knit_with_params.png)
-
-
-
-Alternatively, use the R Markdown `knit_params_ask` function. For example:
-
-```r
-report <- createLoadTestReport("/directory/for/report", "nameOfReport.Rmd")
-report %>% 
-  knit_params_ask() %>% 
-  render(report, params = .)
-```
-
-You will be prompted to enter the parameters for your load test:
-
-![](./inst/examples/img/params.png)
-
-
-**WARNING** This report can take a long time to render and will generate multiple processes on the client machine. Use with caution. 
-
-In addition to running the load test, this report will establish a baseline by running the test script for 1 concurrent connection multiple times. The report can be edited as necessary. The logs for the baseline test and the load test are saved to RDS files alongside the R Markdown file and HTML output.
-
-
-## [Example Report Output](https://beta.rstudioconnect.com/content/2554/load_test_template.html)
-
 
 ## Use Cases
 

@@ -73,7 +73,7 @@
     <p>Get duration for simple event pairs</p>
     
 
-    <pre><span class='fu'>getEventInterval</span>(<span class='no'>eventLog</span>, <span class='no'>startEvent</span>, <span class='no'>endEvent</span>)</pre>
+    <pre><span class='fu'>getEventInterval</span>(<span class='no'>eventLog</span>, <span class='no'>startEvent</span>, <span class='no'>endEvent</span>, <span class='kw'>workerId</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <dl class="dl-horizontal">
@@ -84,6 +84,8 @@
       <dd>The first event in the pair, i.e. &quot;Navigating to Shiny app&quot;</dd>
       <dt>endEvent</dt>
       <dd>The second event in the pair, i.e. &quot;Shiny app started&quot;</dd>
+      <dt>workerId</dt>
+      <dd>Should the returned data frame include the worker id</dd>
     </dl>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>

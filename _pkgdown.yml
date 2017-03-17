@@ -17,3 +17,6 @@ reference:
   - title: "Load Test Report"
     contents:
       - createLoadTestReport
+      - addinLoadTest
+      - guessTimeout
+      - guessTestDuration

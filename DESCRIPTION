@@ -18,7 +18,10 @@ Imports:
     doParallel,
     shinytest,
     R6,
-    withr
+    withr,
+    miniUI,
+    rstudioapi,
+    shiny
 Suggests: rmarkdown,
     dplyr,
     ggplot2,

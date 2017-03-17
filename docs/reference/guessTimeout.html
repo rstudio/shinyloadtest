@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get errors from event log — getErrors • shinyloadtest</title>
+<title>Infer Timeouts — guessTimeout • shinyloadtest</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -66,27 +66,25 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get errors from event log</h1>
+    <h1>Infer Timeouts</h1>
     </div>
 
     
-    <p>Get errors from event log</p>
+    <p>Infer Timeouts</p>
     
 
-    <pre><span class='fu'>getErrors</span>(<span class='no'>eventLog</span>)</pre>
+    <pre><span class='fu'>guessTimeout</span>(<span class='no'>num_concurrent</span>, <span class='kw'>default</span> <span class='kw'>=</span> <span class='fl'>15</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <dl class="dl-horizontal">
-      <dt>eventLog</dt>
-      <dd>Returned from <code><a href='loadTest.html'>loadTest</a></code>. The <code>eventLog</code> is
-a list composed of data frames (from successful tests) and potnetially errors.</dd>
+      <dt>num_concurrent</dt>
+      <dd>number of concurrent connections</dd>
     </dl>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Given an <code>eventLog</code> containing successesful test results (data
-  frames) and error messages, this function returns the error messages in a
-  list. See <code><a href='getSuccesses.html'>getSuccesses</a></code></p>
+    <p>Uses a hueristic to set phantomJS timeout and shiny load timeout
+  based on the number of concurrent connections</p>
     
 
   </div>

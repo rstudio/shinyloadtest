@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get errors from event log — getErrors • shinyloadtest</title>
+<title>Addin To Setup Load Test — addinLoadTest • shinyloadtest</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -66,34 +66,26 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get errors from event log</h1>
+    <h1>Addin To Setup Load Test</h1>
     </div>
 
     
-    <p>Get errors from event log</p>
+    <p>Addin To Setup Load Test</p>
     
 
-    <pre><span class='fu'>getErrors</span>(<span class='no'>eventLog</span>)</pre>
-    
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
-    <dl class="dl-horizontal">
-      <dt>eventLog</dt>
-      <dd>Returned from <code><a href='loadTest.html'>loadTest</a></code>. The <code>eventLog</code> is
-a list composed of data frames (from successful tests) and potnetially errors.</dd>
-    </dl>
-    
+    <pre><span class='fu'>addinLoadTest</span>()</pre>
+        
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>Given an <code>eventLog</code> containing successesful test results (data
-  frames) and error messages, this function returns the error messages in a
-  list. See <code><a href='getSuccesses.html'>getSuccesses</a></code></p>
+    <p>Runs a Shiny Gadget that helps users build a load test report -
+  similar to knitting the parameterized report, but with more helpful
+  defaults</p>
     
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#details">Details</a></li>
           </ul>

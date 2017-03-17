@@ -113,9 +113,9 @@ ggplot(results, aes(type, load_time_sec)) +
     subtitle = paste(params$concurrent, "Concurrent Targetted"),
     y = "Load Time (sec)",
     x = "",
-    fill = ""
+    color = "# of Conns Sharing R Process"
   ) +
-  guides(fill = FALSE)
+  guides(shape = FALSE)
 ```
 
 The average page load time under load was `r mean(load$load_time_sec)` seconds compared to `r mean(base$load_time_sec)` seconds with no concurrent load.
@@ -158,5 +158,53 @@ ggplot(results, aes(type, event_time_sec)) +
   ) +
   theme_minimal() + 
   guides(fill = FALSE)
+```
+
+## R Processes
+
+Application latency is often the result of too many users sharing the same R process. RStudio Connect and Shiny Server Pro allow users to be spread across multiple R processes for any application.
+
+```{r}
+
+summariseTiming <- function(loadTestLog, label) {
+  pageLoad <- getPageLoadTimes(loadTestLog)
+  
+  # coerce page loads into format that works with set input results
+  pageLoad$input_id <-  "Page Load"
+  pageLoad$event_time_sec <- pageLoad$load_time_sec
+  pageLoad$load_time_sec <- NULL
+  
+  # get set input times and select relevant columns
+  actionLoad <- getSetInputTimes(loadTestLog)
+  actionLoad <- actionLoad[,c(1,4,5)]
+  
+  # combine results
+  load <- rbind(pageLoad, actionLoad )
+  
+  # add whether there were shared connections
+  worker <- getConnectionsPerR(loadTestLog)
+  result <- merge(load, worker)
+  result$type <- label
+  result
+}
+
+load <- summariseTiming(loadTestLog, "Under Load")
+base <- summariseTiming(baselineLog, "Baseline")
+
+results <- rbind(load, base)
+
+ggplot(results, aes(y = other_connections, x = event_time_sec)) +
+  geom_jitter(aes(color = input_id), alpha = 0.4) + 
+  geom_smooth(se = FALSE) +
+  scale_color_brewer(type = "div") +
+  theme_minimal() + 
+  labs(
+    title = "Sharing R Processes Increases Event Time",
+    subtitle = "An upward sloping line indicates too many connections per R process",
+    x = 'Event Time (sec)',
+    y = 'How Many Other Users were Sharing the R Process',
+    color = "Action"
+  )
+
 ```
 
