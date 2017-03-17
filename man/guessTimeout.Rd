@@ -8,6 +8,8 @@ guessTimeout(num_concurrent, default = 15)
 }
 \arguments{
 \item{num_concurrent}{number of concurrent connections}
+
+\item{default}{the number of seconds to wait with no concurrency}
 }
 \description{
 Infer Timeouts

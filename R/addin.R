@@ -316,6 +316,7 @@ guessStagger <- function(test_time_sec) {
 #'   based on the number of concurrent connections
 #'
 #' @param num_concurrent number of concurrent connections
+#' @param default the number of seconds to wait with no concurrency
 guessTimeout <- function(num_concurrent, default = 15) {
   scale <- 1
   if (num_concurrent > 10)
