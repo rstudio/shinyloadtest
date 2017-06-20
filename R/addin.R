@@ -31,7 +31,6 @@ addinLoadTest <- function() {
       miniTabPanel("Test Settings", icon = icon("sliders"),
        textInput('output_file',
         label = "path/name.Rmd for results report:",
-        placeholder = paste0(getwd(), "/loadtest.Rmd"),
         width = "75%"),
 
        numericInput('num_concurrent',
@@ -144,6 +143,7 @@ addinLoadTest <- function() {
       ## create a report Rmd from template
       output_dir <- dirname(input$output_file)
       output_file <- basename(input$output_file)
+
       createLoadTestReport(output_dir, output_file)
 
       ## create parameter list
@@ -159,7 +159,13 @@ addinLoadTest <- function() {
       ## render document (how to smartly handle errors?)
       setwd(output_dir)
       rmarkdown::render(input$output_file, params = params, envir = new.env())
-      rstudioapi::viewer(input$output_file)
+
+      ## try to open report
+      result_file <- paste0(tools::file_path_sans_ext(output_file), ".html")
+      result_file_full <- paste0(output_dir, "/", result_file)
+      rstudioapi::viewer(result_file_full)
+
+
       ## return report
       stopApp(returnValue = list(file  = input$output_file, params = params))
     })
@@ -205,7 +211,7 @@ guessTestDuration <- function(test_file){
 ## "is" Functions ----------------
 
 isRmd <- function(output_file) {
-  grepl(pattern = ".*\\.[Rr]md$", output_file)
+  length(output_file) > 0 && grepl(pattern = ".*\\.[Rr]md$", output_file)
 }
 
 isRFile <- function(test_file) {
@@ -289,7 +295,7 @@ guessAppURL <- function(app_file) {
     ## app_dir
     ## - + server
     ## - - + account
-    ## which is listed as the 3rd overally subdirectorys
+    ## which is listed as the 3rd overall subdirectory
     setwd(subdir[3])
 
     ## parse dcf file for url
