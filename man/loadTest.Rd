@@ -6,7 +6,7 @@
 \usage{
 loadTest(testFile = "./tests/myloadtest.R", url = NULL, numConcurrent = 4,
   numTotal = numConcurrent, loadTimeout = 5, stagger = 5,
-  phantomTimeout = 10)
+  phantomTimeout = 10, fork = FALSE)
 }
 \arguments{
 \item{testFile}{The file containing a test script to run. Test script can be
@@ -27,6 +27,9 @@ that no staggering will occur.}
 
 \item{phantomTimeout}{Number of seconds to wait for the slave phantomJS
 processes to start. Default to 10 seconds.}
+
+\item{fork}{Whether to use Forked processes or PSOCK (default).
+\code{fork=TRUE} is not supported on Windows.}
 }
 \value{
 Returns a list with the results from each child process. The results

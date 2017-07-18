@@ -12,6 +12,9 @@
 #'   that no staggering will occur.
 #' @param phantomTimeout Number of seconds to wait for the slave phantomJS
 #'   processes to start. Default to 10 seconds.
+#' @param fork Whether to use Forked processes or PSOCK (default).
+#'   \code{fork=TRUE} is not supported on Windows.
+#'
 #'
 #' @details This function simulates load against a deployed Shiny app. The
 #'   function creates a cluster of workers using the parallel function
@@ -38,7 +41,8 @@ loadTest <- function(testFile = "./tests/myloadtest.R",
                      numTotal = numConcurrent,
                      loadTimeout = 5,
                      stagger = 5,
-                     phantomTimeout = 10
+                     phantomTimeout = 10,
+                     fork = FALSE
                      ) {
 
   assert_that(file.exists(testFile))
@@ -61,7 +65,12 @@ loadTest <- function(testFile = "./tests/myloadtest.R",
   message(paste0('====== Initializing PSOCK Cluster with ',
                  numConcurrent, ' Workers ======'))
 
-  cl <- parallel::makePSOCKcluster(numConcurrent)
+  if (fork) {
+    cl <- parallel::makeForkCluster(numConcurrent)
+  } else {
+    cl <- parallel::makePSOCKcluster(numConcurrent)
+  }
+
   on.exit(parallel::stopCluster(cl))
   doParallel::registerDoParallel(cl)
 
