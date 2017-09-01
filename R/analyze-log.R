@@ -1,48 +1,33 @@
 #' Get successes from event log
 #'
 #' @param eventLog Returned from \code{\link{loadTest}}. The \code{eventLog} is
-#'   a list composed of data frames (from successful tests) and potnetially errors.
+#'   a list composed of a data frame with timing from successful sessions and a
+#'   numeric with the number of failed sessions.
 #'
-#' @details Given an \code{eventLog} containing successesful test results (data
-#'   frames) and error messages, this function returns the successful results in
+#' @details Given an \code{eventLog}, this function returns the successful results in
 #'   a collapsed data frame. See \code{\link{getErrors}}
 #' @importFrom assertthat assert_that
 #' @export
 getSuccesses <- function(eventLog) {
   assert_that(is.list(eventLog))
 
-  successes <- lapply(seq_along(eventLog), function(i) {
-    df <- NULL
-    if (is.data.frame(eventLog[[i]])) {
-      df <- eventLog[[i]]
-    }
-    df
-  })
-  successes <- do.call(rbind, successes)
+  successes <- eventLog$successes
   successes
 }
 
 #' Get errors from event log
 #'
 #' @param eventLog Returned from \code{\link{loadTest}}. The \code{eventLog} is
-#'   a list composed of data frames (from successful tests) and potnetially errors.
+#'   a list composed of a data frame with timing from successful sessions and a
+#'   numeric with the number of failed sessions.
 #'
-#' @details Given an \code{eventLog} containing successesful test results (data
-#'   frames) and error messages, this function returns the error messages in a
-#'   list. See \code{\link{getSuccesses}}
+#' @details Given an \code{eventLog}, this function returns the number of failed
+#'   sessions.
 #'
 #' @export
 getErrors <- function(eventLog){
   assert_that(is.list(eventLog))
-
-  errors <- lapply(seq_along(eventLog), function(i) {
-    df <- NULL
-    if (!is.data.frame(eventLog[[i]])) {
-      df <- eventLog[[i]]
-    }
-    df
-  })
-  errors <- errors[!vapply(errors,is.null, logical(1))]
+  errors <- eventLog$errors
   errors
 }
 
@@ -60,11 +45,6 @@ getErrors <- function(eventLog){
 #' @export
 getEventInterval <- function(eventLog, startEvent, endEvent, workerId = TRUE) {
 
-  if (!requireNamespace("lubridate", quietly = TRUE)) {
-    stop("lubridate needed for this function to work. Please install it.",
-         call. = FALSE)
-  }
-
   assert_that(startEvent %in% eventLog$event)
   assert_that(endEvent %in% eventLog$event)
 
@@ -73,14 +53,14 @@ getEventInterval <- function(eventLog, startEvent, endEvent, workerId = TRUE) {
   colnames(start) <- c("start_time", "connection")
 
   end <- eventLog[which(eventLog$event == endEvent),
-                    c("time", "connection")]
+                  c("time", "connection")]
   colnames(end) <- c("end_time", "connection")
 
   suppressMessages({
     result <- merge(start, end)
     result$interval <-
       lubridate::interval(start = lubridate::ymd_hms(result$start_time),
-        end = lubridate::ymd_hms(result$end_time)
+                          end = lubridate::ymd_hms(result$end_time)
       )
   })
 
@@ -125,6 +105,42 @@ getMaxConcurrent <- function(eventLog) {
 }
 
 
+
+#' Get concurrent connections over the test duration
+#'
+#' @param eventLog Data frame of events returned from either
+#'   \code{\link{loadTest}} or \code{\link{getSuccesses}}
+#'
+#' @return A data frame with time stamps and the number of concurrent
+#'   connections for each time stamp
+#' @importFrom lubridate %within%
+#' @export
+getConcurrentOverTest <- function(eventLog) {
+
+  result <- getEventInterval(eventLog, "Shiny app started",
+                             "Closing PhantomJS session")
+
+
+
+  interval <- seq(min(result$start_time), max(result$end_time), by = 5)
+
+  # fix timezones before comparisons
+  interval <- lubridate::force_tz(interval, tzone = "UTC")
+
+
+  cons <- vector(length = length(interval), mode = "numeric")
+
+  for (i in seq_along(interval)) {
+    for (j in seq_along(result$interval)) {
+      if (interval[i] %within% result$interval[j])
+        cons[i] <- cons[i] + 1
+    }
+  }
+
+  data.frame(time = interval, connections = cons)
+
+}
+
 #' Get page load times
 #'
 #' @param eventLog Data frame of events returned from either
@@ -161,11 +177,6 @@ getTestDurations <- function(eventLog) {
 #' @export
 getSetInputTimes <- function(eventLog) {
 
-  if (!requireNamespace("lubridate", quietly = TRUE)) {
-    stop("lubridate needed for this function to work. Please install it.",
-         call. = FALSE)
-  }
-
 
   ## These come in pairs, so we need to do more work
   ## Start by adding a unique id for each input
@@ -180,7 +191,7 @@ getSetInputTimes <- function(eventLog) {
   result <- merge(start, end, by.x = merge_by, by.y = merge_by)
 
   result$interval <- lubridate::interval(start = lubridate::ymd_hms(result$time.x),
-                       end = lubridate::ymd_hms(result$time.y))
+                                         end = lubridate::ymd_hms(result$time.y))
 
   result$event_time_sec <- suppressMessages({as.numeric(result$interval)})
 
@@ -207,6 +218,7 @@ getSetInputTimes <- function(eventLog) {
 #'   scheduler should be updated.
 #' @export
 getConnectionsPerR <- function(eventLog) {
+
   ids <- unique(eventLog$workerid)
   result <- getEventInterval(eventLog, "Shiny app started",
                              "Closing PhantomJS session", workerId = TRUE)
@@ -222,4 +234,25 @@ getConnectionsPerR <- function(eventLog) {
   desired_cols <- c("connection", "other_connections")
   result <- result[, names(result) %in% desired_cols]
   result
+}
+
+#' Remove connections during ramp up from log
+#'
+#' @param eventLog  A data frame with event information as returned from
+#'   \code{getSuccesses}
+#' @param rampUpConns Number of connections to remove.
+#'
+#' @details \code{rampUpConns} connections are removed from the beginning of the
+#'   event log. Trimming these connections can help stabalize the results of the
+#'   load test.
+#'
+#' @return Trimmed \code{eventLog}
+#' @export
+trimRampUp <- function(eventLog, rampUpConns) {
+  # check that eventLog is sorted
+  eventLog <- eventLog[ with(eventLog, order(connection, time)), ]
+
+  connsToRemove <- unique(eventLog$connection)[1:rampUpConns]
+  trimmedLog <- eventLog[which(!(eventLog$connection %in% connsToRemove)),]
+  trimmedLog
 }
