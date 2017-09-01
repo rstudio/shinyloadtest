@@ -7,7 +7,7 @@
 createLog(logsDir)
 }
 \arguments{
-\item{logsDir}{- directory containing run logs, see \code{loadtest}}
+\item{logsDir}{directory containing run logs, see \code{loadtest}}
 }
 \value{
 data frame with raw event logs from successful tests

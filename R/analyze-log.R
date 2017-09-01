@@ -12,7 +12,7 @@ createLog <- function(logsDir) {
 
   for (i in seq_along(files)) {
     fname <- file.path(logsDir, files[i])
-    f <- read.table(fname, stringsAsFactors = FALSE)
+    f <- utils::read.table(fname, stringsAsFactors = FALSE)
     colnames(f) <- c('eventid', 'time', 'elapsed_ms', 'event')
 
     # check for unique REQ_HOME and WS_CLOSE

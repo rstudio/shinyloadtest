@@ -8,7 +8,7 @@ trimRampUp(eventLog, rampUpConns)
 }
 \arguments{
 \item{eventLog}{A data frame with event information as returned from
-\code{getSuccesses}}
+\code{\link{createLog}}}
 
 \item{rampUpConns}{Number of connections to remove.}
 }

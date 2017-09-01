@@ -7,8 +7,7 @@
 getSetInputTimes(eventLog)
 }
 \arguments{
-\item{eventLog}{eventLog Data frame of events returned from either
-\code{\link{loadTest}} or \code{\link{getSuccesses}}}
+\item{eventLog}{eventLog Data frame of events returned from \code{\link{createLog}}}
 }
 \value{
 Data frame containing a unique input id and event duration

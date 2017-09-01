@@ -7,12 +7,11 @@
 getEventInterval(eventLog, startEvent, endEvent)
 }
 \arguments{
-\item{eventLog}{Data frame of events returned from either
-\code{\link{loadTest}} or \code{\link{getSuccesses}}}
+\item{eventLog}{Data frame of events returned from \code{\link{createLog}}}
 
-\item{startEvent}{The first event in the pair, i.e. "Navigating to Shiny app"}
+\item{startEvent}{The first event in the pair, i.e. "REQ_HOME"}
 
-\item{endEvent}{The second event in the pair, i.e. "Shiny app started"}
+\item{endEvent}{The second event in the pair, i.e. "WS_CLOSE"}
 }
 \value{
 A data frame containing the duration of the event pair per connection

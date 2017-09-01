@@ -7,8 +7,7 @@
 getConcurrentOverTest(eventLog)
 }
 \arguments{
-\item{eventLog}{Data frame of events returned from either
-\code{\link{loadTest}} or \code{\link{getSuccesses}}}
+\item{eventLog}{Data frame of events returned from \code{\link{createLog}}}
 }
 \value{
 A data frame with time stamps and the number of concurrent
