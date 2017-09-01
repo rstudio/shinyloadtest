@@ -4,7 +4,7 @@
 \alias{getEventInterval}
 \title{Get duration for simple event pairs}
 \usage{
-getEventInterval(eventLog, startEvent, endEvent, workerId = TRUE)
+getEventInterval(eventLog, startEvent, endEvent)
 }
 \arguments{
 \item{eventLog}{Data frame of events returned from either
@@ -13,8 +13,6 @@ getEventInterval(eventLog, startEvent, endEvent, workerId = TRUE)
 \item{startEvent}{The first event in the pair, i.e. "Navigating to Shiny app"}
 
 \item{endEvent}{The second event in the pair, i.e. "Shiny app started"}
-
-\item{workerId}{Should the returned data frame include the worker id}
 }
 \value{
 A data frame containing the duration of the event pair per connection
