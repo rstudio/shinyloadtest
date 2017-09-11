@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get event duration for user interactions with inputs — getSetInputTimes • shinyloadtest</title>
+<title>Get concurrent connections over the test duration — getConcurrentOverTest • shinyloadtest</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -75,27 +75,28 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get event duration for user interactions with inputs</h1>
+    <h1>Get concurrent connections over the test duration</h1>
     </div>
 
     
-    <p>Get event duration for user interactions with inputs</p>
+    <p>Get concurrent connections over the test duration</p>
     
 
-    <pre class="usage"><span class='fu'>getSetInputTimes</span>(<span class='no'>eventLog</span>)</pre>
+    <pre class="usage"><span class='fu'>getConcurrentOverTest</span>(<span class='no'>eventLog</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>eventLog</th>
-      <td><p>eventLog Data frame of events returned from <code><a href='createLog.html'>createLog</a></code></p></td>
+      <td><p>Data frame of events returned from <code><a href='createLog.html'>createLog</a></code></p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Data frame containing a unique input id and event duration</p>
+    <p>A data frame with time stamps and the number of concurrent
+  connections for each time stamp</p>
     
 
   </div>

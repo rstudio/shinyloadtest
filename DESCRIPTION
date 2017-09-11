@@ -1,6 +1,6 @@
 Package: shinyloadtest
 Title: Tools for laod testing Shiny applications
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: c(person("Sean", "Lopp", email = "sean@rstudio.com",
   role = c("aut", "cre")),
   person("Winston", "Chang", email = "winston@rstudio.com", 
@@ -17,4 +17,5 @@ Imports:
     lubridate,
     utils
 Suggests: rmarkdown,
-    ggplot2
+    ggplot2,
+    testthat

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get event duration for user interactions with inputs — getSetInputTimes • shinyloadtest</title>
+<title>Remove connections during ramp up from log — trimRampUp • shinyloadtest</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -75,27 +75,38 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get event duration for user interactions with inputs</h1>
+    <h1>Remove connections during ramp up from log</h1>
     </div>
 
     
-    <p>Get event duration for user interactions with inputs</p>
+    <p>Remove connections during ramp up from log</p>
     
 
-    <pre class="usage"><span class='fu'>getSetInputTimes</span>(<span class='no'>eventLog</span>)</pre>
+    <pre class="usage"><span class='fu'>trimRampUp</span>(<span class='no'>eventLog</span>, <span class='no'>rampUpConns</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>eventLog</th>
-      <td><p>eventLog Data frame of events returned from <code><a href='createLog.html'>createLog</a></code></p></td>
+      <td><p>A data frame with event information as returned from
+<code><a href='createLog.html'>createLog</a></code></p></td>
+    </tr>
+    <tr>
+      <th>rampUpConns</th>
+      <td><p>Number of connections to remove.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Data frame containing a unique input id and event duration</p>
+    <p>Trimmed <code>eventLog</code></p>
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p><code>rampUpConns</code> connections are removed from the beginning of the
+  event log. Trimming these connections can help stabalize the results of the
+  load test.</p>
     
 
   </div>
@@ -105,6 +116,8 @@
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
+
+      <li><a href="#details">Details</a></li>
           </ul>
 
   </div>

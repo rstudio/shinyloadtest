@@ -23,14 +23,17 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-
+  
+  
 <!-- mathjax -->
-<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+<script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
 <!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
+
+
   </head>
 
   <body>
@@ -49,6 +52,12 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
+  <a href="..//index.html">
+    <span class="fa fa-home fa-lg"></span>
+     
+  </a>
+</li>
+<li>
   <a href="../reference/index.html">Reference</a>
 </li>
       </ul>
@@ -73,19 +82,21 @@
     <p>Return the number of concurrent connections</p>
     
 
-    <pre><span class='fu'>getMaxConcurrent</span>(<span class='no'>eventLog</span>)</pre>
+    <pre class="usage"><span class='fu'>getMaxConcurrent</span>(<span class='no'>eventLog</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
-    <dl class="dl-horizontal">
-      <dt>eventLog</dt>
-      <dd>Data frame of events returned from either
-<code><a href='loadTest.html'>loadTest</a></code> or <code><a href='getSuccesses.html'>getSuccesses</a></code></dd>
-    </dl>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>eventLog</th>
+      <td><p>Data frame of events returned from e<code><a href='createLog.html'>createLog</a></code></p></td>
+    </tr>
+    </table>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>The actual number of concurrent connections for a load test can vary
-  from the target. This function uses the conenct and disconnect events from
+  from the target. This function uses the connect and disconnect events from
   the log to determine the interval when each connection was open. The
   maximum number of overlapping intervals is returned as the maxiumum number
   of concurrent connections achieved during the test.</p>

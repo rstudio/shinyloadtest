@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get event duration for user interactions with inputs — getSetInputTimes • shinyloadtest</title>
+<title>Create log file from directory containing run logs — createLog • shinyloadtest</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -75,27 +75,27 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Get event duration for user interactions with inputs</h1>
+    <h1>Create log file from directory containing run logs</h1>
     </div>
 
     
-    <p>Get event duration for user interactions with inputs</p>
+    <p>Create log file from directory containing run logs</p>
     
 
-    <pre class="usage"><span class='fu'>getSetInputTimes</span>(<span class='no'>eventLog</span>)</pre>
+    <pre class="usage"><span class='fu'>createLog</span>(<span class='no'>logsDir</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>eventLog</th>
-      <td><p>eventLog Data frame of events returned from <code><a href='createLog.html'>createLog</a></code></p></td>
+      <th>logsDir</th>
+      <td><p>directory containing run logs, see <code>loadtest</code></p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Data frame containing a unique input id and event duration</p>
+    <p>data frame with raw event logs from successful tests</p>
     
 
   </div>
