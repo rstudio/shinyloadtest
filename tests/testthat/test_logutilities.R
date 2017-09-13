@@ -1,8 +1,8 @@
 context('Log Utilities')
 
 test_that('bad logs fail correctly', {
-  expect_error(createLog("fakedir"), "dir_exists(path = logsDir) is not TRUE")
-  expect_error(createLog("../sample_logs/profile_no_ws_close"), "Error: Playback file ../sample_logs/bad_logs/profile_0_0.txt should have 1 instance of `WS_CLOSE`. Perhaps you recorded a bad test?")
+  expect_error(createLog("fakedir"), "dir_exists(path = logsDir) is not TRUE", fixed = TRUE)
+  expect_error(createLog("../sample_logs/profile_no_ws_close"), "Error: Playback file ../sample_logs/profile_no_ws_close/profile_0_0.txt should have 1 instance of `WS_CLOSE`. Perhaps you recorded a bad test?")
   # TODO: Add tests for other bad log types
     # also add tests for parser ...
 })
@@ -10,7 +10,7 @@ test_that('bad logs fail correctly', {
 test_that('good profiles create a log with correct dims', {
   log <- createLog("../sample_logs/good_profiles")
   expect_equal(class(log), "data.frame")
-  expect_equal(colnames(log), c("eventid", "time", "elapsed_ms", "event", "process", "connection"))
+  expect_equal(colnames(log), c("eventid", "time", "elapsed_ms", "event", NA ,"process", "connection"))
   expect_equal(nrow(log), 2560)
 })
 
@@ -59,7 +59,7 @@ test_that('getTestDuration returns expected test duration', {
 test_that('getSetInputTimes returns expected times', {
   res <- getSetInputTimes(log)
   expect_equal(class(res), 'data.frame')
-  expect_equal(colnames(res), c('inputId', 'connection', 'interval', 'event_time_sed'))
+  expect_equal(colnames(res), c('inputId', 'connection', 'interval', 'event_time_sec'))
   expect_equal(res$event_time_sec[1], 0)
 })
 
