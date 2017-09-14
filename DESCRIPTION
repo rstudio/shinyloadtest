@@ -1,13 +1,13 @@
 Package: shinyloadtest
-Title: Tools for laod testing Shiny applications
+Title: Tools for load testing Shiny applications
 Version: 0.2.0
 Authors@R: c(person("Sean", "Lopp", email = "sean@rstudio.com",
   role = c("aut", "cre")),
-  person("Winston", "Chang", email = "winston@rstudio.com", 
+  person("Joe", "Cheng", email = "joe@rstudio.com", 
   role = "aut"))
-Description: This package allows users to record a user interaction
-  with an app and then replay the user interaction in parallel to test
-  the app at scale.
+Description: This package allows users to analyze the results of
+    a load test against a Shiny app performed with proxyrec both
+    during and after the test.
 Encoding: UTF-8
 License: GPL-3
 LazyData: true
@@ -15,7 +15,10 @@ RoxygenNote: 6.0.1
 Imports:
     assertthat,
     lubridate,
-    utils
-Suggests: rmarkdown,
+    utils,
+    purrr,
     ggplot2,
+    httr,
+    progress
+Suggests: rmarkdown,
     testthat
