@@ -6,7 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Authors • shinyloadtest</title>
+<title>Responsible for polling the desired metrics across all servers and
+aggregating the results — poll_multiple • shinyloadtest</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -20,9 +21,9 @@
 
 
 <!-- pkgdown -->
-<link href="pkgdown.css" rel="stylesheet">
-<script src="jquery.sticky-kit.min.js"></script>
-<script src="pkgdown.js"></script>
+<link href="../pkgdown.css" rel="stylesheet">
+<script src="../jquery.sticky-kit.min.js"></script>
+<script src="../pkgdown.js"></script>
   
   
 <!-- mathjax -->
@@ -37,7 +38,7 @@
   </head>
 
   <body>
-    <div class="container template-authors">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -47,21 +48,21 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="index.html">shinyloadtest</a>
+      <a class="navbar-brand" href="../index.html">shinyloadtest</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="/index.html">
+  <a href="..//index.html">
     <span class="fa fa-home fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="reference/index.html">Reference</a>
+  <a href="../reference/index.html">Reference</a>
 </li>
 <li>
-  <a href="news/index.html">News</a>
+  <a href="../news/index.html">News</a>
 </li>
       </ul>
       
@@ -76,26 +77,44 @@
       </header>
 
       <div class="row">
-  <div class="contents col-md-12">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Authors</h1>
+    <h1>Responsible for polling the desired metrics across all servers and
+aggregating the results</h1>
     </div>
 
-    <ul class="list-unstyled">
-      <li>
-        <p><strong>Sean Lopp</strong>. Author, maintainer.
-        </p>
-      </li>
-      <li>
-        <p><strong>Joe Cheng</strong>. Author.
-        </p>
-      </li>
-    </ul>
+    
+    <p>Responsible for polling the desired metrics across all servers and
+aggregating the results</p>
+    
+
+    <pre class="usage"><span class='fu'>poll_multiple</span>(<span class='no'>endpoints</span>, <span class='no'>metric</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>metric</th>
+      <td><p>one of: ram, cpu, concurrent</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>data frame</p>
+    
 
   </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+    <h2>Contents</h2>
+    <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
+      
+      <li><a href="#value">Value</a></li>
+          </ul>
 
+  </div>
 </div>
-
 
       <footer>
       <div class="copyright">

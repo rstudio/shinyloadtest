@@ -60,6 +60,9 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li>
+  <a href="../news/index.html">News</a>
+</li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
@@ -77,7 +80,7 @@
     <div class="page-header">
       <h1>
         Reference
-        <small>version&nbsp;0.1.0</small>
+        <small>version&nbsp;0.2.0</small>
       </h1>
     </div>
 
@@ -142,6 +145,33 @@
       </tbody><tbody>
         <tr>
           <th colspan="2">
+            <h2 id="section-poll-during-test" class="hasAnchor"><a href="#section-poll-during-test" class="anchor"></a>Poll During Test</h2>
+            <p class="section-desc"><p>During a load test, see server-reported metrics</p></p>
+          </th>
+        </tr>
+        <tr>
+          <!--  -->
+          <td>
+            <p><code><a href="poll_multiple.html">poll_multiple</a></code> </p>
+          </td>
+          <td><p>Responsible for polling the desired metrics across all servers and
+aggregating the results</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="poll_once.html">poll_once</a></code> </p>
+          </td>
+          <td><p>Switches between metrics for one server</p></td>
+        </tr><tr>
+          <!--  -->
+          <td>
+            <p><code><a href="poll.html">poll</a></code> </p>
+          </td>
+          <td><p>Poll server(s) during load test</p></td>
+        </tr>
+      </tbody><tbody>
+        <tr>
+          <th colspan="2">
             <h2 id="section-load-test-report" class="hasAnchor"><a href="#section-load-test-report" class="anchor"></a>Load Test Report</h2>
             <p class="section-desc"></p>
           </th>
@@ -162,6 +192,7 @@
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#section-analyze-event-logs">Analyze Event Logs</a></li>
+      <li><a href="#section-poll-during-test">Poll During Test</a></li>
       <li><a href="#section-load-test-report">Load Test Report</a></li>
     </ul>
   </div>
@@ -169,7 +200,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Sean Lopp, Winston Chang.</p>
+  <p>Developed by Sean Lopp, Joe Cheng.</p>
 </div>
 
 <div class="pkgdown">
