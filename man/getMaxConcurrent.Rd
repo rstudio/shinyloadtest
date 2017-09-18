@@ -7,15 +7,14 @@
 getMaxConcurrent(eventLog)
 }
 \arguments{
-\item{eventLog}{Data frame of events returned from either
-\code{\link{loadTest}} or \code{\link{getSuccesses}}}
+\item{eventLog}{Data frame of events returned from e\code{\link{createLog}}}
 }
 \description{
 Return the number of concurrent connections
 }
 \details{
 The actual number of concurrent connections for a load test can vary
-  from the target. This function uses the conenct and disconnect events from
+  from the target. This function uses the connect and disconnect events from
   the log to determine the interval when each connection was open. The
   maximum number of overlapping intervals is returned as the maxiumum number
   of concurrent connections achieved during the test.

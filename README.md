@@ -1,81 +1,110 @@
 # shinyloadtest
 [![Build Status](https://travis-ci.org/rstudio/shinyloadtest.svg?branch=master)](https://travis-ci.org/rstudio/shinyloadtest)
 
+[Shiny](https://shiny.rstudio.com) is a web framework for R. `shinyloadtest`
+adds support for load testing Shiny applications using a the
+[proxyrec](https://github.com/rstudio/proxyrec) node js package. 
 
-This package extends the [shinytest package](https://github.com/rstudio/shinytest) to enable users to load test deployed Shiny applications. Load testing is executed using parallel phantomJS sessions.
+**Why `shinyloadtest` ?**
+
+Load testing has many uses:
+-  ensure application performance during real-world use 
+-  determine server specs
+-  test and tune different server settings
+
+For more details see:
+[Performance Tuning for Shiny Server
+Pro](https://support.rstudio.com/hc/en-us/articles/220546267-Scaling-and-Performance-Tuning-Applications-in-Shiny-Server-Pro),
+[Performance Tuning for RStudio
+Connect](https://support.rstudio.com/hc/en-us/articles/231874748), and
+[Performance Tuning for
+shinyapps.io](http://shiny.rstudio.com/articles/scaling-and-tuning.html).
+
+**Why do I need another load testing tool?**
+
+Shiny is not a good fit for traditional HTTP load testing tools like
+ApacheBench, as they are designed for the stateless HTTP request/response model.
+Shiny apps, on the other hand, do much of their communication over stateful
+WebSockets, using Shiny's own application-level protocol.
+
+`shinyloadtest` provides tools to interactively record a test and then rerun the
+test at scale, mimicing hundreds or thousands of concurrent users.
+`shinyloadtest` also captures and analyzes metrics to understand latency under
+load.  
+
+![](img/sample_concurrency_plot.png)
 
 ## Installation
 
-Currently, `shinyloadtest` is available on Github:
+Load testing shiny applications will require 2 tools: the `shinyloadtest` R
+package and the `proxyrec` node js package. 
+
+### Installing `proxyrec`
+
+#### Executable
+
+Use the following links to download pre-compiled executables.
+
+|Operating System|
+|----------------|
+|[Mac OS](https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/27/27.1/main-macos)|
+|[Linux](https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/27/27.1/main-linux)|
+
+
+We recommend renaming the executable to `proxyrec`. To confirm a successful
+download, run: 
+
+```bash
+./proxyrec --help
+Commands:
+  record	   Record a run
+  playback <file>  Playback a run
+
+Options:
+  --help Show help
+```
+
+#### From Source
+
+To install `proxyrec` and use the source package:
+
+1. Install [node js 8](https://nodejs.org/en/download/current/)
+
+2. Clone the `shinyloadtest` repository: `git clone https://github.com/rstudio/proxyrec.git`
+
+3. Within the repository, run: `npm install`
+
+4. For the remaining usage instructions, replace `./proxyrec` with `node
+lib/main.js`. Commands must be run from within the repo.
+
+### Installing `shinyloadtest`
+
+Next, install `shinyloadtest` by running the following in R:
 
 ```r
 devtools::install_github("rstudio/shinyloadtest")
 ```
 
-You will also need to install `shinytest` and `phantomJS`. `shinytest` includes a helper function to install the latest version of `phantomJS`.
+## Use
 
-## Record Test
+Load testing requires 3 steps: 
 
-To get started, record a test using the `shinytest` package's recorder with `load_mode` enabled. The test should be reflective of expected application use. For more details, see the [`shinytest` documentation](https://rstudio.github.io/shinytest/). Tests must be recorded against a local copy of the deployed application.
+1. Recording user interactions with an app to a test file
+2. Playing back the recorded test with a specified # of concurrent users for a
+given duration
+3. Analzying the playback results
 
-```r
-library(shinytest)
-recordTest("path/to/app", load_mode = TRUE)
-```
+Each step is described in a detailed article.
 
-![](./inst/img/recorder_screenshot_superzip.png)
+## Known limitations 
 
-The recorder will save interactions with the application and timing information into a R file. In `load_mode` the recorded timing includes user pauses. This infomration is used to simulate a realistic user experience while load testing the application.
+`shinyloadtest` does not work for all classes of shiny apps. Please submit an
+issue with a [reprex](https://github.com/tidyverse/reprex) for applications that are not able to be tested.
+ 
+- Subapps are not supported (or any page with Shiny apps in an iframe) 
+- File uploads are not supported
+- Applications that use `session$user` information are not supported
 
-## Performing a Load Test
+## License
 
-The easiest way to use the package is through the included addin. From within RStudio, navigate to the application file and then click `Load Test Shiny App` from the Addins menu.
-
-![](./inst/img/addin.png)
-
-The addin will walk through the parameters for defining a load test and will help pick useful defaults. Clicking `Run` will begin the load test. The load test includes running the application at load and a baseline test composed of a series of sequential tests, each executed 1 at a time. At the end of the load test an HTML report is created containing useful information about the result of the test. Detailed logs are also generated and written to the current working directory.
-
-**WARNING** The load test can take a long time to run. The addin includes an estimate of the total test duration. The load test will generate multiple processes on the client machine. Use with caution. 
-
-
-## [Example Report Output](https://beta.rstudioconnect.com/content/2612/addinTest.html)
-
-
-## The `loadTest` function
-
-The addin uses the `loadTest` function to run the load test.
-
-```r
-library(shinyloadtest)  
-loadTest(testFile = 'myloadTest.R',
-         url = 'https://beta.rstudioconnect.com/content/2551',
-         numConcurrent = 8,
-         numTotal = 16,
-         loadTimeout = 5,
-         stagger = 4, 
-         phantomTimeout = 20)
-```
-
-This function uses the `parallel` and `foreach` packages to open concurrent R processes. Each R process uses phantomJS to run the recorded test against the deployed application.
-
-`numConcurrent` is the number of concurrent connections to the application.
-
-`numTotal` is the total number of tests run against the application.
-
-`loadTimeout` is the maximum amount of seconds to wait for the Shiny app to load.
-
-`stagger` adds a random delay of up to `stagger` seconds to the concurrent connections. 
-
-`phantomTimeout` is the maximum seconds to wait for the phantomJS process to start.
-
-**WARNING** Load testing a large number of concurrent connections will open a large number of processes on the client computer. Use with caution.
-
-The `loadTest` function returns an event log that contains timing and event information for each visit to the application. The package includes functions for analyzing the event log such as `getSuccesses`, `getErrors`, `getMaxConcurrent`, `getPageLoadTimes`, and others. 
-
-## Use Cases
-
-`shinyloadtest` is best suited for testing applications with 20-60 concurrent connections. Driving more load on the deployed appliction is possible, but may require a server to act as the client. 
-
-We recommend using `shinyloadtest` to experiment with application performance and tuning. For more details see: [Performance Tuning for Shiny Server Pro](https://support.rstudio.com/hc/en-us/articles/220546267-Scaling-and-Performance-Tuning-Applications-in-Shiny-Server-Pro), [Performance Tuning for RStudio Connect](https://support.rstudio.com/hc/en-us/articles/231874748), and [Performance Tuning for shinyapps.io](http://shiny.rstudio.com/articles/scaling-and-tuning.html).
-
-
+The R package and the `proxyrec` tool are both GPLv3.

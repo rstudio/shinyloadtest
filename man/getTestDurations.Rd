@@ -7,8 +7,7 @@
 getTestDurations(eventLog)
 }
 \arguments{
-\item{eventLog}{Data frame of events returned from either
-\code{\link{loadTest}} or \code{\link{getSuccesses}}}
+\item{eventLog}{Data frame of events returned from \code{\link{createLog}}}
 }
 \value{
 Data frame containing the test duration per connection.

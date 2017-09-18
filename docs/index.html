@@ -5,11 +5,11 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tools for laod testing Shiny applications • shinyloadtest</title>
+<title>Tools for load testing Shiny applications • shinyloadtest</title>
 <!-- jquery --><script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 <!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
-<script src="jquery.sticky-kit.min.js"></script><script src="pkgdown.js"></script><!-- mathjax --><script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--[if lt IE 9]>
+<script src="jquery.sticky-kit.min.js"></script><script src="pkgdown.js"></script><!-- mathjax --><script src="https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
@@ -29,7 +29,34 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
+  <a href="/index.html">
+    <span class="fa fa-home fa-lg"></span>
+     
+  </a>
+</li>
+<li>
   <a href="reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="articles/analyzing-results.html">3. Analyzing Results</a>
+    </li>
+    <li>
+      <a href="articles/load-testing.html">2. Running a Load Test</a>
+    </li>
+    <li>
+      <a href="articles/recording.html">1. Recording Load Test</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="news/index.html">News</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right"></ul>
@@ -45,65 +72,100 @@
   <div class="contents col-md-9">
     <div id="shinyloadtest" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#shinyloadtest" class="anchor"> </a>shinyloadtest</h1></div>
+<a href="#shinyloadtest" class="anchor"></a>shinyloadtest</h1></div>
 
-<p>This package extends the <a href="https://github.com/rstudio/shinytest">shinytest package</a> to enable users to load test deployed Shiny applications. Load testing is executed using parallel phantomJS sessions.</p>
+<p><a href="https://shiny.rstudio.com">Shiny</a> is a web framework for R. <code>shinyloadtest</code> adds support for load testing Shiny applications using a the <a href="https://github.com/rstudio/proxyrec">proxyrec</a> node js package.</p>
+<p><strong>Why <code>shinyloadtest</code> ?</strong></p>
+<p>Load testing has many uses:</p>
+<ul>
+<li>ensure application performance during real-world use</li>
+<li>determine server specs</li>
+<li>test and tune different server settings</li>
+</ul>
+<p>For more details see: <a href="https://support.rstudio.com/hc/en-us/articles/220546267-Scaling-and-Performance-Tuning-Applications-in-Shiny-Server-Pro">Performance Tuning for Shiny Server Pro</a>, <a href="https://support.rstudio.com/hc/en-us/articles/231874748">Performance Tuning for RStudio Connect</a>, and <a href="http://shiny.rstudio.com/articles/scaling-and-tuning.html">Performance Tuning for shinyapps.io</a>.</p>
+<p><strong>Why do I need another load testing tool?</strong></p>
+<p>Shiny is not a good fit for traditional HTTP load testing tools like ApacheBench, as they are designed for the stateless HTTP request/response model. Shiny apps, on the other hand, do much of their communication over stateful WebSockets, using Shiny’s own application-level protocol.</p>
+<p><code>shinyloadtest</code> provides tools to interactively record a test and then rerun the test at scale, mimicing hundreds or thousands of concurrent users. <code>shinyloadtest</code> also captures and analyzes metrics to understand latency under load.</p>
+<p><img src="img/sample_concurrency_plot.png"></p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
-<a href="#installation" class="anchor"> </a>Installation</h2>
-<p>Currently, <code>shinyloadtest</code> is available on Github:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools::<span class="kw">install_github</span>(<span class="st">"rstudio/shinyloadtest"</span>)</code></pre></div>
-<p>You will also need to install <code>shinytest</code> and <code>phantomJS</code>. <code>shinytest</code> includes a helper function to install the latest version of <code>phantomJS</code>.</p>
+<a href="#installation" class="anchor"></a>Installation</h2>
+<p>Load testing shiny applications will require 2 tools: the <code>shinyloadtest</code> R package and the <code>proxyrec</code> node js package.</p>
+<div id="installing-proxyrec" class="section level3">
+<h3 class="hasAnchor">
+<a href="#installing-proxyrec" class="anchor"></a>Installing <code>proxyrec</code>
+</h3>
+<div id="executable" class="section level4">
+<h4 class="hasAnchor">
+<a href="#executable" class="anchor"></a>Executable</h4>
+<p>Use the following links to download pre-compiled executables.</p>
+<table class="table">
+<thead><tr class="header">
+<th>Operating System</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><a href="https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/27/27.1/main-macos">Mac OS</a></td>
+</tr>
+<tr class="even">
+<td><a href="https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/27/27.1/main-linux">Linux</a></td>
+</tr>
+</tbody>
+</table>
+<p>We recommend renaming the executable to <code>proxyrec</code>. To confirm a successful download, run:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">./proxyrec</span> --help
+<span class="ex">Commands</span>:
+  <span class="ex">record</span>       Record a run
+  <span class="ex">playback</span> <span class="op">&lt;</span>file<span class="op">&gt;</span>  Playback a run
+
+<span class="ex">Options</span>:
+  <span class="ex">--help</span> Show help</code></pre></div>
 </div>
-<div id="record-test" class="section level2">
-<h2 class="hasAnchor">
-<a href="#record-test" class="anchor"> </a>Record Test</h2>
-<p>To get started, record a test using the <code>shinytest</code> package’s recorder with <code>load_mode</code> enabled. The test should be reflective of expected application use. For more details, see the <a href="https://rstudio.github.io/shinytest/"><code>shinytest</code> documentation</a>. Tests must be recorded against a local copy of the deployed application.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shinytest)
-<span class="kw">recordTest</span>(<span class="st">"path/to/app"</span>, <span class="dt">load_mode =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<p><img src="img/recorder_screenshot_superzip.png"></p>
-<p>The recorder will save interactions with the application and timing information into a R file. In <code>load_mode</code> the recorded timing includes user pauses. This infomration is used to simulate a realistic user experience while load testing the application.</p>
+<div id="from-source" class="section level4">
+<h4 class="hasAnchor">
+<a href="#from-source" class="anchor"></a>From Source</h4>
+<p>To install <code>proxyrec</code> and use the source package:</p>
+<ol>
+<li><p>Install <a href="https://nodejs.org/en/download/current/">node js 8</a></p></li>
+<li><p>Clone the <code>shinyloadtest</code> repository: <code>git clone https://github.com/rstudio/proxyrec.git</code></p></li>
+<li><p>Within the repository, run: <code>npm install</code></p></li>
+<li><p>For the remaining usage instructions, replace <code>./proxyrec</code> with <code>node lib/main.js</code>. Commands must be run from within the repo.</p></li>
+</ol>
 </div>
-<div id="performing-a-load-test" class="section level2">
-<h2 class="hasAnchor">
-<a href="#performing-a-load-test" class="anchor"> </a>Performing a Load Test</h2>
-<p>The easiest way to use the package is through the included addin. From within RStudio, navigate to the application file and then click <code>Load Test Shiny App</code> from the Addins menu.</p>
-<p><img src="img/addin.png"></p>
-<p>The addin will walk through the parameters for defining a load test and will help pick useful defaults. Clicking <code>Run</code> will begin the load test. The load test includes running the application at load and a baseline test composed of a series of sequential tests, each executed 1 at a time. At the end of the load test an HTML report is created containing useful information about the result of the test. Detailed logs are also generated and written to the current working directory.</p>
-<p><strong>WARNING</strong> The load test can take a long time to run. The addin includes an estimate of the total test duration. The load test will generate multiple processes on the client machine. Use with caution.</p>
 </div>
-<div id="example-report-output" class="section level2">
-<h2 class="hasAnchor">
-<a href="#example-report-output" class="anchor"> </a>
-<a href="https://beta.rstudioconnect.com/content/2612/addinTest.html">Example Report Output</a>
-</h2>
+<div id="installing-shinyloadtest" class="section level3">
+<h3 class="hasAnchor">
+<a href="#installing-shinyloadtest" class="anchor"></a>Installing <code>shinyloadtest</code>
+</h3>
+<p>Next, install <code>shinyloadtest</code> by running the following in R:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"rstudio/shinyloadtest"</span>)</code></pre></div>
 </div>
-<div id="the-loadtest-function" class="section level2">
-<h2 class="hasAnchor">
-<a href="#the-loadtest-function" class="anchor"> </a>The <code>loadTest</code> function</h2>
-<p>The addin uses the <code>loadTest</code> function to run the load test.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shinyloadtest)  
-<span class="kw"><a href="reference/loadTest.html">loadTest</a></span>(<span class="dt">testFile =</span> <span class="st">'myloadTest.R'</span>,
-         <span class="dt">url =</span> <span class="st">'https://beta.rstudioconnect.com/content/2551'</span>,
-         <span class="dt">numConcurrent =</span> <span class="dv">8</span>,
-         <span class="dt">numTotal =</span> <span class="dv">16</span>,
-         <span class="dt">loadTimeout =</span> <span class="dv">5</span>,
-         <span class="dt">stagger =</span> <span class="dv">4</span>, 
-         <span class="dt">phantomTimeout =</span> <span class="dv">20</span>)</code></pre></div>
-<p>This function uses the <code>parallel</code> and <code>foreach</code> packages to open concurrent R processes. Each R process uses phantomJS to run the recorded test against the deployed application.</p>
-<p><code>numConcurrent</code> is the number of concurrent connections to the application.</p>
-<p><code>numTotal</code> is the total number of tests run against the application.</p>
-<p><code>loadTimeout</code> is the maximum amount of seconds to wait for the Shiny app to load.</p>
-<p><code>stagger</code> adds a random delay of up to <code>stagger</code> seconds to the concurrent connections.</p>
-<p><code>phantomTimeout</code> is the maximum seconds to wait for the phantomJS process to start.</p>
-<p><strong>WARNING</strong> Load testing a large number of concurrent connections will open a large number of processes on the client computer. Use with caution.</p>
-<p>The <code>loadTest</code> function returns an event log that contains timing and event information for each visit to the application. The package includes functions for analyzing the event log such as <code>getSuccesses</code>, <code>getErrors</code>, <code>getMaxConcurrent</code>, <code>getPageLoadTimes</code>, and others.</p>
 </div>
-<div id="use-cases" class="section level2">
+<div id="use" class="section level2">
 <h2 class="hasAnchor">
-<a href="#use-cases" class="anchor"> </a>Use Cases</h2>
-<p><code>shinyloadtest</code> is best suited for testing applications with 20-60 concurrent connections. Driving more load on the deployed appliction is possible, but may require a server to act as the client.</p>
-<p>We recommend using <code>shinyloadtest</code> to experiment with application performance and tuning. For more details see: <a href="https://support.rstudio.com/hc/en-us/articles/220546267-Scaling-and-Performance-Tuning-Applications-in-Shiny-Server-Pro">Performance Tuning for Shiny Server Pro</a>, <a href="https://support.rstudio.com/hc/en-us/articles/231874748">Performance Tuning for RStudio Connect</a>, and <a href="http://shiny.rstudio.com/articles/scaling-and-tuning.html">Performance Tuning for shinyapps.io</a>.</p>
+<a href="#use" class="anchor"></a>Use</h2>
+<p>Load testing requires 3 steps:</p>
+<ol>
+<li>Recording user interactions with an app to a test file</li>
+<li>Playing back the recorded test with a specified # of concurrent users for a given duration</li>
+<li>Analzying the playback results</li>
+</ol>
+<p>Each step is described in a detailed article.</p>
+</div>
+<div id="known-limitations" class="section level2">
+<h2 class="hasAnchor">
+<a href="#known-limitations" class="anchor"></a>Known limitations</h2>
+<p><code>shinyloadtest</code> does not work for all classes of shiny apps. Please submit an issue with a <a href="https://github.com/tidyverse/reprex">reprex</a> for applications that are not able to be tested.</p>
+<ul>
+<li>Subapps are not supported (or any page with Shiny apps in an iframe)</li>
+<li>File uploads are not supported</li>
+<li>Applications that use <code>session$user</code> information are not supported</li>
+</ul>
+</div>
+<div id="license" class="section level2">
+<h2 class="hasAnchor">
+<a href="#license" class="anchor"></a>License</h2>
+<p>The R package and the <code>proxyrec</code> tool are both GPLv3.</p>
 </div>
 </div>
   </div>
@@ -114,20 +176,18 @@
 <h2>Developers</h2>
 <ul class="list-unstyled">
 <li>Sean Lopp <br><small class="roles"> Author, maintainer </small> </li>
-<li>Winston Chang <br><small class="roles"> Author </small> </li>
+<li>Joe Cheng <br><small class="roles"> Author </small> </li>
 </ul>
-<html><body>
 <h2>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://travis-ci.org/rstudio/shinyloadtest"><img src="https://travis-ci.org/rstudio/shinyloadtest.svg?branch=master" alt="Build Status"></a></li>
 </ul>
-</body></html>
 </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Sean Lopp, Winston Chang.</p>
+  <p>Developed by Sean Lopp, Joe Cheng.</p>
 </div>
 
 <div class="pkgdown">

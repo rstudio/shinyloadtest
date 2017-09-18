@@ -4,30 +4,9 @@ output:
   html_document:
     df_print: paged
 params: 
-  url:
-    label: "Deployed URL"
-    value: "https://"
-  concurrent:
-    label: "Load Test: Number of Concurrent Connections"
-    value: 4
-  total: 
-    label: "Load Test: Total Number of Connections"
-    value: 4
-  baseline:
-    label: "Baseline Test: Total Number Sequential Connections"
-    value: 4
-  testFile:
-    label: "Path to Load Test Script"
-    value: "./tests/myloadtest.R"
-  stagger: 
-    label: "Maximum Delay in Staggering Concurrent Connections (sec)"
-    value: 5
-  loadTimeout:
-    label: "Maximum time to wait for the Shiny app to load (sec)"
-    value: 15
-  phantomTimeout:
-    label: "Maximum time to wait for phantomJS to start (sec)"
-    value: 30
+  directory:
+    label: "Directory with profiles from load test"
+    value: !r getwd()
 ---
 
 ```{r setup, include=FALSE}
@@ -36,120 +15,54 @@ library(shinyloadtest)
 library(ggplot2)
 ```
 
-Load test run against `r params$url`. The load test target was **`r params$total` total visits** with **`r params$concurrent` concurrent users** at a time. Concurrent user sessions were staggered, with a max delay of `r params$stagger` seconds. Each "user" ran a series of actions against the application as recorded in `r params$testFile`.
 
 ```{r runTest, warning = FALSE}
-loadTestLog <- loadTest(testFile = params$testFile, 
-                        url = params$url,
-                        numConcurrent = params$concurrent,
-                        numTotal = params$total, 
-                        loadTimeout = params$loadTimeout,
-                        stagger = params$stagger,
-                        phantomTimeout = params$phantomTimeout)
-saveRDS(loadTestLog, file = "loadTestLog.Rds")
-```
-
-A baseline test was run with **`r params$baseline` total visits** occuring sequentially, one at a time.
-
-```{r}
-baselineLog <- loadTest(testFile = params$testFile, 
-                        url = params$url,
-                        numConcurrent = 1,
-                        loadTimeout = params$loadTimeout,
-                        numTotal = params$baseline, 
-                        stagger = 0)
-saveRDS(baselineLog, file = "baselineLog.Rds")
+log <- createLog(params$directory)
 ```
 
 
 ## Results
 
-```{r}
-errors <- getErrors(loadTestLog)
-loadTestLog <- getSuccesses(loadTestLog)
+The load test was started at `r min(log$time)` and ended at `r max(log$time)`. There were `r length(unique(log$connection))` successful connections. A maximum `r getMaxConcurrent(log)` concurrent connections were achieved.
 
-baseline_errors <- getErrors(baselineLog)
-baselineLog <- getSuccesses(baselineLog)
-
-```
-
-
-The load test was started at `r min(loadTestLog$time)` and ended at `r max(loadTestLog$time)`. Of the targetted `r params$total` visits, `r length(unique(loadTestLog$connection))` were successful. 
-
-```{r}
-if (length(errors) > 0) {
-  print("The following errors occured in the unsuccessful visits:")
-  print(errors)
-}
-
-if (length(baseline_errors) > 0) {
-  print("The following errors occured in the baseline test:")
-  print(baseline_errors)
-}
+```{r concurrent_over_time}
+con <- getConcurrentOverTest(log)
+ggplot(con, aes(time, connections)) +
+         geom_point() +
+         geom_smooth() +
+         theme_bw() +
+         labs(
+           title = "Concurrent connections over time"
+         )
 
 ```
 
-A maximum `r getMaxConcurrent(loadTestLog)` concurrent connections were achieved, compared to the target of `r params$concurrent`.
-
-`r if ( length(errors) == 0 && (getMaxConcurrent(loadTestLog) < params$concurrent)) {message("Because all visits were successful, but the number of concurrent connections did not meet the target, consider lowering the stagger parameter or checking the server settings.")}`
-
-
-## Comparison to Baseline
+## Page load time
 
 ```{r}
-load <- getPageLoadTimes(loadTestLog) 
-load$type = "Under Load"
+load <- getPageLoadTimes(log) 
 
-base <- getPageLoadTimes(baselineLog)
-base$type = "Baseline"
-
-results <- rbind(load, base)
-
-ggplot(results, aes(type, load_time_sec)) + 
-  geom_boxplot(aes(fill = type), alpha = 0.3) +
+ggplot(load, aes(1, load_time_sec)) + 
+  geom_boxplot() +
   theme_minimal() +
+  scale_x_continuous(breaks = NULL) +
   labs(
     title = "Page Load Time",
-    subtitle = paste(params$concurrent, "Concurrent Targetted"),
     y = "Load Time (sec)",
-    x = "",
-    color = "# of Conns Sharing R Process"
+    x = ""
   ) +
   guides(shape = FALSE)
 ```
 
-The average page load time under load was `r mean(load$load_time_sec)` seconds compared to `r mean(base$load_time_sec)` seconds with no concurrent load.
+The average page load time under load was `r mean(load$load_time_sec)` seconds.
 
-The following graph shows the response time for specific events taken after page load. The table lists any events that did not trigger an update pior to the default timeout. For inputs that do not trigger an output (i.e. applications that use action buttons) this is expected behavior.
-
-```{r}
-load <- getSetInputTimes(loadTestLog)
-base <- getSetInputTimes(baselineLog)
-
-load$type = "Under Load"
-base$type = "Basline"
-
-results <- rbind(load, base)
-
-## look for timeouts
-timeout <- aggregate(results$timedout, by = list(id  = results$input_id), FUN = sum)
-n <- length(unique(load$connection)) + length(unique(base$connection))
-
-message <- paste0(
-  timeout$id, " - ",
-  timeout$x, " of ", n, " timed out ",
-  ifelse(timeout$x == n, " as expected. This input appears to be isolated from outputs.", 
-         ifelse(timeout$x > 0, ". Warning! Some outputs did not return before the timeout.", "as expected.")))
-
-data.frame(Results = message, stringsAsFactors = FALSE)
-```
-
+The following graph shows the response time for specific events taken after page load.
 
 ```{r}
-## plot the distributions
-ggplot(results, aes(type, event_time_sec)) +
-  geom_boxplot(aes(fill = type), alpha = 0.4)  +
-  facet_wrap(~input_id, scales = "free") +
+load <- getSetInputTimes(log)
+load$inputId <- as.factor(load$inputId)
+ggplot(load, aes(inputId, event_time_sec)) +
+  geom_boxplot()  +
   labs(
     title = "Application Usage",
     x = "",
@@ -158,53 +71,5 @@ ggplot(results, aes(type, event_time_sec)) +
   ) +
   theme_minimal() + 
   guides(fill = FALSE)
-```
-
-## R Processes
-
-Application latency is often the result of too many users sharing the same R process. RStudio Connect and Shiny Server Pro allow users to be spread across multiple R processes for any application.
-
-```{r}
-
-summariseTiming <- function(loadTestLog, label) {
-  pageLoad <- getPageLoadTimes(loadTestLog)
-  
-  # coerce page loads into format that works with set input results
-  pageLoad$input_id <-  "Page Load"
-  pageLoad$event_time_sec <- pageLoad$load_time_sec
-  pageLoad$load_time_sec <- NULL
-  
-  # get set input times and select relevant columns
-  actionLoad <- getSetInputTimes(loadTestLog)
-  actionLoad <- actionLoad[,c(1,4,5)]
-  
-  # combine results
-  load <- rbind(pageLoad, actionLoad )
-  
-  # add whether there were shared connections
-  worker <- getConnectionsPerR(loadTestLog)
-  result <- merge(load, worker)
-  result$type <- label
-  result
-}
-
-load <- summariseTiming(loadTestLog, "Under Load")
-base <- summariseTiming(baselineLog, "Baseline")
-
-results <- rbind(load, base)
-
-ggplot(results, aes(y = other_connections, x = event_time_sec)) +
-  geom_jitter(aes(color = input_id), alpha = 0.4) + 
-  geom_smooth(se = FALSE) +
-  scale_color_brewer(type = "div") +
-  theme_minimal() + 
-  labs(
-    title = "Sharing R Processes Increases Event Time",
-    subtitle = "An upward sloping line indicates too many connections per R process",
-    x = 'Event Time (sec)',
-    y = 'How Many Other Users were Sharing the R Process',
-    color = "Action"
-  )
-
 ```
 
