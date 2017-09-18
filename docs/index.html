@@ -31,11 +31,29 @@
 <li>
   <a href="/index.html">
     <span class="fa fa-home fa-lg"></span>
-
+     
   </a>
 </li>
 <li>
   <a href="reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="articles/analyzing-results.html">3. Analyzing Results</a>
+    </li>
+    <li>
+      <a href="articles/load-testing.html">2. Running a Load Test</a>
+    </li>
+    <li>
+      <a href="articles/recording.html">1. Recording Load Test</a>
+    </li>
+  </ul>
 </li>
 <li>
   <a href="news/index.html">News</a>
@@ -49,39 +67,105 @@
 </div>
 <!--/.navbar -->
 
-
+      
       </header><div class="row">
   <div class="contents col-md-9">
     <div id="shinyloadtest" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#shinyloadtest" class="anchor"></a>shinyloadtest</h1></div>
 
-<p>This package helps analyze logs created by a <a href="https://github.com/rstudio/proxyrec">proxyrec</a> load test. Follow the instructions in <a href="https://github.com/rstudio/proxyrec">proxyrec</a> for creating and running a load test for a <a href="https://shiny.rstudio.com">shiny</a> application.</p>
+<p><a href="https://shiny.rstudio.com">Shiny</a> is a web framework for R. <code>shinyloadtest</code> adds support for load testing Shiny applications using a the <a href="https://github.com/rstudio/proxyrec">proxyrec</a> node js package.</p>
+<p><strong>Why <code>shinyloadtest</code> ?</strong></p>
+<p>Load testing has many uses:</p>
+<ul>
+<li>ensure application performance during real-world use</li>
+<li>determine server specs</li>
+<li>test and tune different server settings</li>
+</ul>
+<p>For more details see: <a href="https://support.rstudio.com/hc/en-us/articles/220546267-Scaling-and-Performance-Tuning-Applications-in-Shiny-Server-Pro">Performance Tuning for Shiny Server Pro</a>, <a href="https://support.rstudio.com/hc/en-us/articles/231874748">Performance Tuning for RStudio Connect</a>, and <a href="http://shiny.rstudio.com/articles/scaling-and-tuning.html">Performance Tuning for shinyapps.io</a>.</p>
+<p><strong>Why do I need another load testing tool?</strong></p>
+<p>Shiny is not a good fit for traditional HTTP load testing tools like ApacheBench, as they are designed for the stateless HTTP request/response model. Shiny apps, on the other hand, do much of their communication over stateful WebSockets, using Shiny’s own application-level protocol.</p>
+<p><code>shinyloadtest</code> provides tools to interactively record a test and then rerun the test at scale, mimicing hundreds or thousands of concurrent users. <code>shinyloadtest</code> also captures and analyzes metrics to understand latency under load.</p>
+<p><img src="img/sample_concurrency_plot.png"></p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<p>Currently, <code>shinyloadtest</code> is available on Github:</p>
+<p>Load testing shiny applications will require 2 tools: the <code>shinyloadtest</code> R package and the <code>proxyrec</code> node js package.</p>
+<div id="installing-proxyrec" class="section level3">
+<h3 class="hasAnchor">
+<a href="#installing-proxyrec" class="anchor"></a>Installing <code>proxyrec</code>
+</h3>
+<div id="executable" class="section level4">
+<h4 class="hasAnchor">
+<a href="#executable" class="anchor"></a>Executable</h4>
+<p>Use the following links to download pre-compiled executables.</p>
+<table class="table">
+<thead><tr class="header">
+<th>Operating System</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><a href="https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/27/27.1/main-macos">Mac OS</a></td>
+</tr>
+<tr class="even">
+<td><a href="https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/27/27.1/main-linux">Linux</a></td>
+</tr>
+</tbody>
+</table>
+<p>We recommend renaming the executable to <code>proxyrec</code>. To confirm a successful download, run:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">./proxyrec</span> --help
+<span class="ex">Commands</span>:
+  <span class="ex">record</span>       Record a run
+  <span class="ex">playback</span> <span class="op">&lt;</span>file<span class="op">&gt;</span>  Playback a run
+
+<span class="ex">Options</span>:
+  <span class="ex">--help</span> Show help</code></pre></div>
+</div>
+<div id="from-source" class="section level4">
+<h4 class="hasAnchor">
+<a href="#from-source" class="anchor"></a>From Source</h4>
+<p>To install <code>proxyrec</code> and use the source package:</p>
+<ol>
+<li><p>Install <a href="https://nodejs.org/en/download/current/">node js 8</a></p></li>
+<li><p>Clone the <code>shinyloadtest</code> repository: <code>git clone https://github.com/rstudio/proxyrec.git</code></p></li>
+<li><p>Within the repository, run: <code>npm install</code></p></li>
+<li><p>For the remaining usage instructions, replace <code>./proxyrec</code> with <code>node lib/main.js</code>. Commands must be run from within the repo.</p></li>
+</ol>
+</div>
+</div>
+<div id="installing-shinyloadtest" class="section level3">
+<h3 class="hasAnchor">
+<a href="#installing-shinyloadtest" class="anchor"></a>Installing <code>shinyloadtest</code>
+</h3>
+<p>Next, install <code>shinyloadtest</code> by running the following in R:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"rstudio/shinyloadtest"</span>)</code></pre></div>
+</div>
 </div>
 <div id="use" class="section level2">
 <h2 class="hasAnchor">
 <a href="#use" class="anchor"></a>Use</h2>
-<p><a href="https://github.com/rstudio/proxyrec">proxyrec</a> will create a directory of log files from a load test. Given a directory, this package includes functions for:</p>
-<ul>
-<li><p>creating a data frame from the log files (<code>createLog</code>)</p></li>
-<li><p>analyzing the number of concurrent connections over time (<code>getConncurrentOverTest</code> &amp; <code>getMaxConcurrent</code>)</p></li>
-<li><p>analyzing latencies for page load and application use (<code>getPageLoadTimes</code> &amp; <code>getSetInputtimes</code>)</p></li>
-<li><p>trimming a log to remove burnin and final tests (<code>trimRampUp</code> &amp; <code>TODO</code>)</p></li>
-</ul>
-<p><img src="img/sample_concurrency_plot.png"></p>
-<p>The package also includes a sample R Markdown report:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw"><a href="reference/createLoadTestReport.html">createLoadTestReport</a></span>()
-rmarkdown<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/rmarkdown/topics/render">render</a></span>(<span class="st">'load_test_template.Rmd'</span>, <span class="dt">params =</span> <span class="kw">list</span>(<span class="dt">dirctory =</span> <span class="st">'/path/to/proxyrec/results'</span>))</code></pre></div>
+<p>Load testing requires 3 steps:</p>
+<ol>
+<li>Recording user interactions with an app to a test file</li>
+<li>Playing back the recorded test with a specified # of concurrent users for a given duration</li>
+<li>Analzying the playback results</li>
+</ol>
+<p>Each step is described in a detailed article.</p>
 </div>
-<div id="use-cases" class="section level2">
+<div id="known-limitations" class="section level2">
 <h2 class="hasAnchor">
-<a href="#use-cases" class="anchor"></a>Use Cases</h2>
-<p>We recommend using <a href="https://github.com/rstudio/proxyrec">proxyrec</a> and <code>shinyloadtest</code> to experiment with application performance and tuning. For more details see: <a href="https://support.rstudio.com/hc/en-us/articles/220546267-Scaling-and-Performance-Tuning-Applications-in-Shiny-Server-Pro">Performance Tuning for Shiny Server Pro</a>, <a href="https://support.rstudio.com/hc/en-us/articles/231874748">Performance Tuning for RStudio Connect</a>, and <a href="http://shiny.rstudio.com/articles/scaling-and-tuning.html">Performance Tuning for shinyapps.io</a>.</p>
+<a href="#known-limitations" class="anchor"></a>Known limitations</h2>
+<p><code>shinyloadtest</code> does not work for all classes of shiny apps. Please submit an issue with a <a href="https://github.com/tidyverse/reprex">reprex</a> for applications that are not able to be tested.</p>
+<ul>
+<li>Subapps are not supported (or any page with Shiny apps in an iframe)</li>
+<li>File uploads are not supported</li>
+<li>Applications that use <code>session$user</code> information are not supported</li>
+</ul>
+</div>
+<div id="license" class="section level2">
+<h2 class="hasAnchor">
+<a href="#license" class="anchor"></a>License</h2>
+<p>The R package and the <code>proxyrec</code> tool are both GPLv3.</p>
 </div>
 </div>
   </div>

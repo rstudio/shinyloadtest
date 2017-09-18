@@ -21,4 +21,6 @@ Imports:
     httr,
     progress
 Suggests: rmarkdown,
-    testthat
+    testthat,
+    knitr
+VignetteBuilder: knitr
