@@ -13,6 +13,12 @@
 #'
 #' @export
 poll <- function(servers, appName, duration_sec, platform) {
+  # we need some packages
+  if (!requireNamespace(c("ggplot2","purrr","progress", "rsconnect"), quietly = TRUE)) {
+    stop("ggplot2, purrr, and progress packages needed for this function to work. Please install them.",
+         call. = FALSE)
+  }
+
   # validate inputs
   assertthat::assert_that(platform %in% c('connect'))
 
@@ -52,7 +58,6 @@ poll <- function(servers, appName, duration_sec, platform) {
 #' Plot server-reported metrics
 #'
 #' @param metrics server reported metrics from \code{\link{poll}}
-#' @import ggplot2
 #' @export
 plot_metrics <- function(metrics) {
   ggplot(metrics) +

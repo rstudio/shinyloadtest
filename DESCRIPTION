@@ -16,11 +16,11 @@ Imports:
     assertthat,
     lubridate,
     utils,
-    purrr,
-    ggplot2,
-    httr,
-    progress
+    httr
 Suggests: rmarkdown,
+    ggplot2,
+    purrr,
+    progress,
     testthat,
     knitr
 VignetteBuilder: knitr
