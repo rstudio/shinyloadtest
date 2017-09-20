@@ -14,7 +14,7 @@ c('http://connect1.example.com', 'http://connect2.example.com')}
 
 \item{duration_sec}{duration of polling in seconds}
 
-\item{platform}{one of: 'connect'}
+\item{platform}{one of: 'connect', 'ssp','shinyapps'}
 }
 \value{
 generates a real time plot of concurrent connections, aggregated

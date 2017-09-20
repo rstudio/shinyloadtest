@@ -6,7 +6,7 @@
 #'   c('http://connect1.example.com', 'http://connect2.example.com')
 #' @param appName name of the deployed application
 #' @param duration_sec duration of polling in seconds
-#' @param platform one of: 'connect'
+#' @param platform one of: 'connect', 'ssp','shinyapps'
 #'
 #' @return generates a real time plot of concurrent connections, aggregated
 #'   load, and aggregated RAM used by the app
@@ -15,12 +15,12 @@
 poll <- function(servers, appName, duration_sec, platform) {
   # we need some packages
   if (!requireNamespace(c("ggplot2","purrr","progress", "rsconnect"), quietly = TRUE)) {
-    stop("ggplot2, purrr, and progress packages needed for this function to work. Please install them.",
+    stop("ggplot2, purrr, rsconnect, and progress packages needed for this function to work. Please install them.",
          call. = FALSE)
   }
 
   # validate inputs
-  assertthat::assert_that(platform %in% c('connect'))
+  assertthat::assert_that(platform %in% c('connect', 'ssp', 'shinyapps'))
 
   ## TODO: validate other inputs
   ## especially servers is a vector of http(s):// looking things
@@ -43,7 +43,7 @@ poll <- function(servers, appName, duration_sec, platform) {
 
     # don't plot the first time
     if (plt)
-      print(suppressWarnings({plot_metrics(rbind(ram, cpu, conns))}))
+      suppressMessages(print(plot_metrics(rbind(ram, cpu, conns))))
 
     Sys.sleep(5)
     plt <- TRUE
@@ -60,13 +60,14 @@ poll <- function(servers, appName, duration_sec, platform) {
 #' @param metrics server reported metrics from \code{\link{poll}}
 #' @export
 plot_metrics <- function(metrics) {
-  ggplot(metrics) +
-    geom_line(aes(x = date, y = value)) +
-    facet_grid(metric ~ ., scales = "free") +
-    theme_minimal() +
-    theme(
-      panel.spacing = unit(2, "lines")
-    )
+    ggplot2::ggplot(metrics) +
+      ggplot2::geom_line(ggplot2::aes(x = date, y = value)) +
+      ggplot2::facet_grid(metric ~ ., scales = "free") +
+      ggplot2::theme_minimal() +
+      ggplot2::theme(
+        panel.spacing = ggplot2::unit(2, "lines")
+      )
+
 }
 
 #' Create endpoints object from inputs
@@ -141,11 +142,11 @@ poll_once_concurrent <- function(endpoint) {
   UseMethod("poll_once_concurrent", endpoint)
 }
 
-# specific implementations
+
+# RSC impelmentations --------------------------------------------------------------------
 poll_once_ram.connect <- function(endpoint) {
   res <- poll_metrics(endpoint)
   check_app_running(endpoint, res)
-
   res <- res[which(res$appName == endpoint$appName),"ram"]
 
   if (nrow(res) > 1)
@@ -228,6 +229,141 @@ check_app_running <- function(endpoint, running) {
 
   if (!(endpoint$appName %in% unique(running$appName)))
     stop(paste0(endpoint$appName, " is not running at ", endpoint$server))
+}
+
+
+# SSP implementations -----------------------------------------------------
+poll_once_concurrent.ssp <- function(endpoint) {
+  metrics <- poll_metrics_ssp(endpoint)
+  warn_multiple_apps(metrics, endpoint$server)
+  data.frame(
+    time = Sys.time(),
+    value = as.numeric(metrics$`active-connections`),
+    metric = 'connections'
+  )
+}
+
+poll_once_cpu.ssp <- function(endpoint) {
+  metrics <- poll_metrics_ssp(endpoint)
+  warn_multiple_apps(metrics, endpoint$server)
+  data.frame(
+    time = Sys.time(),
+    value = as.numeric(metrics$`load-average`),
+    metric = 'cpu'
+  )
+}
+
+poll_once_ram.ssp <- function(endpoint) {
+  metrics <- poll_metrics_ssp(endpoint)
+  warn_multiple_apps(metrics, endpoint$server)
+  data.frame(
+    time = Sys.time(),
+    value = as.numeric(metrics$`memory-percent`),
+    metric = 'ram'
+  )
+}
+
+warn_multiple_apps <- function(metrics, server) {
+  if (as.numeric(metrics$`active-apps`) > 1)
+    warning(paste0('More than 1 application running on ',
+                   server, "! Metrics will not be accurate."))
+}
+
+poll_metrics_ssp <- function(endpoint) {
+  if (class(endpoint) != 'ssp')
+    stop('This function is only used for SSP!')
+
+  parse_ssp <- function(content) {
+    res_l <- purrr::map(strsplit(content, "\n"), ~strsplit(.x, ":"))
+    res_l <- res_l[[1]]
+    purrr::flatten(purrr::map(res_l, ~ll(!!.x[1] := .x[2])))
+  }
+
+  url <- paste0(endpoint$server, '/__health-check__')
+  resp <- httr::GET(url)
+  c <- suppressMessages(httr::content(resp, as = 'text'))
+  parse_ssp(c)
+}
+
+
+
+
+# shinyapps.io implementations
+poll_once_cpu.shinyapps <- function(endpoint) {
+  account <- parse_account(endpoint$server)
+  metrics <- rsconnect::showMetrics(
+    metricSeries = 'container.cpu',
+    metricNames = c('cpu.system') ,
+    appName = endpoint$appName,
+    from = "1s",
+    server = 'shinyapps.io',
+    account = account
+  )
+
+  data.frame(
+    date = Sys.time(),
+    metric = "cpu",
+    value = metrics$cpu.system
+  )
+
+}
+
+poll_once_ram.shinyapps <- function(endpoint) {
+  account <- parse_account(endpoint$server)
+  metrics <- rsconnect::showMetrics(
+    metricSeries = 'container.memory',
+    metricNames = c('memory.total_rss') ,
+    appName = endpoint$appName,
+    from = "1s",
+    server = 'shinyapps.io',
+    account = account
+  )
+
+  data.frame(
+    date = Sys.time(),
+    metric = "ram",
+    value = metrics$memory.total_rss
+  )
+
+}
+
+poll_once_concurrent.shinyapps <- function(endpoint) {
+  account <- parse_account(endpoint$server)
+  metrics <- rsconnect::showMetrics(
+    metricSeries = 'container.shiny.connections',
+    metricNames = c('shiny.connections.active') ,
+    appName = endpoint$appName,
+    from = "1s",
+    server = 'shinyapps.io',
+    account = account
+  )
+
+  data.frame(
+    date = Sys.time(),
+    metric = "connections",
+    value = metrics$shiny.connections.active
+  )
+
+}
+
+
+parse_account <- function(url) {
+  account <- regmatches(url, regexec(pattern = "https*\\://(.*)\\.shinyapps\\.io", text = url, perl = TRUE))[[1]][2]
+  if (is.na(account)) {
+    stop(paste0('Unable to parse account name from URL ', url,
+                '. url must be of the form: https://account.shinyapps.io/appname'))
+  }
+
+  tryCatch({
+    rsconnect::accountInfo(account, 'shinyapps.io')
+  }, error = function(e) {
+    stop(paste0('Account ', account,
+        ' does not exist locally.
+        You must have shinyapps.io account credentials.
+        See ?shinyapps::setAccountInfo'))
+  })
+
+  account
 }
 
 
