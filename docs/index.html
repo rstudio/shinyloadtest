@@ -91,24 +91,20 @@
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>Load testing shiny applications will require 2 tools: the <code>shinyloadtest</code> R package and the <code>proxyrec</code> node js package.</p>
-<div id="installing-proxyrec" class="section level3">
-<h3 class="hasAnchor">
-<a href="#installing-proxyrec" class="anchor"></a>Installing <code>proxyrec</code>
-</h3>
-<div id="executable" class="section level4">
-<h4 class="hasAnchor">
-<a href="#executable" class="anchor"></a>Executable</h4>
-<p>Use the following links to download pre-compiled executables.</p>
+<p><strong>Installing <code>proxyrec</code></strong></p>
+<p><code>proxyrec</code> can be installed from pre-compiled executables or froms source.</p>
+<p><em>Executable</em></p>
+<p>Use the following links to download pre-compiled executables. The executable is just a bundling of <code>node js 8.4</code>’s executable and the <code>proxyrec</code> package.</p>
 <table class="table">
 <thead><tr class="header">
 <th>Operating System</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td><a href="https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/27/27.1/main-macos">Mac OS</a></td>
+<td><a href="https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/35/35.1/main-macos">Mac OS</a></td>
 </tr>
 <tr class="even">
-<td><a href="https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/27/27.1/main-linux">Linux</a></td>
+<td><a href="https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/35/35.1/main-linux">Linux</a></td>
 </tr>
 </tbody>
 </table>
@@ -120,10 +116,7 @@
 
 <span class="ex">Options</span>:
   <span class="ex">--help</span> Show help</code></pre></div>
-</div>
-<div id="from-source" class="section level4">
-<h4 class="hasAnchor">
-<a href="#from-source" class="anchor"></a>From Source</h4>
+<p><em>From Source</em></p>
 <p>To install <code>proxyrec</code> and use the source package:</p>
 <ol>
 <li><p>Install <a href="https://nodejs.org/en/download/current/">node js 8</a></p></li>
@@ -131,15 +124,9 @@
 <li><p>Within the repository, run: <code>npm install</code></p></li>
 <li><p>For the remaining usage instructions, replace <code>./proxyrec</code> with <code>node lib/main.js</code>. Commands must be run from within the repo.</p></li>
 </ol>
-</div>
-</div>
-<div id="installing-shinyloadtest" class="section level3">
-<h3 class="hasAnchor">
-<a href="#installing-shinyloadtest" class="anchor"></a>Installing <code>shinyloadtest</code>
-</h3>
+<p><strong>Installing <code>shinyloadtest</code></strong></p>
 <p>Next, install <code>shinyloadtest</code> by running the following in R:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"rstudio/shinyloadtest"</span>)</code></pre></div>
-</div>
 </div>
 <div id="use" class="section level2">
 <h2 class="hasAnchor">
@@ -159,7 +146,7 @@
 <ul>
 <li>Subapps are not supported (or any page with Shiny apps in an iframe)</li>
 <li>File uploads are not supported</li>
-<li>Applications that use <code>session$user</code> information are not supported</li>
+<li>Applications that require authentication or use <code>session$user</code> information are not supported</li>
 </ul>
 </div>
 <div id="license" class="section level2">

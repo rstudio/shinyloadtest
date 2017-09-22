@@ -78,16 +78,15 @@
 <li>Running a Load Test</li>
 </ol></h1>
             
-            <h4 class="date">2017-09-18</h4>
+            <h4 class="date">2017-09-22</h4>
           </div>
 
     
     
 <div class="contents">
 <p>To run a load test from a recording file, use the <code>playback</code> function in <code>proxyrec</code> and optionally the <code>poll</code> function in <code>shinyloadtest</code>.</p>
-<div id="proxyrec-usage" class="section level2">
-<h2 class="hasAnchor">
-<a href="#proxyrec-usage" class="anchor"></a><code>proxyrec</code> Usage</h2>
+<p><strong><code>proxyrec</code></strong></p>
+<p>To start a load test, use the <code>playback</code> function.</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">./proxyrec</span> playback  --help</code></pre></div>
 <p>The <code>playback</code> function has a number of options:</p>
 <ul>
@@ -103,18 +102,15 @@
 <code>--outdir</code> The directory to store the resulting test profiles.</li>
 <li>
 <code>--pause-mode</code> Whether to include user pauses during playback, see guidelines.</li>
+<li>
+<code>--concurrency</code> Targetted number of concurrent users.</li>
+<li>
+<code>--debug</code> Debug mode prints the proxy requests.</li>
 </ul>
-</div>
-<div id="shinyloadtest-poll-experimental-wip" class="section level2">
-<h2 class="hasAnchor">
-<a href="#shinyloadtest-poll-experimental-wip" class="anchor"></a><code>shinyloadtest poll</code> Experimental WIP</h2>
-<p><code>shinyloadtest</code> includes an experimental <code>poll</code> function designed to be run alongside of the <code>proxyrec</code> <code>playback</code> function.</p>
-<blockquote>
-<p>We recommend using RStudio 1.1 which includes support for a Terminal.</p>
-</blockquote>
-<p>The poll function supports <code>RStudio Connect</code> and \TODO SSP. During the course of the load test, the function will ping the server to get usage statistics on CPU, RAM, and server-reported concurrent connections. The information is plotted in real time helping track the progress of the test.</p>
+<p><strong><code><a href="http://www.rdocumentation.org/packages/shinyloadtest/topics/poll">shinyloadtest::poll</a></code></strong></p>
+<p><code>shinyloadtest</code> includes an experimental <code>poll</code> function designed to be run alongside of the <code>proxyrec</code> <code>playback</code> function. The <code>playback</code> function should be run first. We recommend using RStudio 1.1 which includes support for a Terminal.</p>
+<p>The poll function supports <code>RStudio Connect</code>, <code>Shiny Server Pro</code>, and <code>shinyapps.io</code>. During the course of the load test, the function will ping the server to get usage statistics on CPU, RAM, and server-reported concurrent connections. The information is plotted in real time helping track the progress of the test.</p>
 <p><img src="sample-poll.png"></p>
-</div>
 <div id="load-testing-guidelines" class="section level2">
 <h2 class="hasAnchor">
 <a href="#load-testing-guidelines" class="anchor"></a>Load Testing Guidelines</h2>
@@ -136,9 +132,7 @@
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-<li><a href="#proxyrec-usage"><code>proxyrec</code> Usage</a></li>
-      <li><a href="#shinyloadtest-poll-experimental-wip"><code>shinyloadtest poll</code> Experimental WIP</a></li>
-      <li><a href="#load-testing-guidelines">Load Testing Guidelines</a></li>
+<li><a href="#load-testing-guidelines">Load Testing Guidelines</a></li>
       </ul>
 </div>
       </div>

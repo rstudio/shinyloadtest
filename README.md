@@ -39,16 +39,18 @@ load.
 Load testing shiny applications will require 2 tools: the `shinyloadtest` R
 package and the `proxyrec` node js package. 
 
-### Installing `proxyrec`
+**Installing `proxyrec`**
 
-#### Executable
+`proxyrec` can be installed from pre-compiled executables or froms source.
 
-Use the following links to download pre-compiled executables.
+*Executable*
+
+Use the following links to download pre-compiled executables. The executable is just a bundling of `node js 8.4`'s executable and the `proxyrec` package.
 
 |Operating System|
 |----------------|
-|[Mac OS](https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/27/27.1/main-macos)|
-|[Linux](https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/27/27.1/main-linux)|
+|[Mac OS](https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/35/35.1/main-macos)|
+|[Linux](https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/35/35.1/main-linux)|
 
 
 We recommend renaming the executable to `proxyrec`. To confirm a successful
@@ -64,7 +66,7 @@ Options:
   --help Show help
 ```
 
-#### From Source
+*From Source*
 
 To install `proxyrec` and use the source package:
 
@@ -77,7 +79,7 @@ To install `proxyrec` and use the source package:
 4. For the remaining usage instructions, replace `./proxyrec` with `node
 lib/main.js`. Commands must be run from within the repo.
 
-### Installing `shinyloadtest`
+**Installing `shinyloadtest`**
 
 Next, install `shinyloadtest` by running the following in R:
 
@@ -103,7 +105,7 @@ issue with a [reprex](https://github.com/tidyverse/reprex) for applications that
  
 - Subapps are not supported (or any page with Shiny apps in an iframe) 
 - File uploads are not supported
-- Applications that use `session$user` information are not supported
+- Applications that require authentication or use `session$user` information are not supported
 
 ## License
 
