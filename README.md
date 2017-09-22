@@ -49,8 +49,8 @@ Use the following links to download pre-compiled executables. The executable is 
 
 |Operating System|
 |----------------|
-|[Mac OS](https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/35/35.1/main-macos)|
-|[Linux](https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/35/35.1/main-linux)|
+|[Mac OS](https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/36/36.1/main-macos)|
+|[Linux](https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/36/36.1/main-linux)|
 
 
 We recommend renaming the executable to `proxyrec`. To confirm a successful
