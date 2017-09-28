@@ -7,10 +7,11 @@ adds support for load testing Shiny applications using a the
 
 **Why `shinyloadtest` ?**
 
-Load testing has many uses:
+You might do a load test if you want to:
 -  ensure application performance during real-world use 
 -  determine server specs
 -  test and tune different server settings
+-  have fun maxing out your laptop and server
 
 For more details see:
 [Performance Tuning for Shiny Server
@@ -41,7 +42,7 @@ package and the `proxyrec` node js package.
 
 **Installing `proxyrec`**
 
-`proxyrec` can be installed from pre-compiled executables or froms source.
+`proxyrec` can be installed from pre-compiled executables or from source.
 
 *Executable*
 
@@ -49,8 +50,8 @@ Use the following links to download pre-compiled executables. The executable is 
 
 |Operating System|
 |----------------|
-|[Mac OS](https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/36/36.1/main-macos)|
-|[Linux](https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/36/36.1/main-linux)|
+|[Mac OS](https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/43/43.1/main-macos)|
+|[Linux](https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/43/43.1/main-linux)|
 
 
 We recommend renaming the executable to `proxyrec`. To confirm a successful
@@ -72,7 +73,7 @@ To install `proxyrec` and use the source package:
 
 1. Install [node js 8](https://nodejs.org/en/download/current/)
 
-2. Clone the `shinyloadtest` repository: `git clone https://github.com/rstudio/proxyrec.git`
+2. Clone the `proxyrec` repository: `git clone https://github.com/rstudio/proxyrec.git`
 
 3. Within the repository, run: `npm install`
 

@@ -78,7 +78,7 @@
 <li>Running a Load Test</li>
 </ol></h1>
             
-            <h4 class="date">2017-09-22</h4>
+            <h4 class="date">2017-09-28</h4>
           </div>
 
     
@@ -110,6 +110,20 @@
 <p><strong><code><a href="http://www.rdocumentation.org/packages/shinyloadtest/topics/poll">shinyloadtest::poll</a></code></strong></p>
 <p><code>shinyloadtest</code> includes an experimental <code>poll</code> function designed to be run alongside of the <code>proxyrec</code> <code>playback</code> function. The <code>playback</code> function should be run first. We recommend using RStudio 1.1 which includes support for a Terminal.</p>
 <p>The poll function supports <code>RStudio Connect</code>, <code>Shiny Server Pro</code>, and <code>shinyapps.io</code>. During the course of the load test, the function will ping the server to get usage statistics on CPU, RAM, and server-reported concurrent connections. The information is plotted in real time helping track the progress of the test.</p>
+<p>To use <code>poll</code>, load the following packages and then run the <code>poll</code> function:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rlang)
+<span class="kw">library</span>(purrr)
+<span class="kw">library</span>(ggplot2)
+<span class="kw">library</span>(httr)
+<span class="kw">library</span>(progress)
+<span class="kw">library</span>(rsconnect)
+
+<span class="kw"><a href="../reference/poll.html">poll</a></span>(
+  <span class="dt">servers =</span> <span class="kw">c</span>(<span class="st">'http://shiny.example.com'</span>),
+  <span class="dt">appName =</span> <span class="st">'helloload'</span>,
+  <span class="dt">duration_sec =</span> <span class="dv">180</span>,
+  <span class="dt">platform =</span> <span class="st">'ssp'</span>
+)</code></pre></div>
 <p><img src="sample-poll.png"></p>
 <div id="load-testing-guidelines" class="section level2">
 <h2 class="hasAnchor">

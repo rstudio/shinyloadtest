@@ -76,11 +76,12 @@
 
 <p><a href="https://shiny.rstudio.com">Shiny</a> is a web framework for R. <code>shinyloadtest</code> adds support for load testing Shiny applications using a the <a href="https://github.com/rstudio/proxyrec">proxyrec</a> node js package.</p>
 <p><strong>Why <code>shinyloadtest</code> ?</strong></p>
-<p>Load testing has many uses:</p>
+<p>You might do a load test if you want to:</p>
 <ul>
 <li>ensure application performance during real-world use</li>
 <li>determine server specs</li>
 <li>test and tune different server settings</li>
+<li>have fun maxing out your laptop and server</li>
 </ul>
 <p>For more details see: <a href="https://support.rstudio.com/hc/en-us/articles/220546267-Scaling-and-Performance-Tuning-Applications-in-Shiny-Server-Pro">Performance Tuning for Shiny Server Pro</a>, <a href="https://support.rstudio.com/hc/en-us/articles/231874748">Performance Tuning for RStudio Connect</a>, and <a href="http://shiny.rstudio.com/articles/scaling-and-tuning.html">Performance Tuning for shinyapps.io</a>.</p>
 <p><strong>Why do I need another load testing tool?</strong></p>
@@ -92,7 +93,7 @@
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>Load testing shiny applications will require 2 tools: the <code>shinyloadtest</code> R package and the <code>proxyrec</code> node js package.</p>
 <p><strong>Installing <code>proxyrec</code></strong></p>
-<p><code>proxyrec</code> can be installed from pre-compiled executables or froms source.</p>
+<p><code>proxyrec</code> can be installed from pre-compiled executables or from source.</p>
 <p><em>Executable</em></p>
 <p>Use the following links to download pre-compiled executables. The executable is just a bundling of <code>node js 8.4</code>’s executable and the <code>proxyrec</code> package.</p>
 <table class="table">
@@ -101,10 +102,10 @@
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td><a href="https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/36/36.1/main-macos">Mac OS</a></td>
+<td><a href="https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/43/43.1/main-macos">Mac OS</a></td>
 </tr>
 <tr class="even">
-<td><a href="https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/36/36.1/main-linux">Linux</a></td>
+<td><a href="https://s3-us-west-2.amazonaws.com/rstudio-proxyrec-execs/rstudio/proxyrec/43/43.1/main-linux">Linux</a></td>
 </tr>
 </tbody>
 </table>
@@ -120,7 +121,7 @@
 <p>To install <code>proxyrec</code> and use the source package:</p>
 <ol>
 <li><p>Install <a href="https://nodejs.org/en/download/current/">node js 8</a></p></li>
-<li><p>Clone the <code>shinyloadtest</code> repository: <code>git clone https://github.com/rstudio/proxyrec.git</code></p></li>
+<li><p>Clone the <code>proxyrec</code> repository: <code>git clone https://github.com/rstudio/proxyrec.git</code></p></li>
 <li><p>Within the repository, run: <code>npm install</code></p></li>
 <li><p>For the remaining usage instructions, replace <code>./proxyrec</code> with <code>node lib/main.js</code>. Commands must be run from within the repo.</p></li>
 </ol>
