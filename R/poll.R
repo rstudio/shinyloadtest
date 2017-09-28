@@ -269,7 +269,6 @@ warn_multiple_apps <- function(metrics, server) {
                    server, "! Metrics will not be accurate."))
 }
 
-#' @import rlang
 poll_metrics_ssp <- function(endpoint) {
   if (class(endpoint) != 'ssp')
     stop('This function is only used for SSP!')

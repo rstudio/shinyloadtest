@@ -15,14 +15,14 @@ RoxygenNote: 6.0.1
 Imports:
     assertthat,
     lubridate,
-    utils,
-    httr
+    utils
 Suggests: rmarkdown,
     ggplot2,
     rsconnect,
     purrr,
     progress,
     testthat,
-    knitr
-    rlang
+    knitr,
+    rlang,
+    httr
 VignetteBuilder: knitr
