@@ -14,7 +14,7 @@
 #' @export
 poll <- function(servers, appName, duration_sec, platform) {
   # we need some packages
-  if (!requireNamespace(c("ggplot2","purrr","progress", "rsconnect"), quietly = TRUE)) {
+  if (!requireNamespace(c("ggplot2","purrr","progress", "rsconnect", "rlang"), quietly = TRUE)) {
     stop("ggplot2, purrr, rsconnect, and progress packages needed for this function to work. Please install them.",
          call. = FALSE)
   }

@@ -16,8 +16,7 @@ Imports:
     assertthat,
     lubridate,
     utils,
-    httr,
-    rlang
+    httr
 Suggests: rmarkdown,
     ggplot2,
     rsconnect,
@@ -25,4 +24,5 @@ Suggests: rmarkdown,
     progress,
     testthat,
     knitr
+    rlang
 VignetteBuilder: knitr
