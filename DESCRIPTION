@@ -16,7 +16,8 @@ Imports:
     assertthat,
     lubridate,
     utils,
-    httr
+    httr,
+    rlang
 Suggests: rmarkdown,
     ggplot2,
     rsconnect,
