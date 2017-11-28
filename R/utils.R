@@ -5,7 +5,7 @@ is_count <- function(x) {
 }
 
 is_valid_rmd_name <- function(x) {
-  valid <- grepl("^[a-zA-Z0-9\\-_]+\\.[Rr]md$", x)
+  valid <- grepl("^[a-zA-Z0-9_-]+\\.[Rr]md$", x)
   if (valid) {
     TRUE
   } else {
