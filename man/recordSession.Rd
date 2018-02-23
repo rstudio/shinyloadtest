@@ -4,10 +4,11 @@
 \alias{recordSession}
 \title{Title}
 \usage{
-recordSession(targetAppUrl, listenPort = 8600)
+recordSession(targetAppUrl, host = "0.0.0.0", port = 8600,
+  outputFile = "recording.log")
 }
 \arguments{
-\item{listenPort}{}
+\item{outputFile}{}
 }
 \description{
 Title

@@ -46,39 +46,80 @@ resp_httr_to_rook <- function(resp) {
     x
 }
 
+# TODO
+# Intercept, parse, and record regular HTTP traffic:
+# REQ, REQ_HOME, REQ_TOK, REQ_SINF
+# Intercept and parse WS traffic:
+# WS_OPEN, WS_CLOSE, WS_SEND, WS_RECV
+
+RecordingSession <- R6::R6Class("RecordingSession",
+  public = list(
+    initialize = function(targetAppUrl, host, port, outputFile) {
+      parsedUrl <- urltools::url_parse(targetAppUrl)
+      private$targetHost <- parsedUrl$domain
+      private$targetPort <- parsedUrl$port %OR% 80
+
+      private$localHost <- host
+      private$localPort <- port
+      private$outputFile <- outputFile
+
+      private$startServer()
+    },
+    stop = function() {
+      if (is.null(private$localServer)) stop("Can't stop, server not running")
+      httpuv::stopServer(private$localServer)
+      private$localServer <- NULL
+    }
+  ),
+  private = list(
+    targetHost = NULL,
+    targetPort = NULL,
+    localHost = NULL,
+    localPort = NULL,
+    localServer = NULL,
+    outputFile = NULL,
+    handleCall = function(req) {
+      req_curl <- req_rook_to_curl(req, private$targetHost, private$targetPort)
+      h <- curl::new_handle()
+      do.call(curl::handle_setheaders, c(h, req_curl))
+      httpUrl <- paste0("http://", private$targetHost, ":", private$targetPort, req$PATH_INFO)
+      resp_curl <- curl::curl_fetch_memory(httpUrl, handle = h)
+      # TODO: Pass req and the response code from resp_curl to a function that interprets these values and writes a REQ_* line to the session log.
+      resp_httr_to_rook(resp_curl)
+    },
+    handleWSOpen = function(clientWS) {
+      wsUrl <- paste0("ws://", private$targetHost, ":", private$targetPort)
+      serverWS <- websocketClient::WebsocketClient$new(wsUrl, onMessage = function(msgFromServer) {
+        cat("Got message from server: ", msgFromServer, "\n")
+        clientWS$send(msgFromServer)
+      })
+      clientWS$onMessage(function (isBinary, msgFromClient) {
+        cat("Got message from client: ", msgFromClient, "\n")
+        serverWS$send(msgFromClient)
+      })
+    },
+    startServer = function() {
+      private$localServer <- httpuv::startServer(private$localHost, private$localPort,
+        list(call = private$handleCall, onWSOpen = private$handleWSOpen)
+      )
+    }
+  )
+)
+
 #' Title
 #'
 #' @param targetAppUrl
-#' @param listenPort
+#' @param host
+#' @param port
+#' @param outputFile
 #'
 #' @return
 #' @export
 #'
 #' @examples
-recordSession <- function(targetAppUrl, listenPort = 8600) {
-  parsedUrl <- urltools::url_parse(targetAppUrl)
-  targetAppPort <- parsedUrl$port %OR% 80
-  httpuv::startServer("0.0.0.0", listenPort,
-    list(
-      call = function(req) {
-        req_curl <- req_rook_to_curl(req, parsedUrl$domain, targetAppPort)
-        h <- curl::new_handle()
-        do.call(curl::handle_setheaders, c(h, req_curl))
-        httpUrl <- paste0("http://", parsedUrl$domain, ":", targetAppPort, req$PATH_INFO)
-        resp_curl <- curl::curl_fetch_memory(httpUrl, handle = h)
-        resp_httr_to_rook(resp_curl)
-      },
-      onWSOpen = function(clientWS) {
-        wsUrl <- paste0("ws://", parsedUrl$domain, ":", targetAppPort)
-        serverWS <- websocketClient::WebsocketClient$new(wsUrl, onMessage = function(msgFromServer) {
-          cat("Got message from server: ", msgFromServer, "\n")
-          clientWS$send(msgFromServer)
-        })
-        clientWS$onMessage(function (isBinary, msgFromClient) {
-          cat("Got message from client: ", msgFromClient, "\n")
-          serverWS$send(msgFromClient)
-        })
-      }
-    )
-  )
+recordSession <- function(targetAppUrl, host = "0.0.0.0", port = 8600, outputFile = "recording.log") {
+  session <- RecordingSession$new(targetAppUrl, host, port, outputFile)
+  message("Listening on ", host, ":", port)
+  on.exit(session$stop())
+  httpuv::service(Inf)
 }
