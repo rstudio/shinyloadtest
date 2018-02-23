@@ -12,7 +12,8 @@ LazyData: true
 Imports: 
     websocketClient,
     curl,
-    httpuv
+    httpuv,
+    urltools
 Remotes: rstudio/websocketClient,
     rstudio/httpuv
 RoxygenNote: 6.0.1.9000
