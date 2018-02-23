@@ -14,7 +14,8 @@ Imports:
     curl,
     httpuv,
     urltools,
-    R6
+    R6,
+    logging
 Remotes: rstudio/websocketClient,
     rstudio/httpuv
 RoxygenNote: 6.0.1.9000
