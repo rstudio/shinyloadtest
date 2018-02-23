@@ -15,7 +15,9 @@ Imports:
     httpuv,
     urltools,
     R6,
-    logging
+    logging,
+    jsonlite,
+    withr
 Remotes: rstudio/websocketClient,
     rstudio/httpuv
 RoxygenNote: 6.0.1.9000

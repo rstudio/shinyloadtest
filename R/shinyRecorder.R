@@ -50,7 +50,39 @@ resp_httr_to_rook <- function(resp) {
 # Intercept, parse, and record regular HTTP traffic:
 # REQ, REQ_HOME, REQ_TOK, REQ_SINF
 # Intercept and parse WS traffic:
-# WS_OPEN, WS_CLOSE, WS_SEND, WS_RECV
+# WS_OPEN, WS_CLOSE, WS_SEND, WS_RECV, WS_RECV_INIT
+
+getHTTPEventType <- function(session, req_rook, resp_curl) {
+  if (grepl("(\\/|\\.rmd)($|\\?)", req_rook$PATH_INFO, ignore.case = TRUE)) {
+    "REQ_HOME"
+  } else {
+    stop("Couldn't determine HTTP event type")
+  }
+}
+
+makeTimestamp <- function(time = Sys.time()) {
+  withr::with_options(
+    list(digits.secs = 3),
+    format(time, "%Y-%m-%dT%H:%M:%OSZ", tz = "GMT")
+  )
+}
+
+httpEventToJSON <- function(eventType, session, req_rook, resp_curl, created = Sys.time()) {
+  if (eventType == "REQ_HOME") {
+    #{"type":"REQ_HOME","created":"2018-02-15T19:14:43.935Z","method":"GET","url":"/","statusCode":200}
+    jsonlite::toJSON(
+      list(
+        type = "REQ_HOME",
+        created = makeTimestamp(created),
+        method = "GET",
+        url = req_rook$PATH_INFO,
+        statusCode = 200
+      ),
+      auto_unbox = TRUE)
+  } else {
+    stop("Unknown event type: ", eventType)
+  }
+}
 
 RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
@@ -84,7 +116,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
       do.call(curl::handle_setheaders, c(h, req_curl))
       httpUrl <- paste0("http://", private$targetHost, ":", private$targetPort, req$PATH_INFO)
       resp_curl <- curl::curl_fetch_memory(httpUrl, handle = h)
-      # TODO: Pass req and the response code from resp_curl to a function that interprets these values and writes a REQ_* line to the session log.
+      eventType <- getHTTPEventType(self, req, resp_curl)
+      eventJson <- httpEventToJSON(eventType, self, req, resp_curl)
+      cat(eventJson)
       resp_httr_to_rook(resp_curl)
     },
     handleWSOpen = function(clientWS) {
