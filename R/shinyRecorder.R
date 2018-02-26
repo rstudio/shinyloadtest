@@ -108,7 +108,7 @@ makeEvent <- function(tokens, server, req, resp_curl, created = Sys.time()) {
 }
 
 format.REQ = function(evt) {
-  lst = unclass(evt)
+  lst <- unclass(evt)
   jsonlite::toJSON(lst[names(lst) != "newTokens"], auto_unbox = TRUE)
 }
 
