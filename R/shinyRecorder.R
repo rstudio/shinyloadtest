@@ -52,14 +52,6 @@ resp_httr_to_rook <- function(resp) {
 # Intercept and parse WS traffic:
 # WS_OPEN, WS_CLOSE, WS_SEND, WS_RECV, WS_RECV_INIT
 
-getHTTPEventType <- function(session, req_rook, resp_curl) {
-  if (grepl("(\\/|\\.rmd)($|\\?)", req_rook$PATH_INFO, ignore.case = TRUE)) {
-    "REQ_HOME"
-  } else {
-    stop("Couldn't determine HTTP event type")
-  }
-}
-
 makeTimestamp <- function(time = Sys.time()) {
   withr::with_options(
     list(digits.secs = 3),
@@ -67,21 +59,23 @@ makeTimestamp <- function(time = Sys.time()) {
   )
 }
 
-httpEventToJSON <- function(eventType, session, req_rook, resp_curl, created = Sys.time()) {
-  if (eventType == "REQ_HOME") {
-    #{"type":"REQ_HOME","created":"2018-02-15T19:14:43.935Z","method":"GET","url":"/","statusCode":200}
-    jsonlite::toJSON(
-      list(
+makeEvent <- function(session, req_rook, resp_curl, created = Sys.time()) {
+  if (grepl("(\\/|\\.rmd)($|\\?)", req_rook$PATH_INFO, ignore.case = TRUE)) {
+    structure(list(
         type = "REQ_HOME",
         created = makeTimestamp(created),
         method = "GET",
         url = req_rook$PATH_INFO,
         statusCode = 200
       ),
-      auto_unbox = TRUE)
+      class = "REQ")
   } else {
-    stop("Unknown event type: ", eventType)
+    stop("Couldn't determine HTTP event type")
   }
+}
+
+format.REQ = function(evt) {
+  jsonlite::toJSON(unclass(evt), auto_unbox = TRUE)
 }
 
 RecordingSession <- R6::R6Class("RecordingSession",
@@ -110,15 +104,16 @@ RecordingSession <- R6::R6Class("RecordingSession",
     localPort = NULL,
     localServer = NULL,
     outputFile = NULL,
+    writeLine = function(evt) {
+      cat(evt,"\n")
+    },
     handleCall = function(req) {
       req_curl <- req_rook_to_curl(req, private$targetHost, private$targetPort)
       h <- curl::new_handle()
       do.call(curl::handle_setheaders, c(h, req_curl))
       httpUrl <- paste0("http://", private$targetHost, ":", private$targetPort, req$PATH_INFO)
       resp_curl <- curl::curl_fetch_memory(httpUrl, handle = h)
-      eventType <- getHTTPEventType(self, req, resp_curl)
-      eventJson <- httpEventToJSON(eventType, self, req, resp_curl)
-      cat(eventJson)
+      self$writeLine(format(makeEvent(session, req_rook, resp_curl)))
       resp_httr_to_rook(resp_curl)
     },
     handleWSOpen = function(clientWS) {
