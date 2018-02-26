@@ -174,17 +174,33 @@ RecordingSession <- R6::R6Class("RecordingSession",
           ),
           private$outputFile
         )
+        flush(private$outputFile)
       } else {
-        # emit WS_OPEN and replace token values in url with token name placeholders
+        # TODO emit WS_OPEN and replace token values in url with token name placeholders
       }
       wsUrl <- paste0("ws://", private$targetHost, ":", private$targetPort)
       serverWS <- websocketClient::WebsocketClient$new(wsUrl, onMessage = function(msgFromServer) {
-        cat("Got message from server: ", msgFromServer, "\n")
+        #cat("Got message from server: ", msgFromServer, "\n")
+        writeLines(jsonlite::toJSON(list(type = "WS_RECV", created = makeTimestamp(), message = msgFromServer),
+          auto_unbox = TRUE),
+          private$outputFile)
+        flush(private$outputFile)
         clientWS$send(msgFromServer)
       })
       clientWS$onMessage(function (isBinary, msgFromClient) {
-        cat("Got message from client: ", msgFromClient, "\n")
+        #cat("Got message from client: ", msgFromClient, "\n")
+        writeLines(jsonlite::toJSON(list(type = "WS_SEND", created = makeTimestamp(), message = msgFromClient),
+          auto_unbox = TRUE),
+          private$outputFile)
+        flush(private$outputFile)
         serverWS$send(msgFromClient)
+      })
+      clientWS$onClose(function() {
+        writeLines(jsonlite::toJSON(list(type = "WS_CLOSE", created = makeTimestamp()),
+          auto_unbox = TRUE),
+          private$outputFile)
+        flush(private$outputFile)
+        serverWS$close()
       })
     },
     startServer = function() {
