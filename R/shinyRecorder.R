@@ -59,35 +59,49 @@ makeTimestamp <- function(time = Sys.time()) {
   )
 }
 
-makeEvent <- function(session, req_rook, resp_curl, created = Sys.time()) {
+# Returns NA if workerid not found. This either indicates an error state of some
+# kind, or more likely, the Shiny session is running locally.
+getWorkerId <- function(page) {
+  pat <- ".*<base href=\"_w_([0-9a-z]+)/.*"
+  stringr::str_match(page, pat)[[2]]
+}
+
+# Make a fake one: newEvent <- makeEvent(empty_env(), list(PATH_INFO="/"), list(content = charToRaw(page)))
+makeEvent <- function(tokens, req_rook, resp_curl, created = Sys.time()) {
   if (grepl("(\\/|\\.rmd)($|\\?)", req_rook$PATH_INFO, ignore.case = TRUE)) {
+    page <- resp_curl$content %>% rawToChar()
+    workerId <- getWorkerId(page)
     structure(list(
-        type = "REQ_HOME",
-        created = makeTimestamp(created),
-        method = "GET",
-        url = req_rook$PATH_INFO,
-        statusCode = 200
-      ),
-      class = "REQ")
+      newTokens = if (is.na(workerId)) tokens else child_env(tokens, WORKER = workerId),
+      type = "REQ_HOME",
+      created = makeTimestamp(created),
+      method = "GET",
+      server = if (is.na(workerId)) "local" else "hosted",
+      url = req_rook$PATH_INFO,
+      statusCode = 200
+    ),
+    class = "REQ")
   } else {
     stop("Couldn't determine HTTP event type")
   }
 }
 
 format.REQ = function(evt) {
-  jsonlite::toJSON(unclass(evt), auto_unbox = TRUE)
+  # Prints every member of evt except the first, which is the newTokens field
+  # which we use internally but don't want to show up in the output.
+  jsonlite::toJSON(unclass(evt)[-1], auto_unbox = TRUE)
 }
 
 RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
-    initialize = function(targetAppUrl, host, port, outputFile) {
+    initialize = function(targetAppUrl, host, port, outputFileName) {
       parsedUrl <- urltools::url_parse(targetAppUrl)
       private$targetHost <- parsedUrl$domain
       private$targetPort <- parsedUrl$port %OR% 80
 
       private$localHost <- host
       private$localPort <- port
-      private$outputFile <- outputFile
+      private$outputFile <- file(outputFileName, "w")
 
       private$startServer()
     },
@@ -95,6 +109,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       if (is.null(private$localServer)) stop("Can't stop, server not running")
       httpuv::stopServer(private$localServer)
       private$localServer <- NULL
+      close(private$outputFile)
     }
   ),
   private = list(
@@ -104,8 +119,10 @@ RecordingSession <- R6::R6Class("RecordingSession",
     localPort = NULL,
     localServer = NULL,
     outputFile = NULL,
-    writeLine = function(evt) {
-      cat(evt,"\n")
+    tokens = rlang::child_env(rlang::empty_env()),
+    writeEvent = function(evt) {
+      writeLines(format(evt), private$outputFile)
+      flush(private$outputFile)
     },
     handleCall = function(req) {
       req_curl <- req_rook_to_curl(req, private$targetHost, private$targetPort)
@@ -113,7 +130,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
       do.call(curl::handle_setheaders, c(h, req_curl))
       httpUrl <- paste0("http://", private$targetHost, ":", private$targetPort, req$PATH_INFO)
       resp_curl <- curl::curl_fetch_memory(httpUrl, handle = h)
-      self$writeLine(format(makeEvent(session, req_rook, resp_curl)))
+      event <- makeEvent(private$tokens, req_rook, resp_curl)
+      private$tokens <- event$newTokens
+      private$writeEvent(event)
       resp_httr_to_rook(resp_curl)
     },
     handleWSOpen = function(clientWS) {
