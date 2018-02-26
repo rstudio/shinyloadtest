@@ -66,9 +66,23 @@ getWorkerId <- function(page) {
   stringr::str_match(page, pat)[[2]]
 }
 
-# Make a fake one: newEvent <- makeEvent(empty_env(), list(PATH_INFO="/"), list(content = charToRaw(page)))
-makeEvent <- function(tokens, req_rook, resp_curl, created = Sys.time()) {
-  if (grepl("(\\/|\\.rmd)($|\\?)", req_rook$PATH_INFO, ignore.case = TRUE)) {
+insertTokenPlaceholders <- function(tokens, server, url) {
+  if (server == "local") {
+    url
+  } else if (server == "hosted") {
+  } else {
+    stop("Unkown server:", server)
+  }
+}
+
+# Make a fake one: newEvent <- makeEvent(empty_env(), NULL, list(PATH_INFO="/"), list(content = charToRaw(page)))
+makeEvent <- function(tokens, server, req, resp_curl, created = Sys.time()) {
+  if (req$REQUEST_METHOD != "GET") stop("Unsupported method, only handle GET:", req$REQUEST_METHOD)
+  # ShinyTokenRequestEvent,
+  # x ShinyHomeRequestEvent,
+  # ShinySockJSInfoRequestEvent,
+  # x ShinyRequestEvent
+  if (grepl("(\\/|\\.rmd)($|\\?)", req$PATH_INFO, ignore.case = TRUE)) {
     page <- resp_curl$content %>% rawToChar()
     workerId <- getWorkerId(page)
     structure(list(
@@ -77,12 +91,19 @@ makeEvent <- function(tokens, req_rook, resp_curl, created = Sys.time()) {
       created = makeTimestamp(created),
       method = "GET",
       server = if (is.na(workerId)) "local" else "hosted",
-      url = req_rook$PATH_INFO,
+      url = req$PATH_INFO,
       statusCode = 200
-    ),
-    class = "REQ")
+    ), class = "REQ")
   } else {
-    stop("Couldn't determine HTTP event type")
+    structure(list(
+      newTokens = tokens,
+      type = "REQ",
+      created = makeTimestamp(created),
+      method = "GET",
+      server = server,
+      url = insertTokenPlaceholders(tokens, server, req$PATH_INFO),
+      statusCode = 200
+    ), class = "REQ")
   }
 }
 
@@ -119,6 +140,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
     localServer = NULL,
     outputFile = NULL,
     tokens = rlang::child_env(rlang::empty_env()),
+    server = NULL,
     writeEvent = function(evt) {
       writeLines(format(evt), private$outputFile)
       flush(private$outputFile)
@@ -129,9 +151,12 @@ RecordingSession <- R6::R6Class("RecordingSession",
       do.call(curl::handle_setheaders, c(h, req_curl))
       httpUrl <- paste0("http://", private$targetHost, ":", private$targetPort, req$PATH_INFO)
       resp_curl <- curl::curl_fetch_memory(httpUrl, handle = h)
-      event <- makeEvent(private$tokens, req_rook, resp_curl)
+
+      event <- makeEvent(private$tokens, private$server, req, resp_curl)
       private$tokens <- event$newTokens
+      private$server <- event$server
       private$writeEvent(event)
+
       resp_httr_to_rook(resp_curl)
     },
     handleWSOpen = function(clientWS) {
