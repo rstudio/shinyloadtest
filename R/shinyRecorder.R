@@ -76,7 +76,7 @@ insertTokenPlaceholders <- function(tokens, server, url) {
 }
 
 # Make a fake one: newEvent <- makeEvent(empty_env(), NULL, list(PATH_INFO="/"), list(content = charToRaw(page)))
-makeEvent <- function(tokens, server, req, resp_curl, created = Sys.time()) {
+makeHTTPEvent <- function(tokens, server, req, resp_curl, created = Sys.time()) {
   if (req$REQUEST_METHOD != "GET") stop("Unsupported method, only handle GET:", req$REQUEST_METHOD)
   # ShinyTokenRequestEvent,
   # x ShinyHomeRequestEvent,
@@ -107,9 +107,13 @@ makeEvent <- function(tokens, server, req, resp_curl, created = Sys.time()) {
   }
 }
 
-format.REQ = function(evt) {
-  lst <- unclass(evt)
+format.REQ = function(httpEvt) {
+  lst <- unclass(httpEvt)
   jsonlite::toJSON(lst[names(lst) != "newTokens"], auto_unbox = TRUE)
+}
+
+format.WS = function(wsEvt) {
+  jsonlite::toJSON(unclass(wsEvt), auto_unbox = TRUE)
 }
 
 RecordingSession <- R6::R6Class("RecordingSession",
@@ -152,7 +156,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       httpUrl <- paste0("http://", private$targetHost, ":", private$targetPort, req$PATH_INFO)
       resp_curl <- curl::curl_fetch_memory(httpUrl, handle = h)
 
-      event <- makeEvent(private$tokens, private$server, req, resp_curl)
+      event <- makeHTTPEvent(private$tokens, private$server, req, resp_curl)
       private$tokens <- event$newTokens
       private$server <- event$server
       private$writeEvent(event)
@@ -160,6 +164,19 @@ RecordingSession <- R6::R6Class("RecordingSession",
       resp_httr_to_rook(resp_curl)
     },
     handleWSOpen = function(clientWS) {
+      if (private$server == "local") {
+        # emit simple WS_OPEN with url: "/websocket/"
+        writeLines(jsonlite::toJSON(list(
+            type = "WS_OPEN",
+            created = makeTimestamp(),
+            url = clientWS$request$PATH_INFO),
+          auto_unbox = TRUE
+          ),
+          private$outputFile
+        )
+      } else {
+        # emit WS_OPEN and replace token values in url with token name placeholders
+      }
       wsUrl <- paste0("ws://", private$targetHost, ":", private$targetPort)
       serverWS <- websocketClient::WebsocketClient$new(wsUrl, onMessage = function(msgFromServer) {
         cat("Got message from server: ", msgFromServer, "\n")
