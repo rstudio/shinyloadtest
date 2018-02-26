@@ -87,9 +87,8 @@ makeEvent <- function(tokens, req_rook, resp_curl, created = Sys.time()) {
 }
 
 format.REQ = function(evt) {
-  # Prints every member of evt except the first, which is the newTokens field
-  # which we use internally but don't want to show up in the output.
-  jsonlite::toJSON(unclass(evt)[-1], auto_unbox = TRUE)
+  lst = unclass(evt)
+  jsonlite::toJSON(lst[names(lst) != "newTokens"], auto_unbox = TRUE)
 }
 
 RecordingSession <- R6::R6Class("RecordingSession",
