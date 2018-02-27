@@ -107,6 +107,10 @@ makeHTTPEvent <- function(tokens, server, req, resp_curl, created = Sys.time()) 
   }
 }
 
+makeWSEvent <- function(type, created = Sys.time(), ...) {
+  structure(list(type = type, created = makeTimestamp(created), ...), class = "WS")
+}
+
 format.REQ = function(httpEvt) {
   lst <- unclass(httpEvt)
   jsonlite::toJSON(lst[names(lst) != "newTokens"], auto_unbox = TRUE)
@@ -165,41 +169,25 @@ RecordingSession <- R6::R6Class("RecordingSession",
     },
     handleWSOpen = function(clientWS) {
       if (private$server == "local") {
-        # emit simple WS_OPEN with url: "/websocket/"
-        writeLines(jsonlite::toJSON(list(
-            type = "WS_OPEN",
-            created = makeTimestamp(),
-            url = clientWS$request$PATH_INFO),
-          auto_unbox = TRUE
-          ),
-          private$outputFile
-        )
-        flush(private$outputFile)
+        private$writeEvent(makeWSEvent("WS_OPEN", url = clientWS$request$PATH_INFO))
       } else {
         # TODO emit WS_OPEN and replace token values in url with token name placeholders
       }
       wsUrl <- paste0("ws://", private$targetHost, ":", private$targetPort)
-      serverWS <- websocketClient::WebsocketClient$new(wsUrl, onMessage = function(msgFromServer) {
-        #cat("Got message from server: ", msgFromServer, "\n")
-        writeLines(jsonlite::toJSON(list(type = "WS_RECV", created = makeTimestamp(), message = msgFromServer),
-          auto_unbox = TRUE),
-          private$outputFile)
-        flush(private$outputFile)
-        clientWS$send(msgFromServer)
+      serverWS <- websocketClient::WebsocketClient$new(wsUrl,
+        onMessage = function(msgFromServer) {
+          private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
+          clientWS$send(msgFromServer)
+      }, onDisconnected = function() {
+        clientWS$close()
+        serverWS$close()
       })
-      clientWS$onMessage(function (isBinary, msgFromClient) {
-        #cat("Got message from client: ", msgFromClient, "\n")
-        writeLines(jsonlite::toJSON(list(type = "WS_SEND", created = makeTimestamp(), message = msgFromClient),
-          auto_unbox = TRUE),
-          private$outputFile)
-        flush(private$outputFile)
+      clientWS$onMessage(function(isBinary, msgFromClient) {
+        private$writeEvent(makeWSEvent("WS_SEND", message = msgFromClient))
         serverWS$send(msgFromClient)
       })
       clientWS$onClose(function() {
-        writeLines(jsonlite::toJSON(list(type = "WS_CLOSE", created = makeTimestamp()),
-          auto_unbox = TRUE),
-          private$outputFile)
-        flush(private$outputFile)
+        private$writeEvent(makeWSEvent("WS_CLOSE"))
         serverWS$close()
       })
     },
