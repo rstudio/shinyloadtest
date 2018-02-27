@@ -134,10 +134,13 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$startServer()
     },
     stop = function() {
-      if (is.null(private$localServer)) stop("Can't stop, server not running")
-      httpuv::stopServer(private$localServer)
-      private$localServer <- NULL
-      close(private$outputFile)
+      if (!(is.null(private$localServer))) {
+        cat("Stopping server\n")
+        httpuv::stopServer(private$localServer)
+        httpuv::interrupt()
+        private$localServer <- NULL
+        close(private$outputFile)
+      }
     }
   ),
   private = list(
@@ -149,6 +152,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
     outputFile = NULL,
     tokens = rlang::child_env(rlang::empty_env()),
     server = NULL,
+    clientWsState = NULL,
     writeEvent = function(evt) {
       writeLines(format(evt), private$outputFile)
       flush(private$outputFile)
@@ -168,6 +172,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       resp_httr_to_rook(resp_curl)
     },
     handleWSOpen = function(clientWS) {
+      private$clientWsState <- "OPEN"
       if (private$server == "local") {
         private$writeEvent(makeWSEvent("WS_OPEN", url = clientWS$request$PATH_INFO))
       } else {
@@ -179,22 +184,28 @@ RecordingSession <- R6::R6Class("RecordingSession",
           private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
           clientWS$send(msgFromServer)
       }, onDisconnected = function() {
-        clientWS$close()
-        serverWS$close()
+        cat("Server disconnected\n")
+        if (private$clientWsState == "OPEN") {
+          clientWS$close()
+          private$clientWsState <- "CLOSED"
+        }
       })
       clientWS$onMessage(function(isBinary, msgFromClient) {
         private$writeEvent(makeWSEvent("WS_SEND", message = msgFromClient))
         serverWS$send(msgFromClient)
       })
       clientWS$onClose(function() {
+        cat("Client disconnected\n")
+        if (!(serverWS$getState() %in% c("CLOSED", "CLOSING"))) {
+          serverWS$close()
+        }
         private$writeEvent(makeWSEvent("WS_CLOSE"))
-        serverWS$close()
+        self$stop()
       })
     },
     startServer = function() {
       private$localServer <- httpuv::startServer(private$localHost, private$localPort,
-        list(call = private$handleCall, onWSOpen = private$handleWSOpen)
-      )
+        list(call = private$handleCall, onWSOpen = private$handleWSOpen))
     }
   )
 )
