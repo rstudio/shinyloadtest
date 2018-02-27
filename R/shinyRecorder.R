@@ -83,7 +83,7 @@ makeHTTPEvent <- function(tokens, server, req, resp_curl, created = Sys.time()) 
   # ShinySockJSInfoRequestEvent,
   # x ShinyRequestEvent
   if (grepl("(\\/|\\.rmd)($|\\?)", req$PATH_INFO, ignore.case = TRUE)) {
-    page <- resp_curl$content %>% rawToChar()
+    page <- rawToChar(resp_curl$content)
     workerId <- getWorkerId(page)
     structure(list(
       newTokens = if (is.na(workerId)) tokens else child_env(tokens, WORKER = workerId),
