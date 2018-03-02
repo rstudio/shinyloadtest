@@ -66,6 +66,14 @@ getWorkerId <- function(page) {
   stringr::str_match(page, pat)[[2]]
 }
 
+# Parses a JSON message from the server; returns the object from the nested JSON, if any
+parseMessage <- function(msg) {
+  res <- stringr::str_match(msg, '^a\\["([0-9A-F*]+#)?0\\|m\\|(.*)"\\]$')
+  encodedMsg <- res[1,3]
+  if (is.na(encodedMsg)) stop("Couldn't parse WS message")
+  jsonlite::fromJSON(gsub('\\\\\"', '\"', encodedMsg, fixed = TRUE))
+}
+
 # val allowedTokens: HashSet<String> = hashSetOf("WORKER", "TOKEN", "ROBUST_ID", "SOCKJSID", "SESSION")
 # ShinySockJSInfoRequestEvent,
 #
@@ -126,7 +134,6 @@ makeHTTPEvent <- function(server, req, resp_curl, created = Sys.time()) {
 
 makeWSEvent <- function(type, created = Sys.time(), ...) {
   structure(list(type = type, created = makeTimestamp(created), ...), class = "WS")
-  # {"type":"WS_OPEN","created":"2017-12-14T16:43:34.273Z","url":"/__sockjs__/n=${ROBUST_ID}/t=${TOKEN}/w=${WORKER}/s=0/${SOCKJSID}/websocket"}
   # {"type":"WS_RECV_INIT","created":"2017-12-14T16:43:34.414Z","message":"a[\"1#0|m|{\\\\\"config\\\\\":{\\\\\"workerId\\\\\":\\\\\"${WORKER}\\\\\",\\\\\"sessionId\\\\\":\\\\\"${SESSION}\\\\\",\\\\\"user\\\\\":null}}\"]"}
 }
 
@@ -204,7 +211,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
       wsUrl <- paste0("ws://", private$targetHost, ":", private$targetPort)
       serverWS <- websocketClient::WebsocketClient$new(wsUrl,
         onMessage = function(msgFromServer) {
+          parsed <- parseMessage(msgFromServer)
           private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
+
           clientWS$send(msgFromServer)
       }, onDisconnected = function() {
         cat("Server disconnected\n")
