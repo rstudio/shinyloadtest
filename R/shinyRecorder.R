@@ -66,12 +66,21 @@ getWorkerId <- function(page) {
   stringr::str_match(page, pat)[[2]]
 }
 
+messagePattern <- '^(a\\[")([0-9A-F*]+#)?(0\\|m\\|)(.*)("\\])$'
+
 # Parses a JSON message from the server; returns the object from the nested JSON, if any
 parseMessage <- function(msg) {
-  res <- stringr::str_match(msg, '^a\\["([0-9A-F*]+#)?0\\|m\\|(.*)"\\]$')
-  encodedMsg <- res[1,3]
+  res <- stringr::str_match(msg, messagePattern)
+  encodedMsg <- res[1,5]
   if (is.na(encodedMsg)) stop("Couldn't parse WS message")
   jsonlite::fromJSON(gsub('\\\\\"', '\"', encodedMsg, fixed = TRUE))
+}
+
+# Generate a new message based on originalMessage but with new contents
+spliceMessage <- function(originalMessage, newMessageObject) {
+  newMsg <- gsub('"', '\\\\\"', jsonlite::toJSON(newMessageObject, null = 'null'), fixed = TRUE)
+  group <- stringr::str_match(originalMessage, messagePattern)
+  paste0(group[1,2], group[1,3], group[1,4], newMsg, group[1,6])
 }
 
 # val allowedTokens: HashSet<String> = hashSetOf("WORKER", "TOKEN", "ROBUST_ID", "SOCKJSID", "SESSION")
@@ -145,12 +154,25 @@ format.WS = function(wsEvt) {
   jsonlite::toJSON(unclass(wsEvt), auto_unbox = TRUE)
 }
 
+# Given a path like the one provided by urltools::url_parse, returns a path
+# guaranteed to have a leading forward slash but no trailing slash.
+canonicalPath <- function(urlPath) {
+  if (substr(urlPath, 1, 1) != "/") {
+    urlPath <- paste0("/", urlPath)
+  }
+  if (substr(urlPath, nchar(urlPath), nchar(urlPath)) == "/") {
+    urlPath <- substr(urlPath, 1, nchar(urlPath)-1)
+  }
+  urlPath
+}
+
 RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
     initialize = function(targetAppUrl, host, port, outputFileName) {
       parsedUrl <- urltools::url_parse(targetAppUrl)
       private$targetHost <- parsedUrl$domain
       private$targetPort <- parsedUrl$port %OR% 80
+      private$targetPath <- if (is.na(parsedUrl$path)) "" else paste0("/", parsedUrl$path)
 
       private$localHost <- host
       private$localPort <- port
@@ -171,6 +193,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
   private = list(
     targetHost = NULL,
     targetPort = NULL,
+    targetPath = NULL,
     localHost = NULL,
     localPort = NULL,
     localServer = NULL,
@@ -185,7 +208,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
       req_curl <- req_rook_to_curl(req, private$targetHost, private$targetPort)
       h <- curl::new_handle()
       do.call(curl::handle_setheaders, c(h, req_curl))
-      httpUrl <- paste0("http://", private$targetHost, ":", private$targetPort, req$PATH_INFO)
+
+      httpUrl <- paste0("http://", private$targetHost, ":", private$targetPort, private$targetPath, req$PATH_INFO)
+
       resp_curl <- curl::curl_fetch_memory(httpUrl, handle = h)
 
       event <- makeHTTPEvent(private$server, req, resp_curl)
@@ -199,21 +224,28 @@ RecordingSession <- R6::R6Class("RecordingSession",
       if (private$server == "local") {
         private$writeEvent(makeWSEvent("WS_OPEN", url = clientWS$request$PATH_INFO))
       } else {
-        # {"type":"WS_OPEN","created":"2017-12-14T16:43:34.273Z","url":"/__sockjs__/n=${ROBUST_ID}/t=${TOKEN}/w=${WORKER}/s=0/${SOCKJSID}/websocket"}",
         private$writeEvent(makeWSEvent("WS_OPEN", url =  stringr::str_replace_all(clientWS$request$PATH_INFO, c(
           "n=\\w+" = "n=${ROBUST_ID}",
           "t=\\w+" = "t=${TOKEN}",
           "w=\\w+" = "w=${WORKER}",
           "\\/\\w+\\/\\w+\\/websocket$" = "/${SOCKJSID}/websocket"
         ))))
-        # !!!!! not here !!!!!! private$writeEvent(makeWSEvent("WS_RECV_INIT", url = clientWS$request$PATH_INFO))
       }
       wsUrl <- paste0("ws://", private$targetHost, ":", private$targetPort)
       serverWS <- websocketClient::WebsocketClient$new(wsUrl,
         onMessage = function(msgFromServer) {
           parsed <- parseMessage(msgFromServer)
-          private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
-
+          # If the message from the server is an object with a "config" key, fix
+          # up some keys with placeholders and record the message as a
+          # WS_RECV_INIT
+          if ("config" %in% names(parsed)) {
+            newMsgObj <- parsed
+            newMsgObj$config$workerId <- "${WORKER}"
+            newMsgObj$config$sessionId <- "${SESSION}"
+            private$writeEvent(makeWSEvent("WS_RECV_INIT", message = spliceMessage(msgFromServer, newMsgObj)))
+          } else {
+            private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
+          }
           clientWS$send(msgFromServer)
       }, onDisconnected = function() {
         cat("Server disconnected\n")
