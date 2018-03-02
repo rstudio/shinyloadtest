@@ -66,27 +66,18 @@ getWorkerId <- function(page) {
   stringr::str_match(page, pat)[[2]]
 }
 
-insertTokenPlaceholders <- function(tokens, server, url) {
-  if (server == "local") {
-    url
-  } else if (server == "hosted") {
-  } else {
-    stop("Unkown server:", server)
-  }
-}
-
+# val allowedTokens: HashSet<String> = hashSetOf("WORKER", "TOKEN", "ROBUST_ID", "SOCKJSID", "SESSION")
+# ShinySockJSInfoRequestEvent,
+#
 # Make a fake one: newEvent <- makeEvent(empty_env(), NULL, list(PATH_INFO="/"), list(content = charToRaw(page)))
-makeHTTPEvent <- function(tokens, server, req, resp_curl, created = Sys.time()) {
+makeHTTPEvent <- function(server, req, resp_curl, created = Sys.time()) {
   if (req$REQUEST_METHOD != "GET") stop("Unsupported method, only handle GET:", req$REQUEST_METHOD)
-  # ShinyTokenRequestEvent,
-  # x ShinyHomeRequestEvent,
-  # ShinySockJSInfoRequestEvent,
-  # x ShinyRequestEvent
+
+  # ShinyHomeRequestEvent,
   if (grepl("(\\/|\\.rmd)($|\\?)", req$PATH_INFO, ignore.case = TRUE)) {
     page <- rawToChar(resp_curl$content)
     workerId <- getWorkerId(page)
     structure(list(
-      newTokens = if (is.na(workerId)) tokens else child_env(tokens, WORKER = workerId),
       type = "REQ_HOME",
       created = makeTimestamp(created),
       method = "GET",
@@ -94,14 +85,40 @@ makeHTTPEvent <- function(tokens, server, req, resp_curl, created = Sys.time()) 
       url = req$PATH_INFO,
       statusCode = 200
     ), class = "REQ")
+
+  # ShinyTokenRequestEvent,
+  } else if (grepl("__token__?_=", req$PATH_INFO, fixed = TRUE)) {
+    structure(list(
+      type = "REQ_TOK",
+      created = makeTimestamp(created),
+      method = "GET",
+      server = server,
+      url = gsub("_w_[a-z0-9]+", "_w_${WORKER}", req$PATH_INFO),
+      statusCode = 200
+    ), class = "REQ")
+
+  # ShinySINFRequestEvent
+  } else if (grepl("__sockjs__/", req$PATH_INFO, fixed = TRUE)) {
+    structure(list(
+      type = "REQ_SINF",
+      created = makeTimestamp(created),
+      method = "GET",
+      server = server,
+      url = stringr::str_replace_all(req$PATH_INFO, c(
+        "n=\\w+" = "n=${ROBUST_ID}",
+        "t=\\w+" = "t=${TOKEN}",
+        "w=\\w+" = "w=${WORKER}")),
+      statusCode = 200
+    ), class = "REQ")
+
+  # ShinyRequestEvent
   } else {
     structure(list(
-      newTokens = tokens,
       type = "REQ",
       created = makeTimestamp(created),
       method = "GET",
       server = server,
-      url = insertTokenPlaceholders(tokens, server, req$PATH_INFO),
+      url = if (server == "local") req$PATH_INFO else gsub("_w_\\w+", "_w_${WORKER}", req$PATH_INFO),
       statusCode = 200
     ), class = "REQ")
   }
@@ -109,11 +126,12 @@ makeHTTPEvent <- function(tokens, server, req, resp_curl, created = Sys.time()) 
 
 makeWSEvent <- function(type, created = Sys.time(), ...) {
   structure(list(type = type, created = makeTimestamp(created), ...), class = "WS")
+  # {"type":"WS_OPEN","created":"2017-12-14T16:43:34.273Z","url":"/__sockjs__/n=${ROBUST_ID}/t=${TOKEN}/w=${WORKER}/s=0/${SOCKJSID}/websocket"}
+  # {"type":"WS_RECV_INIT","created":"2017-12-14T16:43:34.414Z","message":"a[\"1#0|m|{\\\\\"config\\\\\":{\\\\\"workerId\\\\\":\\\\\"${WORKER}\\\\\",\\\\\"sessionId\\\\\":\\\\\"${SESSION}\\\\\",\\\\\"user\\\\\":null}}\"]"}
 }
 
 format.REQ = function(httpEvt) {
-  lst <- unclass(httpEvt)
-  jsonlite::toJSON(lst[names(lst) != "newTokens"], auto_unbox = TRUE)
+  jsonlite::toJSON(unclass(httpEvt), auto_unbox = TRUE)
 }
 
 format.WS = function(wsEvt) {
@@ -150,7 +168,6 @@ RecordingSession <- R6::R6Class("RecordingSession",
     localPort = NULL,
     localServer = NULL,
     outputFile = NULL,
-    tokens = rlang::child_env(rlang::empty_env()),
     server = NULL,
     clientWsState = NULL,
     writeEvent = function(evt) {
@@ -164,8 +181,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       httpUrl <- paste0("http://", private$targetHost, ":", private$targetPort, req$PATH_INFO)
       resp_curl <- curl::curl_fetch_memory(httpUrl, handle = h)
 
-      event <- makeHTTPEvent(private$tokens, private$server, req, resp_curl)
-      private$tokens <- event$newTokens
+      event <- makeHTTPEvent(private$server, req, resp_curl)
       private$server <- event$server
       private$writeEvent(event)
 
@@ -176,7 +192,14 @@ RecordingSession <- R6::R6Class("RecordingSession",
       if (private$server == "local") {
         private$writeEvent(makeWSEvent("WS_OPEN", url = clientWS$request$PATH_INFO))
       } else {
-        # TODO emit WS_OPEN and replace token values in url with token name placeholders
+        # {"type":"WS_OPEN","created":"2017-12-14T16:43:34.273Z","url":"/__sockjs__/n=${ROBUST_ID}/t=${TOKEN}/w=${WORKER}/s=0/${SOCKJSID}/websocket"}",
+        private$writeEvent(makeWSEvent("WS_OPEN", url =  stringr::str_replace_all(clientWS$request$PATH_INFO, c(
+          "n=\\w+" = "n=${ROBUST_ID}",
+          "t=\\w+" = "t=${TOKEN}",
+          "w=\\w+" = "w=${WORKER}",
+          "\\/\\w+\\/\\w+\\/websocket$" = "/${SOCKJSID}/websocket"
+        ))))
+        # !!!!! not here !!!!!! private$writeEvent(makeWSEvent("WS_RECV_INIT", url = clientWS$request$PATH_INFO))
       }
       wsUrl <- paste0("ws://", private$targetHost, ":", private$targetPort)
       serverWS <- websocketClient::WebsocketClient$new(wsUrl,
