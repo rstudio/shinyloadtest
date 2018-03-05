@@ -72,7 +72,7 @@ messagePattern <- '^(a\\[")([0-9A-F*]+#)?(0\\|m\\|)(.*)("\\])$'
 parseMessage <- function(msg) {
   res <- stringr::str_match(msg, messagePattern)
   encodedMsg <- res[1,5]
-  if (is.na(encodedMsg)) stop("Couldn't parse WS message")
+  if (is.na(encodedMsg)) stop("Couldn't parse WS message: ", msg)
   jsonlite::fromJSON(gsub('\\\\\"', '\"', encodedMsg, fixed = TRUE))
 }
 
@@ -83,10 +83,6 @@ spliceMessage <- function(originalMessage, newMessageObject) {
   paste0(group[1,2], group[1,3], group[1,4], newMsg, group[1,6])
 }
 
-# val allowedTokens: HashSet<String> = hashSetOf("WORKER", "TOKEN", "ROBUST_ID", "SOCKJSID", "SESSION")
-# ShinySockJSInfoRequestEvent,
-#
-# Make a fake one: newEvent <- makeEvent(empty_env(), NULL, list(PATH_INFO="/"), list(content = charToRaw(page)))
 makeHTTPEvent <- function(server, req, resp_curl, created = Sys.time()) {
   if (req$REQUEST_METHOD != "GET") stop("Unsupported method, only handle GET:", req$REQUEST_METHOD)
 
@@ -104,7 +100,7 @@ makeHTTPEvent <- function(server, req, resp_curl, created = Sys.time()) {
     ), class = "REQ")
 
   # ShinyTokenRequestEvent,
-  } else if (grepl("__token__?_=", req$PATH_INFO, fixed = TRUE)) {
+  } else if (grepl("__token__", req$PATH_INFO, fixed = TRUE)) {
     structure(list(
       type = "REQ_TOK",
       created = makeTimestamp(created),
@@ -130,6 +126,7 @@ makeHTTPEvent <- function(server, req, resp_curl, created = Sys.time()) {
 
   # ShinyRequestEvent
   } else {
+    if (server == "hosted") print(req$PATH_INFO)
     structure(list(
       type = "REQ",
       created = makeTimestamp(created),
@@ -143,7 +140,6 @@ makeHTTPEvent <- function(server, req, resp_curl, created = Sys.time()) {
 
 makeWSEvent <- function(type, created = Sys.time(), ...) {
   structure(list(type = type, created = makeTimestamp(created), ...), class = "WS")
-  # {"type":"WS_RECV_INIT","created":"2017-12-14T16:43:34.414Z","message":"a[\"1#0|m|{\\\\\"config\\\\\":{\\\\\"workerId\\\\\":\\\\\"${WORKER}\\\\\",\\\\\"sessionId\\\\\":\\\\\"${SESSION}\\\\\",\\\\\"user\\\\\":null}}\"]"}
 }
 
 format.REQ = function(httpEvt) {
@@ -234,18 +230,23 @@ RecordingSession <- R6::R6Class("RecordingSession",
       wsUrl <- paste0("ws://", private$targetHost, ":", private$targetPort)
       serverWS <- websocketClient::WebsocketClient$new(wsUrl,
         onMessage = function(msgFromServer) {
-          parsed <- parseMessage(msgFromServer)
-          # If the message from the server is an object with a "config" key, fix
-          # up some keys with placeholders and record the message as a
-          # WS_RECV_INIT
-          if ("config" %in% names(parsed)) {
-            newMsgObj <- parsed
-            newMsgObj$config$workerId <- "${WORKER}"
-            newMsgObj$config$sessionId <- "${SESSION}"
-            private$writeEvent(makeWSEvent("WS_RECV_INIT", message = spliceMessage(msgFromServer, newMsgObj)))
-          } else {
-            private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
+          cat(msgFromServer, "\n")
+          if (private$server == "hosted") {
+            parsed <- parseMessage(msgFromServer)
+            # If the message from the server is an object with a "config" key, fix
+            # up some keys with placeholders and record the message as a
+            # WS_RECV_INIT
+            if ("config" %in% names(parsed)) {
+              newMsgObj <- parsed
+              newMsgObj$config$workerId <- "${WORKER}"
+              newMsgObj$config$sessionId <- "${SESSION}"
+              private$writeEvent(makeWSEvent("WS_RECV_INIT", message = spliceMessage(msgFromServer, newMsgObj)))
+              clientWS$send(msgFromServer)
+              return(invisible())
+            }
           }
+          # Every other websocket event
+          private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
           clientWS$send(msgFromServer)
       }, onDisconnected = function() {
         cat("Server disconnected\n")
