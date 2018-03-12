@@ -74,13 +74,23 @@ messagePattern <- '^(a\\[")([0-9A-F*]+#)?(0\\|m\\|)(.*)("\\])$'
 parseMessage <- function(msg) {
   res <- stringr::str_match(msg, messagePattern)
   encodedMsg <- res[1,5]
-  if (is.na(encodedMsg)) stop("Couldn't parse WS message: ", msg)
-  jsonlite::fromJSON(gsub('\\\\\"', '\"', encodedMsg, fixed = TRUE))
+  # If the regex failed, then msg is probably a bare JSON string that can be
+  # decoded directly.
+  if (is.na(encodedMsg)) {
+    jsonlite::fromJSON(msg)
+  # If the regex succeeded, we have the payload as an almost-double-JSON-encoded
+  # object - it just needs to be wrapped in a set of double-quotes.
+  } else {
+    wrappedMsg <- paste0('"', encodedMsg, '"')
+    jsonlite::fromJSON(jsonlite::fromJSON(wrappedMsg))
+  }
 }
 
 # Generate a new message based on originalMessage but with new contents
+# {"type":"WS_RECV_INIT","created":"2018-03-12T19:51:59.675Z","message":"a[\"1#0|m|{\\\\\"config\\\\\":{\\\\\"workerId\\\\\":[\\\\\"${WORKER}\\\\\"],\\\\\"sessionId\\\\\":[\\\\\"${SESSION}\\\\\"],\\\\\"user\\\\\":null}}\"]"}
+# {"type":"WS_RECV_INIT","created":"2018-03-12T20:21:27.086Z","message":"a[\"1#0|m|[\"{\\\"config\\\":{\\\"workerId\\\":[\\\"${WORKER}\\\"],\\\"sessionId\\\":[\\\"${SESSION}\\\"],\\\"user\\\":null}}\"]\"]"}
 spliceMessage <- function(originalMessage, newMessageObject) {
-  newMsg <- gsub('"', '\\\\\"', jsonlite::toJSON(newMessageObject, null = 'null'), fixed = TRUE)
+  newMsg <- jsonlite::toJSON(jsonlite::unbox(jsonlite::toJSON(newMessageObject, null = 'null')))
   group <- stringr::str_match(originalMessage, messagePattern)
   paste0(group[1,2], group[1,3], group[1,4], newMsg, group[1,6])
 }
@@ -238,8 +248,14 @@ RecordingSession <- R6::R6Class("RecordingSession",
       #browser()
       serverWS <- websocketClient::WebsocketClient$new(wsUrl,
         onMessage = function(msgFromServer) {
-          # cat(msgFromServer, "\n")
+          cat(msgFromServer, "\n")
           if (private$server == "hosted") {
+            if (msgFromServer == "o") {
+              private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
+              clientWS$send(msgFromServer)
+              return(invisible())
+            }
+
             parsed <- parseMessage(msgFromServer)
             # If the message from the server is an object with a "config" key, fix
             # up some keys with placeholders and record the message as a
