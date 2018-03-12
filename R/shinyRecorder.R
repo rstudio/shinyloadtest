@@ -32,9 +32,11 @@ req_rook_to_curl <- function(req, domain, port) {
 resp_httr_to_rook <- function(resp) {
   # browser()
   status <- as.integer(sub("^HTTP\\S+ (\\d+).*", "\\1", curl::parse_headers(resp$headers)[1]))
+  headers <- curl::parse_headers_list(resp$headers)
+  headers[["transfer-encoding"]] <- NULL
   list(
     status = status,
-    headers = curl::parse_headers_list(resp$headers),
+    headers = headers,
     body = resp$content
   )
 }
@@ -150,13 +152,11 @@ format.WS = function(wsEvt) {
   jsonlite::toJSON(unclass(wsEvt), auto_unbox = TRUE)
 }
 
-# Given a path like the one provided by urltools::url_parse, returns a path
-# guaranteed to have a leading forward slash but no trailing slash.
-canonicalPath <- function(urlPath) {
-  if (substr(urlPath, 1, 1) != "/") {
-    urlPath <- paste0("/", urlPath)
+trimslash <- function(urlPath, which = c("both", "left", "right")) {
+  if (which %in% c("both", "left") && substr(urlPath, 1, 1) == "/") {
+    urlPath <- substr(urlPath, 2, nchar(urlPath))
   }
-  if (substr(urlPath, nchar(urlPath), nchar(urlPath)) == "/") {
+  if (which %in% c("both", "right") && substr(urlPath, nchar(urlPath), nchar(urlPath)) == "/") {
     urlPath <- substr(urlPath, 1, nchar(urlPath)-1)
   }
   urlPath
@@ -168,7 +168,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       parsedUrl <- urltools::url_parse(targetAppUrl)
       private$targetHost <- parsedUrl$domain
       private$targetPort <- parsedUrl$port %OR% 80
-      private$targetPath <- if (is.na(parsedUrl$path)) "" else paste0("/", parsedUrl$path)
+      private$targetPath <- if (is.na(parsedUrl$path)) "" else parsedUrl$path
 
       private$localHost <- host
       private$localPort <- port
@@ -205,7 +205,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       h <- curl::new_handle()
       do.call(curl::handle_setheaders, c(h, req_curl))
 
-      httpUrl <- paste0("http://", private$targetHost, ":", private$targetPort, private$targetPath, req$PATH_INFO)
+      httpUrl <- paste0("http://", private$targetHost, ":", private$targetPort, "/", private$targetPath, "/", req$PATH_INFO, req$QUERY_STRING)
 
       resp_curl <- curl::curl_fetch_memory(httpUrl, handle = h)
 
@@ -213,9 +213,16 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$server <- event$server
       private$writeEvent(event)
 
-      resp_httr_to_rook(resp_curl)
+      ret <- resp_httr_to_rook(resp_curl)
+      if (grepl(".*__token__.*", httpUrl)) {
+        print(resp_curl)
+        print(ret)
+        print(rawToChar(ret$body))
+      }
+      ret
     },
     handleWSOpen = function(clientWS) {
+      cat("WS open!")
       private$clientWsState <- "OPEN"
       if (private$server == "local") {
         private$writeEvent(makeWSEvent("WS_OPEN", url = clientWS$request$PATH_INFO))
@@ -227,10 +234,11 @@ RecordingSession <- R6::R6Class("RecordingSession",
           "\\/\\w+\\/\\w+\\/websocket$" = "/${SOCKJSID}/websocket"
         ))))
       }
-      wsUrl <- paste0("ws://", private$targetHost, ":", private$targetPort)
+      wsUrl <- paste0("ws://", private$targetHost, ":", private$targetPort, "/", trimslash(private$targetPath), "/", trimslash(clientWS$request$PATH_INFO))
+      #browser()
       serverWS <- websocketClient::WebsocketClient$new(wsUrl,
         onMessage = function(msgFromServer) {
-          cat(msgFromServer, "\n")
+          # cat(msgFromServer, "\n")
           if (private$server == "hosted") {
             parsed <- parseMessage(msgFromServer)
             # If the message from the server is an object with a "config" key, fix
