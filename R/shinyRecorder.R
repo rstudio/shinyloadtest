@@ -250,6 +250,14 @@ RecordingSession <- R6::R6Class("RecordingSession",
         onMessage = function(msgFromServer) {
           cat(msgFromServer, "\n")
           if (private$server == "hosted") {
+
+            # These kinds of messages are relayed to the browser but are not recorded.
+            canIgnore <- c('^a\\["ACK.*$', '^\\["ACK.*$', '^h$')
+            if (length(unlist(stringr::str_match_all(msgFromServer, canIgnore))) > 0) {
+              clientWS$send(msgFromServer)
+              return(invisible())
+            }
+
             if (msgFromServer == "o") {
               private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
               clientWS$send(msgFromServer)
