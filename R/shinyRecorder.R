@@ -243,7 +243,6 @@ RecordingSession <- R6::R6Class("RecordingSession",
 
       serverWS <- websocketClient::WebsocketClient$new(wsUrl,
         onMessage = function(msgFromServer) {
-          cat(msgFromServer, "\n")
           if (private$server == "hosted") {
 
             # These kinds of messages are relayed to the browser but are not recorded.
