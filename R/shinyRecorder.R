@@ -1,5 +1,4 @@
 req_rook_to_curl <- function(req, domain, port) {
-  # browser()
   # Rename headers. Example: HTTP_CACHE_CONTROL => Cache-Control
   r <- as.list(req)
 
@@ -30,10 +29,10 @@ req_rook_to_curl <- function(req, domain, port) {
 
 
 resp_httr_to_rook <- function(resp) {
-  # browser()
   status <- as.integer(sub("^HTTP\\S+ (\\d+).*", "\\1", curl::parse_headers(resp$headers)[1]))
   headers <- curl::parse_headers_list(resp$headers)
   headers[["transfer-encoding"]] <- NULL
+  headers[["content-encoding"]] <- "identity"
   list(
     status = status,
     headers = headers,
@@ -217,19 +216,15 @@ RecordingSession <- R6::R6Class("RecordingSession",
 
       httpUrl <- paste0("http://", private$targetHost, ":", private$targetPort, "/", private$targetPath, "/", req$PATH_INFO, req$QUERY_STRING)
 
-      resp_curl <- curl::curl_fetch_memory(httpUrl, handle = h)
+      # This is a hack around the fact that somehow there's three forward slashes in one of the separators
+      httpUrl <- gsub("///", "/", httpUrl, fixed = TRUE)
 
+      resp_curl <- curl::curl_fetch_memory(httpUrl, handle = h)
       event <- makeHTTPEvent(private$server, req, resp_curl)
       private$server <- event$server
       private$writeEvent(event)
 
-      ret <- resp_httr_to_rook(resp_curl)
-      if (grepl(".*__token__.*", httpUrl)) {
-        print(resp_curl)
-        print(ret)
-        print(rawToChar(ret$body))
-      }
-      ret
+      resp_httr_to_rook(resp_curl)
     },
     handleWSOpen = function(clientWS) {
       cat("WS open!")
@@ -245,7 +240,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
         ))))
       }
       wsUrl <- paste0("ws://", private$targetHost, ":", private$targetPort, "/", trimslash(private$targetPath), "/", trimslash(clientWS$request$PATH_INFO))
-      #browser()
+
       serverWS <- websocketClient::WebsocketClient$new(wsUrl,
         onMessage = function(msgFromServer) {
           cat(msgFromServer, "\n")
