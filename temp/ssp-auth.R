@@ -2,11 +2,9 @@
 install.packages("xml2")
 library(xml2)
 
-resLoginForm <- httr::GET("http://localhost:3838/sample-apps/hello/")
-login <- "/Users/barbaraborges/Desktop/login.html"
-login_html <- xml2::read_html(readChar(login, file.info(login)$size))
-
-getHiddenInputs <- function(login_html) {
+getHiddenInputs <- function(url = "http://localhost:3838/sample-apps/hello/") {
+  login <- httr::GET(url)
+  login_html <- xml2::read_html(login)
   inputs <- xml2::xml_find_all(login_html, "//input[@type='hidden']")
   attrs <- xml2::xml_attrs(inputs)
   lst <- Map(function(input) c(input["name"], input["value"]), attrs)
@@ -16,6 +14,10 @@ getHiddenInputs <- function(login_html) {
   df
 }
 
-sendPostReq <- function() {
-httr::POST()
+sendPostReq <- function(url = "http://localhost:3838/sample-apps/hello/") {
+  req_url <- paste0(url, "__login__")
+  httr::POST(req_url, config = list(
+    add_headers(Accept = ""),
+    set_cookies(a = 1, b = 2)
+  ))
 }
