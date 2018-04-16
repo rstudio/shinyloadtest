@@ -309,35 +309,6 @@ RecordingSession <- R6::R6Class("RecordingSession",
   )
 )
 
-makePair <- function(k, v) {
-  pair <- list(v)
-  names(pair) <- k
-  pair
-}
-
-# TODO factor httr into curl
-getHiddenInputs <- function(url = "http://localhost:3838/sample-apps/hello/") {
-  login <- httr::GET(url)
-  login_html <- xml2::read_html(login)
-  inputs <- xml2::xml_find_all(login_html, "//input[@type='hidden']")
-  attrs <- xml2::xml_attrs(inputs)
-  Reduce(function(pairs, input) {
-    append(pairs, makePair(input[["name"]], input[["value"]]))
-  }, attrs, init = list())
-}
-
-# TODO factor httr into curl
-postLogin <- function(hiddenInputs, username, password, url = "http://localhost:3838/sample-apps/hello/__login__") {
-  httr::POST(url,
-    config = list(),
-    body = append(list(
-      username = username,
-      password = password
-    ), hiddenInputs),
-    encode = "form"
-  )
-}
-
 #' Title
 #'
 #' @param targetAppUrl
