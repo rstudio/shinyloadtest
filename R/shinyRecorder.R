@@ -173,7 +173,7 @@ trimslash <- function(urlPath, which = c("both", "left", "right")) {
 
 RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
-    initialize = function(targetAppUrl, host, port, outputFileName) {
+    initialize = function(targetAppUrl, host, port, outputFileName, authCookies = NULL) {
       parsedUrl <- urltools::url_parse(targetAppUrl)
       private$targetHost <- parsedUrl$domain
       private$targetPort <- parsedUrl$port %OR% 80
@@ -182,6 +182,12 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$localHost <- host
       private$localPort <- port
       private$outputFile <- file(outputFileName, "w")
+
+      if (is.null(authCookies)) {
+        private$authCookies <- new.env(parent = emptyenv())
+      } else {
+        private$authCookies <- authCookies
+      }
 
       private$startServer()
     },
@@ -204,6 +210,8 @@ RecordingSession <- R6::R6Class("RecordingSession",
     localServer = NULL,
     outputFile = NULL,
     server = NULL,
+    # This environment is non-empty only when the target application is protected.
+    authCookies = NULL,
     clientWsState = NULL,
     writeEvent = function(evt) {
       writeLines(format(evt), private$outputFile)
@@ -301,6 +309,35 @@ RecordingSession <- R6::R6Class("RecordingSession",
   )
 )
 
+makePair <- function(k, v) {
+  pair <- list(v)
+  names(pair) <- k
+  pair
+}
+
+# TODO factor httr into curl
+getHiddenInputs <- function(url = "http://localhost:3838/sample-apps/hello/") {
+  login <- httr::GET(url)
+  login_html <- xml2::read_html(login)
+  inputs <- xml2::xml_find_all(login_html, "//input[@type='hidden']")
+  attrs <- xml2::xml_attrs(inputs)
+  Reduce(function(pairs, input) {
+    append(pairs, makePair(input[["name"]], input[["value"]]))
+  }, attrs, init = list())
+}
+
+# TODO factor httr into curl
+postLogin <- function(hiddenInputs, username, password, url = "http://localhost:3838/sample-apps/hello/__login__") {
+  httr::POST(url,
+    config = list(),
+    body = append(list(
+      username = username,
+      password = password
+    ), hiddenInputs),
+    encode = "form"
+  )
+}
+
 #' Title
 #'
 #' @param targetAppUrl
@@ -313,7 +350,11 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #'
 #' @examples
 recordSession <- function(targetAppUrl, host = "0.0.0.0", port = 8600, outputFile = "recording.log") {
-  session <- RecordingSession$new(targetAppUrl, host, port, outputFile)
+  # TODO Here is where we test if the app is protected, and if it is, attempt to
+  # log into it. If successfull, the result of our login attempt is the set of
+  # cookies that need to be send with any request.
+  authCookies <- if (isProtected) theCookies else NULL
+  session <- RecordingSession$new(targetAppUrl, host, port, outputFile, authCookies = authCookies) # TODO add cookie param
   message("Listening on ", host, ":", port)
   on.exit(session$stop())
   httpuv::service(Inf)

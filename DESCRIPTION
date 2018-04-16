@@ -19,7 +19,8 @@ Imports:
     jsonlite,
     withr,
     stringr,
-    rlang
+    rlang,
+    xml2
 Remotes: rstudio/websocketClient,
     rstudio/httpuv
 RoxygenNote: 6.0.1.9000
