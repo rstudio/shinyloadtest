@@ -32,9 +32,14 @@ makeParamString <- function(params, sep) {
 # TODO factor httr into curl
 postLogin <- function(hidden_inputs, cookies, username, password, url = "http://localhost:3838/sample-apps/hello/__login__") {
   params <- append(list(username = username, password = password), hidden_inputs)
-  postfields <- URLencode(makeParamString(params, "&"))
   h <- curl::new_handle()
-  curl::handle_setopt(h, postfields = postfields, url = url, post = TRUE)
+  curl::handle_setopt(h,
+    postfields = URLencode(makeParamString(params, "&")),
+    cookie = makeParamString(cookies, ";"),
+    url = url,
+    post = TRUE,
+    followlocation = FALSE
+  )
   curl::handle_setheaders(h, accept = "application/json, text/xml, application/xml, */*")
   curl::curl_fetch_memory(url, handle = h)
 }
