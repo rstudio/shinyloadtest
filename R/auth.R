@@ -4,20 +4,19 @@ makePair <- function(k, v) {
   pair
 }
 
-getHiddenInputs <- function(url = "http://localhost:3838/sample-apps/hello/") {
+collectNamesValues <- function(rows) {
+  Reduce(function(pairs, input) {
+    append(pairs, makePair(input[["name"]], input[["value"]]))
+  }, rows, init = list())
+}
+
+getLoginTokens <- function(url) {
   h <- curl::new_handle()
   resp <- curl::curl_fetch_memory(url, handle = h)
   content <- rawToChar(resp$content)
   login_html <- xml2::read_html(content)
   inputs <- xml2::xml_find_all(login_html, "//input[@type='hidden']")
   attrs <- xml2::xml_attrs(inputs)
-
-  collectNamesValues <- function(rows) {
-    Reduce(function(pairs, input) {
-      append(pairs, makePair(input[["name"]], input[["value"]]))
-    }, rows, init = list())
-  }
-
   list(
     hidden_inputs = collectNamesValues(attrs),
     cookies = collectNamesValues(apply(curl::handle_cookies(h)[,c("name", "value")], 1, as.list))
@@ -29,32 +28,23 @@ makeParamString <- function(params, sep) {
   do.call(paste, c(kvs, sep = sep))
 }
 
-# TODO factor httr into curl
-postLogin <- function(hidden_inputs, cookies, username, password, url = "http://localhost:3838/sample-apps/hello/__login__") {
-  params <- append(list(username = username, password = password), hidden_inputs)
+postLogin <- function(username, password, appUrl, loginUrl) {
+  tokens <- getLoginTokens(appUrl)
+  params <- append(list(username = username, password = password), tokens$hidden_inputs)
   h <- curl::new_handle()
   curl::handle_setopt(h,
     postfields = URLencode(makeParamString(params, "&")),
-    cookie = makeParamString(cookies, ";"),
-    url = url,
+    cookie = makeParamString(tokens$cookies, "; "),
+    url = loginUrl,
     post = TRUE,
     followlocation = FALSE
   )
-  curl::handle_setheaders(h, accept = "application/json, text/xml, application/xml, */*")
-  curl::curl_fetch_memory(url, handle = h)
+  curl::curl_fetch_memory(loginUrl, handle = h)
+  df <- curl::handle_cookies(h)
+  df[which(df$name == "session_state"), "value"]
 }
 
-postLoginHttr <- function(hiddenInputs, username, password, url = "http://localhost:3838/sample-apps/hello/__login__") {
-  httr::POST(url,
-    config = list(),
-    body = append(list(
-      username = username,
-      password = password
-    ), hiddenInputs),
-    encode = "form"
-  )
-}
-
-isProtected <- function(appUrl) {
-
+# TODO
+protectedBy <- function(appUrl) {
+  # Returns string "none", "ssp", "rsc", "shinyapps"
 }
