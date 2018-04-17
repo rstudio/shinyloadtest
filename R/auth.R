@@ -28,6 +28,13 @@ makeParamString <- function(params, sep) {
   do.call(paste, c(kvs, sep = sep))
 }
 
+# TODO
+# postLoginSSP
+# postLoginRSC
+
+# Returns a named vector representing a cookie named `name` with value `value`
+# that should be attached to all subsequent HTTP requests, including the initial
+# websocket request.
 postLogin <- function(username, password, appUrl, loginUrl) {
   tokens <- getLoginTokens(appUrl)
   params <- append(list(username = username, password = password), tokens$hidden_inputs)
@@ -41,7 +48,7 @@ postLogin <- function(username, password, appUrl, loginUrl) {
   )
   curl::curl_fetch_memory(loginUrl, handle = h)
   df <- curl::handle_cookies(h)
-  df[which(df$name == "session_state"), "value"]
+  unlist(df[which(df$name == "session_state"), c("name", "value")])
 }
 
 protectedBy <- function(appUrl) {

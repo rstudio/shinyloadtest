@@ -173,7 +173,7 @@ trimslash <- function(urlPath, which = c("both", "left", "right")) {
 
 RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
-    initialize = function(targetAppUrl, host, port, outputFileName, authCookies = NULL) {
+    initialize = function(targetAppUrl, host, port, outputFileName, sessionCookie = NULL) {
       parsedUrl <- urltools::url_parse(targetAppUrl)
       private$targetHost <- parsedUrl$domain
       private$targetPort <- parsedUrl$port %OR% 80
@@ -182,12 +182,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$localHost <- host
       private$localPort <- port
       private$outputFile <- file(outputFileName, "w")
-
-      if (is.null(authCookies)) {
-        private$authCookies <- new.env(parent = emptyenv())
-      } else {
-        private$authCookies <- authCookies
-      }
+      private$sessionCookie <- sessionCookie
 
       private$startServer()
     },
@@ -210,8 +205,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
     localServer = NULL,
     outputFile = NULL,
     server = NULL,
-    # This environment is non-empty only when the target application is protected.
-    authCookies = NULL,
+    sessionCookie = NULL,
     clientWsState = NULL,
     writeEvent = function(evt) {
       writeLines(format(evt), private$outputFile)
@@ -320,12 +314,13 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #' @export
 #'
 #' @examples
-recordSession <- function(targetAppUrl, host = "0.0.0.0", port = 8600, outputFile = "recording.log") {
+recordSession <- function(targetAppUrl, host = "0.0.0.0", port = 8600, outputFile = "recording.log", username = NULL, password = NULL) {
   # TODO Here is where we test if the app is protected, and if it is, attempt to
   # log into it. If successfull, the result of our login attempt is the set of
   # cookies that need to be send with any request.
-  authCookies <- if (isProtected) theCookies else NULL
-  session <- RecordingSession$new(targetAppUrl, host, port, outputFile, authCookies = authCookies) # TODO add cookie param
+  sessionCookie <- if (!is.null(username) && !is.null(password))
+    postLogin(username, password, targetAppUrl, paste0(targetAppUrl, "/__login__"))
+  session <- RecordingSession$new(targetAppUrl, host, port, outputFile, sessionCookie = sessionCookie) # TODO add cookie param
   message("Listening on ", host, ":", port)
   on.exit(session$stop())
   httpuv::service(Inf)
