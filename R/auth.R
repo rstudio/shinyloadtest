@@ -44,7 +44,13 @@ postLogin <- function(username, password, appUrl, loginUrl) {
   df[which(df$name == "session_state"), "value"]
 }
 
-# TODO
 protectedBy <- function(appUrl) {
   # Returns string "none", "ssp", "rsc", "shinyapps"
+  h <- curl::new_handle()
+  resp <- curl::curl_fetch_memory(appUrl, handle = h)
+  df <- curl::handle_cookies(h)
+  if (resp$status_code == 403) {
+    if (nrow(df[which(df$name == "SSP-XSRF"),]) == 1) return("ssp")
+  }
+  "none"
 }
