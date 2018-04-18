@@ -276,7 +276,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
           # Every other websocket event
           private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
           clientWS$send(msgFromServer)
-      }, onDisconnected = function() {
+      }, onClose = function() {
         cat("Server disconnected\n")
         if (private$clientWsState == "OPEN") {
           clientWS$close()
