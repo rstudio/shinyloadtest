@@ -175,6 +175,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
     initialize = function(targetAppUrl, host, port, outputFileName, sessionCookie = NULL) {
       parsedUrl <- urltools::url_parse(targetAppUrl)
+      private$targetScheme <- parsedUrl$scheme
       private$targetHost <- parsedUrl$domain
       private$targetPort <- parsedUrl$port %OR% 80
       private$targetPath <- if (is.na(parsedUrl$path)) "" else parsedUrl$path
@@ -197,6 +198,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
     }
   ),
   private = list(
+    targetScheme = NULL,
     targetHost = NULL,
     targetPort = NULL,
     targetPath = NULL,
@@ -216,7 +218,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       h <- curl::new_handle()
       do.call(curl::handle_setheaders, c(h, req_curl))
 
-      httpUrl <- paste0("http://", private$targetHost, ":", private$targetPort, "/", private$targetPath, "/", req$PATH_INFO, req$QUERY_STRING)
+      httpUrl <- paste0(private$targetScheme, "://", private$targetHost, ":", private$targetPort, "/", private$targetPath, "/", req$PATH_INFO, req$QUERY_STRING)
 
       # This is a hack around the fact that somehow there's three forward slashes in one of the separators
       httpUrl <- gsub("///", "/", httpUrl, fixed = TRUE)
@@ -241,7 +243,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
           "\\/\\w+\\/\\w+\\/websocket$" = "/${SOCKJSID}/websocket"
         ))))
       }
-      wsUrl <- paste0("ws://", private$targetHost, ":", private$targetPort, "/", trimslash(private$targetPath), "/", trimslash(clientWS$request$PATH_INFO))
+
+      wsScheme <- if (private$targetScheme == "https") "wss" else "ws"
+      wsUrl <- paste0(wsScheme, "://", private$targetHost, ":", private$targetPort, "/", trimslash(private$targetPath), "/", trimslash(clientWS$request$PATH_INFO))
 
       serverWS <- websocketClient::WebsocketClient$new(wsUrl,
         onMessage = function(msgFromServer) {
