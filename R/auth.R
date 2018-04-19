@@ -17,7 +17,9 @@ getLoginTokens <- function(url) {
   login_html <- xml2::read_html(content)
   inputs <- xml2::xml_find_all(login_html, "//input[@type='hidden']")
   attrs <- xml2::xml_attrs(inputs)
+  # Maybe this should be a dataframe with a 'type' column of 'cookie'/'input'
   list(
+    # TODO These should both be dataframe values?
     hidden_inputs = collectNamesValues(attrs),
     cookies = collectNamesValues(apply(curl::handle_cookies(h)[,c("name", "value")], 1, as.list))
   )
@@ -26,6 +28,10 @@ getLoginTokens <- function(url) {
 makeParamString <- function(params, sep) {
   kvs <- Map(function (key) paste0(key, "=", params[[key]]), names(params))
   do.call(paste, c(kvs, sep = sep))
+}
+
+makeParamString2 <- function(name, value, sep) {
+  paste0(name, "=", value, collapse = sep)
 }
 
 # TODO
@@ -41,6 +47,7 @@ postLogin <- function(username, password, appUrl, loginUrl) {
   h <- curl::new_handle()
   curl::handle_setopt(h,
     postfields = URLencode(makeParamString(params, "&")),
+    # TODO how should the cookies be encoding?
     cookie = makeParamString(tokens$cookies, "; "),
     url = loginUrl,
     post = TRUE,
