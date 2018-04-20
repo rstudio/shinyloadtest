@@ -1,7 +1,7 @@
 source("R/auth.R")
 
 username <- "barbara"
-password <- "nc09brib"
+password <- "password"
 appUrl <- "http://10.211.55.6:3939/content/3/"
 loginUrl <- "http://10.211.55.6:3939/__login__"
 
@@ -36,25 +36,52 @@ postLoginRSC <- function(username, password, appUrl, loginUrl) {
   # apime <- curl::curl_fetch_memory(appUrl, handle = h)
 }
 
+t <- postLoginRSCHttr(
+"barbara",
+"password",
+  appUrl = "http://10.211.55.6:3939/connect/#/login?url=http:%2F%2F10.211.55.6:3939%2Fcontent%2F3%2F",
+  loginUrl = "http://10.211.55.6:3939/connect/#/login?url=http:%2F%2F10.211.55.6:3939%2Fcontent%2F3%2F"
+)
 
-+postLogin <- function(hiddenInputs, username, password, url = "http://localhost:3838/sample-apps/hello/__login__") {
-  +  httr::POST(url,
-    +    config = list(),
-    +    body = append(list(
-      +      username = username,
-      +      password = password
-      +    ), hiddenInputs),
-    +    encode = "form"
-    +  )
-  +}
-
-"http://10.211.55.6:3939/__login__"
-postLoginRSCHttr <- function(username, password, appUrl, loginUrl) {
+# 1. obtain rscid, rsconnect, and RSC-XSRF cookies by visiting app url
+# 2. post to http://10.211.55.6:3939/__login__ with 3 cookies and an additional
+#    header (X-RSC-XSRF: aISSTqRLUZ88S20dMzwis6dqNBNu53jc3nIXASJx2UY=, same as cookie)
+#    post body: request payload: {username: "barbara", password: "nc09brib"}
+# 3. use the rsconnect cookie in all future HTTP requests
+#
+#
+# 1. send post with body - request payload: {username: "barbara", password: "nc09brib"}
+# 2. use the rsconnect cookie in all future HTTP requests
+postLoginRSCHttr <- function(username = "barbara", password = "nc09brib", appUrl, loginUrl) {
   tokens <- getLoginTokens(appUrl)
-  params <- append(list(username = username, password = password), tokens$hidden_inputs)
-  httr::POST(loginUrl, body = params, encode = "form")
+  httr::POST(loginUrl, body = list(username = username, password = password), encode = "json")
 }
 
+
+postLoginRsc <- function(username = "barbara", password = "nc09brib", appUrl) {
+  h <- curl::new_handle()
+
+  resp <- curl::curl_fetch_memory(appUrl, handle = h)
+  cookies <- curl::handle_cookies(h)[,c("name", "value")]
+
+  h2 <- curl::new_handle()
+
+  curl::handle_setopt(h2,
+    postfields = '{"username": "barbara", "password": "nc09brib"}',
+    cookie = paste0(cookies[["name"]], "=", cookies[["value"]], collapse = "; "),
+    post = TRUE,
+    followlocation = FALSE
+  )
+  curl::handle_setheaders(h2,
+    # "X-RSC-XSRF" = cookies[[which(cookies["name"] == "RSC-XSRF"), "value"]],
+    "Content-Type" = "application/json"
+  )
+  curl::curl_fetch_memory("http://10.211.55.6:3939/__login__", handle = h2)
+  curl::handle_cookies(h2)[,c("name", "value")]
+}
+
+
+curl::curl_fetch_memory(appUrl, )
 
 protectedBy <- function(appUrl) {
   # Returns string "none", "ssp", "rsc", "shinyapps"
