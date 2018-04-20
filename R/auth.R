@@ -26,7 +26,8 @@ handlePost <- function(handle, loginUrl, postfields, cookies, cookieName) {
     # TODO how should the cookies be encoding?
     cookie = paste0(cookies[["name"]], "=", cookies[["value"]], collapse = "; "),
     post = TRUE,
-    followlocation = FALSE
+    followlocation = FALSE,
+    ssl_verifyhost = 0, ssl_verifypeer = 0
   )
   curl::curl_fetch_memory(loginUrl, handle = handle)
   cookies <- curl::handle_cookies(handle)
@@ -77,7 +78,7 @@ postLogin <- function(appUrl, loginUrl = NULL) {
 
 getApp <- function(appUrl, cookie) {
   h <- curl::new_handle()
-  curl::handle_setopt(h,
+  curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0,
     cookie = paste0(cookie[["name"]], "=", cookie[["value"]], collapse = "; ")
   )
   curl::curl_fetch_memory(appUrl, handle = h)
