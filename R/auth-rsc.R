@@ -58,30 +58,29 @@ postLoginRSCHttr <- function(username = "barbara", password = "nc09brib", appUrl
 }
 
 
-postLoginRsc <- function(username = "barbara", password = "nc09brib", appUrl) {
-  h <- curl::new_handle()
-
-  resp <- curl::curl_fetch_memory(appUrl, handle = h)
-  cookies <- curl::handle_cookies(h)[,c("name", "value")]
-
+postLoginRsc <- function(appUrl, username = "barbara", password = "nc09brib") {
+  h1 <- curl::new_handle()
+  resp <- curl::curl_fetch_memory(appUrl, handle = h1)
+  cookies <- curl::handle_cookies(h1)[,c("name", "value")]
   h2 <- curl::new_handle()
-
   curl::handle_setopt(h2,
     postfields = '{"username": "barbara", "password": "nc09brib"}',
     cookie = paste0(cookies[["name"]], "=", cookies[["value"]], collapse = "; "),
-    post = TRUE,
-    followlocation = FALSE
-  )
-  curl::handle_setheaders(h2,
-    # "X-RSC-XSRF" = cookies[[which(cookies["name"] == "RSC-XSRF"), "value"]],
-    "Content-Type" = "application/json"
+    post = TRUE, followlocation = FALSE
   )
   curl::curl_fetch_memory("http://10.211.55.6:3939/__login__", handle = h2)
   curl::handle_cookies(h2)[,c("name", "value")]
 }
 
 
-curl::curl_fetch_memory(appUrl, )
+getApp <- function(appUrl, cookies) {
+  h <- curl::new_handle()
+  curl::handle_setopt(h,
+    cookie = paste0(cookies[["name"]], "=", cookies[["value"]], collapse = "; ")
+  )
+  curl::curl_fetch_memory(appUrl, handle = h)
+}
+
 
 protectedBy <- function(appUrl) {
   # Returns string "none", "ssp", "rsc", "shinyapps"
