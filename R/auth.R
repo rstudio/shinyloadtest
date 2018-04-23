@@ -7,17 +7,31 @@ getInputs <- function(html, server) {
   }
 }
 
-# Returns string "none", "ssp", "rsc", "shinyapps"
-protectedBy <- function(appUrl) {
+# Returns string "unknown", "ssp", "rsc"
+# TODO "shinyapps.io"
+servedBy <- function(appUrl) {
   h <- curl::new_handle()
   resp <- curl::curl_fetch_memory(appUrl, handle = h)
   df <- curl::handle_cookies(h)
-  if (resp$status_code == 403) {
-    if (nrow(df[which(df$name == "SSP-XSRF"),]) == 1) return("ssp")
+  if (nrow(df[which(df$name == "SSP-XSRF"),]) == 1) {
+    return("ssp")
+  } else if (nrow(df[which(df$name == "rscid"),]) == 1) {
+    return("rsc")
   }
-  else if (nrow(df[which(df$name == "rscid"),]) == 1) return("rsc")
-  "none"
+  "unknown"
 }
+
+loginUrlFor <- function(appUrl, appServer) {
+  if (appServer == "rsc") {
+    p <- xml2::url_parse(appUrl)
+    paste0(p[1,"scheme"], "://", p[1,"server"], ":", p[1,"port"],  "/__login__", collapse = "")
+  } else if (appServer == "ssp") {
+    paste0(appUrl, "__login__")
+  } else {
+    stop(paste0("Unknown appServer:", appServer))
+  }
+}
+
 
 # Returns the cookie to be persisted in all future HTTP requests in the session
 handlePost <- function(handle, loginUrl, postfields, cookies, cookieName) {
@@ -38,22 +52,12 @@ handlePost <- function(handle, loginUrl, postfields, cookies, cookieName) {
 # that should be attached to all subsequent HTTP requests, including the initial
 # websocket request.
 # Currently implemented for RSC and SSP
-postLogin <- function(appUrl, loginUrl = NULL) {
-  username <- getPass::getPass("Enter your username: ")
-  password <- getPass::getPass("Enter your password: ")
+postLogin <- function(appUrl,
+  username = getPass::getPass("Enter your username: "),
+  password = getPass::getPass("Enter your password: ")) {
 
-  appServer <- protectedBy(appUrl)
-  if (appServer == "none") stop("No server detected")
-
-  if (is.null(loginUrl)) {
-    if (appServer == "rsc") {
-      p <- xml2::url_parse(appUrl)
-      baseUrl <- paste0(p[1,"scheme"], "://", p[1,"server"], ":", p[1,"port"], "/", collapse = "")
-      loginUrl <- paste0(baseUrl, "__login__")
-    } else if (appServer == "ssp") {
-      loginUrl <- paste0(appUrl, "__login__")
-    }
-  }
+  appServer <- servedBy(appUrl)
+  loginUrl <- loginUrlFor(appUrl, appServer)
 
   h <- curl::new_handle()
   resp <- curl::curl_fetch_memory(appUrl, handle = h)
@@ -68,7 +72,7 @@ postLogin <- function(appUrl, loginUrl = NULL) {
       cookies = cookies, cookieName = "rsconnect"
     )
   } else if (appServer == "ssp") {
-    handlePost(handle = h, loginUrl = loginUrl,
+    handlePost(handle = curl::new_handle(), loginUrl = loginUrl,
       postfields = URLencode(paste0(inputs[["name"]], "=", inputs[["value"]], collapse = "&")),
       cookies = cookies, cookieName = "session_state"
     )
