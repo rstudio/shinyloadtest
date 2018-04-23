@@ -15,6 +15,7 @@ pasteParams <- function(df, collapse) {
 # TODO "shinyapps.io"
 servedBy <- function(appUrl) {
   h <- curl::new_handle()
+  curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0)
   resp <- curl::curl_fetch_memory(appUrl, handle = h)
   df <- curl::handle_cookies(h)
   if (nrow(df[which(df$name == "SSP-XSRF"),]) == 1) {
@@ -26,7 +27,9 @@ servedBy <- function(appUrl) {
 }
 
 isProtected <- function(appUrl) {
-  resp <- curl::curl_fetch_memory(appUrl)
+  h <- curl::new_handle()
+  curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0)
+  resp <- curl::curl_fetch_memory(appUrl, handle = h)
   # NOTE: Connect returns a 404 if the app exists but requires authentication.
   # So we don't have a way to distinguish between an appUrl that doesn't exist
   # and an app that's protected.
@@ -71,6 +74,7 @@ postLogin <- function(appUrl, username, password) {
   loginUrl <- loginUrlFor(appUrl, appServer)
 
   h <- curl::new_handle()
+  curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0)
   resp <- curl::curl_fetch_memory(appUrl, handle = h)
   login_html <- xml2::read_html(rawToChar(resp$content))
   inputs <- rbind(getInputs(login_html, appServer), data.frame(
