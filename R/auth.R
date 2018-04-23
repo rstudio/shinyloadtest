@@ -7,6 +7,10 @@ getInputs <- function(html, server) {
   }
 }
 
+pasteParams <- function(df, collapse) {
+  paste0(df[["name"]], "=", df[["value"]], collapse = collapse)
+}
+
 # Returns string "unknown", "ssp", "rsc"
 # TODO "shinyapps.io"
 servedBy <- function(appUrl) {
@@ -19,6 +23,15 @@ servedBy <- function(appUrl) {
     return("rsc")
   }
   "unknown"
+}
+
+isProtected <- function(appUrl) {
+  resp <- curl::curl_fetch_memory(appUrl)
+  # NOTE: Connect returns a 404 if the app exists but requires authentication.
+  # So we don't have a way to distinguish between an appUrl that doesn't exist
+  # and an app that's protected.
+  # SSP returns a 403.
+  resp$status_code %in% c(403, 404)
 }
 
 loginUrlFor <- function(appUrl, appServer) {
@@ -38,7 +51,7 @@ handlePost <- function(handle, loginUrl, postfields, cookies, cookieName) {
   curl::handle_setopt(handle,
     postfields = postfields,
     # TODO how should the cookies be encoding?
-    cookie = paste0(cookies[["name"]], "=", cookies[["value"]], collapse = "; "),
+    cookie = pasteParams(cookies, "; "),
     post = TRUE,
     followlocation = FALSE,
     ssl_verifyhost = 0, ssl_verifypeer = 0
@@ -52,9 +65,7 @@ handlePost <- function(handle, loginUrl, postfields, cookies, cookieName) {
 # that should be attached to all subsequent HTTP requests, including the initial
 # websocket request.
 # Currently implemented for RSC and SSP
-postLogin <- function(appUrl,
-  username = getPass::getPass("Enter your username: "),
-  password = getPass::getPass("Enter your password: ")) {
+postLogin <- function(appUrl, username, password) {
 
   appServer <- servedBy(appUrl)
   loginUrl <- loginUrlFor(appUrl, appServer)
@@ -73,7 +84,7 @@ postLogin <- function(appUrl,
     )
   } else if (appServer == "ssp") {
     handlePost(handle = curl::new_handle(), loginUrl = loginUrl,
-      postfields = URLencode(paste0(inputs[["name"]], "=", inputs[["value"]], collapse = "&")),
+      postfields = URLencode(pasteParams(inputs, "&")),
       cookies = cookies, cookieName = "session_state"
     )
   }
@@ -83,7 +94,7 @@ postLogin <- function(appUrl,
 getApp <- function(appUrl, cookie) {
   h <- curl::new_handle()
   curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0,
-    cookie = paste0(cookie[["name"]], "=", cookie[["value"]], collapse = "; ")
+    cookie = pasteParams(cookie, "; ")
   )
   curl::curl_fetch_memory(appUrl, handle = h)
 }

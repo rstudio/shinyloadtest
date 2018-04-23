@@ -20,7 +20,8 @@ Imports:
     withr,
     stringr,
     rlang,
-    xml2
+    xml2,
+    getPass
 Remotes: rstudio/websocket,
     rstudio/httpuv
 RoxygenNote: 6.0.1.9000
