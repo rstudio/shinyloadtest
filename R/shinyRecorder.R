@@ -173,7 +173,7 @@ trimslash <- function(urlPath, which = c("both", "left", "right")) {
 
 RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
-    initialize = function(targetAppUrl, host, port, outputFileName, sessionCookie = NULL) {
+    initialize = function(targetAppUrl, host, port, outputFileName, sessionCookie) {
       parsedUrl <- urltools::url_parse(targetAppUrl)
       private$targetScheme <- parsedUrl$scheme
       private$targetHost <- parsedUrl$domain
@@ -214,9 +214,29 @@ RecordingSession <- R6::R6Class("RecordingSession",
       flush(private$outputFile)
     },
     handleCall = function(req) {
+  #       h <- curl::new_handle()
+  # curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0,
+  #   cookie = pasteParams(cookie, "; ")
+  # )
+  # curl::curl_fetch_memory(appUrl, handle = h)
       req_curl <- req_rook_to_curl(req, private$targetHost, private$targetPort)
+      if (!is.null(private$sessionCookie)) {
+        req_curl[["Cookie"]] <- pasteParams(private$sessionCookie, "; ")
+      }
       h <- curl::new_handle()
       do.call(curl::handle_setheaders, c(h, req_curl))
+
+      # TODO Accept invalid certificate from upstream. Should we make this an option?
+      if (private$targetScheme == "https") {
+        curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0)
+      }
+
+      # If the target application is protected, include previously-obtained
+      # session cookie on every outbound request.
+      # if (!is.null(private$sessionCookie)) {
+      #   cat("setting session cookie to",pasteParams(private$sessionCookie, "; "), "\n")
+      #   curl::handle_setopt(h, cookie = pasteParams(private$sessionCookie, "; "))
+      # }
 
       httpUrl <- paste0(private$targetScheme, "://", private$targetHost, ":", private$targetPort, "/", private$targetPath, "/", req$PATH_INFO, req$QUERY_STRING)
 
@@ -247,7 +267,8 @@ RecordingSession <- R6::R6Class("RecordingSession",
       wsScheme <- if (private$targetScheme == "https") "wss" else "ws"
       wsUrl <- paste0(wsScheme, "://", private$targetHost, ":", private$targetPort, "/", trimslash(private$targetPath), "/", trimslash(clientWS$request$PATH_INFO))
 
-      serverWS <- websocketClient::WebsocketClient$new(wsUrl,
+      serverWS <- websocket::WebsocketClient$new(wsUrl,
+        headers = if (!is.null(private$sessionCookie)) c(Cookie = pasteParams(private$sessionCookie, "; ")),
         onMessage = function(msgFromServer) {
           if (private$server == "hosted") {
 
@@ -318,13 +339,13 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #' @export
 #'
 #' @examples
-recordSession <- function(targetAppUrl, host = "0.0.0.0", port = 8600, outputFile = "recording.log", username = NULL, password = NULL) {
-  # TODO Here is where we test if the app is protected, and if it is, attempt to
-  # log into it. If successfull, the result of our login attempt is the set of
-  # cookies that need to be send with any request.
-  sessionCookie <- if (!is.null(username) && !is.null(password))
-    postLogin(username, password, targetAppUrl, paste0(targetAppUrl, "/__login__"))
-  session <- RecordingSession$new(targetAppUrl, host, port, outputFile, sessionCookie = sessionCookie) # TODO add cookie param
+recordSession <- function(targetAppUrl, host = "0.0.0.0", port = 8600, outputFile = "recording.log") {
+  sessionCookie <- if (isProtected(targetAppUrl)) {
+    username <- getPass::getPass("Enter your username: ")
+    password <- getPass::getPass("Enter your password: ")
+    postLogin(targetAppUrl, username, password)
+  } else NULL
+  session <- RecordingSession$new(targetAppUrl, host, port, outputFile, sessionCookie)
   message("Listening on ", host, ":", port)
   on.exit(session$stop())
   httpuv::service(Inf)

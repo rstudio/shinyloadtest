@@ -5,7 +5,7 @@
 \title{Title}
 \usage{
 recordSession(targetAppUrl, host = "0.0.0.0", port = 8600,
-  outputFile = "recording.log", username = NULL, password = NULL)
+  outputFile = "recording.log")
 }
 \arguments{
 \item{outputFile}{}
