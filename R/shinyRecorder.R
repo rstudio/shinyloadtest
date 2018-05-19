@@ -171,6 +171,20 @@ trimslash <- function(urlPath, which = c("both", "left", "right")) {
   urlPath
 }
 
+shouldIgnore <- function(msgFromServer) {
+  canIgnore <- c('^a\\["ACK.*$', '^\\["ACK.*$', '^h$')
+  if (length(unlist(stringr::str_match_all(msgFromServer, canIgnore))) > 0) return(TRUE)
+  parsed <- parseMessage(msgFromServer)
+  if (length(intersect(names(parsed), c("busy", "progress", "recalculating"))) > 0) return(TRUE)
+  if (isTRUE(names(parsed) == c("custom"))) {
+    customKeys <- names(parsed[["custom"]])
+    if (isTRUE(customKeys == "reactlog")) return(TRUE)
+  }
+  noop <- list(errors = list(), values = list(), inputMessages = list())
+  if (isTRUE(all.equal(parsed, noop))) return(TRUE)
+  return(FALSE)
+}
+
 RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
     initialize = function(targetAppUrl, host, port, outputFileName, sessionCookie) {
@@ -272,15 +286,14 @@ RecordingSession <- R6::R6Class("RecordingSession",
         onMessage = function(msgFromServer) {
           if (private$server == "hosted") {
 
-            # These kinds of messages are relayed to the browser but are not recorded.
-            canIgnore <- c('^a\\["ACK.*$', '^\\["ACK.*$', '^h$')
-            if (length(unlist(stringr::str_match_all(msgFromServer, canIgnore))) > 0) {
+            if (msgFromServer == "o") {
+              private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
               clientWS$send(msgFromServer)
               return(invisible())
             }
 
-            if (msgFromServer == "o") {
-              private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
+            # These kinds of messages are relayed to the browser but are not recorded.
+            if (shouldIgnore(msgFromServer)) {
               clientWS$send(msgFromServer)
               return(invisible())
             }
