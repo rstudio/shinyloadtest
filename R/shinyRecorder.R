@@ -352,15 +352,16 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #' @export
 #'
 #' @examples
-recordSession <- function(targetAppUrl, host = "0.0.0.0", port = 8600, outputFile = "recording.log") {
-  sessionCookie <- if (isProtected(targetAppUrl)) {
-    username <- getPass::getPass("Enter your username: ")
-    password <- getPass::getPass("Enter your password: ")
-    postLogin(targetAppUrl, username, password)
-  } else NULL
-  session <- RecordingSession$new(targetAppUrl, host, port, outputFile, sessionCookie)
-  message("Listening on ", host, ":", port)
-  browseURL(paste0("http://", host, ":", port))
-  on.exit(session$stop())
-  httpuv::service(Inf)
+recordSession <- function(targetAppUrl, host = "0.0.0.0", port = 8600,
+  outputFile = "recording.log", openBrowser = TRUE) {
+    sessionCookie <- if (isProtected(targetAppUrl)) {
+      username <- getPass::getPass("Enter your username: ")
+      password <- getPass::getPass("Enter your password: ")
+      postLogin(targetAppUrl, username, password)
+    } else NULL
+    session <- RecordingSession$new(targetAppUrl, host, port, outputFile, sessionCookie)
+    message("Listening on ", host, ":", port)
+    if (openBrowser) browseURL(paste0("http://", host, ":", port))
+    on.exit(session$stop())
+    httpuv::service(Inf)
 }
