@@ -18,7 +18,9 @@ servedBy <- function(appUrl) {
   curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0)
   resp <- curl::curl_fetch_memory(appUrl, handle = h)
   df <- curl::handle_cookies(h)
-  if (nrow(df[which(df$name == "SSP-XSRF"),]) == 1) {
+  headers <- curl::parse_headers_list(resp$headers)
+  if (nrow(df[which(df$name == "SSP-XSRF"),]) == 1
+    || isTRUE(headers[["x-powered-by"]] %in% c("Express", "Shiny Server", "Shiny Server Pro"))) {
     return("ssp")
   } else if (nrow(df[which(df$name == "rscid"),]) == 1) {
     return("rsc")
