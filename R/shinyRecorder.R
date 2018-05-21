@@ -176,12 +176,12 @@ shouldIgnore <- function(msgFromServer) {
   if (length(unlist(stringr::str_match_all(msgFromServer, canIgnore))) > 0) return(TRUE)
   parsed <- parseMessage(msgFromServer)
   if (length(intersect(names(parsed), c("busy", "progress", "recalculating"))) > 0) return(TRUE)
-  if (isTRUE(names(parsed) == c("custom"))) {
+  if (identical(names(parsed), c("custom"))) {
     customKeys <- names(parsed[["custom"]])
     if (isTRUE(customKeys == "reactlog")) return(TRUE)
   }
   noop <- list(errors = list(), values = list(), inputMessages = list())
-  if (isTRUE(all.equal(parsed, noop))) return(TRUE)
+  if (identical(parsed, noop)) return(TRUE)
   return(FALSE)
 }
 
