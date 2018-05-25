@@ -27,7 +27,6 @@ req_rook_to_curl <- function(req, domain, port) {
   r
 }
 
-
 resp_httr_to_rook <- function(resp) {
   status <- as.integer(sub("^HTTP\\S+ (\\d+).*", "\\1", curl::parse_headers(resp$headers)[1]))
   headers <- curl::parse_headers_list(resp$headers)
@@ -227,43 +226,57 @@ RecordingSession <- R6::R6Class("RecordingSession",
       writeLines(format(evt), private$outputFile)
       flush(private$outputFile)
     },
-    handleCall = function(req) {
-  #       h <- curl::new_handle()
-  # curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0,
-  #   cookie = pasteParams(cookie, "; ")
-  # )
-  # curl::curl_fetch_memory(appUrl, handle = h)
+    makeUrl = function(req) {
+      httpUrl <- paste0(private$targetScheme, "://", private$targetHost, ":", private$targetPort, "/", private$targetPath, "/", req$PATH_INFO, req$QUERY_STRING)
+      # This is a hack around the fact that somehow there's three forward slashes in one of the separators
+      httpUrl <- gsub("///", "/", httpUrl, fixed = TRUE)
+      httpUrl
+    },
+    makeCurlHandle = function(req) {
       req_curl <- req_rook_to_curl(req, private$targetHost, private$targetPort)
+      h <- curl::new_handle()
+
       if (!is.null(private$sessionCookie)) {
         req_curl[["Cookie"]] <- pasteParams(private$sessionCookie, "; ")
       }
-      h <- curl::new_handle()
+
       do.call(curl::handle_setheaders, c(h, req_curl))
 
       # TODO Accept invalid certificate from upstream. Should we make this an option?
       if (private$targetScheme == "https") {
         curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0)
       }
+      h
+    },
+    handlePOST = function(req) {
+      if (req$HTTP_CONTENT_TYPE == "application/octet-stream") {
+        h <- private$makeCurlHandle(req)
+        url <- private$makeUrl(req)
 
-      # If the target application is protected, include previously-obtained
-      # session cookie on every outbound request.
-      # if (!is.null(private$sessionCookie)) {
-      #   cat("setting session cookie to",pasteParams(private$sessionCookie, "; "), "\n")
-      #   curl::handle_setopt(h, cookie = pasteParams(private$sessionCookie, "; "))
-      # }
+        len <- as.integer(req$HTTP_CONTENT_LENGTH)
+        data <- req$rook.input$read(len)
 
-      httpUrl <- paste0(private$targetScheme, "://", private$targetHost, ":", private$targetPort, "/", private$targetPath, "/", req$PATH_INFO, req$QUERY_STRING)
+        curl::handle_setopt(h, postfieldsize = len, postfields = data, post = TRUE)
 
-      # This is a hack around the fact that somehow there's three forward slashes in one of the separators
-      httpUrl <- gsub("///", "/", httpUrl, fixed = TRUE)
-
-      resp_curl <- curl::curl_fetch_memory(httpUrl, handle = h)
+        resp_curl <- curl::curl_fetch_memory(url, handle = h)
+        event <- makeHTTPEvent(private$server, req, resp_curl)
+        private$server <- event$server
+        private$writeEvent(event)
+        resp_httr_to_rook(resp_curl)
+      } else {
+        stop("Unknown content type: ", req$HTTP_CONTENT_TYPE)
+      }
+    },
+    handleGET = function(req) {
+      h <- private$makeCurlHandle(req)
+      url <- private$makeUrl(req)
+      resp_curl <- curl::curl_fetch_memory(url, handle = h)
       event <- makeHTTPEvent(private$server, req, resp_curl)
       private$server <- event$server
       private$writeEvent(event)
-
       resp_httr_to_rook(resp_curl)
     },
+    handleCall = function(req) private[[paste0("handle", req$REQUEST_METHOD)]](req),
     handleWSOpen = function(clientWS) {
       cat("WS open!")
       private$clientWsState <- "OPEN"
@@ -355,8 +368,10 @@ RecordingSession <- R6::R6Class("RecordingSession",
 recordSession <- function(targetAppUrl, host = "0.0.0.0", port = 8600,
   outputFile = "recording.log", openBrowser = TRUE) {
     sessionCookie <- if (isProtected(targetAppUrl)) {
-      username <- getPass::getPass("Enter your username: ")
-      password <- getPass::getPass("Enter your password: ")
+      #username <- getPass::getPass("Enter your username: ")
+      #password <- getPass::getPass("Enter your password: ")
+      username <- "foo"
+      password <- "barp"
       postLogin(targetAppUrl, username, password)
     } else NULL
     session <- RecordingSession$new(targetAppUrl, host, port, outputFile, sessionCookie)
