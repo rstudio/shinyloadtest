@@ -252,16 +252,14 @@ RecordingSession <- R6::R6Class("RecordingSession",
       if (req$HTTP_CONTENT_TYPE == "application/octet-stream") {
         h <- private$makeCurlHandle(req)
         url <- private$makeUrl(req)
-
         len <- as.integer(req$HTTP_CONTENT_LENGTH)
         data <- req$rook.input$read(len)
-
         curl::handle_setopt(h, postfieldsize = len, postfields = data, post = TRUE)
-
         resp_curl <- curl::curl_fetch_memory(url, handle = h)
-        event <- makeHTTPEvent(private$server, req, resp_curl)
-        private$server <- event$server
-        private$writeEvent(event)
+        # TODO record event w/ base64 encoded data
+        # event <- makeHTTPEvent(private$server, req, resp_curl)
+        # private$server <- event$server
+        # private$writeEvent(event)
         resp_httr_to_rook(resp_curl)
       } else {
         stop("Unknown content type: ", req$HTTP_CONTENT_TYPE)
