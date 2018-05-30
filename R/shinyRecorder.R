@@ -66,9 +66,10 @@ getWorkerId <- function(page) {
   stringr::str_match(page, pat)[[2]]
 }
 
-messagePattern <- '^(a\\[")([0-9A-F*]+#)?(0\\|m\\|)(.*)("\\])$'
+# Messages from the server start with a[, messages from the client start with [
+messagePattern <- '^(a?\\[")([0-9A-F*]+#)?(0\\|m\\|)(.*)("\\])$'
 
-# Parses a JSON message from the server; returns the object from the nested JSON, if any
+# Parses a JSON message from the server or client; returns the object from the nested JSON, if any
 parseMessage <- function(msg) {
   res <- stringr::str_match(msg, messagePattern)
   encodedMsg <- res[1,5]
@@ -88,24 +89,18 @@ parseMessage <- function(msg) {
 # {"type":"WS_RECV_INIT","created":"2018-03-12T19:51:59.675Z","message":"a[\"1#0|m|{\\\\\"config\\\\\":{\\\\\"workerId\\\\\":[\\\\\"${WORKER}\\\\\"],\\\\\"sessionId\\\\\":[\\\\\"${SESSION}\\\\\"],\\\\\"user\\\\\":null}}\"]"}
 # {"type":"WS_RECV_INIT","created":"2018-03-12T20:21:27.086Z","message":"a[\"1#0|m|[\"{\\\"config\\\":{\\\"workerId\\\":[\\\"${WORKER}\\\"],\\\"sessionId\\\":[\\\"${SESSION}\\\"],\\\"user\\\":null}}\"]\"]"}
 spliceMessage <- function(originalMessage, newMessageObject) {
-  newMsg <- jsonlite::toJSON(jsonlite::unbox(jsonlite::toJSON(newMessageObject, null = 'null')))
+  newMsg <- jsonlite::toJSON(jsonlite::unbox(jsonlite::toJSON(newMessageObject, null = 'null', auto_unbox = TRUE)))
   group <- stringr::str_match(originalMessage, messagePattern)
   paste0(group[1,2], group[1,3], group[1,4], newMsg, group[1,6])
-}
-
-buildUrl <- function(req) {
-  query <- if (req$QUERY_STRING == "") "" else req$QUERY_STRING
-  paste0(req$PATH_INFO, query)
 }
 
 makeHTTPEvent_POST <- function(server, req, data, resp_curl, created = Sys.time()) {
   if (grepl("/upload/", req$PATH_INFO)) {
     structure(list(
-      type = "REQ_POST",
+      type = "REQ_POST_UPLOAD",
       created = makeTimestamp(created),
       statusCode = resp_curl$status_code,
       server = server,
-      url = buildUrl(req),
       data = if (is.null(data)) NULL else httpuv::rawToBase64(data)
     ), class = "REQ")
   } else {
@@ -242,6 +237,8 @@ RecordingSession <- R6::R6Class("RecordingSession",
     server = NULL,
     sessionCookies = data.frame(),
     clientWsState = NULL,
+    uploadUrl = NULL,
+    uploadJobId = NULL,
     writeEvent = function(evt) {
       writeLines(format(evt), private$outputFile)
       flush(private$outputFile)
@@ -355,6 +352,16 @@ RecordingSession <- R6::R6Class("RecordingSession",
               private$writeEvent(makeWSEvent("WS_RECV_INIT", message = spliceMessage(msgFromServer, newMsgObj)))
               clientWS$send(msgFromServer)
               return(invisible())
+            } else if(!is.null(parsed$response$value$jobId)) {
+              # WS_RECV_BEGIN_UPLOAD (upload response)
+              private$uploadUrl <- parsed$response$value$uploadUrl
+              private$uploadJobId <- parsed$response$value$jobId
+              newMsgObj <- parsed
+              newMsgObj$response$value$uploadUrl <- "${UPLOAD_URL}"
+              newMsgObj$response$value$jobId <- "${UPLOAD_JOB_ID}"
+              private$writeEvent(makeWSEvent("WS_RECV_BEGIN_UPLOAD", message = spliceMessage(msgFromServer, newMsgObj)))
+              clientWS$send(msgFromServer)
+              return(invisible())
             }
           }
           # Every other websocket event
@@ -368,8 +375,17 @@ RecordingSession <- R6::R6Class("RecordingSession",
         }
       })
       clientWS$onMessage(function(isBinary, msgFromClient) {
-        private$writeEvent(makeWSEvent("WS_SEND", message = msgFromClient))
-        serverWS$send(msgFromClient)
+        parsed <- parseMessage(msgFromClient)
+        # TODO Clean up message type dispatch here
+        if ("method" %in% names(parsed) && parsed$method == "uploadEnd") {
+          newMsgObj <- parsed
+          newMsgObj$args[[1]] <- "${UPLOAD_JOB_ID}"
+          private$writeEvent(makeWSEvent("WS_SEND_END_UPLOAD", message = spliceMessage(msgFromClient, newMsgObj)))
+          serverWS$send(msgFromClient)
+        } else {
+          private$writeEvent(makeWSEvent("WS_SEND", message = msgFromClient))
+          serverWS$send(msgFromClient)
+        }
       })
       clientWS$onClose(function() {
         cat("Client disconnected\n")
