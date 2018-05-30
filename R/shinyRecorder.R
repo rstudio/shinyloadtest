@@ -101,6 +101,7 @@ makeHTTPEvent_POST <- function(server, req, data, resp_curl, created = Sys.time(
       created = makeTimestamp(created),
       statusCode = resp_curl$status_code,
       server = server,
+      url = "${UPLOAD_URL}",
       data = if (is.null(data)) NULL else httpuv::rawToBase64(data)
     ), class = "REQ")
   } else {
