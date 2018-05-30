@@ -93,7 +93,27 @@ spliceMessage <- function(originalMessage, newMessageObject) {
   paste0(group[1,2], group[1,3], group[1,4], newMsg, group[1,6])
 }
 
-makeHTTPEvent <- function(server, req, resp_curl, created = Sys.time()) {
+buildUrl <- function(req) {
+  query <- if (req$QUERY_STRING == "") "" else req$QUERY_STRING
+  paste0(req$PATH_INFO, query)
+}
+
+makeHTTPEvent_POST <- function(server, req, data, resp_curl, created = Sys.time()) {
+  if (grepl("/upload/", req$PATH_INFO)) {
+    structure(list(
+      type = "REQ_POST",
+      created = makeTimestamp(created),
+      statusCode = resp_curl$status_code,
+      server = server,
+      url = buildUrl(req),
+      data = if (is.null(data)) NULL else httpuv::rawToBase64(data)
+    ), class = "REQ")
+  } else {
+    stop("Unknown POST flavor")
+  }
+}
+
+makeHTTPEvent_GET <- function(server, req, resp_curl, created = Sys.time()) {
   if (req$REQUEST_METHOD != "GET") stop("Unsupported method, only handle GET:", req$REQUEST_METHOD)
 
   # ShinyHomeRequestEvent,
@@ -186,7 +206,7 @@ shouldIgnore <- function(msgFromServer) {
 
 RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
-    initialize = function(targetAppUrl, host, port, outputFileName, sessionCookie) {
+    initialize = function(targetAppUrl, host, port, outputFileName, sessionCookies) {
       parsedUrl <- urltools::url_parse(targetAppUrl)
       private$targetScheme <- parsedUrl$scheme
       private$targetHost <- parsedUrl$domain
@@ -196,7 +216,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$localHost <- host
       private$localPort <- port
       private$outputFile <- file(outputFileName, "w")
-      private$sessionCookie <- sessionCookie
+      private$sessionCookies <- sessionCookies
 
       private$startServer()
     },
@@ -220,7 +240,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
     localServer = NULL,
     outputFile = NULL,
     server = NULL,
-    sessionCookie = NULL,
+    sessionCookies = data.frame(),
     clientWsState = NULL,
     writeEvent = function(evt) {
       writeLines(format(evt), private$outputFile)
@@ -236,8 +256,8 @@ RecordingSession <- R6::R6Class("RecordingSession",
       req_curl <- req_rook_to_curl(req, private$targetHost, private$targetPort)
       h <- curl::new_handle()
 
-      if (!is.null(private$sessionCookie)) {
-        req_curl[["Cookie"]] <- pasteParams(private$sessionCookie, "; ")
+      if (nrow(private$sessionCookies) > 0) {
+        req_curl[["Cookie"]] <- pasteParams(private$sessionCookies, "; ")
       }
 
       do.call(curl::handle_setheaders, c(h, req_curl))
@@ -248,38 +268,48 @@ RecordingSession <- R6::R6Class("RecordingSession",
       }
       h
     },
-    handlePOST = function(req) {
+    handle_POST = function(req) {
       h <- private$makeCurlHandle(req)
       url <- private$makeUrl(req)
+      data <- NULL
 
       if (!is.null(req$HTTP_CONTENT_LENGTH)) {
         len <- as.integer(req$HTTP_CONTENT_LENGTH)
         if (len > 0) {
           data <- req$rook.input$read(len)
-          curl::handle_setopt(h, postfieldsize = len, postfields = data, post = TRUE)
         }
-      } else if (!is.null(req$HTTP_TRANSFER_ENCODING)
-        && tolower(req$HTTP_TRANSFER_ENCODING) == "chunked") {
-        stop("Chunked post not supported")
+      }
+
+      if (!is.null(data)) {
+        curl::handle_setopt(h,
+          postfieldsize = length(data),
+          postfields = data,
+          post = TRUE
+        )
       }
 
       resp_curl <- curl::curl_fetch_memory(url, handle = h)
-      # TODO record event w/ base64 encoded data (if there was any)
-      # event <- makeHTTPEvent(private$server, req, resp_curl)
-      # private$server <- event$server
-      # private$writeEvent(event)
+
+      # Update sessionCookies in the case of __extendession__ XHR
+      cookies_df <- curl::handle_cookies(h)[,c("name", "value")]
+      if (nrow(cookies_df) > 0) private$sessionCookies <- cookies_df
+
+      event <- makeHTTPEvent_POST(private$server, req, data, resp_curl)
+      private$server <- event$server
+      private$writeEvent(event)
+
       resp_httr_to_rook(resp_curl)
     },
-    handleGET = function(req) {
+    handle_GET = function(req) {
       h <- private$makeCurlHandle(req)
       url <- private$makeUrl(req)
       resp_curl <- curl::curl_fetch_memory(url, handle = h)
-      event <- makeHTTPEvent(private$server, req, resp_curl)
+      event <- makeHTTPEvent_GET(private$server, req, resp_curl)
       private$server <- event$server
       private$writeEvent(event)
       resp_httr_to_rook(resp_curl)
     },
-    handleCall = function(req) private[[paste0("handle", req$REQUEST_METHOD)]](req),
+    handleCall = function(req) private[[paste0("handle_", req$REQUEST_METHOD)]](req),
     handleWSOpen = function(clientWS) {
       cat("WS open!")
       private$clientWsState <- "OPEN"
@@ -370,14 +400,14 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #' @examples
 recordSession <- function(targetAppUrl, host = "0.0.0.0", port = 8600,
   outputFile = "recording.log", openBrowser = TRUE) {
-    sessionCookie <- if (isProtected(targetAppUrl)) {
+    sessionCookies <- if (isProtected(targetAppUrl)) {
       #username <- getPass::getPass("Enter your username: ")
       #password <- getPass::getPass("Enter your password: ")
       username <- "foo"
       password <- "barp"
       postLogin(targetAppUrl, username, password)
     } else NULL
-    session <- RecordingSession$new(targetAppUrl, host, port, outputFile, sessionCookie)
+    session <- RecordingSession$new(targetAppUrl, host, port, outputFile, sessionCookies)
     message("Listening on ", host, ":", port)
     if (openBrowser) browseURL(paste0("http://", host, ":", port))
     on.exit(session$stop())
