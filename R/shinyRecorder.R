@@ -284,6 +284,13 @@ RecordingSession <- R6::R6Class("RecordingSession",
       serverWS <- websocket::WebsocketClient$new(wsUrl,
         headers = if (!is.null(private$sessionCookie)) c(Cookie = pasteParams(private$sessionCookie, "; ")),
         onMessage = function(msgFromServer) {
+          # These kinds of messages are relayed to the browser but are not recorded.
+          # TODO Cleanup this code that handles SSO/dev and SSP cases in an ugly way.
+          if (msgFromServer != "o" && shouldIgnore(msgFromServer)) {
+            clientWS$send(msgFromServer)
+            return(invisible())
+          }
+
           if (private$server == "hosted") {
 
             if (msgFromServer == "o") {
@@ -292,13 +299,8 @@ RecordingSession <- R6::R6Class("RecordingSession",
               return(invisible())
             }
 
-            # These kinds of messages are relayed to the browser but are not recorded.
-            if (shouldIgnore(msgFromServer)) {
-              clientWS$send(msgFromServer)
-              return(invisible())
-            }
-
             parsed <- parseMessage(msgFromServer)
+
             # If the message from the server is an object with a "config" key, fix
             # up some keys with placeholders and record the message as a
             # WS_RECV_INIT
