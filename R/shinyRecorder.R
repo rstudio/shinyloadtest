@@ -159,7 +159,7 @@ makeHTTPEvent_GET <- function(server, req, resp_curl, created = Sys.time()) {
       method = "GET",
       server = server,
       url = if (server == "local") req$PATH_INFO else gsub("_w_\\w+", "_w_${WORKER}", req$PATH_INFO),
-      statusCode = 200
+      statusCode = resp_curl$status_code
     ), class = "REQ")
   }
 }
@@ -307,7 +307,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$writeEvent(event)
       resp_httr_to_rook(resp_curl)
     },
-    handleCall = function(req) private[[paste0("handle_", req$REQUEST_METHOD)]](req),
+    handleCall = function(req) {
+      private[[paste0("handle_", req$REQUEST_METHOD)]](req)
+    },
     handleWSOpen = function(clientWS) {
       cat("WS open!")
       private$clientWsState <- "OPEN"
@@ -423,7 +425,7 @@ recordSession <- function(targetAppUrl, host = "0.0.0.0", port = 8600,
       username <- "foo"
       password <- "barp"
       postLogin(targetAppUrl, username, password)
-    } else NULL
+    } else data.frame()
     session <- RecordingSession$new(targetAppUrl, host, port, outputFile, sessionCookies)
     message("Listening on ", host, ":", port)
     if (openBrowser) browseURL(paste0("http://", host, ":", port))
