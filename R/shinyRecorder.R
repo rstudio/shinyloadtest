@@ -144,7 +144,7 @@ makeHTTPEvent <- function(server, req, resp_curl, created = Sys.time()) {
       method = "GET",
       server = server,
       url = if (server == "local") req$PATH_INFO else gsub("_w_\\w+", "_w_${WORKER}", req$PATH_INFO),
-      statusCode = 200
+      statusCode = resp_curl$status_code
     ), class = "REQ")
   }
 }
