@@ -3,7 +3,8 @@ getInputs <- function(html, server) {
   if (server == "ssp") {
     inputs <- xml2::xml_find_all(html, "//input[@type='hidden']")
     attrs <- xml2::xml_attrs(inputs)
-    as.data.frame(do.call(rbind, attrs), stringsAsFactors = FALSE)[,c("name", "value")]
+    attrs <- lapply(attrs, function(vec) c(name = vec[["name"]], value = vec[["value"]]))
+    as.data.frame(do.call(rbind, attrs), stringsAsFactors = FALSE)
   }
 }
 
