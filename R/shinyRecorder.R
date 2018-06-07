@@ -27,7 +27,6 @@ req_rook_to_curl <- function(req, domain, port) {
   r
 }
 
-
 resp_httr_to_rook <- function(resp) {
   status <- as.integer(sub("^HTTP\\S+ (\\d+).*", "\\1", curl::parse_headers(resp$headers)[1]))
   headers <- curl::parse_headers_list(resp$headers)
@@ -67,9 +66,10 @@ getWorkerId <- function(page) {
   stringr::str_match(page, pat)[[2]]
 }
 
-messagePattern <- '^(a\\[")([0-9A-F*]+#)?(0\\|m\\|)(.*)("\\])$'
+# Messages from the server start with a[, messages from the client start with [
+messagePattern <- '^(a?\\[")([0-9A-F*]+#)?(0\\|m\\|)(.*)("\\])$'
 
-# Parses a JSON message from the server; returns the object from the nested JSON, if any
+# Parses a JSON message from the server or client; returns the object from the nested JSON, if any
 parseMessage <- function(msg) {
   res <- stringr::str_match(msg, messagePattern)
   encodedMsg <- res[1,5]
@@ -89,12 +89,27 @@ parseMessage <- function(msg) {
 # {"type":"WS_RECV_INIT","created":"2018-03-12T19:51:59.675Z","message":"a[\"1#0|m|{\\\\\"config\\\\\":{\\\\\"workerId\\\\\":[\\\\\"${WORKER}\\\\\"],\\\\\"sessionId\\\\\":[\\\\\"${SESSION}\\\\\"],\\\\\"user\\\\\":null}}\"]"}
 # {"type":"WS_RECV_INIT","created":"2018-03-12T20:21:27.086Z","message":"a[\"1#0|m|[\"{\\\"config\\\":{\\\"workerId\\\":[\\\"${WORKER}\\\"],\\\"sessionId\\\":[\\\"${SESSION}\\\"],\\\"user\\\":null}}\"]\"]"}
 spliceMessage <- function(originalMessage, newMessageObject) {
-  newMsg <- jsonlite::toJSON(jsonlite::unbox(jsonlite::toJSON(newMessageObject, null = 'null')))
+  newMsg <- jsonlite::toJSON(jsonlite::unbox(jsonlite::toJSON(newMessageObject, null = 'null', auto_unbox = TRUE)))
   group <- stringr::str_match(originalMessage, messagePattern)
   paste0(group[1,2], group[1,3], group[1,4], newMsg, group[1,6])
 }
 
-makeHTTPEvent <- function(server, req, resp_curl, created = Sys.time()) {
+makeHTTPEvent_POST <- function(server, req, data, resp_curl, created = Sys.time()) {
+  if (grepl("/upload/", req$PATH_INFO)) {
+    structure(list(
+      type = "REQ_POST_UPLOAD",
+      created = makeTimestamp(created),
+      statusCode = resp_curl$status_code,
+      server = server,
+      url = "${UPLOAD_URL}",
+      data = if (is.null(data)) NULL else httpuv::rawToBase64(data)
+    ), class = "REQ")
+  } else {
+    stop("Unknown POST flavor")
+  }
+}
+
+makeHTTPEvent_GET <- function(server, req, resp_curl, created = Sys.time()) {
   if (req$REQUEST_METHOD != "GET") stop("Unsupported method, only handle GET:", req$REQUEST_METHOD)
 
   # ShinyHomeRequestEvent,
@@ -187,7 +202,7 @@ shouldIgnore <- function(msgFromServer) {
 
 RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
-    initialize = function(targetAppUrl, host, port, outputFileName, sessionCookie) {
+    initialize = function(targetAppUrl, host, port, outputFileName, sessionCookies) {
       parsedUrl <- urltools::url_parse(targetAppUrl)
       private$targetScheme <- parsedUrl$scheme
       private$targetHost <- parsedUrl$domain
@@ -197,7 +212,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$localHost <- host
       private$localPort <- port
       private$outputFile <- file(outputFileName, "w")
-      private$sessionCookie <- sessionCookie
+      private$sessionCookies <- sessionCookies
 
       private$startServer()
     },
@@ -221,48 +236,79 @@ RecordingSession <- R6::R6Class("RecordingSession",
     localServer = NULL,
     outputFile = NULL,
     server = NULL,
-    sessionCookie = NULL,
+    sessionCookies = data.frame(),
     clientWsState = NULL,
+    uploadUrl = NULL,
+    uploadJobId = NULL,
     writeEvent = function(evt) {
       writeLines(format(evt), private$outputFile)
       flush(private$outputFile)
     },
-    handleCall = function(req) {
-  #       h <- curl::new_handle()
-  # curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0,
-  #   cookie = pasteParams(cookie, "; ")
-  # )
-  # curl::curl_fetch_memory(appUrl, handle = h)
+    makeUrl = function(req) {
+      httpUrl <- paste0(private$targetScheme, "://", private$targetHost, ":", private$targetPort, "/", private$targetPath, "/", req$PATH_INFO, req$QUERY_STRING)
+      # This is a hack around the fact that somehow there's three forward slashes in one of the separators
+      httpUrl <- gsub("///", "/", httpUrl, fixed = TRUE)
+      httpUrl
+    },
+    makeCurlHandle = function(req) {
       req_curl <- req_rook_to_curl(req, private$targetHost, private$targetPort)
-      if (!is.null(private$sessionCookie)) {
-        req_curl[["Cookie"]] <- pasteParams(private$sessionCookie, "; ")
-      }
       h <- curl::new_handle()
+
+      if (nrow(private$sessionCookies) > 0) {
+        req_curl[["Cookie"]] <- pasteParams(private$sessionCookies, "; ")
+      }
+
       do.call(curl::handle_setheaders, c(h, req_curl))
 
       # TODO Accept invalid certificate from upstream. Should we make this an option?
       if (private$targetScheme == "https") {
         curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0)
       }
+      h
+    },
+    handle_POST = function(req) {
+      h <- private$makeCurlHandle(req)
+      url <- private$makeUrl(req)
+      data <- NULL
 
-      # If the target application is protected, include previously-obtained
-      # session cookie on every outbound request.
-      # if (!is.null(private$sessionCookie)) {
-      #   cat("setting session cookie to",pasteParams(private$sessionCookie, "; "), "\n")
-      #   curl::handle_setopt(h, cookie = pasteParams(private$sessionCookie, "; "))
-      # }
+      if (!is.null(req$HTTP_CONTENT_LENGTH)) {
+        len <- as.integer(req$HTTP_CONTENT_LENGTH)
+        if (len > 0) {
+          data <- req$rook.input$read(len)
+        }
+      }
 
-      httpUrl <- paste0(private$targetScheme, "://", private$targetHost, ":", private$targetPort, "/", private$targetPath, "/", req$PATH_INFO, req$QUERY_STRING)
+      if (!is.null(data)) {
+        curl::handle_setopt(h,
+          postfieldsize = length(data),
+          postfields = data,
+          post = TRUE
+        )
+      }
 
-      # This is a hack around the fact that somehow there's three forward slashes in one of the separators
-      httpUrl <- gsub("///", "/", httpUrl, fixed = TRUE)
+      resp_curl <- curl::curl_fetch_memory(url, handle = h)
 
-      resp_curl <- curl::curl_fetch_memory(httpUrl, handle = h)
-      event <- makeHTTPEvent(private$server, req, resp_curl)
+      # Update sessionCookies in the case of __extendession__ XHR
+      cookies_df <- curl::handle_cookies(h)[,c("name", "value")]
+      if (nrow(cookies_df) > 0) private$sessionCookies <- cookies_df
+
+      event <- makeHTTPEvent_POST(private$server, req, data, resp_curl)
       private$server <- event$server
       private$writeEvent(event)
 
       resp_httr_to_rook(resp_curl)
+    },
+    handle_GET = function(req) {
+      h <- private$makeCurlHandle(req)
+      url <- private$makeUrl(req)
+      resp_curl <- curl::curl_fetch_memory(url, handle = h)
+      event <- makeHTTPEvent_GET(private$server, req, resp_curl)
+      private$server <- event$server
+      private$writeEvent(event)
+      resp_httr_to_rook(resp_curl)
+    },
+    handleCall = function(req) {
+      private[[paste0("handle_", req$REQUEST_METHOD)]](req)
     },
     handleWSOpen = function(clientWS) {
       cat("WS open!")
@@ -311,6 +357,16 @@ RecordingSession <- R6::R6Class("RecordingSession",
               private$writeEvent(makeWSEvent("WS_RECV_INIT", message = spliceMessage(msgFromServer, newMsgObj)))
               clientWS$send(msgFromServer)
               return(invisible())
+            } else if(!is.null(parsed$response$value$jobId)) {
+              # WS_RECV_BEGIN_UPLOAD (upload response)
+              private$uploadUrl <- parsed$response$value$uploadUrl
+              private$uploadJobId <- parsed$response$value$jobId
+              newMsgObj <- parsed
+              newMsgObj$response$value$uploadUrl <- "${UPLOAD_URL}"
+              newMsgObj$response$value$jobId <- "${UPLOAD_JOB_ID}"
+              private$writeEvent(makeWSEvent("WS_RECV_BEGIN_UPLOAD", message = spliceMessage(msgFromServer, newMsgObj)))
+              clientWS$send(msgFromServer)
+              return(invisible())
             }
           }
           # Every other websocket event
@@ -324,8 +380,17 @@ RecordingSession <- R6::R6Class("RecordingSession",
         }
       })
       clientWS$onMessage(function(isBinary, msgFromClient) {
-        private$writeEvent(makeWSEvent("WS_SEND", message = msgFromClient))
-        serverWS$send(msgFromClient)
+        parsed <- parseMessage(msgFromClient)
+        # TODO Clean up message type dispatch here
+        if ("method" %in% names(parsed) && parsed$method == "uploadEnd") {
+          newMsgObj <- parsed
+          newMsgObj$args[[1]] <- "${UPLOAD_JOB_ID}"
+          private$writeEvent(makeWSEvent("WS_SEND_END_UPLOAD", message = spliceMessage(msgFromClient, newMsgObj)))
+          serverWS$send(msgFromClient)
+        } else {
+          private$writeEvent(makeWSEvent("WS_SEND", message = msgFromClient))
+          serverWS$send(msgFromClient)
+        }
       })
       clientWS$onClose(function() {
         cat("Client disconnected\n")
@@ -356,12 +421,14 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #' @examples
 recordSession <- function(targetAppUrl, host = "0.0.0.0", port = 8600,
   outputFile = "recording.log", openBrowser = TRUE) {
-    sessionCookie <- if (isProtected(targetAppUrl)) {
-      username <- getPass::getPass("Enter your username: ")
-      password <- getPass::getPass("Enter your password: ")
+    sessionCookies <- if (isProtected(targetAppUrl)) {
+      #username <- getPass::getPass("Enter your username: ")
+      #password <- getPass::getPass("Enter your password: ")
+      username <- "foo"
+      password <- "barp"
       postLogin(targetAppUrl, username, password)
-    } else NULL
-    session <- RecordingSession$new(targetAppUrl, host, port, outputFile, sessionCookie)
+    } else data.frame()
+    session <- RecordingSession$new(targetAppUrl, host, port, outputFile, sessionCookies)
     message("Listening on ", host, ":", port)
     if (openBrowser) browseURL(paste0("http://", host, ":", port))
     on.exit(session$stop())

@@ -9,7 +9,11 @@ getInputs <- function(html, server) {
 }
 
 pasteParams <- function(df, collapse) {
-  paste0(df[["name"]], "=", df[["value"]], collapse = collapse)
+  if (nrow(df) == 0) {
+    ""
+  } else {
+    paste0(df[["name"]], "=", df[["value"]], collapse = collapse)
+  }
 }
 
 # Returns string "unknown", "ssp", "rsc"
@@ -51,26 +55,23 @@ loginUrlFor <- function(appUrl, appServer) {
   }
 }
 
-
-# Returns the cookie to be persisted in all future HTTP requests in the session
+# Returns the cookies to be persisted in all future HTTP requests in the session
 handlePost <- function(handle, loginUrl, postfields, cookies, cookieName) {
   curl::handle_setopt(handle,
     postfields = postfields,
-    # TODO how should the cookies be encoding?
     cookie = pasteParams(cookies, "; "),
     post = TRUE,
     followlocation = FALSE,
-    ssl_verifyhost = 0, ssl_verifypeer = 0
+    ssl_verifyhost = 0,
+    ssl_verifypeer = 0
   )
   curl::curl_fetch_memory(loginUrl, handle = handle)
-  cookies <- curl::handle_cookies(handle)
-  unlist(cookies[which(cookies$name == cookieName), c("name", "value")])
+  curl::handle_cookies(handle)[,c("name", "value")]
 }
 
-# Returns a named vector representing a cookie named `name` with value `value`
-# that should be attached to all subsequent HTTP requests, including the initial
-# websocket request.
-# Currently implemented for RSC and SSP
+# Returns the cookies that should be attached to all subsequent HTTP requests,
+# including the initial websocket request. Currently implemented for RSC and
+# SSP.
 postLogin <- function(appUrl, username, password) {
 
   appServer <- servedBy(appUrl)
@@ -84,7 +85,7 @@ postLogin <- function(appUrl, username, password) {
     name = c("username", "password"), value = c(username, password))
   )
   cookies <- curl::handle_cookies(h)[,c("name", "value")]
-  cookie <- if (appServer == "rsc") {
+  if (appServer == "rsc") {
     handlePost(handle = curl::new_handle(), loginUrl = loginUrl,
       postfields = paste0('{"username": "', username, '", "password": "', password, '"}'),
       cookies = cookies, cookieName = "rsconnect"
@@ -95,7 +96,6 @@ postLogin <- function(appUrl, username, password) {
       cookies = cookies, cookieName = "session_state"
     )
   }
-  return(cookie)
 }
 
 getApp <- function(appUrl, cookie) {
