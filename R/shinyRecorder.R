@@ -385,7 +385,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
         if ("method" %in% names(parsed) && parsed$method == "uploadEnd") {
           newMsgObj <- parsed
           newMsgObj$args[[1]] <- "${UPLOAD_JOB_ID}"
-          private$writeEvent(makeWSEvent("WS_SEND_END_UPLOAD", message = spliceMessage(msgFromClient, newMsgObj)))
+          private$writeEvent(makeWSEvent("WS_SEND", message = spliceMessage(msgFromClient, newMsgObj)))
           serverWS$send(msgFromClient)
         } else {
           private$writeEvent(makeWSEvent("WS_SEND", message = msgFromClient))
