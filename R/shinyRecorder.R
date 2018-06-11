@@ -102,7 +102,6 @@ makeHTTPEvent_POST <- function(server, req, data, resp_curl, created = Sys.time(
       created = makeTimestamp(created),
       statusCode = resp_curl$status_code,
       server = server,
-      url = "${UPLOAD_URL}",
       data = if (is.null(data)) NULL else httpuv::rawToBase64(data)
     ), class = "REQ")
   } else {
@@ -381,6 +380,8 @@ RecordingSession <- R6::R6Class("RecordingSession",
         }
       })
       clientWS$onMessage(function(isBinary, msgFromClient) {
+        # Ignores ACKs sent from the client
+        if (shouldIgnore(msgFromClient)) return()
         parsed <- parseMessage(msgFromClient)
         # TODO Clean up message type dispatch here
         if ("method" %in% names(parsed) && parsed$method == "uploadEnd") {
