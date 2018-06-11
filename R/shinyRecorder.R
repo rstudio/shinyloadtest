@@ -90,8 +90,9 @@ parseMessage <- function(msg) {
 # {"type":"WS_RECV_INIT","created":"2018-03-12T20:21:27.086Z","message":"a[\"1#0|m|[\"{\\\"config\\\":{\\\"workerId\\\":[\\\"${WORKER}\\\"],\\\"sessionId\\\":[\\\"${SESSION}\\\"],\\\"user\\\":null}}\"]\"]"}
 spliceMessage <- function(originalMessage, newMessageObject) {
   newMsg <- jsonlite::toJSON(jsonlite::unbox(jsonlite::toJSON(newMessageObject, null = 'null', auto_unbox = TRUE)))
+  unquoted <- gsub("^.|.$", "", newMsg)
   group <- stringr::str_match(originalMessage, messagePattern)
-  paste0(group[1,2], group[1,3], group[1,4], newMsg, group[1,6])
+  paste0(group[1,2], group[1,3], group[1,4], unquoted, group[1,6])
 }
 
 makeHTTPEvent_POST <- function(server, req, data, resp_curl, created = Sys.time()) {
