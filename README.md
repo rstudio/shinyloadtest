@@ -1,4 +1,4 @@
-# Load Testing Shiny Applications
+# Load Testing Shiny Applications - WIP DO NOT USE (YET!)
 
 The `shinyloadtest` package and the accompanying `shinycannon` software enable load testing 
 deployed shiny applications.
