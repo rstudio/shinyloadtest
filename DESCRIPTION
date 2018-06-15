@@ -1,13 +1,16 @@
 Package: shinyloadtest
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
-Encoding: GPL-3
+Title: Load Test Shiny Applications
+Version: 0.2.0
+Authors@R: c(
+            person("Alan", "Dipert", role = c("aut", "cre"), email = "alan@rstudio.com"),
+            person("Barbara", "Borges", role = c("aut"), email = "barbara@rstudio.com")
+            )
+Description: shinyloadtest provides functions for recording user sessions, 
+    playing those sessions back in parallel to simulate load, and analzying
+    the results.
+License: GPL-3
+Encoding: UTF-8
 LazyData: true
 Imports: 
     websocket,
@@ -19,9 +22,18 @@ Imports:
     jsonlite,
     withr,
     stringr,
-    rlang,
+    rlang (>= 0.1.2),
     xml2,
-    getPass
+    getPass,
+    ggplot2,
+    tibble,
+    dplyr,
+    readr,
+    magrittr
 Remotes: rstudio/websocket,
     rstudio/httpuv
 RoxygenNote: 6.0.1.9000
+Suggests:
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
