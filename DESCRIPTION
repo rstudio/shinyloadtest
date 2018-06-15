@@ -22,13 +22,18 @@ Imports:
     jsonlite,
     withr,
     stringr,
-    rlang,
+    rlang (>= 0.1.2),
     xml2,
-    getPass
+    getPass,
+    ggplot2,
+    tibble,
+    dplyr,
+    readr,
+    magrittr
 Remotes: rstudio/websocket,
     rstudio/httpuv
 RoxygenNote: 6.0.1.9000
-Suggests: 
+Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr

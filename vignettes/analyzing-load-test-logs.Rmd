@@ -16,6 +16,27 @@ knitr::opts_chunk$set(
 )
 ```
 
-//TODO 
+There are two types of log files generated while using `shinyloadtest`. The first file is the recording log file. This file is a JSON file that captures all of the HTTP(s) and websocket traffic that occured during the recording.
 
-This vignette should detail the log output format as well as the analysis functions.
+The second file is a session log file generated during the loadtest. A file is generated for each simulated session.
+
+The two files are tied together by a set of keys that identify unique "events" that were recorded and played back in the load test.
+
+
+Key | Description 
+-- | --
+REQ_HOME | The initial HTTP request for the application
+REQ | HTTP requests that represent loading static assets necessary for the app, e.g. javascript or css files.
+WS_SEND | 
+WS_RECV | 
+PLAYER | 
+
+The `shinyloadtest::tidy_loadtest` function uses these files to generate a data frame with loadtest results. The resulting data frame contains the following columns:
+
+Column | Description 
+-- | --
+
+> Normally, users will not need to worry about specific files, but should be able to use the tidy data frame to for further analysis.
+
+They key idea is that each row of the tidy results data frame represents an event. Events include the initial page load, user inputs and their associated outputs, and user wait times. You'll want to compare the duration of event times across different load tests.
+
