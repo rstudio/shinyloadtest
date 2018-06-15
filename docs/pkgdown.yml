@@ -1,5 +1,9 @@
 pandoc: '2.2'
 pkgdown: 1.1.0
 pkgdown_sha: ~
-articles: []
+articles:
+  analyzing-load-test-logs: analyzing-load-test-logs.html
+  case-study: case-study.html
+  load-testing-authenticated-apps: load-testing-authenticated-apps.html
+  performance-settings-in-rstudio-connect-or-shiny-server-pro: performance-settings-in-rstudio-connect-or-shiny-server-pro.html
 

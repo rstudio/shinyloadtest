@@ -67,12 +67,12 @@ get_times <- function(df) {
 #' @return A tidy data frame with the test result data. Each row is an event. Columns include
 #'    identifiers and timing information for the event.
 #' @export
-#' @usage  \dontrun{
-#'   analyze_runs(
+#' @usage
+#'   tidy_loadtest(
 #'      test1 = 'results/test-1/',
 #'      test2 = 'results/test-2/'
 #'   )
-#'}
+#'
 tidy_loadtest <- function(...) {
 
   # TODO: Validate input directories and fail intelligently!

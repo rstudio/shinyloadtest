@@ -4,12 +4,10 @@
 \alias{tidy_loadtest}
 \title{Create Tidy Load Test Results}
 \usage{
-\dontrun{
-  analyze_runs(
+tidy_loadtest(
      test1 = 'results/test-1/',
      test2 = 'results/test-2/'
   )
-}
 }
 \arguments{
 \item{...}{Key-value pairs where the key is the desired name for the test and the

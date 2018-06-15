@@ -82,12 +82,47 @@
     <div id="load-testing-shiny-applications" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#load-testing-shiny-applications" class="anchor"></a>Load Testing Shiny Applications</h1></div>
+<blockquote>
+<p>This is a WIP, do not use yet. Please follow community.rstudio.com for a soft launch of the tools.</p>
+</blockquote>
 <p>The <code>shinyloadtest</code> package and the accompanying <code>shinycannon</code> software enable load testing deployed shiny applications.</p>
 <p>Load tests ensure that deployed Shiny applications are ready for mission critical tasks. Load testing helps identify performance bottlenecks (before users do!), test <a href="https://rstudio.github.io/promises">asynchronous Shiny code</a>, and identify optimal scaling settings or server specs (e.g. the necessary cpu and RAM to support an expected audience).</p>
 <p>Just as importantly, load testing can squash the commnon concern that Shiny doesn’t scale. In fact, we used these load testing tools to prove that more than 10,000 users could access a Shiny application at same time!</p>
 <p><a href="https://www.rstudio.com/resources/videos/scaling-shiny/?wvideo=mx214xmcqw"><img src="https://embedwistia-a.akamaihd.net/deliveries/97390a2a0512c2f959b37e3e91b0d9c81e3023c5.jpg?image_play_button_size=2x&amp;image_crop_resized=960x540&amp;image_play_button=1&amp;image_play_button_color=4287c7e0" width="400" height="225" style="width: 400px; height: 225px;"></a></p>
 <p><a href="https://www.rstudio.com/resources/videos/scaling-shiny/?wvideo=mx214xmcqw">Scaling Shiny – RStudio</a></p>
-<p>To get started with <code>shinyloadtest</code>, read through the quick start guide below. Additional resources include details of <code>shinyloadtest</code>’s log format, a case study showing how to interpret load test results, an overview of using <code>shinyloadtest</code> with authenticated apps, and a description of how to use <code>shinyloadtest</code> to determine runtime settings in RStudio Connect or Shiny Server Pro.</p>
+<p>To get started with <code>shinyloadtest</code>, read through the quick start guide below. Additional resources include details of <code>shinyloadtest</code>’s log formats, a case study showing how to interpret load test results, an overview of using <code>shinyloadtest</code> with authenticated apps, and a description of how to use <code>shinyloadtest</code> to determine runtime settings in RStudio Connect or Shiny Server Pro.</p>
+<div id="installation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#installation" class="anchor"></a>Installation</h2>
+<p>To perform a load test you’ll need two pieces of software: <code>shinyloadtest</code> and <code>shinycannon</code>.</p>
+<p>To install <code>shinyloadtest</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">'rstudio/shinyloadtest'</span>)</a></code></pre></div>
+<p><code>shinycannon</code> is a standalone executable:</p>
+<table class="table">
+<thead><tr class="header">
+<th>Platform</th>
+<th>Download URL</th>
+<th>Install Command</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Max OS</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Ubuntu</td>
+<td><a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-06-14-06%3A15%3A50_1.0.0-31565b0/deb/shinycannon_1.0.0-31565b0_amd64.deb">download</a></td>
+<td><code>sudo gdebi shinycannon_1.0.0-31565b0_amd64.db</code></td>
+</tr>
+<tr class="odd">
+<td>Windows</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
 <div id="quick-start" class="section level2">
 <h2 class="hasAnchor">
 <a href="#quick-start" class="anchor"></a>Quick Start</h2>
@@ -101,42 +136,58 @@
 <div id="step-1-recording" class="section level3">
 <h3 class="hasAnchor">
 <a href="#step-1-recording" class="anchor"></a>Step 1: Recording</h3>
-<p>First, install the <code>shinyloadtest</code> package. The package is not currently on CRAN, but can be installed with <code>devtools</code>:</p>
-<pre><code><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">devtools::install_github('shinyloadtest')</a></code></pre>
-<p>The <code>shinyloadtest</code> package contains one essential function, <code>recordSession</code>. The primary argument to <code>recordSession</code> is the URL of the <strong>deployed</strong> application,</p>
-<p>//TODO</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">shinyloadtest<span class="op">::</span><span class="kw">recordSession</span>(<span class="st">'https://beta.rstudioconnect.com/)</span></a></code></pre></div>
-<p>Running the function will open a browser displaying the app. Once open, interact with the application as a normal user would and then close the browser. After closing the browser, a file will be created that contains a recording of the session. This recording, written to <code>recording.log</code> will serve as the basis for the load test.</p>
+<p>Record a session using the <code>recordSession</code> function, which takes the URL of the <strong>deployed</strong> application:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">shinyloadtest<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/shinyloadtest/topics/record_session">record_session</a></span>(<span class="st">'https://beta.rstudioconnect.com/content/3239/'</span>)</a></code></pre></div>
+<p>Running the function will open a browser displaying the app. Once open, interact with the application as a normal user would and then close the browser. After closing the browser, a file will be created that contains a recording of the session. This recording, written to <code>recording.log</code> by default, will serve as the basis for the load test.</p>
 </div>
 <div id="step-2-run-the-load-test" class="section level3">
 <h3 class="hasAnchor">
 <a href="#step-2-run-the-load-test" class="anchor"></a>Step 2: Run the Load Test</h3>
-<p>With the recording in hand, we’re almost ready to run the load test. The actual test is conducted outside of R using a standalone executable called <code>shinycannon</code>. <code>shinycannon</code> can be installed for <a href="">Mac</a>, <a href="">Windows</a>, or <a href="">Ubuntu</a>. <code>shinycannon</code> requires Java, see these <a href="">instructions</a> for details.</p>
-<p>Once installed, <code>shinycannon</code> can be used from the command line to execute a load test using the recording file created in step 1. The main arguments to <code>shinycannon</code> are:</p>
+<p>With the recording in hand, we’re ready to run the load test. The actual test is conducted outside of R using the stand alone <code>shinycannon</code> tool.</p>
+<p><code>shinycannon</code> can be used from the command line. An easy option is to use <code>shinycannon</code> from the RStudio terminal. The main arguments to <code>shinycannon</code> are:</p>
 <ul>
-<li><p>** **: The number of concurrent users to simulate. <code>shinycannon</code> uses separate parallel threads to represent each user.</p></li>
-<li><p>** **: The duration of the load test. <code>shinycannon</code> will re-run the recording as necessary to meet the specified duration. For example, if the recording is 5 minutes long, but the desired test duration is 18 minutes, <code>shinycannon</code> will have each “user” repeat the session 4 times.</p></li>
+<li><p><strong>sessions</strong>: The number of concurrent users to simulate. <code>shinycannon</code> uses separate parallel threads to represent each user.</p></li>
+<li><p><strong>loaded-duration-minutes</strong>: The duration of the load test. <code>shinycannon</code> will re-run the recording as necessary to meet the specified duration. For example, if the recording is 5 minutes long, but the desired test duration is 18 minutes, <code>shinycannon</code> will</p></li>
 </ul>
-<p>As an example, to run a load test simulating 100 concurrent users:</p>
-<p>//TODO</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="ex">shinycannon</span> </a></code></pre></div>
-<p><code>shinycannon</code> includes detailed help documentation explaining the other arguments, available by running:</p>
-<p>//TODO</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"></code></pre></div>
-<p>During the test, <code>shinycannon</code> will report the progress and number of simulated users. The result of the test is an output directory, <code>//TODO</code> by default, which includes timing information for each session.</p>
+<p>As an example, to run a load test simulating 100 concurrent users for 20 minutes:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="ex">shinycannon</span> recording.log https://beta.rstudioconnect.com/content/3239/ --sessions=100 --loaded-duration-minutes=20s</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="ex">Logging</span> at INFO level to output_dir/detail.log</a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="ex">2018-06-15T11</span>:22:29.465037Z - Running: 0, Failed: 0, Done: 0</a>
+<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="ex">2018-06-15T11</span>:22:29.466399Z - Worker thread 1 warming up</a>
+<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="ex">2018-06-15T11</span>:22:29.476858Z - Worker thread 2 warming up</a>
+<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="ex">2018-06-15T11</span>:22:29.477245Z - Worker thread 3 warming up</a>
+<a class="sourceLine" id="cb3-8" data-line-number="8">                           <span class="ex">...</span> </a>
+<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="ex">2018-06-15T11</span>:22:29.499708Z - Waiting for warmup to complete</a>
+<a class="sourceLine" id="cb3-10" data-line-number="10">                           <span class="ex">...</span></a>
+<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="ex">2018-06-15T11</span>:22:29.516885Z - Maintaining for 20 minutes</a>
+<a class="sourceLine" id="cb3-12" data-line-number="12"><span class="ex">2018-06-15T11</span>:28:34.465847Z - Running: 100, Failed: 0, Done: 0</a>
+<a class="sourceLine" id="cb3-13" data-line-number="13">                           <span class="ex">...</span></a>
+<a class="sourceLine" id="cb3-14" data-line-number="14"><span class="ex">2018-06-15T11</span>:44:29.517080Z - Stopped maintaining, waiting for workers to stop</a>
+<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="ex">2018-06-15T11</span>:48:34.465847Z - Running: 60, Failed: 0, Done: 40</a>
+<a class="sourceLine" id="cb3-16" data-line-number="16">                           <span class="ex">...</span></a></code></pre></div>
+<p><code>shinycannon</code> includes detailed help documentation explaining the other arguments:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="ex">shinycannon</span> --help</a></code></pre></div>
+<p>During the test, <code>shinycannon</code> reports the progress and number of simulated users. The result of the test is an output directory which includes timing information for each session.</p>
 </div>
 <div id="step-3-analyze-the-results" class="section level3">
 <h3 class="hasAnchor">
 <a href="#step-3-analyze-the-results" class="anchor"></a>Step 3: Analyze the Results</h3>
 <p>The output directory created in step 2 is the focus of step 3. The <code>shinyloadtest</code> R package provides functions for analyzing the output files from the test.</p>
-<p>As a simple example, we can create a tidy dataframe with the test results and look at a few sample plots.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="op">/</span><span class="er">/</span>TODO</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">library</span>(shinyloadtest)</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">results &lt;-<span class="st"> </span><span class="kw"><a href="reference/tidy_loadtest.html">tidy_loadtest</a></span>(</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3">      <span class="st">`</span><span class="dt">20 users</span><span class="st">`</span> =<span class="st"> 'load-test-results'</span>,</a>
+<a class="sourceLine" id="cb5-4" data-line-number="4">      <span class="st">`</span><span class="dt">1 user</span><span class="st">`</span> =<span class="st"> 'baseline-results'</span></a>
+<a class="sourceLine" id="cb5-5" data-line-number="5">)</a>
+<a class="sourceLine" id="cb5-6" data-line-number="6">results</a></code></pre></div>
+<p><img src="inst/img/results.png"></p>
+<pre><code>results %&gt;% 
+   hist_loadtimes()
+results %&gt;% 
+   plot_time_boxplot()</code></pre>
+<p><img src="inst/img/hist_loadtime.png"></p>
+<p><img src="inst/img/boxplot.png"></p>
 </div>
-</div>
-<div id="limitations" class="section level2">
-<h2 class="hasAnchor">
-<a href="#limitations" class="anchor"></a>Limitations</h2>
-<p>The load testing tool will not be able to record and load test applications if they:</p>
 </div>
 </div>
   </div>
