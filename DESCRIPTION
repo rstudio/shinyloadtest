@@ -7,7 +7,7 @@ Maintainer: The package maintainer <yourself@somewhere.net>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
 License: What license is it under?
-Encoding: UTF-8
+Encoding: GPL-3
 LazyData: true
 Imports: 
     websocket,
