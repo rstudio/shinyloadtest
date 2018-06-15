@@ -95,6 +95,10 @@ spliceMessage <- function(originalMessage, newMessageObject) {
   paste0(group[1,2], group[1,3], group[1,4], unquoted, group[1,6])
 }
 
+# TODO look at DT posts
+# TODO write to separate files instead of embedding via base64. Files are likely to be huge.
+# recording.log
+# recording.log.file1
 makeHTTPEvent_POST <- function(server, req, data, resp_curl, created = Sys.time()) {
   if (grepl("/upload/", req$PATH_INFO)) {
     structure(list(
@@ -109,6 +113,8 @@ makeHTTPEvent_POST <- function(server, req, data, resp_curl, created = Sys.time(
   }
 }
 
+# TODO Remove duplication. The only things that make each item uniqure are (possible munged) URL
+# TODO This is where the token stuff should be revisited too. Store tokens in dictionary once and replace verbatim after
 makeHTTPEvent_GET <- function(server, req, resp_curl, created = Sys.time()) {
   if (req$REQUEST_METHOD != "GET") stop("Unsupported method, only handle GET:", req$REQUEST_METHOD)
 
@@ -245,6 +251,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
       flush(private$outputFile)
     },
     makeUrl = function(req) {
+      # TODO conserve slashes if targetPath is empty
+      # TODO encode httpUrl if it's really decoded by this point
+      # TODO IPv6
       httpUrl <- paste0(private$targetScheme, "://", private$targetHost, ":", private$targetPort, "/", private$targetPath, "/", req$PATH_INFO, req$QUERY_STRING)
       # This is a hack around the fact that somehow there's three forward slashes in one of the separators
       httpUrl <- gsub("///", "/", httpUrl, fixed = TRUE)
@@ -258,9 +267,11 @@ RecordingSession <- R6::R6Class("RecordingSession",
         req_curl[["Cookie"]] <- pasteParams(private$sessionCookies, "; ")
       }
 
-      do.call(curl::handle_setheaders, c(h, req_curl))
+      # do.call(curl::handle_setheaders, c(h, req_curl))
+      # TODO confirm this works now that we're not do.calling
+      curl::handle_setheaders(h, .list = req_curl)
 
-      # TODO Accept invalid certificate from upstream. Should we make this an option?
+      # TODO See if there's an easy way to at least show a warning or message
       if (private$targetScheme == "https") {
         curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0)
       }
@@ -309,10 +320,12 @@ RecordingSession <- R6::R6Class("RecordingSession",
     },
     handleCall = function(req) {
       private[[paste0("handle_", req$REQUEST_METHOD)]](req)
+      # TODO Return a result to indicate when no method matches
     },
     handleWSOpen = function(clientWS) {
       cat("WS open!")
       private$clientWsState <- "OPEN"
+      # TODO Shoudln't need to do this once we just do token replacement instead of scanning
       if (private$server == "local") {
         private$writeEvent(makeWSEvent("WS_OPEN", url = clientWS$request$PATH_INFO))
       } else {
@@ -330,13 +343,14 @@ RecordingSession <- R6::R6Class("RecordingSession",
       serverWS <- websocket::WebsocketClient$new(wsUrl,
         headers = if (!is.null(private$sessionCookie)) c(Cookie = pasteParams(private$sessionCookie, "; ")),
         onMessage = function(msgFromServer) {
-          # These kinds of messages are relayed to the browser but are not recorded.
-          # TODO Cleanup this code that handles SSO/dev and SSP cases in an ugly way.
+          # TODO Put the "o" check in shouldIgnore and ignore "o" everywhere because INIT has the interesting time.
           if (msgFromServer != "o" && shouldIgnore(msgFromServer)) {
             clientWS$send(msgFromServer)
             return(invisible())
           }
 
+
+          # TODO Upload stuff is only inside server == "hosted"
           if (private$server == "hosted") {
 
             if (msgFromServer == "o") {
@@ -352,13 +366,16 @@ RecordingSession <- R6::R6Class("RecordingSession",
             # WS_RECV_INIT
             if ("config" %in% names(parsed)) {
               newMsgObj <- parsed
+              # TODO Only the worker id is meaningful when hosted
               newMsgObj$config$workerId <- "${WORKER}"
+              # TODO The session id is in everything (hosted, dev)
               newMsgObj$config$sessionId <- "${SESSION}"
               private$writeEvent(makeWSEvent("WS_RECV_INIT", message = spliceMessage(msgFromServer, newMsgObj)))
               clientWS$send(msgFromServer)
               return(invisible())
             } else if(!is.null(parsed$response$value$jobId)) {
               # WS_RECV_BEGIN_UPLOAD (upload response)
+              # TODO Concurrent upload support. Manage upload URLs/jobIds correctly
               private$uploadUrl <- parsed$response$value$uploadUrl
               private$uploadJobId <- parsed$response$value$jobId
               newMsgObj <- parsed
@@ -384,6 +401,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
         if (shouldIgnore(msgFromClient)) return()
         parsed <- parseMessage(msgFromClient)
         # TODO Clean up message type dispatch here
+        # TODO This should get simpler when token replacement is simpler
         if ("method" %in% names(parsed) && parsed$method == "uploadEnd") {
           newMsgObj <- parsed
           newMsgObj$args[[1]] <- "${UPLOAD_JOB_ID}"
@@ -424,10 +442,10 @@ RecordingSession <- R6::R6Class("RecordingSession",
 recordSession <- function(targetAppUrl, host = "0.0.0.0", port = 8600,
   outputFile = "recording.log", openBrowser = TRUE) {
     sessionCookies <- if (isProtected(targetAppUrl)) {
-      #username <- getPass::getPass("Enter your username: ")
-      #password <- getPass::getPass("Enter your password: ")
-      username <- "foo"
-      password <- "barp"
+      username <- getPass::getPass("Enter your username: ")
+      password <- getPass::getPass("Enter your password: ")
+      #username <- "foo"
+      #password <- "barp"
       postLogin(targetAppUrl, username, password)
     } else data.frame()
     session <- RecordingSession$new(targetAppUrl, host, port, outputFile, sessionCookies)
