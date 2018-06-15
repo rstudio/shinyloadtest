@@ -1,4 +1,4 @@
-# Load Testing Shiny Applications
+# Load Testing Shiny Applications - WIP DO NOT USE (YET!)
 
 > This is a WIP, do not use yet. Please follow community.rstudio.com for a 
 soft launch of the tools.
