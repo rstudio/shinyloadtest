@@ -15,5 +15,37 @@ knitr::opts_chunk$set(
 )
 ```
 
-This vignette should cover a case study that is publically accessible, like the cranwhale
-application or Winston's CRAN explorer.
+This case study will show an example of using `shinyloadtest` to determine the [runtime settings](https://support.rstudio.com/hc/en-us/articles/231874748-Scaling-and-Performance-Tuning-in-RStudio-Connect) for an application in RStudio Connect. Similar approaches can be used for Shiny Server Pro or open source alternatives designed to scale Shiny applications.
+
+Another example of `shinyloadtest` is available in the documentation and [case study for async Shiny](https://rstudio.github.io/promises/articles/casestudy.html).
+
+## The Application
+
+We'll run the load test against a Shiny application called [cran explorer](https://github.com/wch/shiny_demo). The app is designed to explore CRAN packages over time. The app has two primary views: a timeline showing the state of CRAN by date and a detail page that shows the release history for an individual package.
+
+![](inst/img/cran_explorer_timeline.png)
+
+![](inst/img/cran_explorer_ggplot2.png)
+
+You can visit and explore the application here: `https://beta.rstudioconnect.com/content/3239/`
+
+## Optimizing for 50 Users
+
+Our goal is to ensure the application can support 50 simultaneous visitors without undue latency or slow page load times. There are many different ways to deploy and scale shiny applications. In this example, the application has been deployed to RStudio Connect, which is a publishing platform for analytic products. Publishers who deploy Shiny apps to RStudio Connect have access to a number of [runtime settings](http://docs.rstudio.com/connect/admin/appendix-configuration.html#appendix-configuration-scheduler) that influence how RStudo Connect will scale the Shiny app. We'll use `shinyloadtest` to identify which settings are optimal for the CRAN Explorer app with 50 concurrent users.
+
+TODO:  Note about shimmer
+
+TODO: Note about generally applicable strategies
+
+> TODO: Don't run these commands against our servers with big numbers
+
+### Baseline 
+
+### Test 1
+
+### Test 2
+
+## Analyzing the Results
+
+## General Strategies 
+

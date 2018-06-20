@@ -60,9 +60,6 @@
     <li>
       <a href="../articles/load-testing-authenticated-apps.html">Load Testing Authenticated Apps</a>
     </li>
-    <li>
-      <a href="../articles/performance-settings-in-rstudio-connect-or-shiny-server-pro.html">Performance Settings in RStudio Connect or Shiny Server Pro</a>
-    </li>
   </ul>
 </li>
       </ul>
@@ -80,7 +77,7 @@
     <div class="page-header toc-ignore">
       <h1>Load Testing Authenticated Apps</h1>
             
-            <h4 class="date">2018-06-15</h4>
+            <h4 class="date">2018-06-20</h4>
       
       
       <div class="hidden name"><code>load-testing-authenticated-apps.Rmd</code></div>
@@ -89,17 +86,58 @@
 
     
     
-<p>This one is short and sweet, describing the options for apps that require authentication.</p>
+<p><code>shinyloadtest</code> includes support for recording and load testing applications that require authentication.</p>
+<div id="recording" class="section level2">
+<h2 class="hasAnchor">
+<a href="#recording" class="anchor"></a>Recording:</h2>
+<p>To record against an application that requires authentication, use the same <code>record_session</code> function:</p>
+<pre><code><a href="../reference/record_session.html">shinyloadtest::record_session('https://beta.rstudioconnect.com/content/3239/')</a></code></pre>
+<p>During recording, a prompt will appear asking for the username and password for the application:</p>
+<p><img src="inst/img/credentials_prompt.png"></p>
+<p>The credentials are passed securely to the deployed application, and are not recorded in the recording log file. An important place holder is created in the recording log file. The place holder will be used by <code>shinycannon</code> during the load test.</p>
+</div>
+<div id="load-test" class="section level2">
+<h2 class="hasAnchor">
+<a href="#load-test" class="anchor"></a>Load Test</h2>
+<p>To run the load test, use the same <code>shinycannon</code> commands. <code>shinycannon</code> will require that the credentials for the application are available in the environment variables: <code>SHINYCANNON_USER</code> and <code>SHINYCANNON_PASS</code>.</p>
+<p>For example:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="bu">export</span> <span class="va">SHINYCANNON_USER=</span><span class="st">'username'</span></a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="bu">export</span> <span class="va">SHINYCANNON_PASS=</span><span class="st">'super-secret-pwd'</span></a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="ex">shinycannon</span> recording.log https://beta.rstudioconnect.com/content/3239/ --sessions=50 --loaded-duration-minutes=30</a></code></pre></div>
+</div>
+<div id="limitations" class="section level2">
+<h2 class="hasAnchor">
+<a href="#limitations" class="anchor"></a>Limitations</h2>
+<p>There are two main limitations to load testing applications that require authentication.</p>
+<p>First, the load testing tool only supports authentication forms that accept a username and password directly. We’ve tested <code>shinyloadtest</code> and <code>shinycannon</code> with:</p>
+<ul>
+<li>RStudio Connect and Shiny Server Pro using AD / LDAP</li>
+<li>RStudio Connect and Shiny Server Pro using Built-in Authentication</li>
+<li>RStudio Connect and Shiny Server Pro using PAM</li>
+</ul>
+<p>RStudio Connect and Shiny Server Pro using oAuth, Proxied Auth, or other SSO tools are NOT supported.</p>
+<p>Second, the load testing tool will run every simulated user under the same credentials. For most applications this is not a concern. However, both Shiny Server Pro and RStudio Connect support a class of Shiny applications that behave differently based on the logged in user (available in <code>session$user</code>). By default, a load test will only be able to test a single “behavior path” at a time. To test multiple behaviors at once, create multiple recordings for different users and manually run multiple load tests at the same time.</p>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+        <div id="tocnav">
+      <h2 class="hasAnchor">
+<a href="#tocnav" class="anchor"></a>Contents</h2>
+      <ul class="nav nav-pills nav-stacked">
+<li><a href="#recording">Recording:</a></li>
+      <li><a href="#load-test">Load Test</a></li>
+      <li><a href="#limitations">Limitations</a></li>
+      </ul>
+</div>
       </div>
 
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Alan Dipert, Barbara Borges.</p>
+  <p>Developed by Alan Dipert.</p>
 </div>
 
 <div class="pkgdown">

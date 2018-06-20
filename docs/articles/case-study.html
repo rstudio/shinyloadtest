@@ -60,9 +60,6 @@
     <li>
       <a href="../articles/load-testing-authenticated-apps.html">Load Testing Authenticated Apps</a>
     </li>
-    <li>
-      <a href="../articles/performance-settings-in-rstudio-connect-or-shiny-server-pro.html">Performance Settings in RStudio Connect or Shiny Server Pro</a>
-    </li>
   </ul>
 </li>
       </ul>
@@ -80,7 +77,7 @@
     <div class="page-header toc-ignore">
       <h1>Case Study</h1>
             
-            <h4 class="date">2018-06-15</h4>
+            <h4 class="date">2018-06-20</h4>
       
       
       <div class="hidden name"><code>case-study.Rmd</code></div>
@@ -89,17 +86,66 @@
 
     
     
-<p>This vignette should cover a case study that is publically accessible, like the cranwhale application or Winston’s CRAN explorer.</p>
+<p>This case study will show an example of using <code>shinyloadtest</code> to determine the <a href="https://support.rstudio.com/hc/en-us/articles/231874748-Scaling-and-Performance-Tuning-in-RStudio-Connect">runtime settings</a> for an application in RStudio Connect. Similar approaches can be used for Shiny Server Pro or open source alternatives designed to scale Shiny applications.</p>
+<p>Another example of <code>shinyloadtest</code> is available in the documentation and <a href="https://rstudio.github.io/promises/articles/casestudy.html">case study for async Shiny</a>.</p>
+<div id="the-application" class="section level2">
+<h2 class="hasAnchor">
+<a href="#the-application" class="anchor"></a>The Application</h2>
+<p>We’ll run the load test against a Shiny application called <a href="https://github.com/wch/shiny_demo">cran explorer</a>. The app is designed to explore CRAN packages over time. The app has two primary views: a timeline showing the state of CRAN by date and a detail page that shows the release history for an individual package.</p>
+<p><img src="inst/img/cran_explorer_timeline.png"></p>
+<p><img src="inst/img/cran_explorer_ggplot2.png"></p>
+<p>You can visit and explore the application here: <code>https://beta.rstudioconnect.com/content/3239/</code></p>
+</div>
+<div id="optimizing-for-50-users" class="section level2">
+<h2 class="hasAnchor">
+<a href="#optimizing-for-50-users" class="anchor"></a>Optimizing for 50 Users</h2>
+<p>Our goal is to ensure the application can support 50 simultaneous visitors without undue latency or slow page load times. There are many different ways to deploy and scale shiny applications. In this example, the application has been deployed to RStudio Connect, which is a publishing platform for analytic products. Publishers who deploy Shiny apps to RStudio Connect have access to a number of <a href="http://docs.rstudio.com/connect/admin/appendix-configuration.html#appendix-configuration-scheduler">runtime settings</a> that influence how RStudo Connect will scale the Shiny app. We’ll use <code>shinyloadtest</code> to identify which settings are optimal for the CRAN Explorer app with 50 concurrent users.</p>
+<p>TODO: Note about shimmer</p>
+<p>TODO: Note about generally applicable strategies</p>
+<blockquote>
+<p>TODO: Don’t run these commands against our servers with big numbers</p>
+</blockquote>
+<div id="baseline" class="section level3">
+<h3 class="hasAnchor">
+<a href="#baseline" class="anchor"></a>Baseline</h3>
+</div>
+<div id="test-1" class="section level3">
+<h3 class="hasAnchor">
+<a href="#test-1" class="anchor"></a>Test 1</h3>
+</div>
+<div id="test-2" class="section level3">
+<h3 class="hasAnchor">
+<a href="#test-2" class="anchor"></a>Test 2</h3>
+</div>
+</div>
+<div id="analyzing-the-results" class="section level2">
+<h2 class="hasAnchor">
+<a href="#analyzing-the-results" class="anchor"></a>Analyzing the Results</h2>
+</div>
+<div id="general-strategies" class="section level2">
+<h2 class="hasAnchor">
+<a href="#general-strategies" class="anchor"></a>General Strategies</h2>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+        <div id="tocnav">
+      <h2 class="hasAnchor">
+<a href="#tocnav" class="anchor"></a>Contents</h2>
+      <ul class="nav nav-pills nav-stacked">
+<li><a href="#the-application">The Application</a></li>
+      <li><a href="#optimizing-for-50-users">Optimizing for 50 Users</a></li>
+      <li><a href="#analyzing-the-results">Analyzing the Results</a></li>
+      <li><a href="#general-strategies">General Strategies</a></li>
+      </ul>
+</div>
       </div>
 
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Alan Dipert, Barbara Borges.</p>
+  <p>Developed by Alan Dipert.</p>
 </div>
 
 <div class="pkgdown">

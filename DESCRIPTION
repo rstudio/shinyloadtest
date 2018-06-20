@@ -2,10 +2,7 @@ Package: shinyloadtest
 Type: Package
 Title: Load Test Shiny Applications
 Version: 0.2.0
-Authors@R: c(
-            person("Alan", "Dipert", role = c("aut", "cre"), email = "alan@rstudio.com"),
-            person("Barbara", "Borges", role = c("aut"), email = "barbara@rstudio.com")
-            )
+Authors@R: c(person("Alan", "Dipert", role = c("aut", "cre"), email = "alan@rstudio.com"))
 Description: shinyloadtest provides functions for recording user sessions, 
     playing those sessions back in parallel to simulate load, and analzying
     the results.

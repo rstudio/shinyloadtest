@@ -60,9 +60,6 @@
     <li>
       <a href="../articles/load-testing-authenticated-apps.html">Load Testing Authenticated Apps</a>
     </li>
-    <li>
-      <a href="../articles/performance-settings-in-rstudio-connect-or-shiny-server-pro.html">Performance Settings in RStudio Connect or Shiny Server Pro</a>
-    </li>
   </ul>
 </li>
       </ul>
@@ -79,9 +76,8 @@
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1>Analyzing Load Test Logs</h1>
-                        <h4 class="author">Vignette Author</h4>
             
-            <h4 class="date">2018-06-15</h4>
+            <h4 class="date">2018-06-20</h4>
       
       
       <div class="hidden name"><code>analyzing-load-test-logs.Rmd</code></div>
@@ -90,53 +86,101 @@
 
     
     
-<p>There are two types of log files generated while using <code>shinyloadtest</code>. The first file is the recording log file. This file is a JSON file that captures all of the HTTP(s) and websocket traffic that occured during the recording.</p>
-<p>The second file is a session log file generated during the loadtest. A file is generated for each simulated session.</p>
-<p>The two files are tied together by a set of keys that identify unique “events” that were recorded and played back in the load test.</p>
+<p>There are two types of log files generated while using <code>shinyloadtest</code>. The first file is the recording log file. This file is a JSON file that captures all of the HTTP(s) and websocket traffic that occured during the recording. The second type of file is a session log file generated during the load test. A session log file is generated for each simulated session. The two types files are tied together by a set of keys that identify “events” that were recorded and played back in the load test.</p>
+<blockquote>
+<p>Normally, users will not need to worry about specific files, but should be able to use the tidy data frame for further analysis.</p>
+</blockquote>
+<p>The <code><a href="../reference/tidy_loadtest.html">shinyloadtest::tidy_loadtest</a></code> function uses these files to generate a data frame with load test results. Multiple load tests run against the same recording file can be combined and anayzed at once. The resulting data frame contains the following columns:</p>
 <table class="table">
 <colgroup>
 <col width="50%">
 <col width="50%">
 </colgroup>
 <thead><tr class="header">
-<th>Key</th>
+<th>Column</th>
 <th>Description</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>REQ_HOME</td>
-<td>The initial HTTP request for the application</td>
+<td>run</td>
+<td>A label for the load test. A results data frame can include multiple load tests run against the same recording. See <code><a href="../reference/tidy_loadtest.html">shinyloadtest::tidy_loadtest</a></code>
+</td>
 </tr>
 <tr class="even">
-<td>REQ</td>
-<td>HTTP requests that represent loading static assets necessary for the app, e.g. javascript or css files.</td>
+<td>session</td>
+<td>An ID for a session within a load test. The ID identifies a “simulated user”.</td>
 </tr>
 <tr class="odd">
-<td>WS_SEND</td>
-<td></td>
+<td>input_line_number</td>
+<td>The line number of the event from the recording log file.</td>
 </tr>
 <tr class="even">
-<td>WS_RECV</td>
-<td></td>
+<td>event</td>
+<td>The type of the event, see the table below.</td>
 </tr>
 <tr class="odd">
-<td>PLAYER</td>
-<td></td>
+<td>start</td>
+<td>When the event started, relative to the beginning of the load test (seconds).</td>
+</tr>
+<tr class="even">
+<td>end</td>
+<td>When the event ended, relative to the beginning of the load test (seconds).</td>
+</tr>
+<tr class="odd">
+<td>time</td>
+<td>The event duration (seconds).</td>
+</tr>
+<tr class="even">
+<td>concurrency</td>
+<td>How many other simulated users were connected to the application and running events while this event occured.</td>
+</tr>
+<tr class="odd">
+<td>label</td>
+<td>A unique label for the event. This label can be used to compare the event across simulated users or across load tests.</td>
 </tr>
 </tbody>
 </table>
-<p>The <code><a href="../reference/tidy_loadtest.html">shinyloadtest::tidy_loadtest</a></code> function uses these files to generate a data frame with loadtest results. The resulting data frame contains the following columns:</p>
 <table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
 <thead><tr class="header">
-<th>Column</th>
+<th>Event Type</th>
 <th>Description</th>
 </tr></thead>
-<tbody></tbody>
+<tbody>
+<tr class="odd">
+<td><strong>REQ_HOME</strong></td>
+<td>An event signaling the initial request for the application.</td>
+</tr>
+<tr class="even">
+<td>REQ</td>
+<td>HTTP requests for static assets used by the app, e.g. javascript or css files.</td>
+</tr>
+<tr class="odd">
+<td>REQ_TOK / REQ_SINF</td>
+<td>HTTP requests internal to shiny that establish a user session.</td>
+</tr>
+<tr class="even">
+<td>WS_OPEN</td>
+<td>An HTTP request to open a websocket. The websocket layer is used to communicate inputs / outputs.</td>
+</tr>
+<tr class="odd">
+<td>WS_RECV_INIT</td>
+<td>An event signalling the websocket between the client and the app is ready.</td>
+</tr>
+<tr class="even">
+<td><strong>WS_RECV</strong></td>
+<td>This event type represents a user changing an input and receiving an updated output.</td>
+</tr>
+<tr class="odd">
+<td>PLAYER_SLEEPBEFORE</td>
+<td>This event type represents a user pause, essentially the time a user was looking at the app but not waiting for an updated output. The pause durations come from the recording file.</td>
+</tr>
+</tbody>
 </table>
-<blockquote>
-<p>Normally, users will not need to worry about specific files, but should be able to use the tidy data frame to for further analysis.</p>
-</blockquote>
-<p>They key idea is that each row of the tidy results data frame represents an event. Events include the initial page load, user inputs and their associated outputs, and user wait times. You’ll want to compare the duration of event times across different load tests.</p>
+<p>They key idea is that each row of the data frame represents an event performed by one simulated user. Events include the initial page load, user inputs and their associated outputs, and user wait times. During an analysis, you’ll want to compare the duration of event times across different load tests, different users within a load test, or different concurrency thresholds.</p>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -146,7 +190,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Alan Dipert, Barbara Borges.</p>
+  <p>Developed by Alan Dipert.</p>
 </div>
 
 <div class="pkgdown">
