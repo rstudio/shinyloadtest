@@ -2,10 +2,6 @@ req_rook_to_curl <- function(req, domain, port) {
   # Rename headers. Example: HTTP_CACHE_CONTROL => Cache-Control
   r <- as.list(req)
 
-  # Log request headers
-  logging::logdebug("== Original ==\n")
-  logging::logdebug(capture.output(print(str(r))), sep = "\n")
-
   r <- r[grepl("^HTTP_", names(r))]
   nms <- names(r)
   nms <- sub("^HTTP_", "", nms)
@@ -21,9 +17,6 @@ req_rook_to_curl <- function(req, domain, port) {
     r$Host <- paste0(domain, ":", port)
   }
 
-  # Log modified request headers
-  logging::logdebug("== Modified ==\n")
-  logging::logdebug(capture.output(print(str(r))), sep = "\n")
   r
 }
 
@@ -85,6 +78,8 @@ parseMessage <- function(msg) {
   }
 }
 
+replaceTokens <- function(str, tokens) stringr::str_replace_all(str, unlist(tokens))
+
 # Generate a new message based on originalMessage but with new contents
 # {"type":"WS_RECV_INIT","created":"2018-03-12T19:51:59.675Z","message":"a[\"1#0|m|{\\\\\"config\\\\\":{\\\\\"workerId\\\\\":[\\\\\"${WORKER}\\\\\"],\\\\\"sessionId\\\\\":[\\\\\"${SESSION}\\\\\"],\\\\\"user\\\\\":null}}\"]"}
 # {"type":"WS_RECV_INIT","created":"2018-03-12T20:21:27.086Z","message":"a[\"1#0|m|[\"{\\\"config\\\":{\\\"workerId\\\":[\\\"${WORKER}\\\"],\\\"sessionId\\\":[\\\"${SESSION}\\\"],\\\"user\\\":null}}\"]\"]"}
@@ -113,61 +108,45 @@ makeHTTPEvent_POST <- function(server, req, data, resp_curl, created = Sys.time(
   }
 }
 
-# TODO Remove duplication. The only things that make each item uniqure are (possible munged) URL
-# TODO This is where the token stuff should be revisited too. Store tokens in dictionary once and replace verbatim after
-makeHTTPEvent_GET <- function(server, req, resp_curl, created = Sys.time()) {
-  if (req$REQUEST_METHOD != "GET") stop("Unsupported method, only handle GET:", req$REQUEST_METHOD)
+makeHTTPEvent_GET <- function(session, req, resp_curl, created = Sys.time()) {
+  makeReq <- function(type) {
+    structure(append(list(
+      type = type,
+      created = makeTimestamp(created),
+      method = "GET",
+      statusCode = resp_curl$status_code,
+      url = replaceTokens(req$PATH_INFO, session$tokens)
+    ), lst), class = "REQ")
+  }
 
-  # ShinyHomeRequestEvent,
+  # ShinyHomeRequestEvent
   if (grepl("(\\/|\\.rmd)($|\\?)", req$PATH_INFO, ignore.case = TRUE)) {
     page <- rawToChar(resp_curl$content)
     workerId <- getWorkerId(page)
-    structure(list(
-      type = "REQ_HOME",
-      created = makeTimestamp(created),
-      method = "GET",
-      server = if (is.na(workerId)) "local" else "hosted",
-      url = req$PATH_INFO,
-      statusCode = 200
-    ), class = "REQ")
+    browser()
+    if (!is.na(workerId)) session$tokens[[workerId]] <- "${WORKER}"
+    return(makeReq("REQ_HOME"))
+  }
 
-  # ShinyTokenRequestEvent,
-  } else if (grepl("__token__", req$PATH_INFO, fixed = TRUE)) {
-    structure(list(
-      type = "REQ_TOK",
-      created = makeTimestamp(created),
-      method = "GET",
-      server = server,
-      url = gsub("_w_[a-z0-9]+", "_w_${WORKER}", req$PATH_INFO),
-      statusCode = 200
-    ), class = "REQ")
+  # ShinyTokenRequestEvent
+  if (grepl("__token__", req$PATH_INFO, fixed = TRUE)) {
+    return(makeReq("REQ_TOK"))
+  }
 
   # ShinySINFRequestEvent
-  } else if (grepl("__sockjs__/", req$PATH_INFO, fixed = TRUE)) {
-    structure(list(
-      type = "REQ_SINF",
-      created = makeTimestamp(created),
-      method = "GET",
-      server = server,
-      url = stringr::str_replace_all(req$PATH_INFO, c(
-        "n=\\w+" = "n=${ROBUST_ID}",
-        "t=\\w+" = "t=${TOKEN}",
-        "w=\\w+" = "w=${WORKER}")),
-      statusCode = 200
-    ), class = "REQ")
-
-  # ShinyRequestEvent
-  } else {
-    if (server == "hosted") print(req$PATH_INFO)
-    structure(list(
-      type = "REQ",
-      created = makeTimestamp(created),
-      method = "GET",
-      server = server,
-      url = if (server == "local") req$PATH_INFO else gsub("_w_\\w+", "_w_${WORKER}", req$PATH_INFO),
-      statusCode = resp_curl$status_code
-    ), class = "REQ")
+  if (grepl("__sockjs__/", req$PATH_INFO, fixed = TRUE)) {
+    match <- stringr::str_match(testStr, "n=(\\w+)/t=(\\w+)/")
+    if (is.na(match[[1]])) {
+      error("Failed to match ROBUSTID and TOKEN strings in path for REQ_SINF")
+    } else {
+      session$tokens[[match[[2]]]] <- "${ROBUSTID}"
+      session$tokens[[match[[3]]]] <- "${TOKEN}"
+    }
+    return(makeReq("REQ_SINF"))
   }
+
+  # All other requests
+  return(makeReq("REQ"))
 }
 
 makeWSEvent <- function(type, created = Sys.time(), ...) {
@@ -230,7 +209,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
         private$localServer <- NULL
         close(private$outputFile)
       }
-    }
+    },
+    # Stores a list of strings to their replacements.
+    tokens = list()
   ),
   private = list(
     targetScheme = NULL,
@@ -313,8 +294,8 @@ RecordingSession <- R6::R6Class("RecordingSession",
       h <- private$makeCurlHandle(req)
       url <- private$makeUrl(req)
       resp_curl <- curl::curl_fetch_memory(url, handle = h)
-      event <- makeHTTPEvent_GET(private$server, req, resp_curl)
-      private$server <- event$server
+      event <- makeHTTPEvent_GET(self, req, resp_curl)
+      private$server <- "TODO"
       private$writeEvent(event)
       resp_httr_to_rook(resp_curl)
     },

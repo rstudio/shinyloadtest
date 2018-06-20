@@ -15,7 +15,6 @@ Imports:
     httpuv,
     urltools,
     R6,
-    logging,
     jsonlite,
     withr,
     stringr,
