@@ -32,13 +32,6 @@ resp_httr_to_rook <- function(resp) {
   )
 }
 
-`%OR%` <- function(x, y) {
-  if (is.null(x) || isTRUE(is.na(x)))
-    y
-  else
-    x
-}
-
 # TODO
 # Intercept, parse, and record regular HTTP traffic:
 # REQ, REQ_HOME, REQ_TOK, REQ_SINF
@@ -110,20 +103,19 @@ makeHTTPEvent_POST <- function(server, req, data, resp_curl, created = Sys.time(
 
 makeHTTPEvent_GET <- function(session, req, resp_curl, created = Sys.time()) {
   makeReq <- function(type) {
-    structure(append(list(
+    structure(list(
       type = type,
       created = makeTimestamp(created),
       method = "GET",
       statusCode = resp_curl$status_code,
       url = replaceTokens(req$PATH_INFO, session$tokens)
-    ), lst), class = "REQ")
+    ), class = "REQ")
   }
 
   # ShinyHomeRequestEvent
   if (grepl("(\\/|\\.rmd)($|\\?)", req$PATH_INFO, ignore.case = TRUE)) {
     page <- rawToChar(resp_curl$content)
     workerId <- getWorkerId(page)
-    browser()
     if (!is.na(workerId)) session$tokens[[workerId]] <- "${WORKER}"
     return(makeReq("REQ_HOME"))
   }
@@ -135,7 +127,7 @@ makeHTTPEvent_GET <- function(session, req, resp_curl, created = Sys.time()) {
 
   # ShinySINFRequestEvent
   if (grepl("__sockjs__/", req$PATH_INFO, fixed = TRUE)) {
-    match <- stringr::str_match(testStr, "n=(\\w+)/t=(\\w+)/")
+    match <- stringr::str_match(req$PATH_INFO, "n=(\\w+)/t=(\\w+)/")
     if (is.na(match[[1]])) {
       error("Failed to match ROBUSTID and TOKEN strings in path for REQ_SINF")
     } else {
@@ -161,16 +153,6 @@ format.WS = function(wsEvt) {
   jsonlite::toJSON(unclass(wsEvt), auto_unbox = TRUE)
 }
 
-trimslash <- function(urlPath, which = c("both", "left", "right")) {
-  if (which %in% c("both", "left") && substr(urlPath, 1, 1) == "/") {
-    urlPath <- substr(urlPath, 2, nchar(urlPath))
-  }
-  if (which %in% c("both", "right") && substr(urlPath, nchar(urlPath), nchar(urlPath)) == "/") {
-    urlPath <- substr(urlPath, 1, nchar(urlPath)-1)
-  }
-  urlPath
-}
-
 shouldIgnore <- function(msgFromServer) {
   canIgnore <- c('^a\\["ACK.*$', '^\\["ACK.*$', '^h$')
   if (length(unlist(stringr::str_match_all(msgFromServer, canIgnore))) > 0) return(TRUE)
@@ -188,17 +170,11 @@ shouldIgnore <- function(msgFromServer) {
 RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
     initialize = function(targetAppUrl, host, port, outputFileName, sessionCookies) {
-      parsedUrl <- urltools::url_parse(targetAppUrl)
-      private$targetScheme <- parsedUrl$scheme
-      private$targetHost <- parsedUrl$domain
-      private$targetPort <- parsedUrl$port %OR% 80
-      private$targetPath <- if (is.na(parsedUrl$path)) "" else parsedUrl$path
-
+      private$targetURL <- URLBuilder$new(targetAppUrl)
       private$localHost <- host
       private$localPort <- port
       private$outputFile <- file(outputFileName, "w")
       private$sessionCookies <- sessionCookies
-
       private$startServer()
     },
     stop = function() {
@@ -214,10 +190,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
     tokens = list()
   ),
   private = list(
-    targetScheme = NULL,
-    targetHost = NULL,
-    targetPort = NULL,
-    targetPath = NULL,
+    targetURL = NULL,
     localHost = NULL,
     localPort = NULL,
     localServer = NULL,
@@ -232,16 +205,10 @@ RecordingSession <- R6::R6Class("RecordingSession",
       flush(private$outputFile)
     },
     makeUrl = function(req) {
-      # TODO conserve slashes if targetPath is empty
-      # TODO encode httpUrl if it's really decoded by this point
-      # TODO IPv6
-      httpUrl <- paste0(private$targetScheme, "://", private$targetHost, ":", private$targetPort, "/", private$targetPath, "/", req$PATH_INFO, req$QUERY_STRING)
-      # This is a hack around the fact that somehow there's three forward slashes in one of the separators
-      httpUrl <- gsub("///", "/", httpUrl, fixed = TRUE)
-      httpUrl
+      private$targetURL$appendPaths(raw = TRUE, paste0(req$PATH_INFO, req$QUERY_STRING))$build()
     },
     makeCurlHandle = function(req) {
-      req_curl <- req_rook_to_curl(req, private$targetHost, private$targetPort)
+      req_curl <- req_rook_to_curl(req, private$targetURL$host, private$targetURL$port %OR% 80)
       h <- curl::new_handle()
 
       if (nrow(private$sessionCookies) > 0) {
@@ -253,7 +220,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       curl::handle_setheaders(h, .list = req_curl)
 
       # TODO See if there's an easy way to at least show a warning or message
-      if (private$targetScheme == "https") {
+      if (private$targetURL$scheme == "https") {
         curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0)
       }
       h
@@ -306,20 +273,10 @@ RecordingSession <- R6::R6Class("RecordingSession",
     handleWSOpen = function(clientWS) {
       cat("WS open!")
       private$clientWsState <- "OPEN"
-      # TODO Shoudln't need to do this once we just do token replacement instead of scanning
-      if (private$server == "local") {
-        private$writeEvent(makeWSEvent("WS_OPEN", url = clientWS$request$PATH_INFO))
-      } else {
-        private$writeEvent(makeWSEvent("WS_OPEN", url =  stringr::str_replace_all(clientWS$request$PATH_INFO, c(
-          "n=\\w+" = "n=${ROBUST_ID}",
-          "t=\\w+" = "t=${TOKEN}",
-          "w=\\w+" = "w=${WORKER}",
-          "\\/\\w+\\/\\w+\\/websocket$" = "/${SOCKJSID}/websocket"
-        ))))
-      }
+      private$writeEvent(makeWSEvent("WS_OPEN", url =  replaceTokens(clientWS$request$PATH_INFO, self$tokens)))
 
-      wsScheme <- if (private$targetScheme == "https") "wss" else "ws"
-      wsUrl <- paste0(wsScheme, "://", private$targetHost, ":", private$targetPort, "/", trimslash(private$targetPath), "/", trimslash(clientWS$request$PATH_INFO))
+      wsScheme <- if (private$targetURL$scheme == "https") "wss" else "ws"
+      wsUrl <- private$targetURL$setScheme(wsScheme)$appendPaths(raw = TRUE, clientWS$request$PATH_INFO)$build()
 
       serverWS <- websocket::WebsocketClient$new(wsUrl,
         headers = if (!is.null(private$sessionCookie)) c(Cookie = pasteParams(private$sessionCookie, "; ")),

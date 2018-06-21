@@ -1,39 +1,55 @@
 URLBuilder <- R6::R6Class("URLBuilder",
   public = list(
     initialize = function(str) {
-      # TODO parse str if non-missing and non-empty
+      if (!missing(str)) {
+        parsed <- urltools::url_parse(str)
+        self$length <- nrow(parsed)
+        self$scheme <- parsed[,"scheme"]
+        self$host <- parsed[,"domain"]
+        self$port <- strtoi(parsed[,"port"])
+        self$paths <- stringr::str_split(parsed[,"path"], "/")
+        self$fragment <- parsed[,"fragment"]
+      }
     },
     setScheme = function(scheme) {
-      if (!scheme %in% c("http", "https", "ws", "wss"))
-        error("Unknown URL scheme: ", scheme)
-      copy <- self$clone()
-      copy$scheme <- scheme
-      copy
+      with_let(copy = self$clone(), copy$scheme <- fill_to(scheme, self$length))
     },
     setHost = function(host) {
-      copy <- self$clone()
-      copy$host <- host
-      copy
+      with_let(copy = self$clone(), copy$host <- fill_to(host, self$length))
     },
     setPort = function(port) {
-      if (!is.numeric(port) || port < 0 || port > 65535)
-        error("Invalid port: ", port)
-      copy <- self$clone()
-      copy$port <- port
-      copy
+      with_let(copy = self$clone(), copy$port <- fill_to(port, self$length))
+    },
+    setPaths = function(paths, raw = FALSE) {
+      stopifnot(is.character(paths))
+      paths <- if (raw) paths else URLencode(paths)
+      paths <- paths[!paths == "/"]
+      with_let(copy = self$clone(),
+        copy$paths <- lapply(self$paths, function(oldpath) paths))
     },
     appendPaths = function(paths, raw = FALSE) {
-      # TODO assert paths is a character vector
-      # TODO url encode on the way in if raw is TRUE
+      stopifnot(is.character(paths))
+      paths <- if (raw) paths else URLencode(paths)
+      paths <- paths[!paths == "/"]
+      with_let(copy = self$clone(),
+        copy$paths <- lapply(self$paths, function(oldpath) c(oldpath, paths)))
     },
     build = function() {
-      # TODO construct valid url string and return
-      # TODO error if any required pieces are missing
+      scheme <- paste0(ifelse(is.na(self$scheme), "http", self$scheme), ":/")
+      host_port <- paste0(self$host, ifelse(is.na(self$port), "", paste0(":", self$port)))
+      paths <- sapply(self$paths, function(path) {
+        path <- path[!is.na(path)]
+        paste(collapse = "/", path)
+      })
+      built <- paste(sep = "/", scheme, host_port, paths)
+      cat(built, "\n")
+      built
     },
-    scheme = "http",
-    host = NULL,
-    port = NULL,
+    length = NA,
+    scheme = NA,
+    host = NA,
+    port = NA,
     paths = character(0),
-    fragment = NULL
+    fragment = NA
   )
 )
