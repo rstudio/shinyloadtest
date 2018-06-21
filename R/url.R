@@ -20,19 +20,17 @@ URLBuilder <- R6::R6Class("URLBuilder",
     setPort = function(port) {
       with_let(copy = self$clone(), copy$port <- fill_to(port, self$length))
     },
-    setPaths = function(paths, raw = FALSE) {
+    setPaths = function(paths, raw = FALSE, append = FALSE) {
       stopifnot(is.character(paths))
       paths <- if (raw) paths else URLencode(paths)
       paths <- paths[!paths == "/"]
       with_let(copy = self$clone(),
-        copy$paths <- lapply(self$paths, function(oldpath) paths))
+        copy$paths <- lapply(self$paths, function(oldpath) {
+          if (append) c(oldpath, paths) else paths
+        }))
     },
     appendPaths = function(paths, raw = FALSE) {
-      stopifnot(is.character(paths))
-      paths <- if (raw) paths else URLencode(paths)
-      paths <- paths[!paths == "/"]
-      with_let(copy = self$clone(),
-        copy$paths <- lapply(self$paths, function(oldpath) c(oldpath, paths)))
+      self$setPaths(paths, raw = raw, append = TRUE)
     },
     build = function() {
       scheme <- paste0(ifelse(is.na(self$scheme), "http", self$scheme), ":/")
@@ -41,9 +39,7 @@ URLBuilder <- R6::R6Class("URLBuilder",
         path <- path[!is.na(path)]
         paste(collapse = "/", path)
       })
-      built <- paste(sep = "/", scheme, host_port, paths)
-      cat(built, "\n")
-      built
+      paste(sep = "/", scheme, host_port, paths)
     },
     length = NA,
     scheme = NA,
