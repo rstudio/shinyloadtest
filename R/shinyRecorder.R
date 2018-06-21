@@ -208,7 +208,8 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$targetURL$appendPaths(raw = TRUE, paste0(req$PATH_INFO, req$QUERY_STRING))$build()
     },
     makeCurlHandle = function(req) {
-      req_curl <- req_rook_to_curl(req, private$targetURL$host, private$targetURL$port %OR% 80)
+      port <- private$targetURL$port %OR% if (private$targetURL$scheme == "https") 443 else 80
+      req_curl <- req_rook_to_curl(req, private$targetURL$host, port)
       h <- curl::new_handle()
 
       if (nrow(private$sessionCookies) > 0) {
