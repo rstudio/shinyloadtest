@@ -33,13 +33,13 @@ URLBuilder <- R6::R6Class("URLBuilder",
       self$setPaths(paths, raw = raw, append = TRUE)
     },
     build = function() {
-      scheme <- paste0(ifelse(is.na(self$scheme), "http", self$scheme), ":/")
+      scheme <- paste0(ifelse(is.na(self$scheme), "http", self$scheme), "://")
       host_port <- paste0(self$host, ifelse(is.na(self$port), "", paste0(":", self$port)))
       paths <- sapply(self$paths, function(path) {
         path <- path[!is.na(path)]
         paste(collapse = "/", path)
       })
-      paste(sep = "/", scheme, host_port, paths)
+      paste0(scheme, host_port, "/", paths)
     },
     length = NA,
     scheme = NA,
