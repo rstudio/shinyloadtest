@@ -87,13 +87,12 @@ spliceMessage <- function(originalMessage, newMessageObject) {
 # TODO write to separate files instead of embedding via base64. Files are likely to be huge.
 # recording.log
 # recording.log.file1
-makeHTTPEvent_POST <- function(server, req, data, resp_curl, created = Sys.time()) {
+makeHTTPEvent_POST <- function(req, data, resp_curl, created = Sys.time()) {
   if (grepl("/upload/", req$PATH_INFO)) {
     structure(list(
       type = "REQ_POST_UPLOAD",
       created = makeTimestamp(created),
       statusCode = resp_curl$status_code,
-      server = server,
       data = if (is.null(data)) NULL else httpuv::rawToBase64(data)
     ), class = "REQ")
   } else {
@@ -153,10 +152,12 @@ format.WS = function(wsEvt) {
   jsonlite::toJSON(unclass(wsEvt), auto_unbox = TRUE)
 }
 
-shouldIgnore <- function(msgFromServer) {
-  canIgnore <- c('^a\\["ACK.*$', '^\\["ACK.*$', '^h$')
-  if (length(unlist(stringr::str_match_all(msgFromServer, canIgnore))) > 0) return(TRUE)
-  parsed <- parseMessage(msgFromServer)
+shouldIgnore <- function(msg) {
+  sockJSinit <- c('^o$', '^\\["0#0\\|o\\|"\\]$')
+  acks <- c('^a\\["ACK.*$', '^\\["ACK.*$', '^h$')
+  canIgnore <- c(sockJSinit, acks)
+  if (length(unlist(stringr::str_match_all(msg, canIgnore))) > 0) return(TRUE)
+  parsed <- parseMessage(msg)
   if (length(intersect(names(parsed), c("busy", "progress", "recalculating"))) > 0) return(TRUE)
   if (identical(names(parsed), c("custom"))) {
     customKeys <- names(parsed[["custom"]])
@@ -195,7 +196,6 @@ RecordingSession <- R6::R6Class("RecordingSession",
     localPort = NULL,
     localServer = NULL,
     outputFile = NULL,
-    server = NULL,
     sessionCookies = data.frame(),
     clientWsState = NULL,
     uploadUrl = NULL,
@@ -216,8 +216,6 @@ RecordingSession <- R6::R6Class("RecordingSession",
         req_curl[["Cookie"]] <- pasteParams(private$sessionCookies, "; ")
       }
 
-      # do.call(curl::handle_setheaders, c(h, req_curl))
-      # TODO confirm this works now that we're not do.calling
       curl::handle_setheaders(h, .list = req_curl)
 
       # TODO See if there's an easy way to at least show a warning or message
@@ -252,8 +250,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       cookies_df <- curl::handle_cookies(h)[,c("name", "value")]
       if (nrow(cookies_df) > 0) private$sessionCookies <- cookies_df
 
-      event <- makeHTTPEvent_POST(private$server, req, data, resp_curl)
-      private$server <- event$server
+      event <- makeHTTPEvent_POST(req, data, resp_curl)
       private$writeEvent(event)
 
       resp_httr_to_rook(resp_curl)
@@ -263,7 +260,6 @@ RecordingSession <- R6::R6Class("RecordingSession",
       url <- private$makeUrl(req)
       resp_curl <- curl::curl_fetch_memory(url, handle = h)
       event <- makeHTTPEvent_GET(self, req, resp_curl)
-      private$server <- "TODO"
       private$writeEvent(event)
       resp_httr_to_rook(resp_curl)
     },
@@ -282,52 +278,44 @@ RecordingSession <- R6::R6Class("RecordingSession",
       serverWS <- websocket::WebsocketClient$new(wsUrl,
         headers = if (!is.null(private$sessionCookie)) c(Cookie = pasteParams(private$sessionCookie, "; ")),
         onMessage = function(msgFromServer) {
-          # TODO Put the "o" check in shouldIgnore and ignore "o" everywhere because INIT has the interesting time.
-          if (msgFromServer != "o" && shouldIgnore(msgFromServer)) {
+
+          # Relay but don't record ignorable messages
+          if (shouldIgnore(msgFromServer)) {
             clientWS$send(msgFromServer)
             return(invisible())
           }
 
+          parsed <- parseMessage(msgFromServer)
 
-          # TODO Upload stuff is only inside server == "hosted"
-          if (private$server == "hosted") {
-
-            if (msgFromServer == "o") {
-              private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
-              clientWS$send(msgFromServer)
-              return(invisible())
-            }
-
-            parsed <- parseMessage(msgFromServer)
-
-            # If the message from the server is an object with a "config" key, fix
-            # up some keys with placeholders and record the message as a
-            # WS_RECV_INIT
-            if ("config" %in% names(parsed)) {
-              newMsgObj <- parsed
-              # TODO Only the worker id is meaningful when hosted
-              newMsgObj$config$workerId <- "${WORKER}"
-              # TODO The session id is in everything (hosted, dev)
-              newMsgObj$config$sessionId <- "${SESSION}"
-              private$writeEvent(makeWSEvent("WS_RECV_INIT", message = spliceMessage(msgFromServer, newMsgObj)))
-              clientWS$send(msgFromServer)
-              return(invisible())
-            } else if(!is.null(parsed$response$value$jobId)) {
-              # WS_RECV_BEGIN_UPLOAD (upload response)
-              # TODO Concurrent upload support. Manage upload URLs/jobIds correctly
-              private$uploadUrl <- parsed$response$value$uploadUrl
-              private$uploadJobId <- parsed$response$value$jobId
-              newMsgObj <- parsed
-              newMsgObj$response$value$uploadUrl <- "${UPLOAD_URL}"
-              newMsgObj$response$value$jobId <- "${UPLOAD_JOB_ID}"
-              private$writeEvent(makeWSEvent("WS_RECV_BEGIN_UPLOAD", message = spliceMessage(msgFromServer, newMsgObj)))
-              clientWS$send(msgFromServer)
-              return(invisible())
-            }
+          # If the message from the server is an object with a "config" key, fix
+          # up some keys with placeholders and record the message as a
+          # WS_RECV_INIT
+          if ("config" %in% names(parsed)) {
+            newMsgObj <- parsed
+            # TODO Only the worker id is meaningful when hosted
+            newMsgObj$config$workerId <- "${WORKER}"
+            # TODO The session id is in everything (hosted, dev)
+            newMsgObj$config$sessionId <- "${SESSION}"
+            private$writeEvent(makeWSEvent("WS_RECV_INIT", message = spliceMessage(msgFromServer, newMsgObj)))
+            clientWS$send(msgFromServer)
+            return(invisible())
           }
-          # Every other websocket event
-          private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
-          clientWS$send(msgFromServer)
+
+          if(!is.null(parsed$response$value$jobId)) {
+            # WS_RECV_BEGIN_UPLOAD (upload response)
+            private$uploadUrl <- parsed$response$value$uploadUrl
+            private$uploadJobId <- parsed$response$value$jobId
+            newMsgObj <- parsed
+            newMsgObj$response$value$uploadUrl <- "${UPLOAD_URL}"
+            newMsgObj$response$value$jobId <- "${UPLOAD_JOB_ID}"
+            private$writeEvent(makeWSEvent("WS_RECV_BEGIN_UPLOAD", message = spliceMessage(msgFromServer, newMsgObj)))
+            clientWS$send(msgFromServer)
+            return(invisible())
+          }
+
+        # Every other websocket event
+        private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
+        clientWS$send(msgFromServer)
       }, onClose = function() {
         cat("Server disconnected\n")
         if (private$clientWsState == "OPEN") {
@@ -336,11 +324,11 @@ RecordingSession <- R6::R6Class("RecordingSession",
         }
       })
       clientWS$onMessage(function(isBinary, msgFromClient) {
-        # Ignores ACKs sent from the client
-        if (shouldIgnore(msgFromClient)) return()
+        if (shouldIgnore(msgFromClient)) {
+          serverWS$send(msgFromClient)
+          return()
+        }
         parsed <- parseMessage(msgFromClient)
-        # TODO Clean up message type dispatch here
-        # TODO This should get simpler when token replacement is simpler
         if ("method" %in% names(parsed) && parsed$method == "uploadEnd") {
           newMsgObj <- parsed
           newMsgObj$args[[1]] <- "${UPLOAD_JOB_ID}"
