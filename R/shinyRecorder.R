@@ -71,16 +71,6 @@ parseMessage <- function(msg) {
 
 replaceTokens <- function(str, tokens) stringr::str_replace_all(str, unlist(tokens))
 
-# Generate a new message based on originalMessage but with new contents
-# {"type":"WS_RECV_INIT","created":"2018-03-12T19:51:59.675Z","message":"a[\"1#0|m|{\\\\\"config\\\\\":{\\\\\"workerId\\\\\":[\\\\\"${WORKER}\\\\\"],\\\\\"sessionId\\\\\":[\\\\\"${SESSION}\\\\\"],\\\\\"user\\\\\":null}}\"]"}
-# {"type":"WS_RECV_INIT","created":"2018-03-12T20:21:27.086Z","message":"a[\"1#0|m|[\"{\\\"config\\\":{\\\"workerId\\\":[\\\"${WORKER}\\\"],\\\"sessionId\\\":[\\\"${SESSION}\\\"],\\\"user\\\":null}}\"]\"]"}
-spliceMessage <- function(originalMessage, newMessageObject) {
-  newMsg <- jsonlite::toJSON(jsonlite::unbox(jsonlite::toJSON(newMessageObject, null = 'null', auto_unbox = TRUE)))
-  unquoted <- gsub("^.|.$", "", newMsg)
-  group <- stringr::str_match(originalMessage, messagePattern)
-  paste0(group[1,2], group[1,3], group[1,4], group[1,5], unquoted, group[1,7])
-}
-
 # TODO look at DT posts
 # TODO write to separate files instead of embedding via base64. Files are likely to be huge.
 # recording.log
@@ -202,8 +192,6 @@ RecordingSession <- R6::R6Class("RecordingSession",
     outputFile = NULL,
     sessionCookies = data.frame(),
     clientWsState = NULL,
-    uploadUrl = NULL,
-    uploadJobId = NULL,
     writeEvent = function(evt) {
       writeLines(format(evt), private$outputFile)
       flush(private$outputFile)
@@ -310,12 +298,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
 
           # WS_RECV_BEGIN_UPLOAD (upload response)
           if(!is.null(parsed$response$value$jobId)) {
-            private$uploadUrl <- parsed$response$value$uploadUrl
-            private$uploadJobId <- parsed$response$value$jobId
-            newMsgObj <- parsed
-            newMsgObj$response$value$uploadUrl <- "${UPLOAD_URL}"
-            newMsgObj$response$value$jobId <- "${UPLOAD_JOB_ID}"
-            private$writeEvent(makeWSEvent("WS_RECV_BEGIN_UPLOAD", message = spliceMessage(msgFromServer, newMsgObj)))
+            self$tokens[[parsed$response$value$uploadUrl]] <- "${UPLOAD_URL}"
+            self$tokens[[parsed$response$value$jobId]] <- "${UPLOAD_JOB_ID}"
+            private$writeEvent(makeWSEvent("WS_RECV_BEGIN_UPLOAD", message = replaceTokens(msgFromServer, self$tokens)))
             clientWS$send(msgFromServer)
             return()
           }
@@ -335,16 +320,8 @@ RecordingSession <- R6::R6Class("RecordingSession",
           serverWS$send(msgFromClient)
           return()
         }
-        parsed <- parseMessage(msgFromClient)
-        if ("method" %in% names(parsed) && parsed$method == "uploadEnd") {
-          newMsgObj <- parsed
-          newMsgObj$args[[1]] <- "${UPLOAD_JOB_ID}"
-          private$writeEvent(makeWSEvent("WS_SEND", message = spliceMessage(msgFromClient, newMsgObj)))
-          serverWS$send(msgFromClient)
-        } else {
-          private$writeEvent(makeWSEvent("WS_SEND", message = msgFromClient))
-          serverWS$send(msgFromClient)
-        }
+        private$writeEvent(makeWSEvent("WS_SEND", message = replaceTokens(msgFromClient, self$tokens)))
+        serverWS$send(msgFromClient)
       })
       clientWS$onClose(function() {
         cat("Client disconnected\n")
