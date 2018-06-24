@@ -172,6 +172,12 @@ shouldIgnore <- function(msg) {
   return(FALSE)
 }
 
+# Regex blacklist of paths to proxy but not record
+ignoreGET <- c(".*favicon.ico$")
+shouldIgnoreGET <- function(path) {
+  length(unlist(stringr::str_match_all(path, ignoreGET))) > 0
+}
+
 RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
     initialize = function(targetAppUrl, host, port, outputFileName, sessionCookies) {
@@ -264,7 +270,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
       url <- private$makeUrl(req)
       resp_curl <- curl::curl_fetch_memory(url, handle = h)
       event <- makeHTTPEvent_GET(self, req, resp_curl)
-      private$writeEvent(event)
+      if (!shouldIgnoreGET(req$PATH_INFO)) {
+        private$writeEvent(event)
+      }
       resp_httr_to_rook(resp_curl)
     },
     handleCall = function(req) {
