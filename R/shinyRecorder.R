@@ -53,19 +53,23 @@ getWorkerId <- function(page) {
 }
 
 # Messages from the server start with a[, messages from the client start with [
-messagePattern <- '^(a?\\[")([0-9A-F*]+#)?(0\\|m\\|)(.*)("\\])$'
+# TODO Confirm with Joe if subapp IDs are hex too
+messagePattern <- '^(a?\\[")([0-9A-F*]+#)?([0-9A-F]+)(\\|m\\|)(.*)("\\])$'
 
 # Parses a JSON message from the server or client; returns the object from the nested JSON, if any
 parseMessage <- function(msg) {
   res <- stringr::str_match(msg, messagePattern)
-  encodedMsg <- res[1,5]
+  encodedMsg <- res[1,6]
   # If the regex failed, then msg is probably a bare JSON string that can be
   # decoded directly.
   if (is.na(encodedMsg)) {
     jsonlite::fromJSON(msg)
-  # If the regex succeeded, we have the payload as an almost-double-JSON-encoded
-  # object - it just needs to be wrapped in a set of double-quotes.
+  # If the regex succeeded but the subapp id was nonzero, crash with a helpful message.
+  } else if (res[1,4] != "0") {
+    stop("Subapp id was != 0 and subapp recording is not supported")
   } else {
+    # If the regex succeeded subapp id = 0, we have the payload as an almost-double-JSON-encoded
+    # object - it just needs to be wrapped in a set of double-quotes.
     wrappedMsg <- paste0('"', encodedMsg, '"')
     jsonlite::fromJSON(jsonlite::fromJSON(wrappedMsg))
   }
@@ -80,7 +84,7 @@ spliceMessage <- function(originalMessage, newMessageObject) {
   newMsg <- jsonlite::toJSON(jsonlite::unbox(jsonlite::toJSON(newMessageObject, null = 'null', auto_unbox = TRUE)))
   unquoted <- gsub("^.|.$", "", newMsg)
   group <- stringr::str_match(originalMessage, messagePattern)
-  paste0(group[1,2], group[1,3], group[1,4], unquoted, group[1,6])
+  paste0(group[1,2], group[1,3], group[1,4], group[1,5], unquoted, group[1,7])
 }
 
 # TODO look at DT posts
