@@ -270,6 +270,10 @@ RecordingSession <- R6::R6Class("RecordingSession",
     handleWSOpen = function(clientWS) {
       cat("WS open!")
       private$clientWsState <- "OPEN"
+
+      match <- stringr::str_match(clientWS$request$PATH_INFO, "/(\\w+/\\w+)/websocket$")
+      if (!is.na(match[[1]])) self$tokens[[match[[2]]]] <- "${SOCKJSID}"
+
       private$writeEvent(makeWSEvent("WS_OPEN", url =  replaceTokens(clientWS$request$PATH_INFO, self$tokens)))
 
       wsScheme <- if (private$targetURL$scheme == "https") "wss" else "ws"
