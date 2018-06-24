@@ -293,7 +293,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
           # Relay but don't record ignorable messages
           if (shouldIgnore(msgFromServer)) {
             clientWS$send(msgFromServer)
-            return(invisible())
+            return()
           }
 
           parsed <- parseMessage(msgFromServer)
@@ -302,18 +302,14 @@ RecordingSession <- R6::R6Class("RecordingSession",
           # up some keys with placeholders and record the message as a
           # WS_RECV_INIT
           if ("config" %in% names(parsed)) {
-            newMsgObj <- parsed
-            # TODO Only the worker id is meaningful when hosted
-            newMsgObj$config$workerId <- "${WORKER}"
-            # TODO The session id is in everything (hosted, dev)
-            newMsgObj$config$sessionId <- "${SESSION}"
-            private$writeEvent(makeWSEvent("WS_RECV_INIT", message = spliceMessage(msgFromServer, newMsgObj)))
+            self$tokens[[parsed$config$sessionId]] <- "${SESSION}"
+            private$writeEvent(makeWSEvent("WS_RECV_INIT", message = replaceTokens(msgFromServer, self$tokens)))
             clientWS$send(msgFromServer)
-            return(invisible())
+            return()
           }
 
+          # WS_RECV_BEGIN_UPLOAD (upload response)
           if(!is.null(parsed$response$value$jobId)) {
-            # WS_RECV_BEGIN_UPLOAD (upload response)
             private$uploadUrl <- parsed$response$value$uploadUrl
             private$uploadJobId <- parsed$response$value$jobId
             newMsgObj <- parsed
@@ -321,7 +317,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
             newMsgObj$response$value$jobId <- "${UPLOAD_JOB_ID}"
             private$writeEvent(makeWSEvent("WS_RECV_BEGIN_UPLOAD", message = spliceMessage(msgFromServer, newMsgObj)))
             clientWS$send(msgFromServer)
-            return(invisible())
+            return()
           }
 
         # Every other websocket event
