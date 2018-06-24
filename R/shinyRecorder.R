@@ -270,8 +270,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
       resp_httr_to_rook(resp_curl)
     },
     handleCall = function(req) {
-      private[[paste0("handle_", req$REQUEST_METHOD)]](req)
-      # TODO Return a result to indicate when no method matches
+      handler <- private[[paste0("handle_", req$REQUEST_METHOD)]]
+      if (is.null(handler)) stop("No handler for ", req$REQUEST_METHOD)
+      handler(req)
     },
     handleWSOpen = function(clientWS) {
       cat("WS open!")
