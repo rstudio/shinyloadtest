@@ -71,31 +71,13 @@ parseMessage <- function(msg) {
 
 replaceTokens <- function(str, tokens) stringr::str_replace_all(str, unlist(tokens))
 
-# TODO look at DT posts
-# TODO write to separate files instead of embedding via base64. Files are likely to be huge.
-# recording.log
-# recording.log.file1
-makeHTTPEvent_POST <- function(req, data, resp_curl, created = Sys.time()) {
-  if (grepl("/upload/", req$PATH_INFO)) {
-    structure(list(
-      type = "REQ_POST_UPLOAD",
-      created = makeTimestamp(created),
-      statusCode = resp_curl$status_code,
-      data = if (is.null(data)) NULL else httpuv::rawToBase64(data)
-    ), class = "REQ")
-  } else {
-    stop("Unknown POST flavor")
-  }
-}
-
 makeHTTPEvent_GET <- function(session, req, resp_curl, created = Sys.time()) {
   makeReq <- function(type) {
     structure(list(
       type = type,
       created = makeTimestamp(created),
-      method = "GET",
       statusCode = resp_curl$status_code,
-      url = replaceTokens(req$PATH_INFO, session$tokens)
+      url = replaceTokens(paste0(req$PATH_INFO, req$QUERY_STRING), session$tokens)
     ), class = "REQ")
   }
 
@@ -168,6 +150,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$targetURL <- URLBuilder$new(targetAppUrl)
       private$localHost <- host
       private$localPort <- port
+      private$outputFileName <- outputFileName
       private$outputFile <- file(outputFileName, "w")
       private$sessionCookies <- sessionCookies
       private$startServer()
@@ -189,9 +172,11 @@ RecordingSession <- R6::R6Class("RecordingSession",
     localHost = NULL,
     localPort = NULL,
     localServer = NULL,
+    outputFileName = NULL,
     outputFile = NULL,
     sessionCookies = data.frame(),
     clientWsState = NULL,
+    postCounter = 0,
     writeEvent = function(evt) {
       writeLines(format(evt), private$outputFile)
       flush(private$outputFile)
@@ -219,21 +204,38 @@ RecordingSession <- R6::R6Class("RecordingSession",
     handle_POST = function(req) {
       h <- private$makeCurlHandle(req)
       url <- private$makeUrl(req)
-      data <- NULL
 
+      # If the post body contains data, write the data to a new file named
+      # <outputFile>.post.<n> and set dataFileName.
+      dataFileName <- NULL
+      dataLen <- 0
       if (!is.null(req$HTTP_CONTENT_LENGTH)) {
-        len <- as.integer(req$HTTP_CONTENT_LENGTH)
-        if (len > 0) {
-          data <- req$rook.input$read(len)
+        dataLen <- as.integer(req$HTTP_CONTENT_LENGTH)
+        if (dataLen > 0) {
+          sz <- 8192
+          dataFileName <- sprintf("%s.post.%d", private$outputFileName, private$postCounter)
+          writeCon <- file(dataFileName, "wb")
+          repeat {
+            data <- req$rook.input$read(sz)
+            writeBin(data, writeCon)
+            if (length(data) < sz) break
+          }
+          flush(writeCon)
+          close(writeCon)
+          private$postCounter <- private$postCounter + 1
         }
       }
 
-      if (!is.null(data)) {
-        curl::handle_setopt(h,
-          postfieldsize = length(data),
-          postfields = data,
-          post = TRUE
-        )
+      # If a post data file was written, send its contents upstream.
+      if (!is.null(dataFileName)) {
+        # TODO Figure out how to use CURL_INFILESIZE_LARGE to upload files
+        # larger than 2GB.
+        curl::handle_setopt(h, post = TRUE, infilesize = dataLen)
+        readCon <- file(dataFileName, "rb")
+        on.exit(close(readCon))
+        curl::handle_setopt(h, readfunction = function(n) {
+          readBin(readCon, raw(), n = n)
+        })
       }
 
       resp_curl <- curl::curl_fetch_memory(url, handle = h)
@@ -242,9 +244,15 @@ RecordingSession <- R6::R6Class("RecordingSession",
       cookies_df <- curl::handle_cookies(h)[,c("name", "value")]
       if (nrow(cookies_df) > 0) private$sessionCookies <- cookies_df
 
-      event <- makeHTTPEvent_POST(req, data, resp_curl)
-      private$writeEvent(event)
+      event <- list(
+        type = "REQ_POST",
+        created = makeTimestamp(),
+        statusCode = resp_curl$status_code,
+        url = replaceTokens(paste0(req$PATH_INFO, req$QUERY_STRING), self$tokens)
+      )
 
+      event <- append(event, if (!is.null(dataFileName)) list(datafile = basename(dataFileName)))
+      private$writeEvent(structure(event, class = "REQ"))
       resp_httr_to_rook(resp_curl)
     },
     handle_GET = function(req) {
