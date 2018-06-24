@@ -32,12 +32,6 @@ resp_httr_to_rook <- function(resp) {
   )
 }
 
-# TODO
-# Intercept, parse, and record regular HTTP traffic:
-# REQ, REQ_HOME, REQ_TOK, REQ_SINF
-# Intercept and parse WS traffic:
-# WS_OPEN, WS_CLOSE, WS_SEND, WS_RECV, WS_RECV_INIT
-
 makeTimestamp <- function(time = Sys.time()) {
   withr::with_options(
     list(digits.secs = 3),
