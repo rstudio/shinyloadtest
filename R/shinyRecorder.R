@@ -90,19 +90,16 @@ makeHTTPEvent_GET <- function(session, req, resp_curl, created = Sys.time()) {
   }
 
   # ShinyTokenRequestEvent
-  if (grepl("__token__", req$PATH_INFO, fixed = TRUE)) {
+  match <- stringr::str_match(req$PATH_INFO, "__token__?_=(\\d+)$")
+  if (!is.na(match[[1]])) {
+    session$tokens[[match[[2]]]] <- "${TOKEN}"
     return(makeReq("REQ_TOK"))
   }
 
   # ShinySINFRequestEvent
-  if (grepl("__sockjs__/", req$PATH_INFO, fixed = TRUE)) {
-    match <- stringr::str_match(req$PATH_INFO, "n=(\\w+)/t=(\\w+)/")
-    if (is.na(match[[1]])) {
-      error("Failed to match ROBUSTID and TOKEN strings in path for REQ_SINF")
-    } else {
-      session$tokens[[match[[2]]]] <- "${ROBUSTID}"
-      session$tokens[[match[[3]]]] <- "${TOKEN}"
-    }
+  match <- stringr::str_match(req$PATH_INFO, "__sockjs__/n=(\\w+)")
+  if (!is.na(match[[1]])) {
+    session$tokens[[match[[2]]]] <- "${ROBUSTID}"
     return(makeReq("REQ_SINF"))
   }
 
