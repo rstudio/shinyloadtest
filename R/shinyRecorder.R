@@ -71,6 +71,9 @@ parseMessage <- function(msg) {
 
 replaceTokens <- function(str, tokens) stringr::str_replace_all(str, unlist(tokens))
 
+# TODO Make tokens an environment
+# TODO Use begin/end timestamps for HTTP
+# TODO Confirm Sys.time is the right kind of time thing to use with r-lib
 makeHTTPEvent_GET <- function(session, req, resp_curl, created = Sys.time()) {
   makeReq <- function(type) {
     structure(list(
@@ -90,20 +93,23 @@ makeHTTPEvent_GET <- function(session, req, resp_curl, created = Sys.time()) {
   }
 
   # ShinyTokenRequestEvent
-  match <- stringr::str_match(req$PATH_INFO, "__token__?_=(\\d+)$")
-  if (!is.na(match[[1]])) {
-    session$tokens[[match[[2]]]] <- "${TOKEN}"
+  if (grepl("__token__", req$PATH_INFO)) {
+    token <- rawToChar(resp_curl$content)
+    cat("TOKEN=", token, "\n")
+    session$tokens[[rawToChar(resp_curl$content)]] <- "${TOKEN}"
     return(makeReq("REQ_TOK"))
   }
 
   # ShinySINFRequestEvent
-  match <- stringr::str_match(req$PATH_INFO, "__sockjs__/n=(\\w+)")
+  # TODO Make this work even if n= appears elsewhere after __sockjs__/
+  match <- stringr::str_match(req$PATH_INFO, "/__sockjs__/n=(\\w+)")
   if (!is.na(match[[1]])) {
-    session$tokens[[match[[2]]]] <- "${ROBUSTID}"
+    session$tokens[[match[[2]]]] <- "${ROBUST_ID}"
     return(makeReq("REQ_SINF"))
   }
 
   # All other requests
+  # TODO Detect other non-WS sockjs protocols- URLs that have __sockjs__ but the right-hand side is something else
   return(makeReq("REQ"))
 }
 
@@ -198,6 +204,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       }
       h
     },
+    # TODO Visit whether to store or ignore __extendsession__
     handle_POST = function(req) {
       h <- private$makeCurlHandle(req)
       url <- private$makeUrl(req)
@@ -224,6 +231,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       }
 
       # If a post data file was written, send its contents upstream.
+      # TODO Figure out a way to save the file and send it upstream concurrently
       if (!is.null(dataFileName)) {
         # TODO Figure out how to use CURL_INFILESIZE_LARGE to upload files
         # larger than 2GB.
