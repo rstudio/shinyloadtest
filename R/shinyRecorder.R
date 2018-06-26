@@ -109,7 +109,7 @@ makeHTTPEvent_GET <- function(tokens, req, resp_curl, begin, end) {
 
   # All other requests
   # TODO Detect other non-WS sockjs protocols- URLs that have __sockjs__ but the right-hand side is something else
-  return(makeReq("REQ"))
+  return(makeReq("REQ_GET"))
 }
 
 makeWSEvent <- function(type, begin = Sys.time(), ...) {
