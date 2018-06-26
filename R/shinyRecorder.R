@@ -184,6 +184,12 @@ RecordingSession <- R6::R6Class("RecordingSession",
       writeLines(format(evt), private$outputFile)
       flush(private$outputFile)
     },
+    mergeCookies = function(handle) {
+      df <- curl::handle_cookies(handle)[,c("name", "value")]
+      df <- rbind(private$sessionCookies, df)
+      df <- subset(df, !duplicated(df$name, fromLast = TRUE))
+      private$sessionCookies <- df
+    },
     makeUrl = function(req) {
       private$targetURL$appendPaths(raw = TRUE, paste0(req$PATH_INFO, req$QUERY_STRING))$build()
     },
@@ -245,9 +251,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
 
       resp_curl <- curl::curl_fetch_memory(url, handle = h)
 
-      # Update sessionCookies in the case of __extendession__ XHR
-      cookies_df <- curl::handle_cookies(h)[,c("name", "value")]
-      if (nrow(cookies_df) > 0) private$sessionCookies <- cookies_df
+      private$mergeCookies(h)
 
       event <- list(
         type = "REQ_POST",
@@ -267,6 +271,8 @@ RecordingSession <- R6::R6Class("RecordingSession",
       begin <- Sys.time()
       resp_curl <- curl::curl_fetch_memory(url, handle = h)
       end <- Sys.time()
+
+      private$mergeCookies(h)
 
       event <- makeHTTPEvent_GET(self$tokens, req, resp_curl, begin, end)
 
@@ -292,7 +298,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
       wsUrl <- private$targetURL$setScheme(wsScheme)$appendPaths(raw = TRUE, clientWS$request$PATH_INFO)$build()
 
       serverWS <- websocket::WebsocketClient$new(wsUrl,
-        headers = if (!is.null(private$sessionCookie)) c(Cookie = pasteParams(private$sessionCookie, "; ")),
+        headers = if (nrow(private$sessionCookies) > 0) {
+          c(Cookie = pasteParams(private$sessionCookies, "; "))
+        } else c(),
         onMessage = function(msgFromServer) {
 
           # Relay but don't record ignorable messages
