@@ -74,11 +74,12 @@ replaceTokens <- function(str, tokens) stringr::str_replace_all(str, unlist(toke
 # TODO Make tokens an environment
 # TODO Use begin/end timestamps for HTTP
 # TODO Confirm Sys.time is the right kind of time thing to use with r-lib
-makeHTTPEvent_GET <- function(session, req, resp_curl, created = Sys.time()) {
+makeHTTPEvent_GET <- function(session, req, resp_curl, begin, end) {
   makeReq <- function(type) {
     structure(list(
       type = type,
-      created = makeTimestamp(created),
+      begin = makeTimestamp(begin),
+      end = makeTimestamp(end),
       statusCode = resp_curl$status_code,
       url = replaceTokens(paste0(req$PATH_INFO, req$QUERY_STRING), session$tokens)
     ), class = "REQ")
@@ -113,8 +114,8 @@ makeHTTPEvent_GET <- function(session, req, resp_curl, created = Sys.time()) {
   return(makeReq("REQ"))
 }
 
-makeWSEvent <- function(type, created = Sys.time(), ...) {
-  structure(list(type = type, created = makeTimestamp(created), ...), class = "WS")
+makeWSEvent <- function(type, begin = Sys.time(), ...) {
+  structure(list(type = type, begin = makeTimestamp(begin), ...), class = "WS")
 }
 
 format.REQ = function(httpEvt) {
@@ -263,11 +264,15 @@ RecordingSession <- R6::R6Class("RecordingSession",
     handle_GET = function(req) {
       h <- private$makeCurlHandle(req)
       url <- private$makeUrl(req)
+
+      begin <- Sys.time()
       resp_curl <- curl::curl_fetch_memory(url, handle = h)
-      event <- makeHTTPEvent_GET(self, req, resp_curl)
-      if (!shouldIgnoreGET(req$PATH_INFO)) {
-        private$writeEvent(event)
-      }
+      end <- Sys.time()
+
+      event <- makeHTTPEvent_GET(self, req, resp_curl, begin, end)
+
+      if (!shouldIgnoreGET(req$PATH_INFO)) private$writeEvent(event)
+
       resp_httr_to_rook(resp_curl)
     },
     handleCall = function(req) {
