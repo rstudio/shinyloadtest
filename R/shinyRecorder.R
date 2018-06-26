@@ -69,7 +69,9 @@ parseMessage <- function(msg) {
   }
 }
 
-replaceTokens <- function(str, tokens) stringr::str_replace_all(str, unlist(tokens))
+replaceTokens <- function(str, tokens) {
+  if (length(tokens) > 0) stringr::str_replace_all(str, unlist(tokens)) else str
+}
 
 # TODO Make tokens an environment
 # TODO Use begin/end timestamps for HTTP
