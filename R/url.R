@@ -4,14 +4,13 @@ URLBuilder <- R6::R6Class("URLBuilder",
       if (!missing(str)) {
         # Not vectorized
         stopifnot(length(str) == 1)
-        parsed <- urltools::url_parse(str)
+        parsed <- xml2::url_parse(str)
         self$length <- nrow(parsed)
         self$scheme <- parsed[,"scheme"]
-        self$host <- parsed[,"domain"]
+        self$host <- parsed[,"server"]
         self$port <- strtoi(parsed[,"port"])
         self$paths <- stringr::str_split(parsed[,"path"], "/")[[1]]
         self$paths <- self$paths[self$paths != "" & !is.na(self$paths)]
-        self$fragment <- parsed[,"fragment"]
       }
     },
     setScheme = function(scheme) {
@@ -52,8 +51,6 @@ URLBuilder <- R6::R6Class("URLBuilder",
     scheme = NA,
     host = NA,
     port = NA,
-    paths = character(0),
-    # TODO
-    fragment = NA
+    paths = character(0)
   )
 )

@@ -13,7 +13,6 @@ Imports:
     websocket,
     curl,
     httpuv,
-    urltools,
     R6,
     jsonlite,
     stringr,
