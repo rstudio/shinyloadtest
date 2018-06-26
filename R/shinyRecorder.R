@@ -67,19 +67,21 @@ parseMessage <- function(msg) {
 }
 
 replaceTokens <- function(str, tokens) {
-  if (length(tokens) > 0) stringr::str_replace_all(str, unlist(tokens)) else str
+  if (length(tokens) > 0) {
+    stringr::str_replace_all(str, unlist(as.list.environment(tokens)))
+  } else {
+    str
+  }
 }
 
-# TODO Make tokens an environment
-# TODO Confirm Sys.time is the right kind of time thing to use with r-lib
-makeHTTPEvent_GET <- function(session, req, resp_curl, begin, end) {
+makeHTTPEvent_GET <- function(tokens, req, resp_curl, begin, end) {
   makeReq <- function(type) {
     structure(list(
       type = type,
       begin = makeTimestamp(begin),
       end = makeTimestamp(end),
       statusCode = resp_curl$status_code,
-      url = replaceTokens(paste0(req$PATH_INFO, req$QUERY_STRING), session$tokens)
+      url = replaceTokens(paste0(req$PATH_INFO, req$QUERY_STRING), tokens)
     ), class = "REQ")
   }
 
@@ -87,15 +89,14 @@ makeHTTPEvent_GET <- function(session, req, resp_curl, begin, end) {
   if (grepl("(\\/|\\.rmd)($|\\?)", req$PATH_INFO, ignore.case = TRUE)) {
     page <- rawToChar(resp_curl$content)
     workerId <- getWorkerId(page)
-    if (!is.na(workerId)) session$tokens[[workerId]] <- "${WORKER}"
+    if (!is.na(workerId)) tokens[[workerId]] <- "${WORKER}"
     return(makeReq("REQ_HOME"))
   }
 
   # ShinyTokenRequestEvent
   if (grepl("__token__", req$PATH_INFO)) {
     token <- rawToChar(resp_curl$content)
-    cat("TOKEN=", token, "\n")
-    session$tokens[[rawToChar(resp_curl$content)]] <- "${TOKEN}"
+    tokens[[token]] <- "${TOKEN}"
     return(makeReq("REQ_TOK"))
   }
 
@@ -103,7 +104,7 @@ makeHTTPEvent_GET <- function(session, req, resp_curl, begin, end) {
   # TODO Make this work even if n= appears elsewhere after __sockjs__/
   match <- stringr::str_match(req$PATH_INFO, "/__sockjs__/n=(\\w+)")
   if (!is.na(match[[1]])) {
-    session$tokens[[match[[2]]]] <- "${ROBUST_ID}"
+    tokens[[match[[2]]]] <- "${ROBUST_ID}"
     return(makeReq("REQ_SINF"))
   }
 
@@ -166,8 +167,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
         close(private$outputFile)
       }
     },
-    # Stores a list of strings to their replacements.
-    tokens = list()
+    # An environment of session-specific identifier strings to their
+    # session-agnostic ${PLACEHOLDER} strings.
+    tokens = new.env(parent = emptyenv())
   ),
   private = list(
     targetURL = NULL,
@@ -267,7 +269,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       resp_curl <- curl::curl_fetch_memory(url, handle = h)
       end <- Sys.time()
 
-      event <- makeHTTPEvent_GET(self, req, resp_curl, begin, end)
+      event <- makeHTTPEvent_GET(self$tokens, req, resp_curl, begin, end)
 
       if (!shouldIgnoreGET(req$PATH_INFO)) private$writeEvent(event)
 
