@@ -33,10 +33,7 @@ resp_httr_to_rook <- function(resp) {
 }
 
 makeTimestamp <- function(time = Sys.time()) {
-  withr::with_options(
-    list(digits.secs = 3),
-    format(time, "%Y-%m-%dT%H:%M:%OSZ", tz = "GMT")
-  )
+  format(time, "%Y-%m-%dT%H:%M%%OS3Z", tz = "UTC")
 }
 
 # Returns NA if workerid not found. This either indicates an error state of some
@@ -74,7 +71,6 @@ replaceTokens <- function(str, tokens) {
 }
 
 # TODO Make tokens an environment
-# TODO Use begin/end timestamps for HTTP
 # TODO Confirm Sys.time is the right kind of time thing to use with r-lib
 makeHTTPEvent_GET <- function(session, req, resp_curl, begin, end) {
   makeReq <- function(type) {
