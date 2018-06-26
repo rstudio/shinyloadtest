@@ -44,8 +44,7 @@ getWorkerId <- function(page) {
 }
 
 # Messages from the server start with a[, messages from the client start with [
-# TODO Confirm with Joe if subapp IDs are hex too
-messagePattern <- '^(a?\\[")([0-9A-F*]+#)?([0-9A-F]+)(\\|m\\|)(.*)("\\])$'
+messagePattern <- '^(a?\\[")([0-9A-F*]+#)?([0-9]+)(\\|m\\|)(.*)("\\])$'
 
 # Parses a JSON message from the server or client; returns the object from the nested JSON, if any
 parseMessage <- function(msg) {
