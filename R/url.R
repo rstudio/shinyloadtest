@@ -29,7 +29,7 @@ URLBuilder <- R6::R6Class("URLBuilder",
       copy
     },
     # TODO Complexity with slashes only belongs in place where appending/joining to existing path
-    setPaths = function(paths, raw = FALSE, append = FALSE) {
+    setPaths = function(paths, raw = TRUE, append = FALSE) {
       stopifnot(is.character(paths))
       paths <- if (raw) paths else URLencode(paths)
       paths <- unlist(stringr::str_split(paths, "/"))

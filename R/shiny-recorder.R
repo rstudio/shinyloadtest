@@ -192,7 +192,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$sessionCookies <- df
     },
     makeUrl = function(req) {
-      private$targetURL$appendPaths(raw = TRUE, paste0(req$PATH_INFO, req$QUERY_STRING))$build()
+      private$targetURL$appendPaths(paste0(req$PATH_INFO, req$QUERY_STRING))$build()
     },
     makeCurlHandle = function(req) {
       port <- private$targetURL$port %OR% if (private$targetURL$scheme == "https") 443 else 80
@@ -288,7 +288,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$writeEvent(makeWSEvent("WS_OPEN", url =  replaceTokens(clientWS$request$PATH_INFO, self$tokens)))
 
       wsScheme <- if (private$targetURL$scheme == "https") "wss" else "ws"
-      wsUrl <- private$targetURL$setScheme(wsScheme)$appendPaths(raw = TRUE, clientWS$request$PATH_INFO)$build()
+      wsUrl <- private$targetURL$setScheme(wsScheme)$appendPaths(clientWS$request$PATH_INFO)$build()
 
       serverWS <- websocket::WebsocketClient$new(wsUrl,
         headers = if (nrow(private$sessionCookies) > 0) {
