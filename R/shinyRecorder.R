@@ -370,8 +370,6 @@ recordSession <- function(targetAppUrl, host = "0.0.0.0", port = 8600,
     sessionCookies <- if (isProtected(targetAppUrl)) {
       username <- getPass::getPass("Enter your username: ")
       password <- getPass::getPass("Enter your password: ")
-      #username <- "foo"
-      #password <- "barp"
       postLogin(targetAppUrl, username, password)
     } else data.frame()
     session <- RecordingSession$new(targetAppUrl, host, port, outputFile, sessionCookies)
