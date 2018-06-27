@@ -68,7 +68,7 @@ parseMessage <- function(msg) {
 
 replaceTokens <- function(str, tokens) {
   if (length(tokens) > 0) {
-    stringr::str_replace_all(str, unlist(as.list.environment(tokens)))
+    stringr::str_replace_all(str, unlist(as.list(tokens)))
   } else {
     str
   }
