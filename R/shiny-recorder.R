@@ -101,8 +101,7 @@ makeHTTPEvent_GET <- function(tokens, req, resp_curl, begin, end) {
   }
 
   # ShinySINFRequestEvent
-  # TODO Make this work even if n= appears elsewhere after __sockjs__/
-  match <- stringr::str_match(req$PATH_INFO, "/__sockjs__/n=(\\w+)")
+  match <- stringr::str_match(req$PATH_INFO, "/__sockjs__/(?:.*/)?n=(\\w+)")
   if (!is.na(match[[1]])) {
     tokens[[match[[2]]]] <- "${ROBUST_ID}"
     return(makeReq("REQ_SINF"))
