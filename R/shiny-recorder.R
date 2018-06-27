@@ -153,7 +153,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$localHost <- host
       private$localPort <- port
       private$outputFileName <- outputFileName
-      private$outputFile <- file(outputFileName, "w")
+      cat("", file = private$outputFileName, append = FALSE)
       private$sessionCookies <- sessionCookies
       private$startServer()
     },
@@ -163,7 +163,6 @@ RecordingSession <- R6::R6Class("RecordingSession",
         httpuv::stopServer(private$localServer)
         httpuv::interrupt()
         private$localServer <- NULL
-        close(private$outputFile)
       }
     },
     # An environment of session-specific identifier strings to their
@@ -176,13 +175,15 @@ RecordingSession <- R6::R6Class("RecordingSession",
     localPort = NULL,
     localServer = NULL,
     outputFileName = NULL,
-    outputFile = NULL,
     sessionCookies = data.frame(),
     clientWsState = NULL,
     postCounter = 0,
     writeEvent = function(evt) {
-      writeLines(format(evt), private$outputFile)
-      flush(private$outputFile)
+      cat(
+        format(evt), "\n",
+        file = private$outputFileName,
+        append = TRUE
+      )
     },
     mergeCookies = function(handle) {
       df <- curl::handle_cookies(handle)[,c("name", "value")]
