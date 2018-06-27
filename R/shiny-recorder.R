@@ -354,27 +354,31 @@ RecordingSession <- R6::R6Class("RecordingSession",
   )
 )
 
-#' Title
+#' Record a Session for Load Test
+#' @details This function creates a reverse proxy listening at \code{host:port}
+#'   that stands in front of \code{target_app_url}. As the user interacts with
+#'   the app, the actions and responses are recorded in a file that can be
+#'   replayed later.
+#' @param target_app_url The URL of the deployed application
+#' @param host The host where the proxy will run. Usually localhost is used.
+#' @param output_file The name for the generated log file.
+#' @param open_browser Whether to open a browser on the proxy
+#'   (default=\code{TRUE}) or not (\code{FALSE}).
+#' @param port The port for the proxy. Default is 8600. Change this default if
+#'   port 8600 is used by another service.
 #'
-#' @param targetAppUrl
-#' @param host
-#' @param port
-#' @param outputFile
-#'
-#' @return
+#' @return Creates a recording file that can be used to drive a load test.
 #' @export
-#'
-#' @examples
-recordSession <- function(targetAppUrl, host = "0.0.0.0", port = 8600,
-  outputFile = "recording.log", openBrowser = TRUE) {
-    sessionCookies <- if (isProtected(targetAppUrl)) {
+record_session <- function(target_app_url, host = "0.0.0.0", port = 8600,
+  output_file = "recording.log", open_browser = TRUE) {
+    sessionCookies <- if (isProtected(target_app_url)) {
       username <- getPass::getPass("Enter your username: ")
       password <- getPass::getPass("Enter your password: ")
-      postLogin(targetAppUrl, username, password)
+      postLogin(target_app_url, username, password)
     } else data.frame()
-    session <- RecordingSession$new(targetAppUrl, host, port, outputFile, sessionCookies)
+    session <- RecordingSession$new(target_app_url, host, port, output_file, sessionCookies)
     message("Listening on ", host, ":", port)
-    if (openBrowser) browseURL(paste0("http://", host, ":", port))
+    if (open_browser) browseURL(paste0("http://", host, ":", port))
     on.exit(session$stop())
     httpuv::service(Inf)
 }
