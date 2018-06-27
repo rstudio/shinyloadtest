@@ -180,7 +180,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
     outputFile = NULL,
     sessionCookies = data.frame(),
     clientWsState = NULL,
-    postCounter = 0,
+    postFileCounter = 0,
     writeEvent = function(evt) {
       writeLines(format(evt), private$outputFile)
       flush(private$outputFile)
@@ -222,7 +222,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
           # TODO Figure out how to use CURL_INFILESIZE_LARGE to upload files
           # larger than 2GB.
           curl::handle_setopt(h, post = TRUE, infilesize = dataLen)
-          dataFileName <- sprintf("%s.post.%d", private$outputFileName, private$postCounter)
+          dataFileName <- sprintf("%s.post.%d", private$outputFileName, private$postFileCounter)
           writeCon <- file(dataFileName, "wb")
           curl::handle_setopt(h, readfunction = function(n) {
             data <- req$rook.input$read(n)
@@ -232,7 +232,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
           on.exit({
             flush(writeCon)
             close(writeCon)
-            private$postCounter <- private$postCounter + 1
+            private$postFileCounter <- private$postFileCounter + 1
           })
         }
       }
