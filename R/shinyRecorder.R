@@ -236,13 +236,16 @@ RecordingSession <- R6::R6Class("RecordingSession",
         })
       }
 
+      begin <- Sys.time()
       resp_curl <- curl::curl_fetch_memory(url, handle = h)
+      end <- Sys.time()
 
       private$mergeCookies(h)
 
       event <- list(
         type = "REQ_POST",
-        created = makeTimestamp(),
+        begin = makeTimestamp(begin),
+        end = makeTimestamp(end),
         statusCode = resp_curl$status_code,
         url = replaceTokens(paste0(req$PATH_INFO, req$QUERY_STRING), self$tokens)
       )
