@@ -215,37 +215,24 @@ RecordingSession <- R6::R6Class("RecordingSession",
       h <- private$makeCurlHandle(req)
       url <- private$makeUrl(req)
 
-      # If the post body contains data, write the data to a new file named
-      # <outputFile>.post.<n> and set dataFileName.
-      dataFileName <- NULL
-      dataLen <- 0
+      # If a post data file was written, write it to a file and send its
+      # contents upstream.
       if (!is.null(req$HTTP_CONTENT_LENGTH)) {
         dataLen <- as.integer(req$HTTP_CONTENT_LENGTH)
-        if (dataLen > 0) {
-          sz <- 8192
-          dataFileName <- sprintf("%s.post.%d", private$outputFileName, private$postCounter)
-          writeCon <- file(dataFileName, "wb")
-          repeat {
-            data <- req$rook.input$read(sz)
-            writeBin(data, writeCon)
-            if (length(data) < sz) break
-          }
-          flush(writeCon)
-          close(writeCon)
-          private$postCounter <- private$postCounter + 1
-        }
-      }
-
-      # If a post data file was written, send its contents upstream.
-      # TODO Figure out a way to save the file and send it upstream concurrently
-      if (!is.null(dataFileName)) {
         # TODO Figure out how to use CURL_INFILESIZE_LARGE to upload files
         # larger than 2GB.
         curl::handle_setopt(h, post = TRUE, infilesize = dataLen)
-        readCon <- file(dataFileName, "rb")
-        on.exit(close(readCon))
+        dataFileName <- sprintf("%s.post.%d", private$outputFileName, private$postCounter)
+        writeCon <- file(dataFileName, "wb")
         curl::handle_setopt(h, readfunction = function(n) {
-          readBin(readCon, raw(), n = n)
+          data <- req$rook.input$read(n)
+          writeBin(data, writeCon)
+          data
+        })
+        on.exit({
+          flush(writeCon)
+          close(writeCon)
+          private$postCounter <- private$postCounter + 1
         })
       }
 
