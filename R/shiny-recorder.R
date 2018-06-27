@@ -79,7 +79,7 @@ makeHTTPEvent_GET <- function(tokens, req, resp_curl, begin, end) {
       type = type,
       begin = makeTimestamp(begin),
       end = makeTimestamp(end),
-      statusCode = resp_curl$status_code,
+      status = resp_curl$status_code,
       url = replaceTokens(paste0(req$PATH_INFO, req$QUERY_STRING), tokens)
     ), class = "REQ")
   }
@@ -246,7 +246,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
         type = "REQ_POST",
         begin = makeTimestamp(begin),
         end = makeTimestamp(end),
-        statusCode = resp_curl$status_code,
+        status = resp_curl$status_code,
         url = replaceTokens(paste0(req$PATH_INFO, req$QUERY_STRING), self$tokens)
       )
 
