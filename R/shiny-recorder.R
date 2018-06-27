@@ -2,10 +2,6 @@ req_rook_to_curl <- function(req, domain, port) {
   # Rename headers. Example: HTTP_CACHE_CONTROL => Cache-Control
   r <- as.list(req)
 
-  # Log request headers
-  logging::logdebug("== Original ==\n")
-  logging::logdebug(capture.output(print(str(r))), sep = "\n")
-
   r <- r[grepl("^HTTP_", names(r))]
   nms <- names(r)
   nms <- sub("^HTTP_", "", nms)
@@ -21,12 +17,8 @@ req_rook_to_curl <- function(req, domain, port) {
     r$Host <- paste0(domain, ":", port)
   }
 
-  # Log modified request headers
-  logging::logdebug("== Modified ==\n")
-  logging::logdebug(capture.output(print(str(r))), sep = "\n")
   r
 }
-
 
 resp_httr_to_rook <- function(resp) {
   status <- as.integer(sub("^HTTP\\S+ (\\d+).*", "\\1", curl::parse_headers(resp$headers)[1]))
@@ -40,24 +32,8 @@ resp_httr_to_rook <- function(resp) {
   )
 }
 
-`%OR%` <- function(x, y) {
-  if (is.null(x) || isTRUE(is.na(x)))
-    y
-  else
-    x
-}
-
-# TODO
-# Intercept, parse, and record regular HTTP traffic:
-# REQ, REQ_HOME, REQ_TOK, REQ_SINF
-# Intercept and parse WS traffic:
-# WS_OPEN, WS_CLOSE, WS_SEND, WS_RECV, WS_RECV_INIT
-
 makeTimestamp <- function(time = Sys.time()) {
-  withr::with_options(
-    list(digits.secs = 3),
-    format(time, "%Y-%m-%dT%H:%M:%OSZ", tz = "GMT")
-  )
+  format(time, "%Y-%m-%dT%H:%M%%OS3Z", tz = "UTC")
 }
 
 # Returns NA if workerid not found. This either indicates an error state of some
@@ -67,90 +43,78 @@ getWorkerId <- function(page) {
   stringr::str_match(page, pat)[[2]]
 }
 
-messagePattern <- '^(a\\[")([0-9A-F*]+#)?(0\\|m\\|)(.*)("\\])$'
+# Messages from the server start with a[, messages from the client start with [
+messagePattern <- '^(a?\\[")([0-9A-F*]+#)?([0-9]+)(\\|m\\|)(.*)("\\])$'
 
-# Parses a JSON message from the server; returns the object from the nested JSON, if any
+# Parses a JSON message from the server or client; returns the object from the nested JSON, if any
 parseMessage <- function(msg) {
   res <- stringr::str_match(msg, messagePattern)
-  encodedMsg <- res[1,5]
+  encodedMsg <- res[1,6]
   # If the regex failed, then msg is probably a bare JSON string that can be
-  # decoded directly.
+  # decoded directly. It might also be an older-style SSP message without subapp
+  # support (like "[\"0|o|\"]")
   if (is.na(encodedMsg)) {
     jsonlite::fromJSON(msg)
-  # If the regex succeeded, we have the payload as an almost-double-JSON-encoded
-  # object - it just needs to be wrapped in a set of double-quotes.
+  # If the regex succeeded but the subapp id was nonzero, crash with a helpful message.
+  } else if (res[1,4] != "0") {
+    stop("Subapp id was != 0 and subapp recording is not supported")
   } else {
+    # If the regex succeeded subapp id = 0, we have the payload as an almost-double-JSON-encoded
+    # object - it just needs to be wrapped in a set of double-quotes.
     wrappedMsg <- paste0('"', encodedMsg, '"')
     jsonlite::fromJSON(jsonlite::fromJSON(wrappedMsg))
   }
 }
 
-# Generate a new message based on originalMessage but with new contents
-# {"type":"WS_RECV_INIT","created":"2018-03-12T19:51:59.675Z","message":"a[\"1#0|m|{\\\\\"config\\\\\":{\\\\\"workerId\\\\\":[\\\\\"${WORKER}\\\\\"],\\\\\"sessionId\\\\\":[\\\\\"${SESSION}\\\\\"],\\\\\"user\\\\\":null}}\"]"}
-# {"type":"WS_RECV_INIT","created":"2018-03-12T20:21:27.086Z","message":"a[\"1#0|m|[\"{\\\"config\\\":{\\\"workerId\\\":[\\\"${WORKER}\\\"],\\\"sessionId\\\":[\\\"${SESSION}\\\"],\\\"user\\\":null}}\"]\"]"}
-spliceMessage <- function(originalMessage, newMessageObject) {
-  newMsg <- jsonlite::toJSON(jsonlite::unbox(jsonlite::toJSON(newMessageObject, null = 'null')))
-  group <- stringr::str_match(originalMessage, messagePattern)
-  paste0(group[1,2], group[1,3], group[1,4], newMsg, group[1,6])
-}
-
-makeHTTPEvent <- function(server, req, resp_curl, created = Sys.time()) {
-  if (req$REQUEST_METHOD != "GET") stop("Unsupported method, only handle GET:", req$REQUEST_METHOD)
-
-  # ShinyHomeRequestEvent,
-  if (grepl("(\\/|\\.rmd)($|\\?)", req$PATH_INFO, ignore.case = TRUE)) {
-    page <- rawToChar(resp_curl$content)
-    workerId <- getWorkerId(page)
-    structure(list(
-      type = "REQ_HOME",
-      created = makeTimestamp(created),
-      method = "GET",
-      server = if (is.na(workerId)) "local" else "hosted",
-      url = req$PATH_INFO,
-      statusCode = 200
-    ), class = "REQ")
-
-  # ShinyTokenRequestEvent,
-  } else if (grepl("__token__", req$PATH_INFO, fixed = TRUE)) {
-    structure(list(
-      type = "REQ_TOK",
-      created = makeTimestamp(created),
-      method = "GET",
-      server = server,
-      url = gsub("_w_[a-z0-9]+", "_w_${WORKER}", req$PATH_INFO),
-      statusCode = 200
-    ), class = "REQ")
-
-  # ShinySINFRequestEvent
-  } else if (grepl("__sockjs__/", req$PATH_INFO, fixed = TRUE)) {
-    structure(list(
-      type = "REQ_SINF",
-      created = makeTimestamp(created),
-      method = "GET",
-      server = server,
-      url = stringr::str_replace_all(req$PATH_INFO, c(
-        "n=\\w+" = "n=${ROBUST_ID}",
-        "t=\\w+" = "t=${TOKEN}",
-        "w=\\w+" = "w=${WORKER}")),
-      statusCode = 200
-    ), class = "REQ")
-
-  # ShinyRequestEvent
+replaceTokens <- function(str, tokens) {
+  if (length(tokens) > 0) {
+    stringr::str_replace_all(str, unlist(as.list.environment(tokens)))
   } else {
-    if (server == "hosted") print(req$PATH_INFO)
-    structure(list(
-      type = "REQ",
-      created = makeTimestamp(created),
-      method = "GET",
-      server = server,
-      url = if (server == "local") req$PATH_INFO else gsub("_w_\\w+", "_w_${WORKER}", req$PATH_INFO),
-      statusCode = resp_curl$status_code
-    ), class = "REQ")
+    str
   }
 }
 
-makeWSEvent <- function(type, created = Sys.time(), ...) {
-  structure(list(type = type, created = makeTimestamp(created), ...), class = "WS")
+makeHTTPEvent_GET <- function(tokens, req, resp_curl, begin, end) {
+  makeReq <- function(type) {
+    structure(list(
+      type = type,
+      begin = makeTimestamp(begin),
+      end = makeTimestamp(end),
+      status = resp_curl$status_code,
+      url = replaceTokens(paste0(req$PATH_INFO, req$QUERY_STRING), tokens)
+    ), class = "REQ")
+  }
+
+  # ShinyHomeRequestEvent
+  if (grepl("(\\/|\\.rmd)($|\\?)", req$PATH_INFO, ignore.case = TRUE)) {
+    page <- rawToChar(resp_curl$content)
+    workerId <- getWorkerId(page)
+    if (!is.na(workerId)) tokens[[workerId]] <- "${WORKER}"
+    return(makeReq("REQ_HOME"))
+  }
+
+  # ShinyTokenRequestEvent
+  if (grepl("__token__", req$PATH_INFO)) {
+    token <- rawToChar(resp_curl$content)
+    tokens[[token]] <- "${TOKEN}"
+    return(makeReq("REQ_TOK"))
+  }
+
+  # ShinySINFRequestEvent
+  # TODO Make this work even if n= appears elsewhere after __sockjs__/
+  match <- stringr::str_match(req$PATH_INFO, "/__sockjs__/n=(\\w+)")
+  if (!is.na(match[[1]])) {
+    tokens[[match[[2]]]] <- "${ROBUST_ID}"
+    return(makeReq("REQ_SINF"))
+  }
+
+  # All other requests
+  # TODO Detect other non-WS sockjs protocols- URLs that have __sockjs__ but the right-hand side is something else
+  return(makeReq("REQ_GET"))
+}
+
+makeWSEvent <- function(type, begin = Sys.time(), ...) {
+  structure(list(type = type, begin = makeTimestamp(begin), ...), class = "WS")
 }
 
 format.REQ = function(httpEvt) {
@@ -161,20 +125,12 @@ format.WS = function(wsEvt) {
   jsonlite::toJSON(unclass(wsEvt), auto_unbox = TRUE)
 }
 
-trimslash <- function(urlPath, which = c("both", "left", "right")) {
-  if (which %in% c("both", "left") && substr(urlPath, 1, 1) == "/") {
-    urlPath <- substr(urlPath, 2, nchar(urlPath))
-  }
-  if (which %in% c("both", "right") && substr(urlPath, nchar(urlPath), nchar(urlPath)) == "/") {
-    urlPath <- substr(urlPath, 1, nchar(urlPath)-1)
-  }
-  urlPath
-}
-
-shouldIgnore <- function(msgFromServer) {
-  canIgnore <- c('^a\\["ACK.*$', '^\\["ACK.*$', '^h$')
-  if (length(unlist(stringr::str_match_all(msgFromServer, canIgnore))) > 0) return(TRUE)
-  parsed <- parseMessage(msgFromServer)
+shouldIgnore <- function(msg) {
+  sockJSinit <- c('^o$', '^\\["0#0\\|o\\|"\\]$', '^\\["0\\|o\\|"\\]$')
+  acks <- c('^a\\["ACK.*$', '^\\["ACK.*$', '^h$')
+  canIgnore <- c(sockJSinit, acks)
+  if (length(unlist(stringr::str_match_all(msg, canIgnore))) > 0) return(TRUE)
+  parsed <- parseMessage(msg)
   if (length(intersect(names(parsed), c("busy", "progress", "recalculating"))) > 0) return(TRUE)
   if (identical(names(parsed), c("custom"))) {
     customKeys <- names(parsed[["custom"]])
@@ -185,20 +141,21 @@ shouldIgnore <- function(msgFromServer) {
   return(FALSE)
 }
 
+# Regex blacklist of paths to proxy but not record
+ignoreGET <- c(".*favicon.ico$")
+shouldIgnoreGET <- function(path) {
+  length(unlist(stringr::str_match_all(path, ignoreGET))) > 0
+}
+
 RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
-    initialize = function(targetAppUrl, host, port, outputFileName, sessionCookie) {
-      parsedUrl <- urltools::url_parse(targetAppUrl)
-      private$targetScheme <- parsedUrl$scheme
-      private$targetHost <- parsedUrl$domain
-      private$targetPort <- parsedUrl$port %OR% 80
-      private$targetPath <- if (is.na(parsedUrl$path)) "" else parsedUrl$path
-
+    initialize = function(targetAppUrl, host, port, outputFileName, sessionCookies) {
+      private$targetURL <- URLBuilder$new(targetAppUrl)
       private$localHost <- host
       private$localPort <- port
+      private$outputFileName <- outputFileName
       private$outputFile <- file(outputFileName, "w")
-      private$sessionCookie <- sessionCookie
-
+      private$sessionCookies <- sessionCookies
       private$startServer()
     },
     stop = function() {
@@ -209,113 +166,166 @@ RecordingSession <- R6::R6Class("RecordingSession",
         private$localServer <- NULL
         close(private$outputFile)
       }
-    }
+    },
+    # An environment of session-specific identifier strings to their
+    # session-agnostic ${PLACEHOLDER} strings.
+    tokens = new.env(parent = emptyenv())
   ),
   private = list(
-    targetScheme = NULL,
-    targetHost = NULL,
-    targetPort = NULL,
-    targetPath = NULL,
+    targetURL = NULL,
     localHost = NULL,
     localPort = NULL,
     localServer = NULL,
+    outputFileName = NULL,
     outputFile = NULL,
-    server = NULL,
-    sessionCookie = NULL,
+    sessionCookies = data.frame(),
     clientWsState = NULL,
+    postFileCounter = 0,
     writeEvent = function(evt) {
       writeLines(format(evt), private$outputFile)
       flush(private$outputFile)
     },
-    handleCall = function(req) {
-  #       h <- curl::new_handle()
-  # curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0,
-  #   cookie = pasteParams(cookie, "; ")
-  # )
-  # curl::curl_fetch_memory(appUrl, handle = h)
-      req_curl <- req_rook_to_curl(req, private$targetHost, private$targetPort)
-      if (!is.null(private$sessionCookie)) {
-        req_curl[["Cookie"]] <- pasteParams(private$sessionCookie, "; ")
-      }
+    mergeCookies = function(handle) {
+      df <- curl::handle_cookies(handle)[,c("name", "value")]
+      df <- rbind(private$sessionCookies, df)
+      df <- subset(df, !duplicated(df$name, fromLast = TRUE))
+      private$sessionCookies <- df
+    },
+    makeUrl = function(req) {
+      private$targetURL$appendPaths(paste0(req$PATH_INFO, req$QUERY_STRING))$build()
+    },
+    makeCurlHandle = function(req) {
+      port <- private$targetURL$port %OR% if (private$targetURL$scheme == "https") 443 else 80
+      req_curl <- req_rook_to_curl(req, private$targetURL$host, port)
       h <- curl::new_handle()
-      do.call(curl::handle_setheaders, c(h, req_curl))
 
-      # TODO Accept invalid certificate from upstream. Should we make this an option?
-      if (private$targetScheme == "https") {
+      if (nrow(private$sessionCookies) > 0) {
+        req_curl[["Cookie"]] <- pasteParams(private$sessionCookies, "; ")
+      }
+
+      curl::handle_setheaders(h, .list = req_curl)
+
+      # TODO See if there's an easy way to at least show a warning or message
+      if (private$targetURL$scheme == "https") {
         curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0)
       }
+      h
+    },
+    handle_POST = function(req) {
+      h <- private$makeCurlHandle(req)
+      url <- private$makeUrl(req)
 
-      # If the target application is protected, include previously-obtained
-      # session cookie on every outbound request.
-      # if (!is.null(private$sessionCookie)) {
-      #   cat("setting session cookie to",pasteParams(private$sessionCookie, "; "), "\n")
-      #   curl::handle_setopt(h, cookie = pasteParams(private$sessionCookie, "; "))
-      # }
+      dataFileName <- NULL
+      # If there wasn't a post body, req$rook.input is probably a
+      # NullInputStream without a .length field
+      if (".length" %in% names(req$rook.input) && req$rook.input$.length > 0) {
+        # TODO Figure out how to use CURL_INFILESIZE_LARGE to upload files
+        # larger than 2GB.
+        curl::handle_setopt(h, post = TRUE, infilesize = req$rook.input$.length)
+        dataFileName <- sprintf("%s.post.%d", private$outputFileName, private$postFileCounter)
+        writeCon <- file(dataFileName, "wb")
+        curl::handle_setopt(h, readfunction = function(n) {
+          data <- req$rook.input$read(n)
+          writeBin(data, writeCon)
+          data
+        })
+        on.exit({
+          flush(writeCon)
+          close(writeCon)
+          private$postFileCounter <- private$postFileCounter + 1
+        })
+      }
 
-      httpUrl <- paste0(private$targetScheme, "://", private$targetHost, ":", private$targetPort, "/", private$targetPath, "/", req$PATH_INFO, req$QUERY_STRING)
+      begin <- Sys.time()
+      resp_curl <- curl::curl_fetch_memory(url, handle = h)
+      end <- Sys.time()
 
-      # This is a hack around the fact that somehow there's three forward slashes in one of the separators
-      httpUrl <- gsub("///", "/", httpUrl, fixed = TRUE)
+      private$mergeCookies(h)
 
-      resp_curl <- curl::curl_fetch_memory(httpUrl, handle = h)
-      event <- makeHTTPEvent(private$server, req, resp_curl)
-      private$server <- event$server
-      private$writeEvent(event)
+      event <- list(
+        type = "REQ_POST",
+        begin = makeTimestamp(begin),
+        end = makeTimestamp(end),
+        status = resp_curl$status_code,
+        url = replaceTokens(paste0(req$PATH_INFO, req$QUERY_STRING), self$tokens)
+      )
+
+      if (!is.null(dataFileName)) {
+        event$datafile <- dataFileName
+      }
+
+      private$writeEvent(structure(event, class = "REQ"))
+      resp_httr_to_rook(resp_curl)
+    },
+    handle_GET = function(req) {
+      h <- private$makeCurlHandle(req)
+      url <- private$makeUrl(req)
+
+      begin <- Sys.time()
+      resp_curl <- curl::curl_fetch_memory(url, handle = h)
+      end <- Sys.time()
+
+      private$mergeCookies(h)
+
+      event <- makeHTTPEvent_GET(self$tokens, req, resp_curl, begin, end)
+
+      if (!shouldIgnoreGET(req$PATH_INFO)) private$writeEvent(event)
 
       resp_httr_to_rook(resp_curl)
+    },
+    handleCall = function(req) {
+      handler <- private[[paste0("handle_", req$REQUEST_METHOD)]]
+      if (is.null(handler)) stop("No handler for ", req$REQUEST_METHOD)
+      handler(req)
     },
     handleWSOpen = function(clientWS) {
       cat("WS open!")
       private$clientWsState <- "OPEN"
-      if (private$server == "local") {
-        private$writeEvent(makeWSEvent("WS_OPEN", url = clientWS$request$PATH_INFO))
-      } else {
-        private$writeEvent(makeWSEvent("WS_OPEN", url =  stringr::str_replace_all(clientWS$request$PATH_INFO, c(
-          "n=\\w+" = "n=${ROBUST_ID}",
-          "t=\\w+" = "t=${TOKEN}",
-          "w=\\w+" = "w=${WORKER}",
-          "\\/\\w+\\/\\w+\\/websocket$" = "/${SOCKJSID}/websocket"
-        ))))
-      }
 
-      wsScheme <- if (private$targetScheme == "https") "wss" else "ws"
-      wsUrl <- paste0(wsScheme, "://", private$targetHost, ":", private$targetPort, "/", trimslash(private$targetPath), "/", trimslash(clientWS$request$PATH_INFO))
+      match <- stringr::str_match(clientWS$request$PATH_INFO, "/(\\w+/\\w+)/websocket$")
+      if (!is.na(match[[1]])) self$tokens[[match[[2]]]] <- "${SOCKJSID}"
+
+      private$writeEvent(makeWSEvent("WS_OPEN", url =  replaceTokens(clientWS$request$PATH_INFO, self$tokens)))
+
+      wsScheme <- if (private$targetURL$scheme == "https") "wss" else "ws"
+      wsUrl <- private$targetURL$setScheme(wsScheme)$appendPaths(clientWS$request$PATH_INFO)$build()
 
       serverWS <- websocket::WebsocketClient$new(wsUrl,
-        headers = if (!is.null(private$sessionCookie)) c(Cookie = pasteParams(private$sessionCookie, "; ")),
+        headers = if (nrow(private$sessionCookies) > 0) {
+          c(Cookie = pasteParams(private$sessionCookies, "; "))
+        } else c(),
         onMessage = function(msgFromServer) {
-          # These kinds of messages are relayed to the browser but are not recorded.
-          # TODO Cleanup this code that handles SSO/dev and SSP cases in an ugly way.
-          if (msgFromServer != "o" && shouldIgnore(msgFromServer)) {
+
+          # Relay but don't record ignorable messages
+          if (shouldIgnore(msgFromServer)) {
             clientWS$send(msgFromServer)
-            return(invisible())
+            return()
           }
 
-          if (private$server == "hosted") {
+          parsed <- parseMessage(msgFromServer)
 
-            if (msgFromServer == "o") {
-              private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
-              clientWS$send(msgFromServer)
-              return(invisible())
-            }
-
-            parsed <- parseMessage(msgFromServer)
-
-            # If the message from the server is an object with a "config" key, fix
-            # up some keys with placeholders and record the message as a
-            # WS_RECV_INIT
-            if ("config" %in% names(parsed)) {
-              newMsgObj <- parsed
-              newMsgObj$config$workerId <- "${WORKER}"
-              newMsgObj$config$sessionId <- "${SESSION}"
-              private$writeEvent(makeWSEvent("WS_RECV_INIT", message = spliceMessage(msgFromServer, newMsgObj)))
-              clientWS$send(msgFromServer)
-              return(invisible())
-            }
+          # If the message from the server is an object with a "config" key, fix
+          # up some keys with placeholders and record the message as a
+          # WS_RECV_INIT
+          if ("config" %in% names(parsed)) {
+            self$tokens[[parsed$config$sessionId]] <- "${SESSION}"
+            private$writeEvent(makeWSEvent("WS_RECV_INIT", message = replaceTokens(msgFromServer, self$tokens)))
+            clientWS$send(msgFromServer)
+            return()
           }
-          # Every other websocket event
-          private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
-          clientWS$send(msgFromServer)
+
+          # WS_RECV_BEGIN_UPLOAD (upload response)
+          if(!is.null(parsed$response$value$jobId)) {
+            self$tokens[[parsed$response$value$uploadUrl]] <- "${UPLOAD_URL}"
+            self$tokens[[parsed$response$value$jobId]] <- "${UPLOAD_JOB_ID}"
+            private$writeEvent(makeWSEvent("WS_RECV_BEGIN_UPLOAD", message = replaceTokens(msgFromServer, self$tokens)))
+            clientWS$send(msgFromServer)
+            return()
+          }
+
+        # Every other websocket event
+        private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
+        clientWS$send(msgFromServer)
       }, onClose = function() {
         cat("Server disconnected\n")
         if (private$clientWsState == "OPEN") {
@@ -324,7 +334,11 @@ RecordingSession <- R6::R6Class("RecordingSession",
         }
       })
       clientWS$onMessage(function(isBinary, msgFromClient) {
-        private$writeEvent(makeWSEvent("WS_SEND", message = msgFromClient))
+        if (shouldIgnore(msgFromClient)) {
+          serverWS$send(msgFromClient)
+          return()
+        }
+        private$writeEvent(makeWSEvent("WS_SEND", message = replaceTokens(msgFromClient, self$tokens)))
         serverWS$send(msgFromClient)
       })
       clientWS$onClose(function() {
@@ -356,16 +370,16 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #' @param port The port for the proxy. Default is 8600. Change this default if
 #'   port 8600 is used by another service.
 #'
-#' @return Cerates a recording file that can be used to drive a load test.
+#' @return Creates a recording file that can be used to drive a load test.
 #' @export
 record_session <- function(target_app_url, host = "0.0.0.0", port = 8600,
   output_file = "recording.log", open_browser = TRUE) {
-    sessionCookie <- if (isProtected(target_app_url)) {
+    sessionCookies <- if (isProtected(target_app_url)) {
       username <- getPass::getPass("Enter your username: ")
       password <- getPass::getPass("Enter your password: ")
       postLogin(target_app_url, username, password)
-    } else NULL
-    session <- RecordingSession$new(target_app_url, host, port, output_file, sessionCookie)
+    } else data.frame()
+    session <- RecordingSession$new(target_app_url, host, port, output_file, sessionCookies)
     message("Listening on ", host, ":", port)
     if (open_browser) browseURL(paste0("http://", host, ":", port))
     on.exit(session$stop())
