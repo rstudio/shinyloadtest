@@ -12,7 +12,7 @@ pasteParams <- function(df, collapse) {
   if (nrow(df) == 0) {
     ""
   } else {
-    paste0(df[["name"]], "=", df[["value"]], collapse = collapse)
+    paste0(df$name, "=", df$value, collapse = collapse)
   }
 }
 
