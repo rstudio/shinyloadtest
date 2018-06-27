@@ -51,7 +51,8 @@ parseMessage <- function(msg) {
   res <- stringr::str_match(msg, messagePattern)
   encodedMsg <- res[1,6]
   # If the regex failed, then msg is probably a bare JSON string that can be
-  # decoded directly.
+  # decoded directly. It might also be an older-style SSP message without subapp
+  # support (like "[\"0|o|\"]")
   if (is.na(encodedMsg)) {
     jsonlite::fromJSON(msg)
   # If the regex succeeded but the subapp id was nonzero, crash with a helpful message.
@@ -125,7 +126,7 @@ format.WS = function(wsEvt) {
 }
 
 shouldIgnore <- function(msg) {
-  sockJSinit <- c('^o$', '^\\["0#0\\|o\\|"\\]$')
+  sockJSinit <- c('^o$', '^\\["0#0\\|o\\|"\\]$', '^\\["0\\|o\\|"\\]$')
   acks <- c('^a\\["ACK.*$', '^\\["ACK.*$', '^h$')
   canIgnore <- c(sockJSinit, acks)
   if (length(unlist(stringr::str_match_all(msg, canIgnore))) > 0) return(TRUE)
