@@ -251,7 +251,10 @@ RecordingSession <- R6::R6Class("RecordingSession",
         url = replaceTokens(paste0(req$PATH_INFO, req$QUERY_STRING), self$tokens)
       )
 
-      event <- append(event, if (!is.null(dataFileName)) list(datafile = basename(dataFileName)))
+      if (!is.null(dataFileName)) {
+        event$datafile <- dataFileName
+      }
+
       private$writeEvent(structure(event, class = "REQ"))
       resp_httr_to_rook(resp_curl)
     },
