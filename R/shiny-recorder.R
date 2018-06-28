@@ -328,13 +328,15 @@ RecordingSession <- R6::R6Class("RecordingSession",
           # so we must detect it here and replace it with the placeholder
           # whenever we see it next.
           df <- tree_df(parsed)
-          urls <- subset(df, df[,5] == "ajax" & df[,6] == "url")[,7]
-          if (length(urls) > 0) {
-            url <- urls[[1]]
-            match <- stringr::str_match(url, "nonce=(\\w+)")
-            if (!is.na(match[[1]])) {
-              self$tokens[[match[[2]]]] <- "${NONCE}"
-            } else stop("Expected an ajax URL containing a nonce")
+          if (ncol(df) >= 7) {
+            urls <- subset(df, df[,5] == "ajax" & df[,6] == "url")[,7]
+            if (length(urls) > 0) {
+              url <- urls[[1]]
+              match <- stringr::str_match(url, "nonce=(\\w+)")
+              if (!is.na(match[[1]])) {
+                self$tokens[[match[[2]]]] <- "${NONCE}"
+              } else stop("Expected an ajax URL containing a nonce")
+            }
           }
 
         # Every other websocket event
