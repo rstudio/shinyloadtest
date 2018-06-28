@@ -17,9 +17,9 @@ as_entries <- function(named_list) {
 # Returns a list of lists, each a path into the nested structure x. Each path
 # ends with the value at the leaf.
 paths <- function(parent, x) {
-  if (rlang::is_list(x)) {
+  if (typeof(x) == "list") {
     # Named list aka JSON object
-    if (rlang::is_named(x)) {
+    if (!is.null(names(x))) {
       Mapcan(function(entry) {
         paths(c(parent, entry$key), entry$val)
       }, as_entries(x))
