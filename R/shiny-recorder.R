@@ -54,7 +54,7 @@ parseMessage <- function(msg) {
   # decoded directly. It might also be an older-style SSP message without subapp
   # support (like "[\"0|o|\"]")
   if (is.na(encodedMsg)) {
-    jsonlite::fromJSON(msg)
+    jsonlite::fromJSON(msg, simplifyVector = FALSE, simplifyDataFrame = FALSE, simplifyMatrix = FALSE)
   # If the regex succeeded but the subapp id was nonzero, crash with a helpful message.
   } else if (res[1,4] != "0") {
     stop("Subapp id was != 0 and subapp recording is not supported")
@@ -62,7 +62,7 @@ parseMessage <- function(msg) {
     # If the regex succeeded subapp id = 0, we have the payload as an almost-double-JSON-encoded
     # object - it just needs to be wrapped in a set of double-quotes.
     wrappedMsg <- paste0('"', encodedMsg, '"')
-    jsonlite::fromJSON(jsonlite::fromJSON(wrappedMsg))
+    jsonlite::fromJSON(jsonlite::fromJSON(wrappedMsg), simplifyVector = FALSE, simplifyDataFrame = FALSE, simplifyMatrix = FALSE)
   }
 }
 
@@ -315,7 +315,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
           }
 
           # WS_RECV_BEGIN_UPLOAD (upload response)
-          if(!is.null(parsed$response$value$jobId)) {
+          if (!is.null(parsed$response$value$jobId)) {
             self$tokens[[parsed$response$value$uploadUrl]] <- "${UPLOAD_URL}"
             self$tokens[[parsed$response$value$jobId]] <- "${UPLOAD_JOB_ID}"
             private$writeEvent(makeWSEvent("WS_RECV_BEGIN_UPLOAD", message = replaceTokens(msgFromServer, self$tokens)))
@@ -323,8 +323,22 @@ RecordingSession <- R6::R6Class("RecordingSession",
             return()
           }
 
+          # Check for the inbound WS message containing a nonce as part of a DT
+          # ajax upload URL. The nonce will be part of subsequent REQ_POST URLs,
+          # so we must detect it here and replace it with the placeholder
+          # whenever we see it next.
+          df <- tree_df(parsed)
+          urls <- subset(df, df[,5] == "ajax" & df[,6] == "url")[,7]
+          if (length(urls) > 0) {
+            url <- urls[[1]]
+            match <- stringr::str_match(url, "nonce=(\\w+)")
+            if (!is.na(match[[1]])) {
+              self$tokens[[match[[2]]]] <- "${NONCE}"
+            } else stop("Expected an ajax URL containing a nonce")
+          }
+
         # Every other websocket event
-        private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
+        private$writeEvent(makeWSEvent("WS_RECV", message = replaceTokens(msgFromServer, self$tokens)))
         clientWS$send(msgFromServer)
       }, onClose = function() {
         cat("Server disconnected\n")
