@@ -33,7 +33,7 @@ resp_httr_to_rook <- function(resp) {
 }
 
 makeTimestamp <- function(time = Sys.time()) {
-  format(time, "%Y-%m-%dT%H:%M%%OS3Z", tz = "UTC")
+  format(time, "%Y-%m-%dT%H:%M:%%OS3Z", tz = "UTC")
 }
 
 # Returns NA if workerid not found. This either indicates an error state of some
@@ -251,7 +251,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       )
 
       if (!is.null(dataFileName)) {
-        event$datafile <- dataFileName
+        event$datafile <- basename(dataFileName)
       }
 
       private$writeEvent(structure(event, class = "REQ"))
