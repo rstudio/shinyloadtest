@@ -372,7 +372,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #'
 #' @return Creates a recording file that can be used to drive a load test.
 #' @export
-record_session <- function(target_app_url, host = "0.0.0.0", port = 8600,
+record_session <- function(target_app_url, host = "127.0.0.1", port = 8600,
   output_file = "recording.log", open_browser = TRUE) {
     sessionCookies <- if (isProtected(target_app_url)) {
       username <- getPass::getPass("Enter your username: ")
