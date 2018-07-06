@@ -150,6 +150,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
     initialize = function(targetAppUrl, host, port, outputFileName, sessionCookies) {
       private$targetURL <- URLBuilder$new(targetAppUrl)
+      if (grepl("shinyapps.io$", private$targetURL$host)) {
+        stop("Recording shinyapps.io apps is not supported")
+      }
       private$localHost <- host
       private$localPort <- port
       private$outputFileName <- outputFileName
