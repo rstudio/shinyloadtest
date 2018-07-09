@@ -359,7 +359,7 @@ plot_gantt_latency <- function(df) {
       labs(
         x = "Session",
         y = "Latency (sec)",
-        subtitle = "shorter is better"
+        subtitle = "shorter bar is better"
       ) +
       theme(legend.position = "bottom")
 }

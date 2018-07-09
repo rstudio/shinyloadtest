@@ -46,7 +46,7 @@ plot_concurrency_time <- function(df, labels = NULL) {
   if(is.null(labels) || length(labels) > 1) {
     p <- p + facet_wrap(~label)
   }
-  p + labs(title = "response time over concurrency", subtitle = "lower is better")
+  p + labs(subtitle = "lower is better")
 }
 
 
@@ -92,7 +92,7 @@ plot_timeline_stacked <- function(df) {
     facet_grid(rows = vars(run), scales = "free_x", space = "free_x") +
     labs(
       x = "Total elapsed time", y = NULL,
-      subtitle = "vertical is better. baseline in background and grey"
+      subtitle = "vertical is better. baseline grey, in background"
     ) +
     theme(legend.position = "bottom")
 }
@@ -144,7 +144,7 @@ hist_loadtimes_stacked <- function(df, max_load_time = 5) {
     labs(
       x = "Inital Page Load Time (sec)",
       y = "Session #",
-      subtitle = "smaller is better"
+      subtitle = "shorter bar is better. baseline grey, in background"
     ) +
     theme(legend.position = "bottom")
 

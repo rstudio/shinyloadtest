@@ -1,4 +1,4 @@
-make_report <- function(df, output_file = tempfile(), ...) {
+make_report <- function(df, output_file = tempfile(fileext = ".Rmd"), ...) {
   if (!stringr::str_detect(output_file, "\\.Rmd$")) {
     stop("output_file must be an .Rmd file")
   }
@@ -38,7 +38,7 @@ df <- readRDS("{fileLocation}")
 
 ## Row
 
-### Worker Activity over time
+### Worker activity over time
 
 ```{{r}}
 shiny::renderPlot({{plot_gantt(df)}})
@@ -62,7 +62,7 @@ shiny::renderPlot({{plot_gantt_latency(df)}})
 
 ## Row
 
-### Elapsed Time Calls Waterfall
+### Elapsed Time Event Waterfall
 
 ```{{r}}
 shiny::renderPlot({{plot_timeline_stacked(df)}})
@@ -74,22 +74,21 @@ shiny::renderPlot({{plot_timeline_stacked(df)}})
 shiny::renderPlot({{hist_loadtimes_stacked(df)}})
 ```
 
-# Run Calls
+# Event Duration
 
 ## Row
 
-### Elapsed time per call within each run
+### Event duration within each run
 
 ```{{r}}
 shiny::renderPlot({{plot_time_boxplot(df)}})
 ```
 
-# Concurrency Calls
+# Event Concurrency
 
 ## Row
 
-
-### plot_concurrency_time(df)
+### Event duration given concurrency for each run
 
 ```{{r}}
 shiny::renderPlot({{plot_concurrency_time(df)}})
