@@ -33,7 +33,7 @@ resp_httr_to_rook <- function(resp) {
 }
 
 makeTimestamp <- function(time = Sys.time()) {
-  format(time, "%Y-%m-%dT%H:%M%%OS3Z", tz = "UTC")
+  format(time, "%Y-%m-%dT%H:%M:%%OS3Z", tz = "UTC")
 }
 
 # Returns NA if workerid not found. This either indicates an error state of some
@@ -101,8 +101,7 @@ makeHTTPEvent_GET <- function(tokens, req, resp_curl, begin, end) {
   }
 
   # ShinySINFRequestEvent
-  # TODO Make this work even if n= appears elsewhere after __sockjs__/
-  match <- stringr::str_match(req$PATH_INFO, "/__sockjs__/n=(\\w+)")
+  match <- stringr::str_match(req$PATH_INFO, "/__sockjs__/(?:.*/)?n=(\\w+)")
   if (!is.na(match[[1]])) {
     tokens[[match[[2]]]] <- "${ROBUST_ID}"
     return(makeReq("REQ_SINF"))
@@ -151,6 +150,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
     initialize = function(targetAppUrl, host, port, outputFileName, sessionCookies) {
       private$targetURL <- URLBuilder$new(targetAppUrl)
+      if (grepl("shinyapps.io$", private$targetURL$host)) {
+        stop("Recording shinyapps.io apps is not supported")
+      }
       private$localHost <- host
       private$localPort <- port
       private$outputFileName <- outputFileName
@@ -251,7 +253,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       )
 
       if (!is.null(dataFileName)) {
-        event$datafile <- dataFileName
+        event$datafile <- basename(dataFileName)
       }
 
       private$writeEvent(structure(event, class = "REQ"))
@@ -372,7 +374,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #'
 #' @return Creates a recording file that can be used to drive a load test.
 #' @export
-record_session <- function(target_app_url, host = "0.0.0.0", port = 8600,
+record_session <- function(target_app_url, host = "127.0.0.1", port = 8600,
   output_file = "recording.log", open_browser = TRUE) {
     sessionCookies <- if (isProtected(target_app_url)) {
       username <- getPass::getPass("Enter your username: ")

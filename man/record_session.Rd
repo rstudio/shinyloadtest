@@ -4,7 +4,7 @@
 \alias{record_session}
 \title{Record a Session for Load Test}
 \usage{
-record_session(target_app_url, host = "0.0.0.0", port = 8600,
+record_session(target_app_url, host = "127.0.0.1", port = 8600,
   output_file = "recording.log", open_browser = TRUE)
 }
 \arguments{
