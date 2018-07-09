@@ -1,0 +1,100 @@
+make_report <- function(df, output_file = tempfile(), ...) {
+  if (!stringr::str_detect(output_file, "\\.Rmd$")) {
+    stop("output_file must be an .Rmd file")
+  }
+  report <- glue_report(df)
+  writeLines(report, output_file)
+  output_file
+}
+
+
+glue_report <- function(df) {
+
+  tmpFile <- tempfile()
+  saveRDS(df, tmpFile)
+  glue::glue_data(
+    list(
+      fileLocation = tmpFile
+    ),
+'
+
+---
+title: "shinyloadtest report"
+runtime: shiny
+output:
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    social: menu
+---
+
+```{{r, include=FALSE}}
+base::library(shinyloadtest)
+df <- readRDS("{fileLocation}")
+```
+
+
+
+# Sessions
+
+## Row
+
+### Worker Activity over time
+
+```{{r}}
+shiny::renderPlot({{plot_gantt(df)}})
+```
+
+### Duration of each session
+
+```{{r}}
+shiny::renderPlot({{plot_gantt_duration(df)}})
+```
+
+### Latency per session
+
+```{{r}}
+shiny::renderPlot({{plot_gantt_latency(df)}})
+```
+
+
+
+# Time
+
+## Row
+
+### Elapsed Time Calls Waterfall
+
+```{{r}}
+shiny::renderPlot({{plot_timeline_stacked(df)}})
+```
+
+### Page Load Time
+
+```{{r}}
+shiny::renderPlot({{hist_loadtimes_stacked(df)}})
+```
+
+# Run Calls
+
+## Row
+
+### Elapsed time per call within each run
+
+```{{r}}
+shiny::renderPlot({{plot_time_boxplot(df)}})
+```
+
+# Concurrency Calls
+
+## Row
+
+
+### plot_concurrency_time(df)
+
+```{{r}}
+shiny::renderPlot({{plot_concurrency_time(df)}})
+```
+
+')
+
+}

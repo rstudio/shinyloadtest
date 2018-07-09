@@ -1,9 +1,9 @@
-# Load Testing Shiny Applications 
+# Load Testing Shiny Applications
 
-> This is a WIP, do not use yet. Please follow community.rstudio.com for a 
+> This is a WIP, do not use yet. Please follow community.rstudio.com for a
 soft launch of the tools.
 
-The `shinyloadtest` package and the accompanying `shinycannon` software enable load testing 
+The `shinyloadtest` package and the accompanying `shinycannon` software enable load testing
 deployed shiny applications.
 
 Load tests ensure that deployed Shiny applications are ready for mission critical tasks. Load testing
@@ -13,7 +13,7 @@ Just as importantly, load testing can squash the commnon concern that Shiny does
 
 <p><a href="https://www.rstudio.com/resources/videos/scaling-shiny/?wvideo=mx214xmcqw"><img src="https://embedwistia-a.akamaihd.net/deliveries/97390a2a0512c2f959b37e3e91b0d9c81e3023c5.jpg?image_play_button_size=2x&amp;image_crop_resized=960x540&amp;image_play_button=1&amp;image_play_button_color=4287c7e0" width="400" height="225" style="width: 400px; height: 225px;"></a></p><p><a href="https://www.rstudio.com/resources/videos/scaling-shiny/?wvideo=mx214xmcqw">Scaling Shiny – RStudio</a></p>
 
-To get started with `shinyloadtest`, read through the quick start guide below. Additional resources 
+To get started with `shinyloadtest`, read through the quick start guide below. Additional resources
 include details of `shinyloadtest`'s log formats, a case study showing how to interpret load test results, an overview of using `shinyloadtest` with authenticated apps, and a description of how to use `shinyloadtest` to determine runtime settings in RStudio Connect or Shiny Server Pro.
 
 ## Installation
@@ -29,7 +29,7 @@ devtools::install_github('rstudio/shinyloadtest')
 `shinycannon` is a standalone executable:
 
 Platform | Download URL | Install Command
--- | -- | -- 
+-- | -- | --
 Max OS | |
 Ubuntu | [download](https://s3.amazonaws.com/rstudio-shinycannon-build/2018-06-14-06%3A15%3A50_1.0.0-31565b0/deb/shinycannon_1.0.0-31565b0_amd64.deb) | `sudo gdebi shinycannon_1.0.0-31565b0_amd64.db`
 Windows | |
@@ -61,7 +61,7 @@ Running the function will open a browser displaying the app. Once open, interact
 
 ### Step 2: Run the Load Test
 
-With the recording in hand, we're ready to run the load test. The actual test is conducted outside of R using the stand alone `shinycannon` tool. 
+With the recording in hand, we're ready to run the load test. The actual test is conducted outside of R using the stand alone `shinycannon` tool.
 
 `shinycannon` can be used from the command line. An easy option is to use `shinycannon` from the RStudio terminal. The main arguments to `shinycannon` are:
 
@@ -79,7 +79,7 @@ Logging at INFO level to output_dir/detail.log
 2018-06-15T11:22:29.466399Z - Worker thread 1 warming up
 2018-06-15T11:22:29.476858Z - Worker thread 2 warming up
 2018-06-15T11:22:29.477245Z - Worker thread 3 warming up
-                           ... 
+                           ...
 2018-06-15T11:22:29.499708Z - Waiting for warmup to complete
                            ...
 2018-06-15T11:22:29.516885Z - Maintaining for 20 minutes
@@ -100,8 +100,8 @@ During the test, `shinycannon` reports the progress and number of simulated user
 
 ### Step 3: Analyze the Results
 
-The output directory created in step 2 is the focus of step 3. The `shinyloadtest` R package provides 
-functions for analyzing the output files from the test. 
+The output directory created in step 2 is the focus of step 3. The `shinyloadtest` R package provides
+functions for analyzing the output files from the test.
 
 ```r
 library(shinyloadtest)
@@ -114,13 +114,21 @@ results
 
 ![](inst/img/results.png)
 
-```
-results %>% 
+```r
+results %>%
    hist_loadtimes()
-results %>% 
+results %>%
    plot_time_boxplot()
 ```
 
 ![](inst/img/hist_loadtime.png)
 
 ![](inst/img/boxplot.png)
+
+
+Load the results into a shiny flex dashboard
+```r
+results %>%
+  make_report() %>%
+  rmarkdown::run()
+```
