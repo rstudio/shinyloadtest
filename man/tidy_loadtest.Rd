@@ -4,14 +4,13 @@
 \alias{tidy_loadtest}
 \title{Create Tidy Load Test Results}
 \usage{
-tidy_loadtest(
-     test1 = 'results/test-1/',
-     test2 = 'results/test-2/'
-  )
+tidy_loadtest(..., baselineName = names(list(...))[1])
 }
 \arguments{
 \item{...}{Key-value pairs where the key is the desired name for the test and the
 value is a path to the test result directory.}
+
+\item{baselineName}{string matching a name of \code{...}. Defaults to the first name.}
 }
 \value{
 A tidy data frame with the test result data. Each row is an event. Columns include
@@ -21,4 +20,12 @@ A tidy data frame with the test result data. Each row is an event. Columns inclu
 The \code{shinycannon} tool creates a directory of log files for
   each load test. This function translates one or more test result
   directories into a tidy data frame.
+}
+\examples{
+\dontrun{
+  tidy_loadtest(
+     `1 core` = 'results/test-1/',
+     `2 cores` = 'results/test-2/'
+  )
+}
 }

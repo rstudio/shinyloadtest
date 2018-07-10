@@ -1,7 +1,8 @@
-make_report <- function(df, output_file = tempfile(fileext = ".Rmd"), ...) {
-  if (!stringr::str_detect(output_file, "\\.Rmd$")) {
-    stop("output_file must be an .Rmd file")
-  }
+#' Make shinyloadtest Report
+#'
+#' @param df data.frame returned from \code{\link{tidy_loadtest}}
+make_report <- function(df) {
+  output_file = tempfile(fileext = ".Rmd")
   report <- glue_report(df)
   writeLines(report, output_file)
   output_file

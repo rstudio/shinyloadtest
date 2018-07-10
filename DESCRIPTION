@@ -29,7 +29,9 @@ Imports:
     magrittr,
     viridis,
     shiny,
-    glue
+    glue,
+    RColorBrewer,
+    lubridate
 Remotes: rstudio/websocket,
     rstudio/httpuv
 RoxygenNote: 6.0.1.9000

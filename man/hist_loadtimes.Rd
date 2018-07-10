@@ -2,12 +2,15 @@
 % Please edit documentation in R/plotting.R
 \name{hist_loadtimes}
 \alias{hist_loadtimes}
+\alias{hist_loadtimes_stacked}
 \title{Histogram of Page Load Times}
 \usage{
 hist_loadtimes(df, max_load_time = 5)
+
+hist_loadtimes_stacked(df, max_load_time = 5)
 }
 \arguments{
-\item{df}{A tidy data frame of test results. See \code{\link{analyze_runs}}}
+\item{df}{A tidy data frame of test results. See \code{\link{tidy_loadtest}}}
 
 \item{max_load_time}{The amount of time users will wait for the page to load
 when first requesting the app.}

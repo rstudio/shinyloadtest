@@ -92,7 +92,7 @@ postLogin <- function(appUrl, username, password) {
     )
   } else if (appServer == "ssp") {
     handlePost(handle = curl::new_handle(), loginUrl = loginUrl,
-      postfields = URLencode(pasteParams(inputs, "&")),
+      postfields = utils::URLencode(pasteParams(inputs, "&")),
       cookies = cookies, cookieName = "session_state"
     )
   }

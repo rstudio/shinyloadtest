@@ -383,7 +383,7 @@ record_session <- function(target_app_url, host = "127.0.0.1", port = 8600,
     } else data.frame()
     session <- RecordingSession$new(target_app_url, host, port, output_file, sessionCookies)
     message("Listening on ", host, ":", port)
-    if (open_browser) browseURL(paste0("http://", host, ":", port))
+    if (open_browser) utils::browseURL(paste0("http://", host, ":", port))
     on.exit(session$stop())
     httpuv::service(Inf)
 }
