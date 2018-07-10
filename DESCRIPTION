@@ -12,7 +12,7 @@ Description: shinyloadtest provides functions for recording user sessions,
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Imports: 
+Imports:
     websocket,
     curl,
     httpuv,
@@ -26,7 +26,12 @@ Imports:
     tibble,
     dplyr,
     readr,
-    magrittr
+    magrittr,
+    viridis,
+    shiny,
+    glue,
+    RColorBrewer,
+    lubridate
 Remotes: rstudio/websocket,
     rstudio/httpuv
 RoxygenNote: 6.0.1.9000
