@@ -51,28 +51,27 @@ shiny::renderPlot({{plot_gantt(df)}})
 shiny::renderPlot({{plot_gantt_duration(df)}})
 ```
 
-### Latency per session
-
-```{{r}}
-shiny::renderPlot({{plot_gantt_latency(df)}})
-```
-
-
 
 # Time
 
 ## Row
 
-### Elapsed Time Event Waterfall
-
-```{{r}}
-shiny::renderPlot({{plot_timeline_stacked(df)}})
-```
-
 ### Page Load Time
 
 ```{{r}}
 shiny::renderPlot({{hist_loadtimes_stacked(df)}})
+```
+
+### Elapsed Time Event Waterfall
+
+```{{r}}
+shiny::renderPlot({{plot_timeline(df)}})
+```
+
+### Latency per session
+
+```{{r}}
+shiny::renderPlot({{plot_gantt_latency(df)}})
 ```
 
 # Event Duration
