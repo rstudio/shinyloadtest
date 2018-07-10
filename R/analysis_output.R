@@ -1,6 +1,7 @@
 #' Make shinyloadtest Report
 #'
 #' @param df data.frame returned from \code{\link{tidy_loadtest}}
+#' @export
 make_report <- function(df) {
   output_file = tempfile(fileext = ".Rmd")
   report <- glue_report(df)
@@ -56,13 +57,13 @@ shiny::renderPlot({{plot_gantt_duration(df)}})
 
 ## Row
 
-### Page Load Time
+### Page load time
 
 ```{{r}}
 shiny::renderPlot({{hist_loadtimes_stacked(df)}})
 ```
 
-### Elapsed Time Event Waterfall
+### Elapsed event time waterfall
 
 ```{{r}}
 shiny::renderPlot({{plot_timeline(df)}})
