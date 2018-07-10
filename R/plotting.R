@@ -83,7 +83,8 @@ plot_timeline <- function(df) {
     labs(
       x = "Total elapsed time", y = NULL,
       subtitle = "vertical is better"
-    )
+    ) +
+    theme(legend.position = "bottom")
 }
 #' @export
 #' @rdname analysis_plots

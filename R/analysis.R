@@ -34,10 +34,13 @@ read_log_file <- function(file) {
 # Read a "sessions/" directory full of .log files
 read_log_dir <- function(dir, name = basename(dirname(dir))) {
   files <- list.files(dir, pattern = "*.csv", full.names = TRUE)
+  if (length(files) == 0) {
+    stop("No files found for dir: ", dir)
+  }
   df <- lapply(files, read_log_file) %>%
     bind_rows() %>%
     arrange(timestamp) %>%
-    mutate(timestamp = (timestamp - min(timestamp)) / 1000)
+    mutate(timestamp = (.$timestamp - min(.$timestamp)) / 1000)
 
   relative_concurrency <- with(df, {
     ifelse(event == "WS_OPEN_START", 1,
