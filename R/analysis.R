@@ -12,7 +12,6 @@ strip_suffix <- function(str) {
 
 # Read a single .log file
 read_log_file <- function(file) {
-  sess <- basename(file) %>% sub(".log$", "", .) %>% as.integer()
   suppressWarnings({
     df <- readr::read_csv(
       file,
