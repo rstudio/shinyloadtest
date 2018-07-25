@@ -127,7 +127,7 @@ hist_loadtimes <- function(df, max_load_time = 5) {
     theme(legend.position = "bottom")
 
   if (length(levels(df$run)) > 1) {
-    p <- p + facet_wrap(facets = vars(baseline, run))
+    p <- p + facet_grid(rows = vars(baseline, run))
   }
   p
 }
