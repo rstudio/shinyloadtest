@@ -337,10 +337,10 @@ latency_df <- function(df) {
     # mutate(session_id = factor(session_id, levels = rev(unique(session_id)))) %>%
     mutate(worker_id = paste0("w:", worker_id)) %>%
     mutate(session_id = factor(session_id, levels = session_levels)) %>%
-    mutate(event = c(REQ_HOME="REQ", REQ_GET="REQ", WS_OPEN="WS", WS_RECV="WS", WS_SEND="WS")[event]) %>%
+    mutate(event = c(REQ_HOME="Homepage", REQ_GET="JS/CSS", WS_OPEN="WS", WS_RECV="WS", WS_SEND="WS")[event]) %>%
     mutate(event = factor(event,
-      levels = c("REQ", "WS"),
-      labels = c("HTTP", "WebSocket"))) %>%
+      levels = c("Homepage", "JS/CSS", "WS"),
+      labels = c("Homepage", "JS/CSS", "WebSocket"))) %>%
     group_by(baseline, run, session_id, event, worker_id) %>%
     summarise(total_latency = sum(time), max_latency = max(time))
   df_sum
@@ -409,8 +409,10 @@ plot_gantt_latency <- function(df) {
     # ) +
     geom_col(position = position_stack(reverse = TRUE)) +
     # geom_step(position = position_stack(reverse = TRUE)) +
-    facet_grid(rows = vars(baseline, run), cols = vars(event)) +
-    scale_fill_manual(values = RColorBrewer::brewer.pal(4, "RdBu")[c(1,3)]) +
+    facet_grid(rows = vars(baseline, run)) +
+    # facet_grid(rows = vars(baseline, run), cols = vars(event)) +
+    # scale_fill_manual(values = RColorBrewer::brewer.pal(4, "RdBu")[c(1,3)]) +
+    # scale_fill_manual(values = RColorBrewer::brewer.pal(4, "RdBu")[c(1,3)]) +
     scale_x_discrete(labels = session_breaks, breaks = session_breaks) +
     labs(
       x = "Session",
@@ -419,6 +421,61 @@ plot_gantt_latency <- function(df) {
     ) +
     theme(legend.position = "bottom")
 }
+# total HTTP - already displayed
+# max WebSocket
+plot_gantt_http_latency <- function(df) {
+  df_sum <- latency_df(df) %>% filter(event == "HTTP")
+  session_levels <- levels(df_sum$session_id)
+  if (length(session_levels) > 20) {
+    session_breaks <- session_levels[seq_along(session_levels) %% 5 == 1]
+  } else {
+    session_breaks <- session_levels
+  }
+
+  ggplot(
+    df_sum,
+    aes(session_id, total_latency, fill = event, group = event)
+  ) +
+    geom_col(position = position_stack(reverse = TRUE)) +
+    # geom_step(position = position_stack(reverse = TRUE)) +
+    facet_grid(rows = vars(baseline, run)) +
+    scale_fill_manual(values = RColorBrewer::brewer.pal(4, "RdBu")[c(1,3)]) +
+    scale_x_discrete(labels = session_breaks, breaks = session_breaks) +
+    labs(
+      x = "Session",
+      y = "Total HTTP Latency (sec)",
+      subtitle = "shorter bar is better"
+    ) +
+    theme(legend.position = "bottom")
+}
+plot_gantt_websocket_latency <- function(df) {
+  df_sum <- latency_df(df) %>% filter(event == "WebSocket")
+  session_levels <- levels(df_sum$session_id)
+  if (length(session_levels) > 20) {
+    session_breaks <- session_levels[seq_along(session_levels) %% 5 == 1]
+  } else {
+    session_breaks <- session_levels
+  }
+
+  scales::hue_pal()(4)
+
+  ggplot(
+    df_sum,
+    aes(session_id, max_latency, fill = event, group = event)
+  ) +
+    geom_col(position = position_stack(reverse = TRUE)) +
+    # geom_step(position = position_stack(reverse = TRUE)) +
+    facet_grid(rows = vars(baseline, run)) +
+    scale_fill_manual(values = RColorBrewer::brewer.pal(4, "RdBu")[c(3)]) +
+    scale_x_discrete(labels = session_breaks, breaks = session_breaks) +
+    labs(
+      x = "Session",
+      y = "Maximum WebSocket Latency (sec)",
+      subtitle = "shorter bar is better"
+    ) +
+    theme(legend.position = "bottom")
+}
+
 
 # plot_gantt_latency_stacked <- function(df) {
 #

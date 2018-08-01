@@ -25,7 +25,7 @@ title: "shinyloadtest report"
 runtime: shiny
 output:
   flexdashboard::flex_dashboard:
-    theme: simplex
+    # theme: simplex
     orientation: rows
     # social: menu
 ---
