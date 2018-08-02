@@ -4,13 +4,11 @@
 \alias{tidy_loadtest}
 \title{Create Tidy Load Test Results}
 \usage{
-tidy_loadtest(..., baselineName = names(list(...))[1])
+tidy_loadtest(...)
 }
 \arguments{
 \item{...}{Key-value pairs where the key is the desired name for the test and the
 value is a path to the test result directory.}
-
-\item{baselineName}{string matching a name of \code{...}. Defaults to the first name.}
 }
 \value{
 A tidy data frame with the test result data. Each row is an event. Columns include

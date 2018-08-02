@@ -1,7 +1,9 @@
 if (getRversion() >= "2.15.1") {
   # TODO remove and upgrade the dplyr fns to FN_()
-  utils::globalVariables(c("input_line_number", "run", "session_id", "worker_id", "iteration", "event", "timestamp", "concurrency", "center", "event_class", "total_latency", ".", "type"))
+  utils::globalVariables(c("input_line_number", "run", "session_id", "user_id", "iteration", "event", "timestamp", "concurrency", "center", "event_class", "total_latency", ".", "type"))
 }
+
+cutoffColor <- "red"
 
 # Utility functions -------------------------------------------------------
 
@@ -27,7 +29,9 @@ read_log_file <- function(file) {
       comment = "#"
     )
   })
-  df
+  df %>%
+    mutate(user_id = worker_id) %>%
+    select(- worker_id)
 }
 
 # Read a "sessions/" directory full of .log files
@@ -47,8 +51,10 @@ read_log_dir <- function(dir, name = basename(dirname(dir))) {
                   0))
   })
   df <- df %>%
-    mutate(concurrency = cumsum(relative_concurrency),
-           run = name)
+    mutate(
+      concurrency = cumsum(relative_concurrency),
+      run = name
+    )
 
   df
 }
@@ -77,7 +83,7 @@ read_recording <- function(fileName) {
     bind_rows() %>%
     mutate(
       session_id = -1,
-      worker_id = -1,
+      user_id = -1,
       iteration = -1,
       input_line_number = seq_len(nrow(.)),
       time = end - start,
@@ -85,7 +91,7 @@ read_recording <- function(fileName) {
       label = paste0(input_line_number, ":", event)
     ) %>%
     select(
-      session_id, worker_id, iteration,
+      session_id, user_id, iteration,
       input_line_number,
       event,
       start, end, time,
@@ -97,7 +103,7 @@ read_recording <- function(fileName) {
 get_times <- function(df) {
   df %>%
     filter(!is.na(input_line_number)) %>%
-    group_by(run, session_id, worker_id, iteration, input_line_number) %>%
+    group_by(run, session_id, user_id, iteration, input_line_number) %>%
     summarise(event = strip_suffix(event[1]),
               start = min(timestamp),
               end = max(timestamp),
@@ -118,8 +124,6 @@ get_times <- function(df) {
 #'   directories into a tidy data frame.
 #' @param ...  Key-value pairs where the key is the desired name for the test and the
 #'   value is a path to the test result directory.
-#' @param baselineName string matching a name of \code{...}. Defaults to the first name.
-#'
 #' @return A tidy data frame with the test result data. Each row is an event. Columns include
 #'    identifiers and timing information for the event.
 #' @export
@@ -130,20 +134,11 @@ get_times <- function(df) {
 #'      `2 cores` = 'results/test-2/'
 #'   )
 #' }
-tidy_loadtest <- function(..., baselineName = names(list(...))[1]) {
+tidy_loadtest <- function(...) {
 
   # TODO: Validate input directories and fail intelligently!
 
   run_levels <- names(list(...))
-
-  if (!all(baselineName %in% run_levels)) {
-    notFound <- baselineName[baselineName %in% run_levels]
-    message(
-      "baselineName: ", notFound, "' not found in names of shinycannon output supplied.\n",
-      "Supplied: ", paste(baselineName, collapse = "', '"), "\n",
-      "Available: ", paste(run_levels, collapse = "', '")
-    )
-  }
 
   df <- list(...) %>%
     lapply(file.path, "workers") %>%
@@ -151,7 +146,7 @@ tidy_loadtest <- function(..., baselineName = names(list(...))[1]) {
     lapply(get_times) %>%
     bind_rows() %>%
     filter(event != "PLAYBACK_SLEEPBEFORE", event != "PLAYER_SESSION") %>%
-    arrange(input_line_number, run) %>%
+    arrange(run, user_id, session_id, input_line_number, ) %>%
     mutate(
       label = paste0(input_line_number, ":", event),
       type = "record"
@@ -183,13 +178,63 @@ tidy_loadtest <- function(..., baselineName = names(list(...))[1]) {
   df <- df %>%
     mutate(
       label = factor(input_line_number, fct_levels, fct_labels, ordered = TRUE),
-      run = factor(run, run_levels, ordered = TRUE),
-      baseline = factor(ifelse(run %in% baselineName, "baseline", "test"), c("baseline", "test"), ordered = TRUE)
+      run = factor(run, run_levels, ordered = TRUE)
+    )
+
+  df$id <- seq_len(nrow(df))
+  df_filtered <- filter_df(df)
+
+  df <- df %>%
+    ungroup() %>%
+    mutate(
+      maintenance = id %in% df_filtered$id
     )
 
   df
 }
 
+
+
+filter_df_start_time <- function(df) {
+  df_start <- df %>%
+    group_by(user_id) %>%
+    summarise(start_time = min(start))
+  max(df_start$start_time)
+}
+filter_df_end_time <- function(df) {
+  df_end <- df %>%
+    group_by(user_id) %>%
+    summarise(end_time = max(end))
+  min(df_end$end_time)
+}
+filter_df <- function(
+  df,
+  start_time,
+  end_time
+) {
+  is_missing_start_time <- missing(start_time)
+  is_missing_end_time <- missing(end_time)
+  lapply(
+    unique(df$run),
+    function(runVal) {
+
+      df_run <- df %>% filter(run == runVal)
+
+      if (is_missing_start_time) start_time <- filter_df_start_time(df_run)
+      if (is_missing_end_time) end_time <- filter_df_end_time(df_run)
+
+      df_times <- df_run %>%
+        group_by(session_id) %>%
+        summarise(min_start = min(start), max_end = max(end)) %>%
+        filter(min_start >= start_time, max_end <= end_time)
+
+      df_run %>%
+        ungroup() %>%
+        filter(session_id %in% df_times$session_id)
+    }
+  ) %>%
+    bind_rows()
+}
 
 
 
@@ -210,35 +255,62 @@ plot_concurrency_time_by_eventtype <- function(df) {
 #' @export
 #' @rdname analysis_plots
 plot_gantt <- function(df) {
-  df %>%
+  df_gantt <- df %>%
     filter(event != "WS_RECV_INIT", event != "WS_CLOSE") %>%
-    mutate(worker_id = factor(worker_id, levels = rev(unique(worker_id)))) %>%
+    mutate(user_id = factor(user_id, levels = rev(unique(user_id)))) %>%
     mutate(center = (end + start) / 2) %>%
     mutate(event = factor(event,
       levels = c("REQ_HOME", "REQ_GET", "WS_OPEN", "WS_RECV", "WS_SEND"),
-      labels = c("Homepage", "JS/CSS", "Start session", "Calculate", "WS_SEND"))) %>%
-    ggplot(aes(x = center, y = worker_id, width = (end - start), fill = event)) +
-      geom_tile(height = 1, color = "#444444") + #, size = 0.3) +
-      facet_grid(rows = vars(baseline, run), scales="free_y", space="free_y") +
-      # scale_fill_viridis_c() +
-      scale_y_discrete(labels = {
-        rev(unique(df$worker_id))
-      }, breaks = {
-        rev(unique(df$worker_id))
-      }) +
-      labs(
-        x = "Elapsed time (sec)",
-        y = "Session #",
-        subtitle = "smaller bar width is better"
-      ) +
-      theme(legend.position = "bottom")
+      labels = c("Homepage", "JS/CSS", "Start session", "Calculate", "WS_SEND")))
+
+  cols <- scales::hue_pal()(4)
+  colors <- c("Homepage" = cols[1], "JS/CSS" = cols[2], "Start session" = cols[3], "Calculate" = cols[4])
+  colorsMuted <- scales::muted(colors, 87, 10)
+  colorsAll <- c(
+    "Homepage" = colors[["Homepage"]],
+    "JS/CSS" = colors[["JS/CSS"]],
+    "Start session" = colors[["Start session"]],
+    "Calculate" = colors[["Calculate"]],
+    "TRUE_Homepage" = colors[["Homepage"]],
+    "TRUE_JS/CSS" = colors[["JS/CSS"]],
+    "TRUE_Start session" = colors[["Start session"]],
+    "TRUE_Calculate" = colors[["Calculate"]],
+    "FALSE_Homepage" = colorsMuted[["Homepage"]],
+    "FALSE_JS/CSS" = colorsMuted[["JS/CSS"]],
+    "FALSE_Start session" = colorsMuted[["Start session"]],
+    "FALSE_Calculate" = colorsMuted[["Calculate"]]
+  )
+
+  df_gantt$colorCol <- paste0(df_gantt$maintenance, "_", df_gantt$event)
+  print(colors)
+  print(colorsMuted)
+  print(colorsMuted[["Homepage"]])
+  print(colorsAll)
+  print(unique(df_gantt$colorCol))
+
+  ggplot(df_gantt, aes(x = center, y = user_id, width = (end - start), fill = colorCol)) +
+    geom_tile(height = 1, color = "#444444") + #, size = 0.3) +
+    scale_fill_manual(values = colorsAll, limits = c("Homepage", "JS/CSS", "Start session", "Calculate")) +
+    facet_grid(rows = vars(run), scales="free_y", space="free_y") +
+    # scale_fill_viridis_c() +
+    scale_y_discrete(labels = {
+      rev(unique(df$user_id))
+    }, breaks = {
+      rev(unique(df$user_id))
+    }) +
+    labs(
+      x = "Elapsed time (sec)",
+      y = "Session #",
+      subtitle = "smaller bar width is better"
+    ) +
+    theme(legend.position = "bottom")
 }
 #' @export
 #' @rdname analysis_plots
 plot_gantt_session <- function(df) {
   df %>%
     filter(event != "WS_RECV_INIT") %>%
-    mutate(worker_id = factor(worker_id, levels = rev(unique(worker_id)))) %>%
+    mutate(user_id = factor(user_id, levels = rev(unique(user_id)))) %>%
     mutate(session_id = factor(session_id, levels = rev(unique(session_id)))) %>%
     mutate(center = (end + start) / 2) %>%
     mutate(event = factor(event,
@@ -246,7 +318,7 @@ plot_gantt_session <- function(df) {
       labels = c("Homepage", "JS/CSS", "Start session", "Calculate", "WS_SEND"))) %>%
     ggplot(aes(x = center, y = session_id, width = (end - start), fill = event)) +
       geom_tile(height = 1, color = "#444444") + #, size = 0.3) +
-      facet_grid(rows = vars(baseline, run), scales="free_y", space="free_y") +
+      facet_grid(rows = vars(run), scales="free_y", space="free_y") +
       # scale_fill_viridis_c() +
       scale_y_discrete(labels = {
         rev(unique(df$session_id))[seq_along(unique(df$session_id)) %% 5 == 0]
@@ -262,24 +334,24 @@ plot_gantt_session <- function(df) {
 plot_gantt_iteration <- function(df) {
   df %>%
     filter(event != "WS_RECV_INIT") %>%
-    mutate(worker_id = factor(worker_id, levels = rev(unique(worker_id)))) %>%
+    mutate(user_id = factor(user_id, levels = rev(unique(user_id)))) %>%
     mutate(session_id = factor(session_id, levels = rev(unique(session_id)))) %>%
     mutate(center = (end + start) / 2) %>%
     mutate(event = factor(event,
       levels = c("REQ_HOME", "REQ_GET", "WS_OPEN", "WS_RECV", "WS_SEND"),
       labels = c("Homepage", "JS/CSS", "Start session", "Calculate", "WS_SEND"))) %>%
-    ggplot(aes(x = center, y = worker_id, width = (end - start),
+    ggplot(aes(x = center, y = user_id, width = (end - start),
       # fill = (iteration %% 2 == 0)
       fill = as.factor(iteration)
     )) +
       geom_tile(height = 1, color = "#444444") + #, size = 0.3) +
-      facet_grid(rows = vars(baseline, run), scales="free_y", space="free_y") +
+      facet_grid(rows = vars(run), scales="free_y", space="free_y") +
       # scale_fill_discrete("iteration", breaks = c(TRUE, FALSE), labels = c("even", "odd")) +
       # scale_fill_viridis_c() +
       scale_y_discrete(labels = {
-        rev(unique(df$worker_id))
+        rev(unique(df$user_id))
       }, breaks = {
-        rev(unique(df$worker_id))
+        rev(unique(df$user_id))
       }) +
       ylab("Session #") +
       xlab("Elapsed time (sec)") +
@@ -289,16 +361,16 @@ plot_gantt_iteration <- function(df) {
 
 #' @export
 #' @rdname analysis_plots
-plot_gantt_duration <- function(df) {
+plot_gantt_duration <- function(df, cutoff = 10) {
   df1 <- df %>%
     filter(event != "WS_RECV_INIT") %>%
-    group_by(run, session_id, worker_id, iteration) %>%
+    group_by(run, session_id, user_id, iteration) %>%
     mutate(end = end - min(start), start = start - min(start)) %>%
     ungroup()
 
   sessions <- df1 %>%
     filter(event != "WS_RECV_INIT") %>%
-    group_by(run, session_id, worker_id, iteration) %>%
+    group_by(run, session_id, user_id, iteration) %>%
     summarise(max = max(end)) %>%
     arrange(run, desc(max)) %>%
     group_by(run) %>%
@@ -306,7 +378,7 @@ plot_gantt_duration <- function(df) {
     ungroup()
 
   df1 <- df1 %>%
-    inner_join(sessions, by = c("run", "session_id", "worker_id", "iteration"))
+    inner_join(sessions, by = c("run", "session_id", "user_id", "iteration"))
   df1 %>%
     mutate(center = (end + start) / 2) %>%
     mutate(event = factor(event,
@@ -314,9 +386,9 @@ plot_gantt_duration <- function(df) {
       labels = c("Homepage", "JS/CSS", "Start session", "Calculate", "WS_SEND"))) %>%
     ggplot(aes(x = center, y = order, width = (end - start), fill = event)) +
       geom_tile(height = 1, color = "#444444") + #, size = 0.3) +
-      facet_grid(rows = vars(baseline, run), scales="free_y", space="free_y") +
+      facet_grid(rows = vars(run), scales="free_y", space="free_y") +
       # scale_fill_brewer(palette = "RdBu") +
-      geom_vline(xintercept = 10, color = "yellow") +
+      geom_vline(xintercept = cutoff, color = cutoffColor) +
       theme(
         axis.text.y=element_blank(),
         axis.ticks.y=element_blank()) +
@@ -335,13 +407,13 @@ latency_df <- function(df) {
   df_sum <- df %>%
     filter(event != "WS_RECV_INIT") %>%
     # mutate(session_id = factor(session_id, levels = rev(unique(session_id)))) %>%
-    mutate(worker_id = paste0("w:", worker_id)) %>%
+    mutate(user_id = paste0("w:", user_id)) %>%
     mutate(session_id = factor(session_id, levels = session_levels)) %>%
     mutate(event = c(REQ_HOME="Homepage", REQ_GET="JS/CSS", WS_OPEN="WS", WS_RECV="WS", WS_SEND="WS")[event]) %>%
     mutate(event = factor(event,
       levels = c("Homepage", "JS/CSS", "WS"),
       labels = c("Homepage", "JS/CSS", "WebSocket"))) %>%
-    group_by(baseline, run, session_id, event, worker_id) %>%
+    group_by(run, session_id, event, user_id) %>%
     summarise(total_latency = sum(time), max_latency = max(time))
   df_sum
 }
@@ -403,14 +475,14 @@ plot_gantt_latency <- function(df) {
     aes(session_id, max_latency, fill = event, group = event)
   ) +
     # geom_text(
-    #   aes(label = worker_id),
+    #   aes(label = user_id),
     #   color = "black", vjust = 0,
     #   position = position_stack(reverse = TRUE)
     # ) +
     geom_col(position = position_stack(reverse = TRUE)) +
     # geom_step(position = position_stack(reverse = TRUE)) +
-    facet_grid(rows = vars(baseline, run)) +
-    # facet_grid(rows = vars(baseline, run), cols = vars(event)) +
+    facet_grid(rows = vars(run)) +
+    # facet_grid(rows = vars(run), cols = vars(event)) +
     # scale_fill_manual(values = RColorBrewer::brewer.pal(4, "RdBu")[c(1,3)]) +
     # scale_fill_manual(values = RColorBrewer::brewer.pal(4, "RdBu")[c(1,3)]) +
     scale_x_discrete(labels = session_breaks, breaks = session_breaks) +
@@ -423,14 +495,19 @@ plot_gantt_latency <- function(df) {
 }
 # total HTTP - already displayed
 # max WebSocket
-plot_gantt_http_latency <- function(df) {
-  df_sum <- latency_df(df) %>% filter(event == "HTTP")
+plot_http_latency <- function(df, cutoff = 10) {
+  df_sum <- latency_df(df) %>%
+    ungroup() %>%
+    filter(event == "Homepage" | event == "JS/CSS") %>%
+    mutate(event = factor(event, levels = c("Homepage", "JS/CSS"), ordered = TRUE))
   session_levels <- levels(df_sum$session_id)
   if (length(session_levels) > 20) {
     session_breaks <- session_levels[seq_along(session_levels) %% 5 == 1]
   } else {
     session_breaks <- session_levels
   }
+  cols <- scales::hue_pal()(4)
+  colors <- c("Homepage" = cols[1], "JS/CSS" = cols[2])
 
   ggplot(
     df_sum,
@@ -438,9 +515,10 @@ plot_gantt_http_latency <- function(df) {
   ) +
     geom_col(position = position_stack(reverse = TRUE)) +
     # geom_step(position = position_stack(reverse = TRUE)) +
-    facet_grid(rows = vars(baseline, run)) +
-    scale_fill_manual(values = RColorBrewer::brewer.pal(4, "RdBu")[c(1,3)]) +
+    facet_grid(rows = vars(run)) +
+    scale_fill_manual(values = colors) +
     scale_x_discrete(labels = session_breaks, breaks = session_breaks) +
+    geom_hline(yintercept = cutoff, color = cutoffColor) +
     labs(
       x = "Session",
       y = "Total HTTP Latency (sec)",
@@ -448,7 +526,7 @@ plot_gantt_http_latency <- function(df) {
     ) +
     theme(legend.position = "bottom")
 }
-plot_gantt_websocket_latency <- function(df) {
+plot_websocket_latency <- function(df, cutoff = 10) {
   df_sum <- latency_df(df) %>% filter(event == "WebSocket")
   session_levels <- levels(df_sum$session_id)
   if (length(session_levels) > 20) {
@@ -457,17 +535,18 @@ plot_gantt_websocket_latency <- function(df) {
     session_breaks <- session_levels
   }
 
-  scales::hue_pal()(4)
+  cols <- scales::hue_pal()(4)
+  colors <- c("WebSocket" = cols[3])
 
   ggplot(
     df_sum,
     aes(session_id, max_latency, fill = event, group = event)
   ) +
     geom_col(position = position_stack(reverse = TRUE)) +
-    # geom_step(position = position_stack(reverse = TRUE)) +
-    facet_grid(rows = vars(baseline, run)) +
-    scale_fill_manual(values = RColorBrewer::brewer.pal(4, "RdBu")[c(3)]) +
+    facet_grid(rows = vars(run)) +
+    scale_fill_manual(values = colors) +
     scale_x_discrete(labels = session_breaks, breaks = session_breaks) +
+    geom_hline(yintercept = cutoff, color = cutoffColor) +
     labs(
       x = "Session",
       y = "Maximum WebSocket Latency (sec)",
@@ -487,7 +566,7 @@ plot_gantt_websocket_latency <- function(df) {
 #       mutate(event = factor(event,
 #         levels = c("REQ", "WS"),
 #         labels = c("HTTP", "WebSocket"))) %>%
-#       group_by(baseline, run, session_id, event_class, worker_id) %>%
+#       group_by(baseline, run, session_id, event_class, user_id) %>%
 #       summarise(total_latency = sum(time))
 #   }
 #
@@ -510,7 +589,7 @@ plot_gantt_websocket_latency <- function(df) {
 #   ggplot(data = dfNonBaseline, aes(session_id, total_latency, fill = I(.col), group = event_class)) +
 #     geom_col(data = dfBaseline, position = position_stack(reverse = TRUE), show.legend = FALSE, col = "black") +
 #     geom_col(position = position_stack(reverse = TRUE), alpha = 0.25, col = "grey") +
-#     geom_text(aes(label = worker_id), color = "black", vjust = 0, position = position_stack(reverse = TRUE)) +
+#     geom_text(aes(label = user_id), color = "black", vjust = 0, position = position_stack(reverse = TRUE)) +
 #     # geom_step(position = position_stack(reverse = TRUE)) +
 #     facet_grid(rows = vars(baseline, run)) +
 #     # scale_fill_manual(values = ) +

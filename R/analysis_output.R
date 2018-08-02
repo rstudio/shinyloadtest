@@ -31,7 +31,7 @@ output:
 ---
 
 ```{{r, include=FALSE}}
-base::library(shinyloadtest)
+library(shinyloadtest)
 df <- readRDS("{fileLocation}")
 ```
 
@@ -41,7 +41,7 @@ df <- readRDS("{fileLocation}")
 
 ## Row
 
-### Worker activity over time
+### Session activity over time
 
 ```{{r}}
 shiny::renderPlot({{plot_gantt(df)}})
@@ -58,24 +58,22 @@ shiny::renderPlot({{plot_gantt_duration(df)}})
 
 ## Row
 
-### Page load time
-
-```{{r}}
-shiny::renderPlot({{hist_loadtimes(df)}})
-```
-
 ### Elapsed event time waterfall
 
 ```{{r}}
 shiny::renderPlot({{plot_timeline(df)}})
 ```
 
-### Latency per session
+### Total http latency per session
 
 ```{{r}}
-shiny::renderPlot({{
-  plot_gantt_latency(df)
-}})
+shiny::renderPlot({{plot_http_latency(df)}})
+```
+
+### Maximum websocket latency per session
+
+```{{r}}
+shiny::renderPlot({{plot_websocket_latency(df)}})
 ```
 
 # Event Duration

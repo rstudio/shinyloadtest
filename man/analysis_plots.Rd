@@ -9,7 +9,6 @@
 \alias{plot_gantt_latency}
 \alias{plot_timestamp_time}
 \alias{plot_timeline}
-\alias{plot_timeline_stacked}
 \title{Analysis plots}
 \usage{
 plot_concurrency_time_by_eventtype(df)
@@ -27,8 +26,6 @@ plot_gantt_latency(df)
 plot_timestamp_time(df)
 
 plot_timeline(df)
-
-plot_timeline_stacked(df)
 }
 \arguments{
 \item{df}{dataframe returned from \code{\link{tidy_loadtest}}}

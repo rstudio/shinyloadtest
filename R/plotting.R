@@ -1,6 +1,6 @@
 if (getRversion() >= "2.15.1") {
   # TODO remove and upgrade the dplyr fns to FN_()
-  utils::globalVariables(c("baseline", "start", "end", "ready", "begin", "label", "time"))
+  utils::globalVariables(c("start", "end", "ready", "begin", "label", "time"))
 }
 
 
@@ -78,7 +78,7 @@ plot_timeline <- function(df) {
     scale_color_viridis_c() +
     scale_y_discrete(limits = rev(levels(df$label))) +
     facet_grid(
-      rows = vars(baseline, run)
+      rows = vars(run)
     ) +
     labs(
       x = "Total elapsed time", y = NULL,
@@ -86,25 +86,25 @@ plot_timeline <- function(df) {
     ) +
     theme(legend.position = "bottom")
 }
-#' @export
-#' @rdname analysis_plots
-plot_timeline_stacked <- function(df) {
-  dfNonBaseline <- df %>% filter(baseline != "baseline")
-  dfBaseline <- df %>% filter(baseline == "baseline")
-  dfNonBaseline %>%
-    # filter(session %% 5 == 1) %>%
-    ggplot(aes(end, label, group = session_id, color = concurrency)) +
-    geom_line(data = dfBaseline %>% select(-run), color = "grey", size = 1.2) +
-    geom_line(size = 1.2, alpha = 0.5) +
-    scale_color_viridis_c() +
-    scale_y_discrete(limits = rev(levels(df$label))) +
-    facet_grid(rows = vars(run), scales = "free_x", space = "free_x") +
-    labs(
-      x = "Total elapsed time", y = NULL,
-      subtitle = "vertical is better. baseline grey, in background"
-    ) +
-    theme(legend.position = "bottom")
-}
+# ' @export
+# ' @rdname analysis_plots
+# plot_timeline_stacked <- function(df) {
+#   dfNonBaseline <- df %>% filter(baseline != "baseline")
+#   dfBaseline <- df %>% filter(baseline == "baseline")
+#   dfNonBaseline %>%
+#     # filter(session %% 5 == 1) %>%
+#     ggplot(aes(end, label, group = session_id, color = concurrency)) +
+#     geom_line(data = dfBaseline %>% select(-run), color = "grey", size = 1.2) +
+#     geom_line(size = 1.2, alpha = 0.5) +
+#     scale_color_viridis_c() +
+#     scale_y_discrete(limits = rev(levels(df$label))) +
+#     facet_grid(rows = vars(run), scales = "free_x", space = "free_x") +
+#     labs(
+#       x = "Total elapsed time", y = NULL,
+#       subtitle = "vertical is better. baseline grey, in background"
+#     ) +
+#     theme(legend.position = "bottom")
+# }
 
 
 
@@ -117,7 +117,7 @@ plot_timeline_stacked <- function(df) {
 #' @export
 hist_loadtimes <- function(df, max_load_time = 5) {
   p <- df %>%
-    group_by(run, baseline, session_id) %>%
+    group_by(run, session_id) %>%
     summarise(begin = min(start), ready = start[event == "WS_OPEN"], finish = max(end)) %>%
     ggplot(aes(ready - begin)) +
     geom_histogram() +
@@ -127,38 +127,38 @@ hist_loadtimes <- function(df, max_load_time = 5) {
     theme(legend.position = "bottom")
 
   if (length(levels(df$run)) > 1) {
-    p <- p + facet_grid(rows = vars(baseline, run))
+    p <- p + facet_grid(rows = vars(run))
   }
   p
 }
-#' @export
-#' @rdname hist_loadtimes
-hist_loadtimes_stacked <- function(df, max_load_time = 5) {
-  dfNonBaseline <- df %>%
-    filter(baseline != "baseline") %>%
-    group_by(run, session_id) %>%
-    summarise(begin = min(start), ready = start[event == "WS_OPEN"], finish = max(end))
-  dfBaseline <- df %>%
-    filter(baseline == "baseline") %>%
-    group_by(run, session_id) %>%
-    summarise(begin = min(start), ready = start[event == "WS_OPEN"], finish = max(end)) %>%
-    ungroup() %>%
-    select(-run)
-
-  p <- dfNonBaseline %>%
-    ggplot(aes(ready - begin, fill = run)) +
-    geom_histogram(data = dfBaseline, fill = "#252525", alpha = 0.5) +
-    geom_histogram(alpha = 0.5) +
-    geom_vline(xintercept = max_load_time, color = "red") +
-    labs(
-      x = "Inital Page Load Time (sec)",
-      y = "Session #",
-      subtitle = "shorter bar is better. baseline grey, in background"
-    ) +
-    theme(legend.position = "bottom")
-
-  if (length(levels(dfNonBaseline$run)) > 1) {
-    p <- p + facet_wrap(facets = vars(run))
-  }
-  p
-}
+# ' @export
+# ' @rdname hist_loadtimes
+# hist_loadtimes_stacked <- function(df, max_load_time = 5) {
+#   dfNonBaseline <- df %>%
+#     filter(baseline != "baseline") %>%
+#     group_by(run, session_id) %>%
+#     summarise(begin = min(start), ready = start[event == "WS_OPEN"], finish = max(end))
+#   dfBaseline <- df %>%
+#     filter(baseline == "baseline") %>%
+#     group_by(run, session_id) %>%
+#     summarise(begin = min(start), ready = start[event == "WS_OPEN"], finish = max(end)) %>%
+#     ungroup() %>%
+#     select(-run)
+#
+#   p <- dfNonBaseline %>%
+#     ggplot(aes(ready - begin, fill = run)) +
+#     geom_histogram(data = dfBaseline, fill = "#252525", alpha = 0.5) +
+#     geom_histogram(alpha = 0.5) +
+#     geom_vline(xintercept = max_load_time, color = "red") +
+#     labs(
+#       x = "Inital Page Load Time (sec)",
+#       y = "Session #",
+#       subtitle = "shorter bar is better. baseline grey, in background"
+#     ) +
+#     theme(legend.position = "bottom")
+#
+#   if (length(levels(dfNonBaseline$run)) > 1) {
+#     p <- p + facet_wrap(facets = vars(run))
+#   }
+#   p
+# }
