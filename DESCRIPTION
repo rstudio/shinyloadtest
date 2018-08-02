@@ -6,7 +6,7 @@ Authors@R: c(
             person("Alan", "Dipert", role = c("aut", "cre"), email = "alan@rstudio.com"),
             person("Barbara", "Borges", role = c("aut"), email = "barbara@rstudio.com")
             )
-Description: shinyloadtest provides functions for recording user sessions, 
+Description: shinyloadtest provides functions for recording user sessions,
     playing those sessions back in parallel to simulate load, and analzying
     the results.
 License: GPL-3
@@ -31,10 +31,12 @@ Imports:
     shiny,
     glue,
     RColorBrewer,
-    lubridate
+    lubridate,
+    DT,
+    flexdashboard
 Remotes: rstudio/websocket,
     rstudio/httpuv
-RoxygenNote: 6.0.1.9000
+RoxygenNote: 6.1.0
 Suggests:
     knitr,
     rmarkdown
