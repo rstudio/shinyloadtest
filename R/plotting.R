@@ -15,6 +15,7 @@ NULL
 #' @name plot_loadtest
 #' @param df data frame returned from \code{\link{tidy_loadtest}}
 #' @param labels A vector of labels to include.  If none are supplied, all labels will be used.
+#' @param cutoff Where to draw a horizontal or vertical line to display a resonable cutoff line for requests.
 #' @param max_load_time The amount of time users will wait for the page to load
 #'   when first requesting the app.
 #' @rdname plot_loadtest
