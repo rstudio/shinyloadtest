@@ -3,15 +3,25 @@ if (getRversion() >= "2.15.1") {
   utils::globalVariables(c("start", "end", "ready", "begin", "label", "time"))
 }
 
+#' @import ggplot2 dplyr
+NULL
 
 # Plotting functions ------------------------------------------------------
 
-
-#' Boxplot of Event Duration
+#' Plotting outputs for tidy_loadtest
 #'
-#' @param df A tidy data frame of test results. See \code{\link{tidy_loadtest}}
-#' @param labels A vector of labels to include
-#' @import ggplot2
+#' Many different plotting routines to display different loadtest information.
+#'
+#' @name plot_loadtest
+#' @param df data frame returned from \code{\link{tidy_loadtest}}
+#' @param labels A vector of labels to include.  If none are supplied, all labels will be used.
+#' @param max_load_time The amount of time users will wait for the page to load
+#'   when first requesting the app.
+#' @rdname plot_loadtest
+NULL
+
+
+#' @describeIn plot_loadtest Box plot of load times for each event in each run
 #' @export
 plot_time_boxplot <- function(df, labels = NULL) {
   df <- df %>% filter(maintenance == TRUE)
@@ -35,12 +45,7 @@ plot_time_boxplot <- function(df, labels = NULL) {
 }
 
 
-#' Concurrency Over Time
-#'
-#' @param df A tidy data frame of test results. See \code{\link{tidy_loadtest}}
-#' @param labels A vector of labels to include
-#'
-#' @import ggplot2 dplyr
+#' @describeIn plot_loadtest Time on concurrency for each event for each run
 #' @export
 plot_concurrency_time <- function(df, labels = NULL) {
   df <- df %>% filter(maintenance == TRUE)
@@ -66,8 +71,7 @@ plot_concurrency_time <- function(df, labels = NULL) {
 
 
 # #' @export
-# #' @rdname analysis_plots
-# plot_timestamp_time <- function(df) {
+# # plot_timestamp_time <- function(df) {
 #   df %>%
 #     ggplot(aes(end, time, color = run)) +
 #     geom_point() +
@@ -75,8 +79,8 @@ plot_concurrency_time <- function(df, labels = NULL) {
 #     facet_wrap(~label)
 # }
 
+#' @describeIn plot_loadtest Event waterfall for each session within each run
 #' @export
-#' @rdname analysis_plots
 plot_timeline <- function(df) {
   non_maintenance <- df %>% filter(maintenance == FALSE) %>% as.data.frame()
   maintenance <- df %>% filter(maintenance == TRUE) %>% as.data.frame()
@@ -110,14 +114,9 @@ plot_timeline <- function(df) {
 }
 
 
-#' Histogram of Page Load Times
-#'
-#' @param df A tidy data frame of test results. See \code{\link{tidy_loadtest}}
-#' @param max_load_time The amount of time users will wait for the page to load
-#'   when first requesting the app.
-#' @import ggplot2
+#' @describeIn plot_loadtest Histogram of page load times
 #' @export
-hist_loadtimes <- function(df, max_load_time = 5) {
+plot_hist_loadtimes <- function(df, max_load_time = 5) {
   p <- df %>%
     filter(maintenance == TRUE) %>%
     group_by(run, session_id) %>%
@@ -162,23 +161,10 @@ request_colors <- function() {
   )
   colorsAll
 }
-# Plotting functions
-#' Analysis plots
-#'
-#' @param df dataframe returned from \code{\link{tidy_loadtest}}
-#' @export
-#' @rdname analysis_plots
-plot_concurrency_time_by_eventtype <- function(df) {
-  df %>%
-    filter(maintenance = TRUE) %>%
-    mutate(event = ifelse(event == "REQ_HOME", "REQ", event)) %>%
-    ggplot(aes(concurrency, time, color = run)) +
-    geom_point() +
-    facet_wrap(~event)
-}
 
+
+#' @describeIn plot_loadtest Gantt chart of event duration for each session within each run
 #' @export
-#' @rdname analysis_plots
 plot_gantt <- function(df) {
   df_gantt <- df %>%
     filter(event != "WS_RECV_INIT", event != "WS_CLOSE") %>%
@@ -207,8 +193,9 @@ plot_gantt <- function(df) {
     ) +
     theme(legend.position = "bottom")
 }
+
+#' @describeIn plot_loadtest Event gantt chart of each user session within each run
 #' @export
-#' @rdname analysis_plots
 plot_gantt_session <- function(df) {
   df_session <- df %>%
     filter(event != "WS_RECV_INIT") %>%
@@ -246,8 +233,8 @@ plot_gantt_session <- function(df) {
 }
 
 
+#' @describeIn plot_loadtest Event gantt chart of fastest to slowest session times within each run
 #' @export
-#' @rdname analysis_plots
 plot_gantt_duration <- function(df, cutoff = 10) {
   df1 <- df %>%
     filter(maintenance == TRUE) %>%
@@ -351,8 +338,8 @@ gantt_latency <- function(df) {
 
 }
 
+#' @describeIn plot_loadtest Stacked bar chart of event duration for each session within each run
 #' @export
-#' @rdname analysis_plots
 plot_gantt_latency <- function(df) {
   df_sum <- latency_df(df)
 
@@ -382,8 +369,8 @@ plot_gantt_latency <- function(df) {
     theme(legend.position = "bottom")
 }
 
+#' @describeIn plot_loadtest Bar chart of total HTTP latency for each session within each run
 #' @export
-#' @rdname analysis_plots
 plot_http_latency <- function(df, cutoff = 10) {
   df_sum <- latency_df(df) %>%
     ungroup() %>%
@@ -414,8 +401,8 @@ plot_http_latency <- function(df, cutoff = 10) {
     ) +
     theme(legend.position = "bottom")
 }
+#' @describeIn plot_loadtest Bar chart of maximum calculation (websocket) latency for each session within each run
 #' @export
-#' @rdname analysis_plots
 plot_websocket_latency <- function(df, cutoff = 10) {
   df_sum <- latency_df(df) %>% filter(event == "Calculate")
 
