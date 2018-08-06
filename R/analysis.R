@@ -238,6 +238,30 @@ filter_df <- function(
 
 
 
+request_color_column <- function(maintenance, event) {
+  paste0(maintenance, "_", event)
+}
+request_colors <- function() {
+  cols <- scales::hue_pal()(4)
+  colors <- c("Homepage" = cols[1], "JS/CSS" = cols[2], "Start session" = cols[3], "Calculate" = cols[4])
+  colorsMuted <- scales::muted(colors, 87, 10)
+  colorsAll <- c(
+    "Warmup / Cooldown" = "lightgrey",
+    "Homepage" = colors[["Homepage"]],
+    "JS/CSS" = colors[["JS/CSS"]],
+    "Start session" = colors[["Start session"]],
+    "Calculate" = colors[["Calculate"]],
+    "TRUE_Homepage" = colors[["Homepage"]],
+    "TRUE_JS/CSS" = colors[["JS/CSS"]],
+    "TRUE_Start session" = colors[["Start session"]],
+    "TRUE_Calculate" = colors[["Calculate"]],
+    "FALSE_Homepage" = colorsMuted[["Homepage"]],
+    "FALSE_JS/CSS" = colorsMuted[["JS/CSS"]],
+    "FALSE_Start session" = colorsMuted[["Start session"]],
+    "FALSE_Calculate" = colorsMuted[["Calculate"]]
+  )
+  colorsAll
+}
 # Plotting functions
 #' Analysis plots
 #'
@@ -246,6 +270,7 @@ filter_df <- function(
 #' @rdname analysis_plots
 plot_concurrency_time_by_eventtype <- function(df) {
   df %>%
+    filter(maintenance = TRUE) %>%
     mutate(event = ifelse(event == "REQ_HOME", "REQ", event)) %>%
     ggplot(aes(concurrency, time, color = run)) +
     geom_point() +
@@ -261,36 +286,13 @@ plot_gantt <- function(df) {
     mutate(center = (end + start) / 2) %>%
     mutate(event = factor(event,
       levels = c("REQ_HOME", "REQ_GET", "WS_OPEN", "WS_RECV", "WS_SEND"),
-      labels = c("Homepage", "JS/CSS", "Start session", "Calculate", "WS_SEND")))
+      labels = c("Homepage", "JS/CSS", "Start session", "Calculate", "WS_SEND"))) %>%
+    mutate(colorCol = request_color_column(maintenance, event))
 
-  cols <- scales::hue_pal()(4)
-  colors <- c("Homepage" = cols[1], "JS/CSS" = cols[2], "Start session" = cols[3], "Calculate" = cols[4])
-  colorsMuted <- scales::muted(colors, 87, 10)
-  colorsAll <- c(
-    "Homepage" = colors[["Homepage"]],
-    "JS/CSS" = colors[["JS/CSS"]],
-    "Start session" = colors[["Start session"]],
-    "Calculate" = colors[["Calculate"]],
-    "TRUE_Homepage" = colors[["Homepage"]],
-    "TRUE_JS/CSS" = colors[["JS/CSS"]],
-    "TRUE_Start session" = colors[["Start session"]],
-    "TRUE_Calculate" = colors[["Calculate"]],
-    "FALSE_Homepage" = colorsMuted[["Homepage"]],
-    "FALSE_JS/CSS" = colorsMuted[["JS/CSS"]],
-    "FALSE_Start session" = colorsMuted[["Start session"]],
-    "FALSE_Calculate" = colorsMuted[["Calculate"]]
-  )
-
-  df_gantt$colorCol <- paste0(df_gantt$maintenance, "_", df_gantt$event)
-  print(colors)
-  print(colorsMuted)
-  print(colorsMuted[["Homepage"]])
-  print(colorsAll)
-  print(unique(df_gantt$colorCol))
 
   ggplot(df_gantt, aes(x = center, y = user_id, width = (end - start), fill = colorCol)) +
     geom_tile(height = 1, color = "#444444") + #, size = 0.3) +
-    scale_fill_manual(values = colorsAll, limits = c("Homepage", "JS/CSS", "Start session", "Calculate")) +
+    scale_fill_manual("Request", values = request_colors(), limits = c("Homepage", "JS/CSS", "Start session", "Calculate", "Warmup / Cooldown")) +
     facet_grid(rows = vars(run), scales="free_y", space="free_y") +
     # scale_fill_viridis_c() +
     scale_y_discrete(labels = {
@@ -301,58 +303,43 @@ plot_gantt <- function(df) {
     labs(
       x = "Elapsed time (sec)",
       y = "Session #",
-      subtitle = "smaller bar width is better"
+      subtitle = "smaller bar width is faster"
     ) +
     theme(legend.position = "bottom")
 }
 #' @export
 #' @rdname analysis_plots
 plot_gantt_session <- function(df) {
-  df %>%
+  df_session <- df %>%
     filter(event != "WS_RECV_INIT") %>%
-    mutate(user_id = factor(user_id, levels = rev(unique(user_id)))) %>%
-    mutate(session_id = factor(session_id, levels = rev(unique(session_id)))) %>%
+    mutate(user_id = factor(user_id, levels = sort(unique(user_id)))) %>%
+    mutate(session_id = factor(session_id, levels = rev(sort(unique(session_id))))) %>%
     mutate(center = (end + start) / 2) %>%
     mutate(event = factor(event,
       levels = c("REQ_HOME", "REQ_GET", "WS_OPEN", "WS_RECV", "WS_SEND"),
       labels = c("Homepage", "JS/CSS", "Start session", "Calculate", "WS_SEND"))) %>%
-    ggplot(aes(x = center, y = session_id, width = (end - start), fill = event)) +
+    mutate(colorCol = request_color_column(maintenance, event))
+
+
+  session_levels <- levels(df_session$session_id)
+  if (length(session_levels) > 20) {
+    session_breaks <- session_levels[seq_along(session_levels) %% 5 == 1]
+  } else {
+    session_breaks <- session_levels
+  }
+
+
+  df_session %>%
+    ggplot(aes(x = center, y = session_id, width = (end - start), fill = colorCol)) +
       geom_tile(height = 1, color = "#444444") + #, size = 0.3) +
       facet_grid(rows = vars(run), scales="free_y", space="free_y") +
+      scale_fill_manual(
+        "Request",
+        values = request_colors(),
+        limits = c("Homepage", "JS/CSS", "Start session", "Calculate", "Warmup / Cooldown")
+      ) +
       # scale_fill_viridis_c() +
-      scale_y_discrete(labels = {
-        rev(unique(df$session_id))[seq_along(unique(df$session_id)) %% 5 == 0]
-      }, breaks = {
-        rev(unique(df$session_id))[seq_along(unique(df$session_id)) %% 5 == 0]
-      }) +
-      ylab("Session #") +
-      xlab("Elapsed time (sec)") +
-      theme(legend.position = "bottom")
-}
-#' @export
-#' @rdname analysis_plots
-plot_gantt_iteration <- function(df) {
-  df %>%
-    filter(event != "WS_RECV_INIT") %>%
-    mutate(user_id = factor(user_id, levels = rev(unique(user_id)))) %>%
-    mutate(session_id = factor(session_id, levels = rev(unique(session_id)))) %>%
-    mutate(center = (end + start) / 2) %>%
-    mutate(event = factor(event,
-      levels = c("REQ_HOME", "REQ_GET", "WS_OPEN", "WS_RECV", "WS_SEND"),
-      labels = c("Homepage", "JS/CSS", "Start session", "Calculate", "WS_SEND"))) %>%
-    ggplot(aes(x = center, y = user_id, width = (end - start),
-      # fill = (iteration %% 2 == 0)
-      fill = as.factor(iteration)
-    )) +
-      geom_tile(height = 1, color = "#444444") + #, size = 0.3) +
-      facet_grid(rows = vars(run), scales="free_y", space="free_y") +
-      # scale_fill_discrete("iteration", breaks = c(TRUE, FALSE), labels = c("even", "odd")) +
-      # scale_fill_viridis_c() +
-      scale_y_discrete(labels = {
-        rev(unique(df$user_id))
-      }, breaks = {
-        rev(unique(df$user_id))
-      }) +
+      scale_y_discrete(labels = session_breaks, breaks = session_breaks) +
       ylab("Session #") +
       xlab("Elapsed time (sec)") +
       theme(legend.position = "bottom")
@@ -363,6 +350,7 @@ plot_gantt_iteration <- function(df) {
 #' @rdname analysis_plots
 plot_gantt_duration <- function(df, cutoff = 10) {
   df1 <- df %>%
+    filter(maintenance == TRUE) %>%
     filter(event != "WS_RECV_INIT") %>%
     group_by(run, session_id, user_id, iteration) %>%
     mutate(end = end - min(start), start = start - min(start)) %>%
@@ -388,6 +376,11 @@ plot_gantt_duration <- function(df, cutoff = 10) {
       geom_tile(height = 1, color = "#444444") + #, size = 0.3) +
       facet_grid(rows = vars(run), scales="free_y", space="free_y") +
       # scale_fill_brewer(palette = "RdBu") +
+      scale_fill_manual(
+        "Request",
+        values = request_colors(),
+        limits = c("Homepage", "JS/CSS", "Start session", "Calculate")
+      ) +
       geom_vline(xintercept = cutoff, color = cutoffColor) +
       theme(
         axis.text.y=element_blank(),
@@ -395,7 +388,7 @@ plot_gantt_duration <- function(df, cutoff = 10) {
       labs(
         x = "Time since session start (sec)",
         y = "Sessions by duration",
-        subtitle = "smaller bar width is better"
+        subtitle = "smaller bar width is faster"
       ) +
       theme(legend.position = "bottom")
 }
@@ -409,12 +402,12 @@ latency_df <- function(df) {
     # mutate(session_id = factor(session_id, levels = rev(unique(session_id)))) %>%
     mutate(user_id = paste0("w:", user_id)) %>%
     mutate(session_id = factor(session_id, levels = session_levels)) %>%
-    mutate(event = c(REQ_HOME="Homepage", REQ_GET="JS/CSS", WS_OPEN="WS", WS_RECV="WS", WS_SEND="WS")[event]) %>%
+    mutate(event = c(REQ_HOME="Homepage", REQ_GET="JS/CSS", WS_OPEN="Calculate", WS_RECV="Calculate", WS_SEND="Calculate")[event]) %>%
     mutate(event = factor(event,
-      levels = c("Homepage", "JS/CSS", "WS"),
-      labels = c("Homepage", "JS/CSS", "WebSocket"))) %>%
-    group_by(run, session_id, event, user_id) %>%
-    summarise(total_latency = sum(time), max_latency = max(time))
+      levels = c("Homepage", "JS/CSS", "Calculate"))) %>%
+    group_by(run, session_id, event, user_id, maintenance) %>%
+    summarise(total_latency = sum(time), max_latency = max(time)) %>%
+    mutate(colorCol = request_color_column(maintenance, event))
   df_sum
 }
 
@@ -447,7 +440,7 @@ gantt_latency <- function(df) {
   }
   bind_rows(
     info(df_lat$HTTP, "HTTP") %>% mutate(val = fmt(val)),
-    info(df_lat$WebSocket, "WebSocket") %>% mutate(val = fmt(val)),
+    info(df_lat$Calculate, "Calculate") %>% mutate(val = fmt(val)),
     info(df_lat$perc_http, "percentage") %>% mutate(val = paste0(fmt(100 * val, 1, 1), "%")),
   ) %>%
     mutate(
@@ -472,62 +465,60 @@ plot_gantt_latency <- function(df) {
 
   ggplot(
     df_sum,
-    aes(session_id, max_latency, fill = event, group = event)
+    aes(session_id, max_latency, fill = colorCol, group = event)
   ) +
-    # geom_text(
-    #   aes(label = user_id),
-    #   color = "black", vjust = 0,
-    #   position = position_stack(reverse = TRUE)
-    # ) +
     geom_col(position = position_stack(reverse = TRUE)) +
-    # geom_step(position = position_stack(reverse = TRUE)) +
+    scale_fill_manual(
+      "Request", values = request_colors(),
+      limits = c("Homepage", "JS/CSS", "Calculate", "Warmup / Cooldown")
+    ) +
     facet_grid(rows = vars(run)) +
-    # facet_grid(rows = vars(run), cols = vars(event)) +
-    # scale_fill_manual(values = RColorBrewer::brewer.pal(4, "RdBu")[c(1,3)]) +
-    # scale_fill_manual(values = RColorBrewer::brewer.pal(4, "RdBu")[c(1,3)]) +
     scale_x_discrete(labels = session_breaks, breaks = session_breaks) +
     labs(
       x = "Session",
       y = "Total Latency (sec)",
-      subtitle = "shorter bar is better"
+      subtitle = "shorter bar is faster"
     ) +
     theme(legend.position = "bottom")
 }
-# total HTTP - already displayed
-# max WebSocket
+
+#' @export
+#' @rdname analysis_plots
 plot_http_latency <- function(df, cutoff = 10) {
   df_sum <- latency_df(df) %>%
     ungroup() %>%
     filter(event == "Homepage" | event == "JS/CSS") %>%
     mutate(event = factor(event, levels = c("Homepage", "JS/CSS"), ordered = TRUE))
+
   session_levels <- levels(df_sum$session_id)
   if (length(session_levels) > 20) {
     session_breaks <- session_levels[seq_along(session_levels) %% 5 == 1]
   } else {
     session_breaks <- session_levels
   }
-  cols <- scales::hue_pal()(4)
-  colors <- c("Homepage" = cols[1], "JS/CSS" = cols[2])
 
   ggplot(
     df_sum,
-    aes(session_id, total_latency, fill = event, group = event)
+    aes(session_id, total_latency, fill = colorCol, group = event)
   ) +
     geom_col(position = position_stack(reverse = TRUE)) +
     # geom_step(position = position_stack(reverse = TRUE)) +
     facet_grid(rows = vars(run)) +
-    scale_fill_manual(values = colors) +
+    scale_fill_manual("Request", values = request_colors(), limits = c("Homepage", "JS/CSS", "Warmup / Cooldown")) +
     scale_x_discrete(labels = session_breaks, breaks = session_breaks) +
     geom_hline(yintercept = cutoff, color = cutoffColor) +
     labs(
       x = "Session",
       y = "Total HTTP Latency (sec)",
-      subtitle = "shorter bar is better"
+      subtitle = "shorter bar is faster"
     ) +
     theme(legend.position = "bottom")
 }
+#' @export
+#' @rdname analysis_plots
 plot_websocket_latency <- function(df, cutoff = 10) {
-  df_sum <- latency_df(df) %>% filter(event == "WebSocket")
+  df_sum <- latency_df(df) %>% filter(event == "Calculate")
+
   session_levels <- levels(df_sum$session_id)
   if (length(session_levels) > 20) {
     session_breaks <- session_levels[seq_along(session_levels) %% 5 == 1]
@@ -535,67 +526,19 @@ plot_websocket_latency <- function(df, cutoff = 10) {
     session_breaks <- session_levels
   }
 
-  cols <- scales::hue_pal()(4)
-  colors <- c("WebSocket" = cols[3])
-
   ggplot(
     df_sum,
-    aes(session_id, max_latency, fill = event, group = event)
+    aes(session_id, max_latency, fill = colorCol, group = event)
   ) +
     geom_col(position = position_stack(reverse = TRUE)) +
     facet_grid(rows = vars(run)) +
-    scale_fill_manual(values = colors) +
+    scale_fill_manual("Request", values = request_colors(), limits = c("Calculate", "Warmup / Cooldown")) +
     scale_x_discrete(labels = session_breaks, breaks = session_breaks) +
     geom_hline(yintercept = cutoff, color = cutoffColor) +
     labs(
       x = "Session",
       y = "Maximum WebSocket Latency (sec)",
-      subtitle = "shorter bar is better"
+      subtitle = "shorter bar is faster"
     ) +
     theme(legend.position = "bottom")
 }
-
-
-# plot_gantt_latency_stacked <- function(df) {
-#
-#   alter_data <- function(x) {
-#     x %>%
-#       filter(event != "WS_RECV_INIT") %>%
-#       mutate(session_id = factor(session_id, levels = rev(unique(session_id)))) %>%
-#       mutate(event_class = c(REQ_HOME="REQ", REQ_GET="REQ", WS_OPEN="WS", WS_RECV="WS", WS_SEND="WS")[event]) %>%
-#       mutate(event = factor(event,
-#         levels = c("REQ", "WS"),
-#         labels = c("HTTP", "WebSocket"))) %>%
-#       group_by(baseline, run, session_id, event_class, user_id) %>%
-#       summarise(total_latency = sum(time))
-#   }
-#
-#   cols <- RColorBrewer::brewer.pal(4, "RdBu")[c(1,3)]
-#   dfNonBaseline <- df %>%
-#     filter(baseline != "baseline") %>%
-#     alter_data() %>%
-#     mutate(
-#       .col = ifelse(event_class == "REQ", cols[1], cols[2])
-#     )
-#   dfBaseline <- df %>%
-#     filter(baseline == "baseline") %>%
-#     alter_data() %>%
-#     ungroup() %>%
-#     select(-run, -baseline) %>%
-#     mutate(
-#       .col = ifelse(event_class == "REQ", "darkgrey", "grey")
-#     )
-#
-#   ggplot(data = dfNonBaseline, aes(session_id, total_latency, fill = I(.col), group = event_class)) +
-#     geom_col(data = dfBaseline, position = position_stack(reverse = TRUE), show.legend = FALSE, col = "black") +
-#     geom_col(position = position_stack(reverse = TRUE), alpha = 0.25, col = "grey") +
-#     geom_text(aes(label = user_id), color = "black", vjust = 0, position = position_stack(reverse = TRUE)) +
-#     # geom_step(position = position_stack(reverse = TRUE)) +
-#     facet_grid(rows = vars(baseline, run)) +
-#     # scale_fill_manual(values = ) +
-#     scale_x_discrete(labels = {
-#       unique(df$session_id)[1:50 %% 5 == 1]
-#     }, breaks = {
-#       unique(df$session_id)[1:50 %% 5 == 1]
-#     })
-# }

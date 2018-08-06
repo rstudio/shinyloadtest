@@ -4,10 +4,10 @@
 \alias{plot_concurrency_time_by_eventtype}
 \alias{plot_gantt}
 \alias{plot_gantt_session}
-\alias{plot_gantt_iteration}
 \alias{plot_gantt_duration}
 \alias{plot_gantt_latency}
-\alias{plot_timestamp_time}
+\alias{plot_http_latency}
+\alias{plot_websocket_latency}
 \alias{plot_timeline}
 \title{Analysis plots}
 \usage{
@@ -17,13 +17,13 @@ plot_gantt(df)
 
 plot_gantt_session(df)
 
-plot_gantt_iteration(df)
-
-plot_gantt_duration(df)
+plot_gantt_duration(df, cutoff = 10)
 
 plot_gantt_latency(df)
 
-plot_timestamp_time(df)
+plot_http_latency(df, cutoff = 10)
+
+plot_websocket_latency(df, cutoff = 10)
 
 plot_timeline(df)
 }

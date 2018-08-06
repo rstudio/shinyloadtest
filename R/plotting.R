@@ -14,16 +14,19 @@ if (getRversion() >= "2.15.1") {
 #' @import ggplot2
 #' @export
 plot_time_boxplot <- function(df, labels = NULL) {
+  df <- df %>% filter(maintenance == TRUE)
+
   if (!is.null(labels)) {
     labels <- enexpr(labels)
     df <- df %>% filter(label %in% UQ(labels))
   }
+
   p <- df %>%
     ggplot(aes(run, time, fill = run)) +
     geom_boxplot() +
     facet_wrap(~label) +
     scale_fill_brewer(type = "qual") +
-    labs(subtitle = "lower is better") +
+    labs(subtitle = "lower is faster") +
     theme(legend.position = "bottom")
   if(is.null(labels) || length(labels) > 1) {
     p <- p + facet_wrap(~label)
@@ -40,72 +43,71 @@ plot_time_boxplot <- function(df, labels = NULL) {
 #' @import ggplot2 dplyr
 #' @export
 plot_concurrency_time <- function(df, labels = NULL) {
+  df <- df %>% filter(maintenance == TRUE)
+
   if (!is.null(labels)) {
     labels <- enexpr(labels)
     df <- df %>% filter(label %in% UQ(labels))
   }
+
   p <- df %>%
     ggplot(aes(concurrency, time, color = run)) +
     geom_point() +
-    geom_smooth() +
-    labs(subtitle = "lower is better") +
+    geom_smooth(method = "lm") +
+    coord_cartesian(ylim = range(df$time))
+    labs(subtitle = "lower is faster") +
     theme(legend.position = "bottom")
 
   if(is.null(labels) || length(labels) > 1) {
     p <- p + facet_wrap(~label)
   }
-  p + labs(subtitle = "lower is better")
+  p + labs(subtitle = "lower is faster")
 }
 
 
-#' @export
-#' @rdname analysis_plots
-plot_timestamp_time <- function(df) {
-  df %>%
-    ggplot(aes(end, time, color = run)) +
-    geom_point() +
-    geom_smooth() +
-    facet_wrap(~label)
-}
+# #' @export
+# #' @rdname analysis_plots
+# plot_timestamp_time <- function(df) {
+#   df %>%
+#     ggplot(aes(end, time, color = run)) +
+#     geom_point() +
+#     geom_smooth() +
+#     facet_wrap(~label)
+# }
 
 #' @export
 #' @rdname analysis_plots
 plot_timeline <- function(df) {
-  df %>%
-    # filter(session %% 5 == 1) %>%
-    ggplot(aes(end, label, group = session_id, color = concurrency)) +
+  non_maintenance <- df %>% filter(maintenance == FALSE) %>% as.data.frame()
+  maintenance <- df %>% filter(maintenance == TRUE) %>% as.data.frame()
+  rect_df <- data.frame(xmin = 0, xmax = 0, ymin = maintenance[1,"label"], ymax = maintenance[2, "label"], fill = "fill")
+  maintenance %>%
+    ggplot(
+      aes(
+        end, label,
+        group = session_id,
+        color = concurrency
+      )
+    ) +
+    geom_line(data = non_maintenance, color = request_colors()[["Warmup / Cooldown"]], size = 1.2) +
     geom_line(size = 1.2) +
     scale_color_viridis_c() +
+    geom_rect(data = rect_df, inherit.aes = FALSE, mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = fill)) +
+    scale_fill_manual(NULL, values = request_colors()[["Warmup / Cooldown"]], limits = "Warmup / Cooldown") +
     scale_y_discrete(limits = rev(levels(df$label))) +
+    guides(
+      color = guide_colorbar(order = 1),
+      fill = guide_legend(order = 2)
+    ) +
     facet_grid(
       rows = vars(run)
     ) +
     labs(
       x = "Total elapsed time", y = NULL,
-      subtitle = "vertical is better"
+      subtitle = "more vertical is faster"
     ) +
     theme(legend.position = "bottom")
 }
-# ' @export
-# ' @rdname analysis_plots
-# plot_timeline_stacked <- function(df) {
-#   dfNonBaseline <- df %>% filter(baseline != "baseline")
-#   dfBaseline <- df %>% filter(baseline == "baseline")
-#   dfNonBaseline %>%
-#     # filter(session %% 5 == 1) %>%
-#     ggplot(aes(end, label, group = session_id, color = concurrency)) +
-#     geom_line(data = dfBaseline %>% select(-run), color = "grey", size = 1.2) +
-#     geom_line(size = 1.2, alpha = 0.5) +
-#     scale_color_viridis_c() +
-#     scale_y_discrete(limits = rev(levels(df$label))) +
-#     facet_grid(rows = vars(run), scales = "free_x", space = "free_x") +
-#     labs(
-#       x = "Total elapsed time", y = NULL,
-#       subtitle = "vertical is better. baseline grey, in background"
-#     ) +
-#     theme(legend.position = "bottom")
-# }
-
 
 
 #' Histogram of Page Load Times
@@ -117,6 +119,7 @@ plot_timeline <- function(df) {
 #' @export
 hist_loadtimes <- function(df, max_load_time = 5) {
   p <- df %>%
+    filter(maintenance == TRUE) %>%
     group_by(run, session_id) %>%
     summarise(begin = min(start), ready = start[event == "WS_OPEN"], finish = max(end)) %>%
     ggplot(aes(ready - begin)) +
@@ -131,34 +134,3 @@ hist_loadtimes <- function(df, max_load_time = 5) {
   }
   p
 }
-# ' @export
-# ' @rdname hist_loadtimes
-# hist_loadtimes_stacked <- function(df, max_load_time = 5) {
-#   dfNonBaseline <- df %>%
-#     filter(baseline != "baseline") %>%
-#     group_by(run, session_id) %>%
-#     summarise(begin = min(start), ready = start[event == "WS_OPEN"], finish = max(end))
-#   dfBaseline <- df %>%
-#     filter(baseline == "baseline") %>%
-#     group_by(run, session_id) %>%
-#     summarise(begin = min(start), ready = start[event == "WS_OPEN"], finish = max(end)) %>%
-#     ungroup() %>%
-#     select(-run)
-#
-#   p <- dfNonBaseline %>%
-#     ggplot(aes(ready - begin, fill = run)) +
-#     geom_histogram(data = dfBaseline, fill = "#252525", alpha = 0.5) +
-#     geom_histogram(alpha = 0.5) +
-#     geom_vline(xintercept = max_load_time, color = "red") +
-#     labs(
-#       x = "Inital Page Load Time (sec)",
-#       y = "Session #",
-#       subtitle = "shorter bar is better. baseline grey, in background"
-#     ) +
-#     theme(legend.position = "bottom")
-#
-#   if (length(levels(dfNonBaseline$run)) > 1) {
-#     p <- p + facet_wrap(facets = vars(run))
-#   }
-#   p
-# }
