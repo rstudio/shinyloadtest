@@ -33,7 +33,8 @@ resp_httr_to_rook <- function(resp) {
 }
 
 makeTimestamp <- function(time = Sys.time()) {
-  format(time, "%Y-%m-%dT%H:%M:%%OS3Z", tz = "UTC")
+  format_string <- "%Y-%m-%dT%H:%M:%OS3Z"
+  format(time, format_string, tz = "UTC")
 }
 
 # Returns NA if workerid not found. This either indicates an error state of some
