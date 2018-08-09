@@ -222,7 +222,7 @@ plot_gantt_session <- function(df) {
       geom_tile(height = 1, color = "#444444") + #, size = 0.3) +
       facet_grid(rows = vars(run), scales="free_y", space="free_y") +
       scale_fill_manual(
-        "Request",
+        NULL,
         values = request_colors(),
         limits = c("Homepage", "JS/CSS", "Start session", "Calculate", "Warmup / Cooldown")
       ) +
@@ -265,7 +265,7 @@ plot_gantt_duration <- function(df, cutoff = 10) {
       facet_grid(rows = vars(run), scales="free_y", space="free_y") +
       # scale_fill_brewer(palette = "RdBu") +
       scale_fill_manual(
-        "Request",
+        NULL,
         values = request_colors(),
         limits = c("Homepage", "JS/CSS", "Start session", "Calculate")
       ) +
@@ -357,7 +357,7 @@ plot_gantt_latency <- function(df) {
   ) +
     geom_col(position = position_stack(reverse = TRUE)) +
     scale_fill_manual(
-      "Request", values = request_colors(),
+      NULL, values = request_colors(),
       limits = c("Homepage", "JS/CSS", "Calculate", "Warmup / Cooldown")
     ) +
     facet_grid(rows = vars(run)) +
@@ -392,7 +392,7 @@ plot_http_latency <- function(df, cutoff = 10) {
     geom_col(position = position_stack(reverse = TRUE)) +
     # geom_step(position = position_stack(reverse = TRUE)) +
     facet_grid(rows = vars(run)) +
-    scale_fill_manual("Request", values = request_colors(), limits = c("Homepage", "JS/CSS", "Warmup / Cooldown")) +
+    scale_fill_manual(NULL, values = request_colors(), limits = c("Homepage", "JS/CSS", "Warmup / Cooldown")) +
     scale_x_discrete(labels = session_breaks, breaks = session_breaks) +
     geom_hline(yintercept = cutoff, color = cutoffColor) +
     labs(
@@ -420,7 +420,7 @@ plot_websocket_latency <- function(df, cutoff = 10) {
   ) +
     geom_col(position = position_stack(reverse = TRUE)) +
     facet_grid(rows = vars(run)) +
-    scale_fill_manual("Request", values = request_colors(), limits = c("Calculate", "Warmup / Cooldown")) +
+    scale_fill_manual(NULL, values = request_colors(), limits = c("Calculate", "Warmup / Cooldown")) +
     scale_x_discrete(labels = session_breaks, breaks = session_breaks) +
     geom_hline(yintercept = cutoff, color = cutoffColor) +
     labs(
