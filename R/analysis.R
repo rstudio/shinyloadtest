@@ -141,7 +141,7 @@ tidy_loadtest <- function(...) {
   run_levels <- names(list(...))
 
   df <- list(...) %>%
-    lapply(file.path, "workers") %>%
+    lapply(file.path, "sessions") %>%
     { mapply(., FUN = read_log_dir, names(.), USE.NAMES = FALSE, SIMPLIFY = FALSE) } %>%
     lapply(get_times) %>%
     bind_rows() %>%
