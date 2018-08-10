@@ -33,7 +33,8 @@ resp_httr_to_rook <- function(resp) {
 }
 
 makeTimestamp <- function(time = Sys.time()) {
-  format(time, "%Y-%m-%dT%H:%M:%%OS3Z", tz = "UTC")
+  format_string <- "%Y-%m-%dT%H:%M:%OS3Z"
+  format(time, format_string, tz = "UTC")
 }
 
 # Returns NA if workerid not found. This either indicates an error state of some
@@ -125,9 +126,7 @@ format.WS = function(wsEvt) {
 }
 
 shouldIgnore <- function(msg) {
-  sockJSinit <- c('^o$', '^\\["0#0\\|o\\|"\\]$', '^\\["0\\|o\\|"\\]$')
-  acks <- c('^a\\["ACK.*$', '^\\["ACK.*$', '^h$')
-  canIgnore <- c(sockJSinit, acks)
+  canIgnore <- c('^a\\["ACK.*$', '^\\["ACK.*$', '^h$')
   if (length(unlist(stringr::str_match_all(msg, canIgnore))) > 0) return(TRUE)
   parsed <- parseMessage(msg)
   if (length(intersect(names(parsed), c("busy", "progress", "recalculating"))) > 0) return(TRUE)
@@ -298,12 +297,25 @@ RecordingSession <- R6::R6Class("RecordingSession",
         } else c(),
         onMessage = function(msgFromServer) {
 
+          # The SockJS init message (doesn't happen with local server) needs to
+          # be recorded and results in an acknowledgement message from the
+          # client. We handle it specially here because it shouldn't be ignored,
+          # but it's also not formatted the way all other messages are. We
+          # should receive this message only once per session, immediately after
+          # WS open.
+          if (msgFromServer == "o") {
+            private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
+            clientWS$send(msgFromServer)
+            return()
+          }
+
           # Relay but don't record ignorable messages
           if (shouldIgnore(msgFromServer)) {
             clientWS$send(msgFromServer)
             return()
           }
 
+          # From here forward, we assumed the message
           parsed <- parseMessage(msgFromServer)
 
           # If the message from the server is an object with a "config" key, fix
@@ -325,9 +337,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
             return()
           }
 
-        # Every other websocket event
-        private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
-        clientWS$send(msgFromServer)
+          # Every other websocket event
+          private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
+          clientWS$send(msgFromServer)
       }, onClose = function() {
         cat("Server disconnected\n")
         if (private$clientWsState == "OPEN") {
