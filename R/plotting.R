@@ -97,11 +97,16 @@ plot_timeline <- function(df) {
       )
     ) +
     geom_line(data = non_maintenance, color = request_colors()[["Warmup / Cooldown"]], size = 1.2) +
+    maintenance_vline_only(data = df, mapping = aes(xintercept = start), show.legend = FALSE) +
+    maintenance_vline_only(data = df, mapping = aes(xintercept = end), show.legend = FALSE) +
+    geom_rect(data = rect_df, inherit.aes = FALSE, mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = fill)) +
+    scale_fill_manual(request_scales_title, values = request_colors()[["Warmup / Cooldown"]], limits = "Warmup / Cooldown") +
+    ## can not add due to competing color scales
+    # request_scale_color(includeWarmup = TRUE) +
+    # request_scale_guides() +
+    scale_y_discrete(limits = rev(levels(df$label))) +
     geom_line(size = 1.2) +
     scale_color_viridis_c() +
-    geom_rect(data = rect_df, inherit.aes = FALSE, mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = fill)) +
-    scale_fill_manual(NULL, values = request_colors()[["Warmup / Cooldown"]], limits = "Warmup / Cooldown") +
-    scale_y_discrete(limits = rev(levels(df$label))) +
     guides(
       color = guide_colorbar(order = 1),
       fill = guide_legend(order = 2)
@@ -165,6 +170,7 @@ request_colors <- function() {
   colorsAll
 }
 
+maintenance_color <- "#2e2e2e"
 maintenance_vline <- function(data, mapping, ...) {
   data <- data %>%
     group_by(run) %>%
@@ -173,7 +179,15 @@ maintenance_vline <- function(data, mapping, ...) {
 
   data$maintenance = "Warmup / Cooldown"
   mapping$colour <- aes(color = maintenance)$colour
-  geom_vline(data = data, mapping = mapping, size = 1, linetype = "dotted")
+  geom_vline(data = data, mapping = mapping, size = 1, linetype = "dotted", ...)
+}
+maintenance_vline_only <- function(data, mapping, ...) {
+  data <- data %>%
+    group_by(run) %>%
+    filter(maintenance == TRUE) %>%
+    summarise(start = min(start), end = max(end), maintenance = "Warmup / Cooldown")
+
+  geom_vline(data = data, mapping = mapping, size = 1, linetype = "dotted", color = maintenance_color, ...)
 }
 maintenance_session_vline <- function(data, mapping, ...) {
   data <- data %>%
@@ -183,7 +197,7 @@ maintenance_session_vline <- function(data, mapping, ...) {
 
   data$maintenance = "Warmup / Cooldown"
   mapping$colour <- aes(color = maintenance)$colour
-  geom_vline(data = data, mapping = mapping, size = 1, linetype = "dotted")
+  geom_vline(data = data, mapping = mapping, size = 1, linetype = "dotted", ...)
 }
 
 request_scales_title <- ""
@@ -205,7 +219,7 @@ request_scale_color <- function(
   for (key in names(values)) {
     values[[key]] <- clear
   }
-  values[["Warmup / Cooldown"]] <- "#2e2e2e"
+  values[["Warmup / Cooldown"]] <- maintenance_color
 
   scale_color_manual(request_scales_title, limits = limits, values = values)
 }
@@ -327,7 +341,7 @@ plot_gantt_duration <- function(df, cutoff = 10) {
         axis.ticks.y=element_blank()) +
       labs(
         x = "Time since session start (sec)",
-        y = "Sessions by duration",
+        y = "Sessions ordered by total duration",
         subtitle = "smaller bar width is faster"
       ) +
       theme(legend.position = "bottom")
