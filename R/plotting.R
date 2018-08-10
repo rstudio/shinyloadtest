@@ -39,6 +39,7 @@ plot_time_boxplot <- function(df, labels = NULL) {
     scale_fill_brewer(type = "qual") +
     labs(subtitle = "lower is faster") +
     theme(legend.position = "bottom")
+
   if(is.null(labels) || length(labels) > 1) {
     p <- p + facet_wrap(~label)
   }
@@ -60,14 +61,15 @@ plot_concurrency_time <- function(df, labels = NULL) {
     ggplot(aes(concurrency, time, color = run)) +
     geom_point() +
     geom_smooth(method = "lm") +
-    coord_cartesian(ylim = range(df$time))
+    scale_fill_brewer(type = "qual") +
+    coord_cartesian(ylim = range(df$time)) +
     labs(subtitle = "lower is faster") +
     theme(legend.position = "bottom")
 
   if(is.null(labels) || length(labels) > 1) {
     p <- p + facet_wrap(~label)
   }
-  p + labs(subtitle = "lower is faster")
+  p
 }
 
 
@@ -163,6 +165,55 @@ request_colors <- function() {
   colorsAll
 }
 
+maintenance_vline <- function(data, mapping, ...) {
+  data <- data %>%
+    group_by(run) %>%
+    filter(maintenance == TRUE) %>%
+    summarise(start = min(start), end = max(end), maintenance = "Warmup / Cooldown")
+
+  data$maintenance = "Warmup / Cooldown"
+  mapping$colour <- aes(color = maintenance)$colour
+  geom_vline(data = data, mapping = mapping, size = 1, linetype = "dotted")
+}
+maintenance_session_vline <- function(data, mapping, ...) {
+  data <- data %>%
+    group_by(run) %>%
+    filter(maintenance == TRUE) %>%
+    summarise(start = min(as.numeric(session_id)) - 0.5, end = max(as.numeric(session_id)) + 0.5, maintenance = "Warmup / Cooldown")
+
+  data$maintenance = "Warmup / Cooldown"
+  mapping$colour <- aes(color = maintenance)$colour
+  geom_vline(data = data, mapping = mapping, size = 1, linetype = "dotted")
+}
+
+request_scales_title <- ""
+request_scale_fill <- function(
+  includeWarmup = FALSE,
+  limits = c("Homepage", "JS/CSS", "Start session", "Calculate", if (includeWarmup) "Warmup / Cooldown")
+) {
+  includeWarmup <- isTRUE(includeWarmup)
+
+  scale_fill_manual(request_scales_title, values = request_colors(), limits = limits)
+}
+
+request_scale_color <- function(
+  includeWarmup = TRUE,
+  limits = c("Homepage", "JS/CSS", "Start session", "Calculate", if (includeWarmup) "Warmup / Cooldown")
+) {
+  clear <- "transparent"
+  values <- request_colors()
+  for (key in names(values)) {
+    values[[key]] <- clear
+  }
+  values[["Warmup / Cooldown"]] <- "#2e2e2e"
+
+  scale_color_manual(request_scales_title, limits = limits, values = values)
+}
+request_scale_guides <- function() {
+  g <- guide_legend(request_scales_title)
+  guides(fill = g, color = g)
+}
+
 
 #' @describeIn plot_loadtest Gantt chart of event duration for each session within each run
 #' @export
@@ -176,12 +227,14 @@ plot_gantt <- function(df) {
       labels = c("Homepage", "JS/CSS", "Start session", "Calculate", "WS_SEND"))) %>%
     mutate(colorCol = request_color_column(maintenance, event))
 
-
   ggplot(df_gantt, aes(x = center, y = user_id, width = (end - start), fill = colorCol)) +
     geom_tile(height = 1, color = "#444444") + #, size = 0.3) +
-    scale_fill_manual("Request", values = request_colors(), limits = c("Homepage", "JS/CSS", "Start session", "Calculate", "Warmup / Cooldown")) +
+    maintenance_vline(data = df_gantt, mapping = aes(xintercept = start)) +
+    maintenance_vline(data = df_gantt, mapping = aes(xintercept = end)) +
+    request_scale_fill(includeWarmup = TRUE) +
+    request_scale_color(includeWarmup = TRUE) +
+    request_scale_guides() +
     facet_grid(rows = vars(run), scales="free_y", space="free_y") +
-    # scale_fill_viridis_c() +
     scale_y_discrete(labels = {
       rev(unique(df$user_id))
     }, breaks = {
@@ -221,12 +274,11 @@ plot_gantt_session <- function(df) {
     ggplot(aes(x = center, y = session_id, width = (end - start), fill = colorCol)) +
       geom_tile(height = 1, color = "#444444") + #, size = 0.3) +
       facet_grid(rows = vars(run), scales="free_y", space="free_y") +
-      scale_fill_manual(
-        NULL,
-        values = request_colors(),
-        limits = c("Homepage", "JS/CSS", "Start session", "Calculate", "Warmup / Cooldown")
-      ) +
-      # scale_fill_viridis_c() +
+      maintenance_vline(data = df_session, mapping = aes(xintercept = start)) +
+      maintenance_vline(data = df_session, mapping = aes(xintercept = end)) +
+      request_scale_fill(includeWarmup = TRUE) +
+      request_scale_color(includeWarmup = TRUE) +
+      request_scale_guides() +
       scale_y_discrete(labels = session_breaks, breaks = session_breaks) +
       ylab("Session #") +
       xlab("Elapsed time (sec)") +
@@ -290,9 +342,9 @@ latency_df <- function(df) {
     # mutate(session_id = factor(session_id, levels = rev(unique(session_id)))) %>%
     mutate(user_id = paste0("w:", user_id)) %>%
     mutate(session_id = factor(session_id, levels = session_levels)) %>%
-    mutate(event = c(REQ_HOME="Homepage", REQ_GET="JS/CSS", WS_OPEN="Calculate", WS_RECV="Calculate", WS_SEND="Calculate")[event]) %>%
+    mutate(event = c(REQ_HOME="Homepage", REQ_GET="JS/CSS", WS_OPEN="Start session", WS_RECV="Calculate", WS_SEND="Calculate")[event]) %>%
     mutate(event = factor(event,
-      levels = c("Homepage", "JS/CSS", "Calculate"))) %>%
+      levels = c("Homepage", "JS/CSS", "Start session", "Calculate"))) %>%
     group_by(run, session_id, event, user_id, maintenance) %>%
     summarise(total_latency = sum(time), max_latency = max(time)) %>%
     mutate(colorCol = request_color_column(maintenance, event))
@@ -356,10 +408,11 @@ plot_gantt_latency <- function(df) {
     aes(session_id, max_latency, fill = colorCol, group = event)
   ) +
     geom_col(position = position_stack(reverse = TRUE)) +
-    scale_fill_manual(
-      NULL, values = request_colors(),
-      limits = c("Homepage", "JS/CSS", "Calculate", "Warmup / Cooldown")
-    ) +
+    maintenance_session_vline(data = df_sum, mapping = aes(xintercept = start)) +
+    maintenance_session_vline(data = df_sum, mapping = aes(xintercept = end)) +
+    request_scale_fill(includeWarmup = TRUE) +
+    request_scale_color(includeWarmup = TRUE) +
+    request_scale_guides() +
     facet_grid(rows = vars(run)) +
     scale_x_discrete(labels = session_breaks, breaks = session_breaks) +
     labs(
@@ -390,9 +443,13 @@ plot_http_latency <- function(df, cutoff = 10) {
     aes(session_id, total_latency, fill = colorCol, group = event)
   ) +
     geom_col(position = position_stack(reverse = TRUE)) +
+    maintenance_session_vline(data = df_sum, mapping = aes(xintercept = start)) +
+    maintenance_session_vline(data = df_sum, mapping = aes(xintercept = end)) +
+    request_scale_fill(includeWarmup = TRUE, limits = c("Homepage", "JS/CSS", "Warmup / Cooldown")) +
+    request_scale_color(includeWarmup = TRUE, limits = c("Homepage", "JS/CSS", "Warmup / Cooldown")) +
+    request_scale_guides() +
     # geom_step(position = position_stack(reverse = TRUE)) +
     facet_grid(rows = vars(run)) +
-    scale_fill_manual(NULL, values = request_colors(), limits = c("Homepage", "JS/CSS", "Warmup / Cooldown")) +
     scale_x_discrete(labels = session_breaks, breaks = session_breaks) +
     geom_hline(yintercept = cutoff, color = cutoffColor) +
     labs(
@@ -420,7 +477,11 @@ plot_websocket_latency <- function(df, cutoff = 10) {
   ) +
     geom_col(position = position_stack(reverse = TRUE)) +
     facet_grid(rows = vars(run)) +
-    scale_fill_manual(NULL, values = request_colors(), limits = c("Calculate", "Warmup / Cooldown")) +
+    maintenance_session_vline(data = df_sum, mapping = aes(xintercept = start)) +
+    maintenance_session_vline(data = df_sum, mapping = aes(xintercept = end)) +
+    request_scale_fill(includeWarmup = TRUE, limits = c("Calculate", "Warmup / Cooldown")) +
+    request_scale_color(includeWarmup = TRUE, limits = c("Calculate", "Warmup / Cooldown")) +
+    request_scale_guides() +
     scale_x_discrete(labels = session_breaks, breaks = session_breaks) +
     geom_hline(yintercept = cutoff, color = cutoffColor) +
     labs(
