@@ -2,7 +2,12 @@
 #'
 #' @param df data.frame returned from \code{\link{tidy_loadtest}}
 #' @export
-make_report <- function(df) {
+make_report <- function(
+  df,
+  duration_cutoff = 10,
+  http_latency_cutoff = 5,
+  max_websocket_cutoff = 20
+) {
   output_file = tempfile(fileext = ".Rmd")
   report <- glue_report(df)
   writeLines(report, output_file)
@@ -50,7 +55,7 @@ shiny::renderPlot({{plot_gantt(df)}})
 ### Duration of each session
 
 ```{{r}}
-shiny::renderPlot({{plot_gantt_duration(df)}})
+shiny::renderPlot({{plot_gantt_duration(df, cutoff = duration_cutoff)}})
 ```
 
 
@@ -67,13 +72,13 @@ shiny::renderPlot({{plot_timeline(df)}})
 ### Total http latency per session
 
 ```{{r}}
-shiny::renderPlot({{plot_http_latency(df)}})
+shiny::renderPlot({{plot_http_latency(df, cutoff = http_latency_cutoff)}})
 ```
 
 ### Maximum websocket latency per session
 
 ```{{r}}
-shiny::renderPlot({{plot_websocket_latency(df)}})
+shiny::renderPlot({{plot_websocket_latency(df, cutoff = max_websocket_cutoff)}})
 ```
 
 # Event Duration
