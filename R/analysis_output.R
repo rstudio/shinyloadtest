@@ -62,7 +62,7 @@ df <- readRDS("{fileLocation}")
 ### Session activity over time
 
 ```{{r}}
-shiny::renderPlot({{plot_gantt(df)}})
+plotly::renderPlotly({{plotly::ggplotly(plot_gantt(df))}})
 ```
 
 ### Duration of each session

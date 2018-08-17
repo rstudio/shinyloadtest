@@ -22,6 +22,79 @@ NULL
 NULL
 
 
+
+# Run colors
+run_fill_colors <- c(
+  "#7fc97f", # medium green
+  "#beaed4", # medium purple
+  "#fdc086", # medium orange
+  "#f28983", # medium red
+  "#7ddbb6", # medium teal
+  "#75aadb", # medium blue
+  "#5d945d", # dark green
+  "#9084a1", # dark purple
+  "#c9996b", # dark orange
+  "#bd5c57", # dark red
+  "#5fa68a", # dark teal
+  "#5981a6", # dark blue
+  "#9efa9e", # bright green
+  "#e5d1ff", # bright purple
+  "#8df5cc", # bright teal
+  "#88c6ff", # bright blue
+  "#3d613d", # very dark green
+  "#625a6e", # very dark purple
+  "#967250", # very dark orange
+  "#8a433f", # very dark red
+  "#467362", # very dark teal
+  "#3d5973"  # very dark blue
+)
+run_accent_color_map <- c(
+  # Accent colors only to be used as accents
+  # e.g. I'm currently using these colors for the lines and dots in the box plots
+
+  # for use with data colors: 01, 07, 13, 17
+  green = "#144714",
+
+  # for use with data colors: 02, 08, 14, 18
+  purple =  "#413554",
+
+  # for use with data colors: 03, 09, 19
+  orange = "#7a4920",
+
+  # for use with data colors: 04, 10, 20
+  red = "#5c1815",
+
+  # for use with data colors: 05, 11, 15, 21
+  teal = "#14593e",
+
+  # for use with data colors: 06, 12, 16, 22
+  blue = "#103659"
+)
+
+run_accent_colors <- run_accent_color_map[c(1:6, 1:6, 1:2, 5:6, 1:6)]
+
+
+make_run_fill <- function(run_names) {
+  if (length(run_names) > length(run_fill_colors)) {
+    stop("Too many runs provided.  Do not have enough colors.")
+  }
+  ret <- run_fill_colors[seq_along(run_names)]
+  names(ret) <- run_names
+  ret
+}
+make_run_color <- function(run_names) {
+  if (length(run_names) > length(run_accent_colors)) {
+    stop("Too many runs provided.  Do not have enough colors.")
+  }
+  ret <- run_accent_colors[seq_along(run_names)]
+  names(ret) <- run_names
+  ret
+}
+
+
+
+
+
 #' @describeIn plot_loadtest Box plot of load times for each event in each run
 #' @export
 plot_time_boxplot <- function(df, labels = NULL) {
@@ -33,15 +106,23 @@ plot_time_boxplot <- function(df, labels = NULL) {
   }
 
   p <- df %>%
-    ggplot(aes(run, time, fill = run)) +
+    ggplot(aes(run, time, fill = run, color = run)) +
     geom_boxplot() +
-    facet_wrap(~recording_label) +
-    scale_fill_brewer(type = "qual") +
+    scale_fill_manual(values = make_run_fill(levels(df$run))) +
+    scale_color_manual(values = make_run_color(levels(df$run))) +
     labs(subtitle = "lower is faster") +
-    theme(legend.position = "bottom")
-
-  if(is.null(labels) || length(labels) > 1) {
+    theme(
+      panel.grid.major.x = element_blank(),
+      legend.position = "bottom"
+    )
+  if(
+    (is.null(labels) || length(labels) > 1)
+    # &&
+    # (length(unique(df$recording_label)) > 1)
+  ) {
     p <- p + facet_wrap(~recording_label)
+  } else {
+    p <- p + labs(title = unique(df$recording_label))
   }
   p
 }
@@ -58,10 +139,11 @@ plot_concurrency_time <- function(df, labels = NULL) {
   }
 
   p <- df %>%
-    ggplot(aes(concurrency, time, color = run)) +
+    ggplot(aes(concurrency, time, fill = run, color = run)) +
     geom_point() +
     geom_smooth(method = "lm") +
-    scale_fill_brewer(type = "qual") +
+    scale_fill_manual(values = make_run_color(levels(df$run))) +
+    scale_color_manual(values = make_run_fill(levels(df$run))) +
     coord_cartesian(ylim = range(df$time)) +
     labs(subtitle = "lower is faster") +
     theme(legend.position = "bottom")
@@ -106,7 +188,8 @@ plot_timeline <- function(df) {
     # request_scale_guides() +
     scale_y_discrete(limits = rev(levels(df$recording_label))) +
     geom_line(size = 1.2) +
-    scale_color_viridis_c() +
+    # scale_color_viridis_c() +
+    scale_colour_gradientn(colours = rev(c(run_fill_colors[c(3, 13, 6)], run_accent_colors[2]))) +
     guides(
       color = guide_colorbar(order = 1),
       fill = guide_legend(order = 2)
@@ -148,10 +231,15 @@ plot_hist_loadtimes <- function(df, max_load_time = 5) {
 request_color_column <- function(maintenance, event) {
   paste0(maintenance, "_", event)
 }
+request_border <- "transparent"
 request_colors <- function() {
-  cols <- scales::hue_pal()(4)
+  # cols <- scales::hue_pal()(4)
+  # request_colors <-
+  # cols <- c("#872f29", "#1c9165", "#00ffe5", "#75aadb")
+  cols <- c("#f28983", "#fdc086", "#9cffd9", "#75aadb")
+
   colors <- c("Homepage" = cols[1], "JS/CSS" = cols[2], "Start session" = cols[3], "Calculate" = cols[4])
-  colorsMuted <- scales::muted(colors, 87, 10)
+  colorsMuted <- scales::muted(colors, 87, 20)
   colorsAll <- c(
     "Warmup / Cooldown" = "lightgrey",
     "Homepage" = colors[["Homepage"]],
@@ -242,7 +330,7 @@ plot_gantt <- function(df) {
     mutate(colorCol = request_color_column(maintenance, event))
 
   ggplot(df_gantt, aes(x = center, y = user_id, width = (end - start), fill = colorCol)) +
-    geom_tile(height = 1, color = "#444444") + #, size = 0.3) +
+    geom_tile(height = 1, color = request_border) + #, size = 0.3) +
     maintenance_vline(data = df_gantt, mapping = aes(xintercept = start)) +
     maintenance_vline(data = df_gantt, mapping = aes(xintercept = end)) +
     request_scale_fill(includeWarmup = TRUE) +
@@ -286,7 +374,7 @@ plot_gantt_session <- function(df) {
 
   df_session %>%
     ggplot(aes(x = center, y = session_id, width = (end - start), fill = colorCol)) +
-      geom_tile(height = 1, color = "#444444") + #, size = 0.3) +
+      geom_tile(height = 1, color = request_border) + #, size = 0.3) +
       facet_grid(rows = vars(run), scales="free_y", space="free_y") +
       maintenance_vline(data = df_session, mapping = aes(xintercept = start)) +
       maintenance_vline(data = df_session, mapping = aes(xintercept = end)) +
@@ -327,7 +415,7 @@ plot_gantt_duration <- function(df, cutoff = 10) {
       levels = c("REQ_HOME", "REQ_GET", "WS_OPEN", "WS_RECV", "WS_SEND"),
       labels = c("Homepage", "JS/CSS", "Start session", "Calculate", "WS_SEND"))) %>%
     ggplot(aes(x = center, y = order, width = (end - start), fill = event)) +
-      geom_tile(height = 1, color = "#444444") + #, size = 0.3) +
+      geom_tile(height = 1, color = request_border) + #, size = 0.3) +
       facet_grid(rows = vars(run), scales="free_y", space="free_y") +
       # scale_fill_brewer(palette = "RdBu") +
       scale_fill_manual(

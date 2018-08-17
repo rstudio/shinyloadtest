@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ShinyLoadTest UI Prototype</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
+      crossorigin="anonymous">
+    <link rel="stylesheet" href="css/shinyUI.css">
+  </head>
+  <body>
+    <!-- this are at the top so that any additional page specific scripts are loaded after -->
+    <script src="js/uikit.min.js"></script>
+    <script src="js/uikit-icons.min.js"></script>
+      <div class="sui-flex-5 sui-layout-flex-horz sui-full-height">
+    <div class="sui-flex-1 uk-background-muted slt-side-menu-container">
+      <ul class="uk-nav sui-nav-sidebar">
+        <li>
+          <h1>Shiny:loadtest</h1>
+        </li>
+        <li class="slt-side-menu-item">
+    <a href=#sessions><span uk-icon=server class="stl-side-menu-icon"></span>Sessions</a>
+  </li>
+  <li class="slt-side-menu-item">
+    <a href=#sessions><span uk-icon=clock class="stl-side-menu-icon"></span>Time</a>
+  </li>
+  <li class="slt-side-menu-item">
+    <a href=#duration><span uk-icon=future class="stl-side-menu-icon"></span>Event Duration</a>
+  </li>
+  <li class="slt-side-menu-item">
+    <a href=#duration><span uk-icon=git-fork class="stl-side-menu-icon"></span>Event Concurrency</a>
+  </li>
+</ul>    </div>
+    <div class="sui-flex-4 slt-main-content">
+      <section class="sui-layout-flex-vert" id="sessions">
+        <div class="sui-flex-0 slt-view-control">
+          <div class="uk-button-group sui-segmented-button" id=sessions-report-controller>
+            <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=four-worker-chart>4 workers</button>
+  <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=sixteen-worker-chart>16 workers</button>
+</div>        </div>
+        <div class="sui-flex-5" id="session-chart-view">
+          <div id="four-worker-chart">
+            <div class="uk-padding uk-padding-remove-bottom">
+              <p class="uk-text-meta">Below is the results of four sessions versus the baseline single session. Note that narrower bars mean better performance.</p>
+            </div>
+            <img src="SVG/4workerbaseline.svg"/>
+          </div>
+          <div id="sixteen-worker-chart">
+            <div class="uk-padding uk-padding-remove-bottom">
+              <p class="uk-text-meta">Below is the results of sixteen sessions versus the baseline single session. Note that narrower bars mean better performance.</p>
+            </div>
+            <img src="SVG/16workerbaseline.svg"/>
+          </div>
+        </div>
+      </section>
+      <section class="sui-layout-flex-vert" id="duration">
+        <div class="sui-flex-0 slt-view-control">
+            <div class="uk-button-group sui-segmented-button" id=duration-filters>
+              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=slowest-min>Slowest min times</button>
+  <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=slowest-max>Slowest max times</button>
+  <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=largest-mean>Largest mean differences</button>
+  <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=data-table>Data table</button>
+</div>        </div>
+        <div class="sui-flex-5" id="duration-chart-view">
+          <div id="chart-grid-page">
+            <div class="slt-box-picker-container">
+              <input id="box-plot-picker" type="number" value="5" min="1" max="500" />
+              <h3>slowest minimum times</h3>
+            </div>
+            <div class="uk-flex uk-grid-match uk-grid-small uk-child-width-1-4@m slt-chart-grid" uk-grid>
+            </div>
+          </div>
+          <div id="data-table" style="padding: 0 2rem;">
+            <table class="uk-table uk-table-hover uk-table-striped slt-data-table">
+              <thead>
+                <tr>
+                  <th>Label</th>
+                  <th>Min time</th>
+                  <th>Max time</th>
+                  <th>Mean Difference</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+<script src="js/nouislider.min.js"></script>
+<script src="js/sui.js"></script>
+<script>
+  
+  suiSegmentedButtons();
+  suiSideNavBar();
+
+  // app specific handler for changing the number of box plots to show
+  const picker = document.querySelector('#box-plot-picker');
+  // this is so ugly but it's quick and this is just a prototype, but still :**(
+  const boxPlotTemplate = `<div class=""><div class="uk-card uk-card-small slt-chart-grid-chart">
+<img src="SVG/boxplot.svg" style="width:100%;"/></div></div>`;
+
+  const adjustBoxPlots = ()=>{
+    const grid = document.querySelector('.slt-chart-grid');
+    if(picker.value > grid.children.length){
+      let toAdd = picker.value - grid.children.length;
+      for(let i = 0; i < toAdd; i++){
+        grid.insertAdjacentHTML('beforeend', boxPlotTemplate); 
+      }
+    }
+    else if(picker.value < grid.children.length){
+      let toTrim = grid.children.length - picker.value;
+      for(let i = 0; i < toTrim; i++){
+        let lastChild = grid.children.length - 1;
+        grid.children[lastChild].remove();
+      }
+    }
+  };
+  
+
+  picker.addEventListener('input', adjustBoxPlots);
+  //pick up the default value;
+  adjustBoxPlots();
+
+  // random int generator helper
+  const randInt = (min, max) => {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min +1)) + min;
+  };
+
+  // generate a data table because no one wants to write a realistic length one by hand
+  const tableBody = document.querySelector('#data-table table tbody');
+  for (let i = 0; i < 50; i++){
+    let label = 'REQ_HOME';
+    if( i > 0) {
+      switch(randInt(1,4)){
+        case 1: 
+          label = 'WS_RECV';
+          break;
+        case 2: 
+          label = 'WS_OPEN';
+          break;
+        case 3:
+          label = 'REQ_GET';
+          break;
+        case 4:
+          label = 'WS_RECV_INIT'
+          break;
+      }
+    }
+      let minTime = Math.random().toFixed(3);
+      let maxTime = Math.random().toFixed(3) + randInt(0,20);
+      let meanDiff =  Math.random().toFixed(3) + randInt(0, 7);
+      const tableRowTemplate = `<tr><td>${i+1}:${label}</td><td>${minTime}</td>
+<td>${maxTime}</td><td>${meanDiff}</td></tr>`;
+      tableBody.insertAdjacentHTML('beforeend', tableRowTemplate);
+  }
+  
+  // core logic to change views with a segmented button control
+  const switchSegmentViews = (viewsContainer, selectedView) => {
+    for(let view of viewsContainer){
+      view.style.display = 'none';
+    }
+    document.querySelector(`#${selectedView}`).style.display = 'block';
+  };
+
+  // app specific click handler for #sessions segmented control
+  const sessionsControllerSegments = document.querySelector('#sessions-report-controller').children;
+  const sessionsCharts = document.querySelector('#session-chart-view').children;
+  for (let segment of sessionsControllerSegments){
+    segment.addEventListener('click', () => {
+      switchSegmentViews(sessionsCharts, segment.dataset.viewOption);
+    });
+  }
+
+  //app specific click handler for #duration segmented control
+  const durationSelectorSegments = document.querySelector('#duration-filters').children;
+  const durationCharts = document.querySelector('#duration-chart-view').children;
+  for(let segment of durationSelectorSegments){
+    // this is kinda hackey, but it's the only way to deal with not having a page for each button
+    let target = segment.dataset.viewOption === 'data-table' ? 'data-table' : 'chart-grid-page';
+    segment.addEventListener('click', () => {
+      switchSegmentViews(durationCharts, target);
+    });
+  }
+
+  // app specific handler to side menu
+  const testSelector = document.querySelector('.sui-nav-sidebar');
+  for(let item of testSelector.children){
+    let link = item.children[0];
+    if(link.href){
+      link.addEventListener('click', () => {
+        let newActivePage = document.querySelector(`#${link.href.split('#')[1]}`);
+        for(let section of document.querySelectorAll('section')){
+          section.style.display = 'none';
+        }
+        newActivePage.style.display = 'block';
+
+      });
+    }
+  }
+</script>
+  </body>
+</html>
