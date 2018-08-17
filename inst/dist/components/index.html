@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ShinyLoadTest UI Prototype</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
+      crossorigin="anonymous">
+    <link rel="stylesheet" href="{base_output_name}/css/shinyUI.css">
+  </head>
+  <body>
+    <!-- this are at the top so that any additional page specific scripts are loaded after -->
+    <script src="{base_output_name}/js/uikit.min.js"></script>
+    <script src="{base_output_name}/js/uikit-icons.min.js"></script>
+    <link rel="stylesheet" href="{base_output_name}/css/shinyloadtest.css">
+
+    <div class="sui-flex-5 sui-layout-flex-horz sui-full-height">
+      <div class="sui-flex-1 uk-background-muted slt-side-menu-container">
+        <ul class="uk-nav sui-nav-sidebar">
+          <li>
+            <h1>Shiny:loadtest</h1>
+          </li>
+          <li class="slt-side-menu-item">
+            <a href=#sessions><span uk-icon=server class="stl-side-menu-icon"></span>Sessions</a>
+          </li>
+          <li class="slt-side-menu-item">
+            <a href=#session-duration><span uk-icon=server class="stl-side-menu-icon"></span>Session Duration</a>
+          </li>
+          <li class="slt-side-menu-item">
+            <a href=#time><span uk-icon=clock class="stl-side-menu-icon"></span>Time</a>
+          </li>
+          <li class="slt-side-menu-item">
+            <a href=#duration><span uk-icon=future class="stl-side-menu-icon"></span>Event Duration</a>
+          </li>
+          <li class="slt-side-menu-item">
+            <a href=#concurrency><span uk-icon=git-fork class="stl-side-menu-icon"></span>Event Concurrency</a>
+          </li>
+        </ul>
+      </div>
+      <div class="sui-flex-4 slt-main-content">
+        <section class="sui-layout-flex-vert" id="sessions">
+          <div class="sui-flex-0 slt-view-control">
+            <div class="uk-button-group sui-segmented-button" id=sessions-report-controller>
+              { glue_multi_component("gantt_button", gantt) }
+            </div>
+          </div>
+          <div class="sui-flex-5 slt-section-group" id="sessions-chart-view">
+            { glue_multi_component("gantt", gantt)}
+          </div>
+        </section>
+        <section class="sui-layout-flex-vert" id="session-duration">
+          <div class="sui-flex-0 slt-view-control">
+            <div class="uk-button-group sui-segmented-button" id=session-duration-report-controller>
+              { glue_multi_component("gantt_duration_button", gantt) }
+            </div>
+          </div>
+          <div class="sui-flex-5 slt-section-group" id="session-duration-chart-view">
+            { glue_multi_component("gantt_duration", gantt)}
+          </div>
+        </section>
+        <section class="sui-layout-flex-vert" id="time">
+          <div class="sui-flex-0 slt-view-control">
+            <div class="uk-button-group sui-segmented-button" id=time-report-controller>
+              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=timeline>Event Waterfall</button>
+              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=total-http>Total HTTP</button>
+              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=max-websocket>Maximum Websocket</button>
+            </div>
+          </div>
+          <div class="sui-flex-5 slt-section-group" id="time-chart-view">
+            <div id="timeline">
+              <div class="uk-padding uk-padding-remove-bottom">
+                <p class="uk-text-meta">INSERT event CAPTION</p>
+              </div>
+              <img src="{src_timeline}"/>
+            </div>
+            <div id="total-http">
+              <div class="uk-padding uk-padding-remove-bottom">
+                <p class="uk-text-meta">INSERT http CAPTION</p>
+              </div>
+              <img src="{src_http}"/>
+            </div>
+            <div id="max-websocket">
+              <div class="uk-padding uk-padding-remove-bottom">
+                <p class="uk-text-meta">INSERT websocket CAPTION</p>
+              </div>
+              <img src="{src_websocket}"/>
+            </div>
+          </div>
+        </section>
+        <section class="sui-layout-flex-vert" id="duration">
+          <div class="sui-flex-0 slt-view-control">
+            <div class="uk-button-group sui-segmented-button" id=duration-report-controller>
+              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=slowest-min>Slowest min times</button>
+              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=slowest-max>Slowest max times</button>
+              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=largest-mean-diff>Largest mean differences</button>
+              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=event-duration-data-table>Data table</button>
+            </div>
+          </div>
+          <div class="sui-flex-5 slt-section-group" id="duration-chart-view">
+            <div id="slowest-min">
+              { glue_component("picker", list(class="slt-box-picker-container", id="slowest-min-picker", value = min(c(12, length(boxplot))),  min = 1, max = length(boxplot), comment = "slowest minimum times")) }
+              <div class="uk-flex uk-grid-match uk-grid-small uk-child-width-1-4@m slt-chart-grid" uk-grid id="slowest-min-grid">
+                { glue_multi_component("boxplot_thumbnail", boxplot)}
+              </div>
+            </div>
+            <div id="slowest-max">
+              { glue_component("picker", list(class="slt-box-picker-container", id="slowest-max-picker", value = min(c(12, length(boxplot))),  min = 1, max = length(boxplot), comment = "slowest maximum times")) }
+              <div class="uk-flex uk-grid-match uk-grid-small uk-child-width-1-4@m slt-chart-grid" uk-grid id="slowest-max-grid">
+                { glue_multi_component("boxplot_thumbnail", boxplot)}
+              </div>
+            </div>
+            <div id="largest-mean-diff">
+              { glue_component("picker", list(class="slt-box-picker-container", id="largest-mean-diff-picker", value = min(c(12, length(boxplot))),  min = 1, max = length(boxplot), comment = "largest mean differences")) }
+              <div class="uk-flex uk-grid-match uk-grid-small uk-child-width-1-4@m slt-chart-grid" uk-grid id="largest-mean-diff-grid">
+                { glue_multi_component("boxplot_thumbnail", boxplot)}
+              </div>
+            </div>
+            <div id="event-duration-data-table" style="padding: 0 2rem;">
+              <table class="uk-table uk-table-hover uk-table-striped slt-data-table">
+                <thead>
+                  <tr>
+                    <th>Label</th>
+                    <th>Min time</th>
+                    <th>Max time</th>
+                    <th>Mean Difference</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <section class="sui-layout-flex-vert" id="concurrency">
+          <div class="sui-flex-0 slt-view-control">
+            <div class="uk-button-group sui-segmented-button" id=concurrency-report-controller>
+              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=largest-slope>Largest Slope</button>
+              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=largest-slope-diff>Largest mean differences</button>
+              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=event-concurrency-data-table>Data table</button>
+            </div>
+          </div>
+          <div class="sui-flex-5 slt-section-group" id="concurrency-chart-view">
+            <div id="largest-slope">
+              { glue_component("picker", list(class="slt-box-picker-container", id="largest-slope-picker", value = min(c(12, length(concurrency))),  min = 1, max = length(concurrency), comment = "largest concurrency slope")) }
+              <div class="uk-flex uk-grid-match uk-grid-small uk-child-width-1-4@m slt-chart-grid" uk-grid id="largest-slope-grid">
+                { glue_multi_component("boxplot_thumbnail", concurrency)}
+              </div>
+            </div>
+            <div id="largest-slope-diff">
+              { glue_component("picker", list(class="slt-box-picker-container", id="largest-slope-diff-picker", value = min(c(12, length(concurrency))),  min = 1, max = length(concurrency), comment = "largest mean difference")) }
+              <div class="uk-flex uk-grid-match uk-grid-small uk-child-width-1-4@m slt-chart-grid" uk-grid id="largest-slope-diff-grid">
+                { glue_multi_component("boxplot_thumbnail", concurrency)}
+              </div>
+            </div>
+            <div id="event-concurrency-data-table" style="padding: 0 2rem;">
+              <table class="uk-table uk-table-hover uk-table-striped slt-data-table">
+                <thead>
+                  <tr>
+                    <th>Label</th>
+                    <th>Min time</th>
+                    <th>Max time</th>
+                    <th>Mean Difference</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <script src="{base_output_name}/js/sui.js"></script>
+    <script src="{base_output_name}/js/shinyloadtest.js"></script>
+  </body>
+</html>

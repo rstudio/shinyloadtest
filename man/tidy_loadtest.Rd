@@ -4,7 +4,7 @@
 \alias{tidy_loadtest}
 \title{Create Tidy Load Test Results}
 \usage{
-tidy_loadtest(...)
+tidy_loadtest(..., verbose = TRUE)
 }
 \arguments{
 \item{...}{Key-value pairs where the key is the desired name for the test and the

@@ -1,8 +1,8 @@
 #' Make shinyloadtest Report
 #'
 #' @param df data.frame returned from \code{\link{tidy_loadtest}}
-#' @export
-make_report <- function(
+#' @noRd
+make_report_old <- function(
   df,
   duration_cutoff = 10,
   http_latency_cutoff = 5,
@@ -62,7 +62,7 @@ df <- readRDS("{fileLocation}")
 ### Session activity over time
 
 ```{{r}}
-plotly::renderPlotly({{plotly::ggplotly(plot_gantt(df))}})
+shiny::renderPlot({{plot_gantt(df)}})
 ```
 
 ### Duration of each session

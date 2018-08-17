@@ -110,7 +110,7 @@ plot_time_boxplot <- function(df, labels = NULL) {
     geom_boxplot() +
     scale_fill_manual(values = make_run_fill(levels(df$run))) +
     scale_color_manual(values = make_run_color(levels(df$run))) +
-    labs(subtitle = "lower is faster") +
+    # labs(subtitle = "lower is faster") +
     theme(
       panel.grid.major.x = element_blank(),
       legend.position = "bottom"
@@ -121,8 +121,6 @@ plot_time_boxplot <- function(df, labels = NULL) {
     # (length(unique(df$recording_label)) > 1)
   ) {
     p <- p + facet_wrap(~recording_label)
-  } else {
-    p <- p + labs(title = unique(df$recording_label))
   }
   p
 }
@@ -145,7 +143,7 @@ plot_concurrency_time <- function(df, labels = NULL) {
     scale_fill_manual(values = make_run_color(levels(df$run))) +
     scale_color_manual(values = make_run_fill(levels(df$run))) +
     coord_cartesian(ylim = range(df$time)) +
-    labs(subtitle = "lower is faster") +
+    # labs(subtitle = "lower is faster") +
     theme(legend.position = "bottom")
 
   if(is.null(labels) || length(labels) > 1) {
@@ -170,7 +168,7 @@ plot_timeline <- function(df) {
   non_maintenance <- df %>% filter(maintenance == FALSE) %>% as.data.frame()
   maintenance <- df %>% filter(maintenance == TRUE) %>% as.data.frame()
   rect_df <- data.frame(xmin = 0, xmax = 0, ymin = maintenance[1,"recording_label"], ymax = maintenance[2, "recording_label"], fill = "fill")
-  maintenance %>%
+  p <- maintenance %>%
     ggplot(
       aes(
         end, recording_label,
@@ -194,14 +192,13 @@ plot_timeline <- function(df) {
       color = guide_colorbar(order = 1),
       fill = guide_legend(order = 2)
     ) +
-    facet_grid(
-      rows = vars(run)
-    ) +
     labs(
-      x = "Total elapsed time", y = NULL,
-      subtitle = "more vertical is faster"
+      x = "Total elapsed time", y = NULL
+      # subtitle = "more vertical is faster"
     ) +
     theme(legend.position = "bottom")
+
+  facet_on_run(p, maintenance)
 }
 
 
@@ -219,10 +216,7 @@ plot_hist_loadtimes <- function(df, max_load_time = 5) {
     ylab("Sessions") +
     theme(legend.position = "bottom")
 
-  if (length(levels(df$run)) > 1) {
-    p <- p + facet_grid(rows = vars(run))
-  }
-  p
+  facet_on_run(p, df)
 }
 
 
@@ -317,6 +311,16 @@ request_scale_guides <- function() {
 }
 
 
+facet_on_run <- function(p, df, col = "run", rows = vars(run), ...) {
+  if (length(unique(df[[col]])) > 1) {
+    p <- p + facet_grid(rows = rows, ...)
+  }
+  p
+}
+facet_on_run_free <- function(p, df, col = "run", rows = vars(run)) {
+  facet_on_run(p, df, col, rows, scales = "free_y", space = "free_y")
+}
+
 #' @describeIn plot_loadtest Gantt chart of event duration for each session within each run
 #' @export
 plot_gantt <- function(df) {
@@ -329,14 +333,13 @@ plot_gantt <- function(df) {
       labels = c("Homepage", "JS/CSS", "Start session", "Calculate", "WS_SEND"))) %>%
     mutate(colorCol = request_color_column(maintenance, event))
 
-  ggplot(df_gantt, aes(x = center, y = user_id, width = (end - start), fill = colorCol)) +
+  p <- ggplot(df_gantt, aes(x = center, y = user_id, width = (end - start), fill = colorCol)) +
     geom_tile(height = 1, color = request_border) + #, size = 0.3) +
     maintenance_vline(data = df_gantt, mapping = aes(xintercept = start)) +
     maintenance_vline(data = df_gantt, mapping = aes(xintercept = end)) +
     request_scale_fill(includeWarmup = TRUE) +
     request_scale_color(includeWarmup = TRUE) +
     request_scale_guides() +
-    facet_grid(rows = vars(run), scales="free_y", space="free_y") +
     scale_y_discrete(labels = {
       rev(unique(df$user_id))
     }, breaks = {
@@ -344,10 +347,12 @@ plot_gantt <- function(df) {
     }) +
     labs(
       x = "Elapsed time (sec)",
-      y = "Session #",
-      subtitle = "smaller bar width is faster"
+      y = "Session #"
+      # subtitle = "smaller bar width is faster"
     ) +
     theme(legend.position = "bottom")
+
+  facet_on_run_free(p, df_gantt)
 }
 
 #' @describeIn plot_loadtest Event gantt chart of each user session within each run
@@ -372,10 +377,9 @@ plot_gantt_session <- function(df) {
   }
 
 
-  df_session %>%
+  p <- df_session %>%
     ggplot(aes(x = center, y = session_id, width = (end - start), fill = colorCol)) +
       geom_tile(height = 1, color = request_border) + #, size = 0.3) +
-      facet_grid(rows = vars(run), scales="free_y", space="free_y") +
       maintenance_vline(data = df_session, mapping = aes(xintercept = start)) +
       maintenance_vline(data = df_session, mapping = aes(xintercept = end)) +
       request_scale_fill(includeWarmup = TRUE) +
@@ -385,18 +389,24 @@ plot_gantt_session <- function(df) {
       ylab("Session #") +
       xlab("Elapsed time (sec)") +
       theme(legend.position = "bottom")
+
+  facet_on_run_free(p, df_session)
 }
 
 
-#' @describeIn plot_loadtest Event gantt chart of fastest to slowest session times within each run
-#' @export
-plot_gantt_duration <- function(df, cutoff = 10) {
-  df1 <- df %>%
+
+gantt_duration_data <- function(df) {
+  df %>%
     filter(maintenance == TRUE) %>%
     filter(event != "WS_RECV_INIT") %>%
     group_by(run, session_id, user_id, iteration) %>%
     mutate(end = end - min(start), start = start - min(start)) %>%
     ungroup()
+}
+#' @describeIn plot_loadtest Event gantt chart of fastest to slowest session times within each run
+#' @export
+plot_gantt_duration <- function(df, cutoff = 10) {
+  df1 <- gantt_duration_data(df)
 
   sessions <- df1 %>%
     filter(event != "WS_RECV_INIT") %>%
@@ -409,14 +419,13 @@ plot_gantt_duration <- function(df, cutoff = 10) {
 
   df1 <- df1 %>%
     inner_join(sessions, by = c("run", "session_id", "user_id", "iteration"))
-  df1 %>%
+  p <- df1 %>%
     mutate(center = (end + start) / 2) %>%
     mutate(event = factor(event,
       levels = c("REQ_HOME", "REQ_GET", "WS_OPEN", "WS_RECV", "WS_SEND"),
       labels = c("Homepage", "JS/CSS", "Start session", "Calculate", "WS_SEND"))) %>%
     ggplot(aes(x = center, y = order, width = (end - start), fill = event)) +
       geom_tile(height = 1, color = request_border) + #, size = 0.3) +
-      facet_grid(rows = vars(run), scales="free_y", space="free_y") +
       # scale_fill_brewer(palette = "RdBu") +
       scale_fill_manual(
         NULL,
@@ -425,14 +434,18 @@ plot_gantt_duration <- function(df, cutoff = 10) {
       ) +
       geom_vline(xintercept = cutoff, color = cutoffColor) +
       theme(
+        panel.grid.minor.y=element_blank(),
+        panel.grid.major.y=element_blank(),
         axis.text.y=element_blank(),
         axis.ticks.y=element_blank()) +
       labs(
         x = "Time since session start (sec)",
-        y = "Sessions ordered by total duration",
-        subtitle = "smaller bar width is faster"
+        y = "Sessions ordered by total duration"
+        # subtitle = "smaller bar width is faster"
       ) +
       theme(legend.position = "bottom")
+
+  facet_on_run_free(p, df1)
 }
 
 
@@ -505,7 +518,7 @@ plot_gantt_latency <- function(df) {
     session_breaks <- session_levels
   }
 
-  ggplot(
+  p <- ggplot(
     df_sum,
     aes(session_id, max_latency, fill = colorCol, group = event)
   ) +
@@ -515,14 +528,15 @@ plot_gantt_latency <- function(df) {
     request_scale_fill(includeWarmup = TRUE) +
     request_scale_color(includeWarmup = TRUE) +
     request_scale_guides() +
-    facet_grid(rows = vars(run)) +
     scale_x_discrete(labels = session_breaks, breaks = session_breaks) +
     labs(
       x = "Session",
-      y = "Total Latency (sec)",
-      subtitle = "shorter bar is faster"
+      y = "Total Latency (sec)"
+      # subtitle = "shorter bar is faster"
     ) +
     theme(legend.position = "bottom")
+
+  facet_on_run(p, df_sum)
 }
 
 #' @describeIn plot_loadtest Bar chart of total HTTP latency for each session within each run
@@ -540,7 +554,7 @@ plot_http_latency <- function(df, cutoff = 10) {
     session_breaks <- session_levels
   }
 
-  ggplot(
+  p <- ggplot(
     df_sum,
     aes(session_id, total_latency, fill = colorCol, group = event)
   ) +
@@ -551,15 +565,16 @@ plot_http_latency <- function(df, cutoff = 10) {
     request_scale_color(includeWarmup = TRUE, limits = c("Homepage", "JS/CSS", "Warmup / Cooldown")) +
     request_scale_guides() +
     # geom_step(position = position_stack(reverse = TRUE)) +
-    facet_grid(rows = vars(run)) +
     scale_x_discrete(labels = session_breaks, breaks = session_breaks) +
     geom_hline(yintercept = cutoff, color = cutoffColor) +
     labs(
       x = "Session",
-      y = "Total HTTP Latency (sec)",
-      subtitle = "shorter bar is faster"
+      y = "Total HTTP Latency (sec)"
+      # subtitle = "shorter bar is faster"
     ) +
     theme(legend.position = "bottom")
+
+  facet_on_run(p, df_sum)
 }
 #' @describeIn plot_loadtest Bar chart of maximum calculation (websocket) latency for each session within each run
 #' @export
@@ -573,12 +588,11 @@ plot_websocket_latency <- function(df, cutoff = 10) {
     session_breaks <- session_levels
   }
 
-  ggplot(
+  p <- ggplot(
     df_sum,
     aes(session_id, max_latency, fill = colorCol, group = event)
   ) +
     geom_col(position = position_stack(reverse = TRUE)) +
-    facet_grid(rows = vars(run)) +
     maintenance_session_vline(data = df_sum, mapping = aes(xintercept = start)) +
     maintenance_session_vline(data = df_sum, mapping = aes(xintercept = end)) +
     request_scale_fill(includeWarmup = TRUE, limits = c("Calculate", "Warmup / Cooldown")) +
@@ -588,8 +602,10 @@ plot_websocket_latency <- function(df, cutoff = 10) {
     geom_hline(yintercept = cutoff, color = cutoffColor) +
     labs(
       x = "Session",
-      y = "Maximum WebSocket Latency (sec)",
-      subtitle = "shorter bar is faster"
+      y = "Maximum WebSocket Latency (sec)"
+      # subtitle = "shorter bar is faster"
     ) +
     theme(legend.position = "bottom")
+
+  facet_on_run(p, df_sum)
 }
