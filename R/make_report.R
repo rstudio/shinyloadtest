@@ -51,7 +51,7 @@ make_report <- function(
   tick("Copy Files")
   # collect base path
   base_output_name <- sub(paste0(".", tools::file_ext(output)), "", output, fixed = TRUE)
-  svg_folder <- "SVG"
+  svg_folder <- "svg"
   # make sure output location exists
   dir.create(
     file.path(base_output_name, svg_folder),
@@ -67,16 +67,6 @@ make_report <- function(
       overwrite = TRUE
     )
 
-  # helper function to save an svg
-  save_svg <- function(p, file) {
-    output <- file.path(base_output_name, svg_folder, paste0(file, ".svg"))
-    if (file.exists(output)) return(output)
-    suppressMessages({
-      ggplot2::ggsave(filename = output, plot = p)
-      # TODO make file smaller!
-    })
-    output
-  }
   save_run_svg <- function(p, run, file) {
     save_svg(p, paste0(file, "-", run))
   }
@@ -158,4 +148,24 @@ make_report <- function(
 
   tick("Done!")
   invisible(output)
+}
+
+
+# helper functions to save a ggplot2 to an svg
+to_svgz <- function(in_path, out_path = tempfile()) {
+  out <- gzfile(out_path, "w")
+  writeLines(readLines(in_path), out)
+  close(out)
+
+  invisible(out_path)
+}
+save_svg <- function(p, file) {
+  output_svgz <- file.path(base_output_name, svg_folder, paste0(file, ".svgz"))
+  if (file.exists(output_svgz)) return(output_svgz)
+  output_tmp <- tempfile(fileext = ".svg")
+  suppressMessages({
+    ggplot2::ggsave(filename = output_tmp, plot = p)
+    # TODO make file smaller!
+  })
+  to_svgz(output_tmp, output_svgz)
 }

@@ -75,6 +75,6 @@ dev_load()
 
 
   dev_load()
-  make_rep(df)
+  make_report(df)
 
 }
