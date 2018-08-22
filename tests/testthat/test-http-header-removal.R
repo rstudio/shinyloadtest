@@ -32,10 +32,8 @@ test_that("hop-by-hop headers removed from Rook requests", {
       HTTP_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/68.0.3440.75 Chrome/68.0.3440.75 Safari/537.36",
       HTTP_HOST = "127.0.0.1:8600"
     )
-  to_remove <-
-    shinyloadtest:::headers_to_remove(rook_req$HTTP_CONNECTION)
-  curl_req <-
-    shinyloadtest:::req_rook_to_curl(rook_req, "example.com", 80)
+  to_remove <- headers_to_remove(rook_req$HTTP_CONNECTION)
+  curl_req <- req_rook_to_curl(rook_req, "example.com", 80)
   expect_length(base::intersect(to_remove, names(curl_req)), 0)
 })
 
@@ -77,7 +75,7 @@ test_that("hop-by-hop headers removed from httr responses", {
           0x6c, 0x73, 0x65, 0x2c, 0x22, 0x65, 0x6e, 0x74, 0x72, 0x6f, 0x70, 0x79, 0x22, 0x3a, 0x33, 0x33, 0x36, 0x35, 0x34, 0x38, 0x30, 0x32, 0x35, 0x31, 0x7d))
     )
   headers <- curl::parse_headers_list(httr_resp$headers)
-  to_remove <- shinyloadtest:::headers_to_remove(headers$connect)
-  rook_resp <- shinyloadtest:::resp_httr_to_rook(httr_resp)
+  to_remove <- headers_to_remove(headers$connect)
+  rook_resp <- resp_httr_to_rook(httr_resp)
   expect_length(base::intersect(to_remove, names(rook_resp$headers)), 0)
 })
