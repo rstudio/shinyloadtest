@@ -107,20 +107,24 @@ plot_time_boxplot <- function(df, labels = NULL) {
 
   p <- df %>%
     ggplot(aes(run, time, fill = run, color = run)) +
-    geom_boxplot() +
+    geom_boxplot(show.legend = FALSE) +
     scale_fill_manual(values = make_run_fill(levels(df$run))) +
     scale_color_manual(values = make_run_color(levels(df$run))) +
     # labs(subtitle = "lower is faster") +
+    labs(y = "Time (sec)", x = NULL) +
     theme(
       panel.grid.major.x = element_blank(),
       legend.position = "bottom"
     )
+
+  recording_label_length <- length(unique(df$recording_label))
   if(
-    (is.null(labels) || length(labels) > 1)
-    # &&
-    # (length(unique(df$recording_label)) > 1)
+    (is.null(labels) || length(labels) > 1) &&
+    (recording_label_length > 1)
   ) {
     p <- p + facet_wrap(~recording_label)
+  } else if (recording_label_length == 1) {
+    p <- p + labs(title = df$recording_label[1])
   }
   p
 }
@@ -143,11 +147,18 @@ plot_concurrency_time <- function(df, labels = NULL) {
     scale_fill_manual(values = make_run_color(levels(df$run))) +
     scale_color_manual(values = make_run_fill(levels(df$run))) +
     coord_cartesian(ylim = range(df$time)) +
+    labs(x = "Concurrency", y = "Time (sec)") +
     # labs(subtitle = "lower is faster") +
-    theme(legend.position = "bottom")
+    theme(legend.position = "none")
 
-  if(is.null(labels) || length(labels) > 1) {
+  recording_label_length <- length(unique(df$recording_label))
+  if(
+    (is.null(labels) || length(labels) > 1) &&
+    (recording_label_length > 1)
+  ) {
     p <- p + facet_wrap(~recording_label)
+  } else if (recording_label_length == 1) {
+    p <- p + labs(title = df$recording_label[1])
   }
   p
 }
@@ -163,8 +174,9 @@ plot_concurrency_time <- function(df, labels = NULL) {
 # }
 
 #' @describeIn plot_loadtest Event waterfall for each session within each run
+#' @param limits passed into \code{\link[ggplot2]{scale_colour_gradientn}}
 #' @export
-plot_timeline <- function(df) {
+plot_timeline <- function(df, limits = c(0, max(df$concurrency, na.rm = TRUE))) {
   non_maintenance <- df %>% filter(maintenance == FALSE) %>% as.data.frame()
   maintenance <- df %>% filter(maintenance == TRUE) %>% as.data.frame()
   rect_df <- data.frame(xmin = 0, xmax = 0, ymin = maintenance[1,"recording_label"], ymax = maintenance[2, "recording_label"], fill = "fill")
@@ -187,13 +199,13 @@ plot_timeline <- function(df) {
     scale_y_discrete(limits = rev(levels(df$recording_label))) +
     geom_line(size = 1.2) +
     # scale_color_viridis_c() +
-    scale_colour_gradientn(colours = rev(c(run_fill_colors[c(3, 13, 6)], run_accent_colors[2]))) +
+    scale_colour_gradientn(colours = rev(c(run_fill_colors[c(3, 13, 6)], run_accent_colors[2])), limits = limits) +
     guides(
       color = guide_colorbar(order = 1),
       fill = guide_legend(order = 2)
     ) +
     labs(
-      x = "Total elapsed time", y = NULL
+      x = "Total elapsed time (sec)", y = NULL
       # subtitle = "more vertical is faster"
     ) +
     theme(legend.position = "bottom")
@@ -369,13 +381,7 @@ plot_gantt_session <- function(df) {
     mutate(colorCol = request_color_column(maintenance, event))
 
 
-  session_levels <- levels(df_session$session_id)
-  if (length(session_levels) > 20) {
-    session_breaks <- session_levels[seq_along(session_levels) %% 5 == 1]
-  } else {
-    session_breaks <- session_levels
-  }
-
+  session_breaks <- breaks_from_session_levels(df_session)
 
   p <- df_session %>%
     ggplot(aes(x = center, y = session_id, width = (end - start), fill = colorCol)) +
@@ -511,12 +517,7 @@ gantt_latency <- function(df) {
 plot_gantt_latency <- function(df) {
   df_sum <- latency_df(df)
 
-  session_levels <- levels(df_sum$session_id)
-  if (length(session_levels) > 20) {
-    session_breaks <- session_levels[seq_along(session_levels) %% 5 == 1]
-  } else {
-    session_breaks <- session_levels
-  }
+  session_breaks <- breaks_from_session_levels(df_sum)
 
   p <- ggplot(
     df_sum,
@@ -547,12 +548,7 @@ plot_http_latency <- function(df, cutoff = 10) {
     filter(event == "Homepage" | event == "JS/CSS") %>%
     mutate(event = factor(event, levels = c("Homepage", "JS/CSS"), ordered = TRUE))
 
-  session_levels <- levels(df_sum$session_id)
-  if (length(session_levels) > 20) {
-    session_breaks <- session_levels[seq_along(session_levels) %% 5 == 1]
-  } else {
-    session_breaks <- session_levels
-  }
+  session_breaks <- breaks_from_session_levels(df_sum)
 
   p <- ggplot(
     df_sum,
@@ -581,12 +577,7 @@ plot_http_latency <- function(df, cutoff = 10) {
 plot_websocket_latency <- function(df, cutoff = 10) {
   df_sum <- latency_df(df) %>% filter(event == "Calculate")
 
-  session_levels <- levels(df_sum$session_id)
-  if (length(session_levels) > 20) {
-    session_breaks <- session_levels[seq_along(session_levels) %% 5 == 1]
-  } else {
-    session_breaks <- session_levels
-  }
+  session_breaks <- breaks_from_session_levels(df_sum)
 
   p <- ggplot(
     df_sum,
@@ -608,4 +599,21 @@ plot_websocket_latency <- function(df, cutoff = 10) {
     theme(legend.position = "bottom")
 
   facet_on_run(p, df_sum)
+}
+
+
+
+breaks_from_session_levels <- function(df) {
+  session_levels <- levels(df$session_id)
+  len <- length(session_levels)
+  if (len <= 20) {
+    return(session_levels)
+  }
+
+  divisor <- 5
+  while (floor(len / divisor) > 20) {
+    divisor <- divisor + 5
+  }
+
+  session_breaks <- session_levels[seq_along(session_levels) %% divisor == 1]
 }

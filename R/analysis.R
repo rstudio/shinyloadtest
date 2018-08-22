@@ -70,7 +70,7 @@ read_recording <- function(fileName) {
       item
     })
   startTime <- baselineInfo[[1]]$begin
-  baselineInfo %>%
+  baselineData <- baselineInfo %>%
     lapply(function(info) {
       tibble::tibble(
         event = info$type,
@@ -82,7 +82,11 @@ read_recording <- function(fileName) {
         json = list(info),
       )
     }) %>%
-    bind_rows() %>%
+    bind_rows()
+
+  baselineData$label <- recording_item_labels(baselineData$json)
+
+  baselineData %>%
     mutate(
       session_id = -1,
       user_id = -1,
@@ -118,7 +122,7 @@ recording_item_labels <- function(x_list) {
   input_changes <- c()
 
   prepend_line <- function(a, i) {
-    paste0(i, ") ", a)
+    paste0("Event ", i, ") ", a)
   }
 
   for (i in seq_along(x_list)) {
@@ -133,18 +137,26 @@ recording_item_labels <- function(x_list) {
         if (i > 1 && identical(x_list[[i - 1]]$type, "WS_RECV_INIT")) {
           "<Initialize Inputs>"
         } else {
-          message <- jsonlite::fromJSON(x$message)
-          name_vals <- names(message$data)
-          visible_name_vals <- name_vals[!grepl("^\\.", name_vals)]
-          paste0("Set: ", paste0(visible_name_vals, collapse = ", "))
+          if (grepl("|o|$", x$message)) {
+            "<SockJS Connect>"
+          } else {
+            message <- parseMessage(x$message)
+            name_vals <- names(message$data)
+            visible_name_vals <- name_vals[!grepl("^\\.", name_vals)]
+            paste0("Set: ", paste0(visible_name_vals, collapse = ", "))
+          }
         }
       },
       "WS_RECV" = {
-        message <- jsonlite::fromJSON(x$message)
-        paste0("Updated: ", paste0(names(message$values), collapse = ", "))
+        if (x$message == "o") {
+          "<SockJS Init>"
+        } else {
+          message <- parseMessage(x$message)
+          paste0("Updated: ", paste0(names(message$values), collapse = ", "))
+        }
       },
       "WS_CLOSE" = "<Close Websocket>",
-      prepend_line(x$type)
+      prepend_line(x$type, i)
     )
     ret <- append(ret, prepend_line(new_label, i))
   }
