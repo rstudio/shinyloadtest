@@ -1,3 +1,7 @@
+if (getRversion() >= "2.15.1") {
+  # TODO remove and upgrade the dplyr fns to FN_()
+  utils::globalVariables(c("max_error", "min_time", "max_time", "mean_time", "lm", "model", "coef", "residuals", "slope", "intercept"))
+}
 
 
 #' Make shinyloadtest Report
@@ -8,8 +12,9 @@
 #' @param http_latency_cutoff Cutoff value for total http latency plot
 #' @param max_websocket_cutoff Cutoff value for max websocket latency plot
 #' @param verbose Boolean that determines if progress output is displayed
+#' @param self_contained Boolean that determines if the final output should be a self contained html file
+#' @param open_browser Whether to open the created output in the browser
 #' @export
-#' @import rmarkdown
 make_report <- function(
   df,
   output = "test.html",
@@ -17,12 +22,15 @@ make_report <- function(
   http_latency_cutoff = 5,
   max_websocket_cutoff = 20,
   open_browser = TRUE,
+  self_contained = TRUE,
   verbose = TRUE
 ) {
   if(!grepl(".html$", output)) {
     stop("'output' should end in '.html'")
   }
 
+  verbose <- isTRUE(verbose)
+  self_contained <- isTRUE(self_contained)
   if (verbose) {
     pr <- progress::progress_bar$new(
       format = ":name - :evt [:bar] :current/:total eta::eta",
@@ -51,7 +59,11 @@ make_report <- function(
   }
 
   # collect base path
-  base_output_name <- sub(paste0(".", tools::file_ext(output)), "", output, fixed = TRUE)
+  if (self_contained) {
+    base_output_name <- file.path(tempdir(TRUE), basename(sub(paste0(".", tools::file_ext(output)), "", output, fixed = TRUE)))
+  } else {
+    base_output_name <- sub(paste0(".", tools::file_ext(output)), "", output, fixed = TRUE)
+  }
   tick("Copy Files")
   svg_folder <- "svg"
   # make sure output location exists
@@ -59,6 +71,7 @@ make_report <- function(
     file.path(base_output_name, svg_folder),
     recursive = TRUE, showWarnings = FALSE
   )
+
   # copy js and css files
   c("js", "css") %>%
     file.path("dist", .) %>%
@@ -73,9 +86,9 @@ make_report <- function(
     save_svg_file(p, paste0(file, "-", run), ...)
   }
   save_svg_file <- function(p, file, ...) {
-    output <- file.path(base_output_name, svg_folder, paste0(file, ".svgz"))
+    output <- file.path(base_output_name, svg_folder, paste0(file, ".svg"))
     save_svg(p, output, ...)
-    file.path(basename(base_output_name), svg_folder, paste0(file, ".svgz"))
+    file.path(basename(base_output_name), svg_folder, paste0(file, ".svg"))
   }
 
   df_maintenance <- df %>% filter(maintenance == TRUE)
@@ -231,7 +244,18 @@ make_report <- function(
   ))
 
   tick("Save HTML")
-  writeLines(output_txt, output)
+
+  if (self_contained) {
+    tmp_file <- tempfile(tmpdir = dirname(base_output_name), fileext = ".html")
+    writeLines(output_txt, tmp_file)
+
+    cat("", file = output)
+    output_path <- normalizePath(output)
+    rmarkdown::pandoc_convert(input = tmp_file, output = output_path, options = c("--self-contained", "--template", tmp_file))
+  } else {
+    writeLines(output_txt, output)
+  }
+
 
   tick(basename(output))
   if (open_browser) utils::browseURL(output)
@@ -248,7 +272,7 @@ to_svgz <- function(in_path, out_path = tempfile()) {
   invisible(out_path)
 }
 save_svg <- function(p, output, width = 15, height = 10, ...) {
-  # if (file.exists(output)) return(output)
+  if (file.exists(output)) return(output)
   output_tmp <- tempfile(fileext = ".svg")
   on.exit({
     unlink(output_tmp)
@@ -257,5 +281,7 @@ save_svg <- function(p, output, width = 15, height = 10, ...) {
     ggplot2::ggsave(filename = output_tmp, plot = p, width = width, height = height, ...)
     # TODO make file smaller!
   })
-  to_svgz(output_tmp, output)
+  # to_svgz(output_tmp, output)
+  file.copy(output_tmp, output)
+  output
 }
