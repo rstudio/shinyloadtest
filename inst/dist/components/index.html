@@ -4,13 +4,17 @@
     <title>ShinyLoadTest UI Prototype</title>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
       crossorigin="anonymous">
-    <link rel="stylesheet" href="{base_output_name}/css/shinyUI.css">
+    <link rel="stylesheet" href="{folder_name}/css/shinyUI.css">
   </head>
   <body>
     <!-- this are at the top so that any additional page specific scripts are loaded after -->
-    <script src="{base_output_name}/js/uikit.min.js"></script>
-    <script src="{base_output_name}/js/uikit-icons.min.js"></script>
-    <link rel="stylesheet" href="{base_output_name}/css/shinyloadtest.css">
+    <script src="{folder_name}/js/uikit.min.js"></script>
+    <script src="{folder_name}/js/uikit-icons.min.js"></script>
+    <script>
+    // three vertical lines
+    UIkit.icon.add({{"menu-rotated": '<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><rect y="2" x="4" height="16" width="1" /><rect y="2" x="9" height="16" width="1" /><rect y="2" x="14" height="16" width="1" /></svg>'}})
+    </script>
+    <link rel="stylesheet" href="{folder_name}/css/shinyloadtest.css">
 
     <div class="sui-flex-5 sui-layout-flex-horz sui-full-height">
       <div class="sui-flex-1 uk-background-muted slt-side-menu-container">
@@ -22,10 +26,10 @@
             <a href=#sessions><span uk-icon=server class="stl-side-menu-icon"></span>Sessions</a>
           </li>
           <li class="slt-side-menu-item">
-            <a href=#session-duration><span uk-icon=server class="stl-side-menu-icon"></span>Session Duration</a>
+            <a href=#session-duration><span uk-icon=album class="stl-side-menu-icon"></span>Session Duration</a>
           </li>
           <li class="slt-side-menu-item">
-            <a href=#waterfall><span uk-icon=server class="stl-side-menu-icon"></span>Event Waterfall</a>
+            <a href=#waterfall><span uk-icon=menu-rotated class="stl-side-menu-icon"></span>Event Waterfall</a>
           </li>
           <li class="slt-side-menu-item">
             <a href=#latency><span uk-icon=clock class="stl-side-menu-icon"></span>Latency</a>
@@ -94,9 +98,9 @@
         <section class="sui-layout-flex-vert" id="duration">
           <div class="sui-flex-0 slt-view-control">
             <div class="uk-button-group sui-segmented-button" id=duration-report-controller>
-              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=slowest-max>Slowest max times</button>
-              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=slowest-min>Slowest min times</button>
-              { if (run_length > 1) '<button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=largest-mean-diff>Largest mean differences</button>' else "" }
+              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=slowest-max>Slowest max time</button>
+              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=slowest-min>Slowest min time</button>
+              { if (run_length > 1) '<button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=largest-mean-diff>Largest mean difference</button>' else "" }
               <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=event-duration-data-table>Data table</button>
             </div>
           </div>
@@ -132,27 +136,27 @@
         <section class="sui-layout-flex-vert" id="concurrency">
           <div class="sui-flex-0 slt-view-control">
             <div class="uk-button-group sui-segmented-button" id=concurrency-report-controller>
-              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=concurrency-slope>Largest Slope</button>
-              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=concurrency-intercept>Largest Intercept</button>
-              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=concurrency-error>Largest Error</button>
+              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=concurrency-slope>Largest slope</button>
+              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=concurrency-intercept>Largest intercept</button>
+              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=concurrency-error>Largest error</button>
               <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=event-concurrency-data-table>Data table</button>
             </div>
           </div>
           <div class="sui-flex-5 slt-section-group" id="concurrency-chart-view">
             <div id="concurrency-slope">
-              { glue_component("picker", list(class="slt-box-picker-container", id="concurrency-slope-picker", value = min(c(12, length(concurrency$slope))),  min = 1, max = length(concurrency$slope), comment = "largest linear model slope")) }
+              { glue_component("picker", list(class="slt-box-picker-container", id="concurrency-slope-picker", value = min(c(12, length(concurrency$slope))),  min = 1, max = length(concurrency$slope), comment = "largest linear model slopes")) }
               <div class="uk-flex uk-grid-match uk-grid-small uk-child-width-1-4@m slt-chart-grid" uk-grid id="concurrency-slope-grid">
                 { glue_multi_component("boxplot_thumbnail", concurrency$slope)}
               </div>
             </div>
             <div id="concurrency-intercept">
-              { glue_component("picker", list(class="slt-box-picker-container", id="concurrency-intercept-picker", value = min(c(12, length(concurrency$intercept))),  min = 1, max = length(concurrency$intercept), comment = "largest linear model intercept")) }
+              { glue_component("picker", list(class="slt-box-picker-container", id="concurrency-intercept-picker", value = min(c(12, length(concurrency$intercept))),  min = 1, max = length(concurrency$intercept), comment = "largest linear model intercepts")) }
               <div class="uk-flex uk-grid-match uk-grid-small uk-child-width-1-4@m slt-chart-grid" uk-grid id="concurrency-intercept-grid">
                 { glue_multi_component("boxplot_thumbnail", concurrency$intercept)}
               </div>
             </div>
             <div id="concurrency-error">
-              { glue_component("picker", list(class="slt-box-picker-container", id="concurrency-error-picker", value = min(c(12, length(concurrency$max_error))),  min = 1, max = length(concurrency$max_error), comment = "largest linear model residual")) }
+              { glue_component("picker", list(class="slt-box-picker-container", id="concurrency-error-picker", value = min(c(12, length(concurrency$max_error))),  min = 1, max = length(concurrency$max_error), comment = "largest linear model residuals")) }
               <div class="uk-flex uk-grid-match uk-grid-small uk-child-width-1-4@m slt-chart-grid" uk-grid id="concurrency-error-grid">
                 { glue_multi_component("boxplot_thumbnail", concurrency$max_error)}
               </div>
@@ -174,7 +178,7 @@
         </section>
       </div>
     </div>
-    <script src="{base_output_name}/js/sui.js"></script>
-    <script src="{base_output_name}/js/shinyloadtest.js"></script>
+    <script src="{folder_name}/js/sui.js"></script>
+    <script src="{folder_name}/js/shinyloadtest.js"></script>
   </body>
 </html>
