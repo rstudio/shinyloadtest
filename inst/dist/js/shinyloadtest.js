@@ -5,8 +5,9 @@ managedChartGrid(document.querySelector('#slowest-min-picker'), document.querySe
 managedChartGrid(document.querySelector('#slowest-max-picker'), document.querySelector('#slowest-max-grid'));
 managedChartGrid(document.querySelector('#largest-mean-diff-picker'), document.querySelector('#largest-mean-diff-grid'));
 
-managedChartGrid(document.querySelector('#largest-slope-picker'), document.querySelector('#largest-slope-grid'));
-managedChartGrid(document.querySelector('#largest-slope-diff-picker'), document.querySelector('#largest-slope-diff-grid'));
+managedChartGrid(document.querySelector('#concurrency-slope-picker'), document.querySelector('#concurrency-slope-grid'));
+managedChartGrid(document.querySelector('#concurrency-intercept-picker'), document.querySelector('#concurrency-intercept-grid'));
+managedChartGrid(document.querySelector('#concurrency-error-picker'), document.querySelector('#concurrency-error-grid'));
 
 
 // app specific handler for changing the number of box plots to show
@@ -17,6 +18,9 @@ const boxPlotTemplate = `<div class=""><div class="uk-card uk-card-small slt-cha
 // this is the script that needs to run in the actual app to manage the generated SVGs
 function managedChartGrid(picker, activeGrid) {
   let charts = [];
+  if (!picker && !activeGrid) {
+    return;
+  }
   for( node of activeGrid.children){
     charts.push(node);
   }
@@ -133,7 +137,8 @@ const add_tab_click_handler = (name) => {
 }
 add_tab_click_handler("sessions");
 add_tab_click_handler("session-duration");
-add_tab_click_handler("time");
+add_tab_click_handler("waterfall");
+add_tab_click_handler("latency");
 add_tab_click_handler("duration");
 add_tab_click_handler("concurrency");
 
