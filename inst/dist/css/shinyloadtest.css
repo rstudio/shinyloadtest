@@ -36,3 +36,8 @@
 .uk-grid > * {
   padding-bottom: 15px;
 }
+
+/* https://www.creativebloq.com/how-to/10-golden-rules-for-responsive-svgs */
+img[src$=".svgz"] {
+  width: 100%;
+}
