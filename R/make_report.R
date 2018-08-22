@@ -9,6 +9,7 @@
 #' @param max_websocket_cutoff Cutoff value for max websocket latency plot
 #' @param verbose Boolean that determines if progress output is displayed
 #' @export
+#' @import rmarkdown
 make_report <- function(
   df,
   output = "test.html",
