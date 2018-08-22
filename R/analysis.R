@@ -1,6 +1,6 @@
 if (getRversion() >= "2.15.1") {
   # TODO remove and upgrade the dplyr fns to FN_()
-  utils::globalVariables(c("input_line_number", "run", "session_id", "user_id", "iteration", "event", "timestamp", "concurrency", "center", "event_class", "total_latency", ".", "type"))
+  utils::globalVariables(c("input_line_number", "run", "session_id", "user_id", "iteration", "event", "timestamp", "concurrency", "center", "event_class", "total_latency", ".", "type", "min_start", "max_end", "worker_id", "json"))
 }
 
 cutoffColor <- "red"
@@ -207,6 +207,7 @@ get_times <- function(df) {
 #'   directories into a tidy data frame.
 #' @param ...  Key-value pairs where the key is the desired name for the test and the
 #'   value is a path to the test result directory.
+#' @param verbose Whether or not to print progress for reading loadtest directories
 #' @return A tidy data frame with the test result data. Each row is an event. Columns include
 #'    identifiers and timing information for the event.
 #' @export

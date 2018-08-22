@@ -9,6 +9,8 @@ tidy_loadtest(..., verbose = TRUE)
 \arguments{
 \item{...}{Key-value pairs where the key is the desired name for the test and the
 value is a path to the test result directory.}
+
+\item{verbose}{Whether or not to print progress for reading loadtest directories}
 }
 \value{
 A tidy data frame with the test result data. Each row is an event. Columns include

@@ -5,7 +5,8 @@
 \title{Make shinyloadtest Report}
 \usage{
 make_report(df, output = "test.html", duration_cutoff = 10,
-  http_latency_cutoff = 5, max_websocket_cutoff = 20, verbose = TRUE)
+  http_latency_cutoff = 5, max_websocket_cutoff = 20,
+  open_browser = TRUE, self_contained = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{df}{data.frame returned from \code{\link{tidy_loadtest}}}
@@ -17,6 +18,10 @@ make_report(df, output = "test.html", duration_cutoff = 10,
 \item{http_latency_cutoff}{Cutoff value for total http latency plot}
 
 \item{max_websocket_cutoff}{Cutoff value for max websocket latency plot}
+
+\item{open_browser}{Whether to open the created output in the browser}
+
+\item{self_contained}{Boolean that determines if the final output should be a self contained html file}
 
 \item{verbose}{Boolean that determines if progress output is displayed}
 }

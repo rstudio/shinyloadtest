@@ -1,6 +1,6 @@
 if (getRversion() >= "2.15.1") {
   # TODO remove and upgrade the dplyr fns to FN_()
-  utils::globalVariables(c("start", "end", "ready", "begin", "label", "recording_label", "time"))
+  utils::globalVariables(c("start", "end", "ready", "begin", "label", "recording_label", "time", "maintenance", "quantile", "spread", "HTTP", "WebSocket", "val", "name", "max_latency", "colorCol", "xmin", "xmax", "ymin", "ymax", "fill"))
 }
 
 #' @import ggplot2 dplyr

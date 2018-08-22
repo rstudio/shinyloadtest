@@ -18,7 +18,7 @@ plot_time_boxplot(df, labels = NULL)
 
 plot_concurrency_time(df, labels = NULL)
 
-plot_timeline(df)
+plot_timeline(df, limits = c(0, max(df$concurrency, na.rm = TRUE)))
 
 plot_hist_loadtimes(df, max_load_time = 5)
 
@@ -38,6 +38,8 @@ plot_websocket_latency(df, cutoff = 10)
 \item{df}{data frame returned from \code{\link{tidy_loadtest}}}
 
 \item{labels}{A vector of labels to include.  If none are supplied, all labels will be used.}
+
+\item{limits}{passed into \code{\link[ggplot2]{scale_colour_gradientn}}}
 
 \item{max_load_time}{The amount of time users will wait for the page to load
 when first requesting the app.}
