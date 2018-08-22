@@ -184,7 +184,11 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$localPort <- port
       private$outputFileName <- outputFileName
       private$outputFile <- file(outputFileName, "w")
-      writeLines(paste0("# version ", packageVersion("shinyloadtest")), private$outputFile)
+      header <- c(
+        paste0("# version: ", packageVersion("shinyloadtest")),
+        paste0("# target: ", targetAppUrl)
+      )
+      writeLines(header, private$outputFile)
       private$sessionCookies <- sessionCookies
       private$startServer()
     },
