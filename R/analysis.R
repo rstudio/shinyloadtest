@@ -35,16 +35,35 @@ read_log_file <- function(file) {
 }
 
 # Read a "sessions/" directory full of .log files
-read_log_dir <- function(dir, name = basename(dirname(dir))) {
+read_log_dir <- function(dir, name = basename(dirname(dir)), verbose = TRUE) {
+  verbose <- isTRUE(verbose)
   files <- list.files(dir, pattern = "*.csv", full.names = TRUE)
   if (length(files) == 0) {
     stop("No files found for dir: ", dir)
   }
-  df <- lapply(files, read_log_file) %>%
+  if (verbose) {
+    pr <- progress::progress_bar$new(
+      format = ":evt [:bar] :current/:total eta::eta",
+      total = length(files) + 2,
+      show_after = 0,
+      clear = FALSE
+    )
+    tick <- function(evt) {
+      pr$tick(tokens = list(evt = evt))
+    }
+  } else {
+    tick <- identity
+  }
+
+  df <- lapply(files, function(file) {
+      tick(name)
+      read_log_file(file)
+    }) %>%
     bind_rows() %>%
     arrange(timestamp) %>%
     mutate(timestamp = (.$timestamp - min(.$timestamp)) / 1000)
 
+  tick(paste0(name, " - Cleanup"))
   relative_concurrency <- with(df, {
     ifelse(event == "WS_OPEN_START", 1,
            ifelse(event == "WS_CLOSE_END", -1,
@@ -55,6 +74,7 @@ read_log_dir <- function(dir, name = basename(dirname(dir))) {
       concurrency = cumsum(relative_concurrency),
       run = name
     )
+  tick(name)
 
   df
 }
@@ -76,9 +96,9 @@ read_recording <- function(fileName) {
         event = info$type,
         start = as.numeric(difftime(info$begin, startTime, units = "secs")),
         end = if (!is.null(info$end))
-            as.numeric(difftime(info$begin, startTime, units = "secs"))
+            as.numeric(difftime(info$end, startTime, units = "secs"))
           else
-            as.numeric(difftime(info$begin, startTime, units = "secs")) + 0.25,
+            as.numeric(difftime(info$begin, startTime, units = "secs")) + 0.001,
         json = list(info),
       )
     }) %>%
@@ -137,7 +157,7 @@ recording_item_labels <- function(x_list) {
         if (i > 1 && identical(x_list[[i - 1]]$type, "WS_RECV_INIT")) {
           "<Initialize Inputs>"
         } else {
-          if (grepl("|o|$", x$message)) {
+          if (grepl("\\|o\\|\"]$", x$message)) {
             "<SockJS Connect>"
           } else {
             message <- parseMessage(x$message)
@@ -204,14 +224,15 @@ tidy_loadtest <- function(..., verbose = TRUE) {
 
   run_levels <- names(list(...))
 
+  first_recording <- list()
+
   df <- list(...) %>%
     {
       mapply(
         ., names(.),
         USE.NAMES = FALSE, SIMPLIFY = FALSE,
         FUN = function(recording_path, run) {
-          if (verbose) message("Processing: '", run, "'")
-          df_run <- read_log_dir(file.path(recording_path, "sessions"), run) %>%
+          df_run <- read_log_dir(file.path(recording_path, "sessions"), run, verbose = verbose) %>%
             get_times() %>%
             filter(event != "PLAYBACK_SLEEPBEFORE", event != "PLAYER_SESSION") %>%
             arrange(run, user_id, session_id, input_line_number) %>%
@@ -221,17 +242,51 @@ tidy_loadtest <- function(..., verbose = TRUE) {
             ) %>%
             select(run, type, everything())
 
-          df_recording <- read_recording(file.path(recording_path, "recording.log")) %>%
+          recording_path <- file.path(recording_path, "recording.log")
+          if (is.null(first_recording$name)) {
+            first_recording$name <<- run
+            first_recording$value <<- readLines(recording_path)
+          } else {
+            recording <- readLines(recording_path)
+            if (!identical(recording, first_recording$value)) {
+              stop(
+                "Recording for `", run, "` does not equal the recording for `", first_recording$name, "`.\n",
+                "Please use the same recording when calling tidy_loadtest()"
+              )
+            }
+          }
+          df_recording <- read_recording(recording_path) %>%
             mutate(
               recording_label = label
             ) %>%
             select(input_line_number, recording_label)
 
+          df_run$id <- seq_len(nrow(df_run))
+          df_filtered <- filter_df(df_run)
+
+          df_run <- df_run %>%
+            ungroup() %>%
+            mutate(
+              maintenance = id %in% df_filtered$id
+            ) %>%
+            select(-id)
+
+          min_maintenance_time <- df_run %>%
+            filter(maintenance == TRUE) %>%
+            select_("start") %>%
+            min()
+          df_run <- df_run %>%
+            mutate(
+              start = start - min_maintenance_time,
+              end = end - min_maintenance_time
+            )
+
           left_join(df_run, df_recording, by = "input_line_number")
         }
       )
-    } %>%
-    bind_rows()
+    }
+
+  df <- df %>% bind_rows()
 
   fct_levels <- df$input_line_number[!duplicated(df$input_line_number)]
   fct_labels <- df$label[!duplicated(df$input_line_number)]
@@ -239,15 +294,6 @@ tidy_loadtest <- function(..., verbose = TRUE) {
     mutate(
       label = factor(input_line_number, fct_levels, fct_labels, ordered = TRUE),
       run = factor(run, run_levels, ordered = TRUE)
-    )
-
-  df$id <- seq_len(nrow(df))
-  df_filtered <- filter_df(df)
-
-  df <- df %>%
-    ungroup() %>%
-    mutate(
-      maintenance = id %in% df_filtered$id
     )
 
   df

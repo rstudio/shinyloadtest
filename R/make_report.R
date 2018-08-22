@@ -15,6 +15,7 @@ make_report <- function(
   duration_cutoff = 10,
   http_latency_cutoff = 5,
   max_websocket_cutoff = 20,
+  open_browser = TRUE,
   verbose = TRUE
 ) {
   if(!grepl(".html$", output)) {
@@ -23,7 +24,7 @@ make_report <- function(
 
   if (verbose) {
     pr <- progress::progress_bar$new(
-      format = ":evt [:bar] :current/:total eta::eta\n",
+      format = ":name - :evt [:bar] :current/:total eta::eta",
       total = 0 +
         1 + # move files
         2 + # time tab
@@ -39,18 +40,18 @@ make_report <- function(
     tick <- function(evt) {
       n <- nchar(evt)
       total_n <- 21
-      if (n < total_n) {
+      if (n < total_n && FALSE) {
         evt <- paste0(evt, paste0(rep(" ", total_n - n), collapse = ""))
       }
-      pr$tick(tokens = list(evt = evt))
+      pr$tick(tokens = list(evt = evt, name = basename(base_output_name)))
     }
   } else {
     tick <- identity
   }
 
-  tick("Copy Files")
   # collect base path
   base_output_name <- sub(paste0(".", tools::file_ext(output)), "", output, fixed = TRUE)
+  tick("Copy Files")
   svg_folder <- "svg"
   # make sure output location exists
   dir.create(
@@ -73,6 +74,7 @@ make_report <- function(
   save_svg_file <- function(p, file, ...) {
     output <- file.path(base_output_name, svg_folder, paste0(file, ".svgz"))
     save_svg(p, output, ...)
+    file.path(basename(base_output_name), svg_folder, paste0(file, ".svgz"))
   }
 
   df_maintenance <- df %>% filter(maintenance == TRUE)
@@ -93,7 +95,8 @@ make_report <- function(
     save_svg_file("websocket_latency", width = 15, height = latency_height)
 
   # gantt chart plots
-  max_gantt_time <- max(df_maintenance$end)
+  min_gantt_time <- min(df$start)
+  max_gantt_time <- max(df$end)
   max_duration <- max(gantt_duration_data(df)$end)
   gantt <- lapply(levels(df$run), function(run_val) {
     run_val_clean <- run_val %>% tolower() %>% gsub("[^a-z0-9]", "-", .) %>% paste0("run-", .)
@@ -101,7 +104,7 @@ make_report <- function(
 
     tick(paste0(run_val, " Session Gantt"))
     src_gantt <- {
-        plot_gantt(df_run) + xlim(0, max_gantt_time)
+        plot_gantt(df_run) + xlim(min_gantt_time, max_gantt_time)
       } %>%
       save_run_svg(run_val_clean, "gantt", height = 7 * (26.625 * length(unique(df_run$user_id)) + 78) / 504)
 
@@ -113,7 +116,7 @@ make_report <- function(
 
     tick(paste0(run_val, " Event Waterfall"))
     src_waterfall <- {
-        plot_timeline(df_run, limits = range(df_maintenance$concurrency, na.rm = TRUE)) + xlim(0, max_gantt_time)
+        plot_timeline(df_run, limits = range(df_maintenance$concurrency, na.rm = TRUE)) + xlim(min_gantt_time, max_gantt_time)
       } %>%
       save_run_svg(
         run_val_clean,
@@ -178,8 +181,8 @@ make_report <- function(
       model = list(lm(time ~ concurrency))
     ) %>%
     mutate(
-      slope = vapply(model, function(mod){ abs(coef(mod)[1]) }, numeric(1)),
-      intercept = vapply(model, function(mod){ abs(coef(mod)[2]) }, numeric(1)),
+      slope = vapply(model, function(mod){ abs(coef(mod)[2]) }, numeric(1)),
+      intercept = vapply(model, function(mod){ abs(coef(mod)[1]) }, numeric(1)),
       max_error = vapply(model, function(mod){ max(c(abs(residuals(mod)), 0), na.rm = TRUE) }, numeric(1)),
     ) %>%
     group_by(recording_label, input_line_number) %>%
@@ -209,7 +212,7 @@ make_report <- function(
 
   tick("Generate HTML")
   output_txt <- glue_index(list(
-    base_output_name = base_output_name,
+    folder_name = basename(base_output_name),
     src_http = src_http,
     src_websocket = src_websocket,
     gantt = gantt,
@@ -229,7 +232,8 @@ make_report <- function(
   tick("Save HTML")
   writeLines(output_txt, output)
 
-  tick("Done!")
+  tick(basename(output))
+  if (open_browser) utils::browseURL(output)
   invisible(output)
 }
 
@@ -243,7 +247,7 @@ to_svgz <- function(in_path, out_path = tempfile()) {
   invisible(out_path)
 }
 save_svg <- function(p, output, width = 15, height = 10, ...) {
-  if (file.exists(output)) return(output)
+  # if (file.exists(output)) return(output)
   output_tmp <- tempfile(fileext = ".svg")
   on.exit({
     unlink(output_tmp)
