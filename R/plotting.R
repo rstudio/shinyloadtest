@@ -180,6 +180,10 @@ plot_timeline <- function(df, limits = c(0, max(df$concurrency, na.rm = TRUE))) 
   non_maintenance <- df %>% filter(maintenance == FALSE) %>% as.data.frame()
   maintenance <- df %>% filter(maintenance == TRUE) %>% as.data.frame()
   rect_df <- data.frame(xmin = 0, xmax = 0, ymin = maintenance[1,"recording_label"], ymax = maintenance[2, "recording_label"], fill = "fill")
+
+  y_limits <- rev(levels(df$recording_label))
+  y_limits <- y_limits[!grepl("<Close Websocket>", y_limits, fixed = TRUE)]
+
   p <- maintenance %>%
     ggplot(
       aes(
@@ -196,7 +200,7 @@ plot_timeline <- function(df, limits = c(0, max(df$concurrency, na.rm = TRUE))) 
     ## can not add due to competing color scales
     # request_scale_color(includeWarmup = TRUE) +
     # request_scale_guides() +
-    scale_y_discrete(limits = rev(levels(df$recording_label))) +
+    scale_y_discrete(limits = y_limits) +
     geom_line(size = 1.2) +
     # scale_color_viridis_c() +
     scale_colour_gradientn(colours = rev(c(run_fill_colors[c(3, 13, 6)], run_accent_colors[2])), limits = limits) +
