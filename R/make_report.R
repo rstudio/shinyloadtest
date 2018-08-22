@@ -249,6 +249,7 @@ make_report <- function(
     tmp_file <- tempfile(tmpdir = dirname(base_output_name), fileext = ".html")
     writeLines(output_txt, tmp_file)
 
+    dir.create(dirname(output), recursive = TRUE, showWarnings = FALSE)
     cat("", file = output)
     output_path <- normalizePath(output)
     rmarkdown::pandoc_convert(input = tmp_file, output = output_path, options = c("--self-contained", "--template", tmp_file))
