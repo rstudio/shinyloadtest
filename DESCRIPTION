@@ -33,7 +33,8 @@ Imports:
     RColorBrewer,
     lubridate,
     DT,
-    flexdashboard
+    flexdashboard,
+    scales
 Remotes: rstudio/websocket,
     rstudio/httpuv
 RoxygenNote: 6.1.0
