@@ -176,7 +176,7 @@ recording_item_labels <- function(x_list) {
         }
       },
       "WS_CLOSE" = "<Close Websocket>",
-      prepend_line(x$type, i)
+      x$type
     )
     ret <- append(ret, prepend_line(new_label, i))
   }
