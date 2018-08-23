@@ -192,7 +192,7 @@ plot_timeline <- function(df, limits = c(0, max(df$concurrency, na.rm = TRUE))) 
         color = concurrency
       )
     ) +
-    geom_line(data = non_maintenance, color = request_colors()[["Warmup / Cooldown"]], size = 1.2) +
+    geom_line(data = non_maintenance, color = request_colors()[["Warmup / Cooldown"]], size = 0.5) +
     maintenance_vline_only(data = df, mapping = aes(xintercept = start), show.legend = FALSE) +
     maintenance_vline_only(data = df, mapping = aes(xintercept = end), show.legend = FALSE) +
     geom_rect(data = rect_df, inherit.aes = FALSE, mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = fill)) +
@@ -201,7 +201,7 @@ plot_timeline <- function(df, limits = c(0, max(df$concurrency, na.rm = TRUE))) 
     # request_scale_color(includeWarmup = TRUE) +
     # request_scale_guides() +
     scale_y_discrete(limits = y_limits) +
-    geom_line(size = 1.2) +
+    geom_line(size = 0.5) +
     # scale_color_viridis_c() +
     scale_colour_gradientn(colours = rev(c(run_fill_colors[c(3, 13, 6)], run_accent_colors[2])), limits = limits) +
     guides(
