@@ -159,13 +159,13 @@ recording_item_labels <- function(x_list) {
           "Initialize Inputs"
         } else {
           if (grepl("\\|o\\|\"]$", x$message)) {
-            "Start Connection"
+            "Initialize Connection"
           } else {
             message <- parseMessage(x$message)
             if (identical(message$method, "uploadInit")) {
               "Start File Upload"
             } else if (identical(message$method, "uploadEnd")) {
-              "File Upload Complete"
+              "Stop File Upload:"
             } else {
               name_vals <- names(message$data)
               visible_name_vals <- name_vals[!grepl("^\\.", name_vals)]
@@ -176,11 +176,11 @@ recording_item_labels <- function(x_list) {
       },
       "WS_RECV" = {
         if (x$message == "o") {
-          "Initialize Connection"
+          "Start Connection"
         } else {
           message <- parseMessage(x$message)
           if (!is.null(message$response$tag)) {
-            "Stop File Upload"
+            "Completed File Upload"
           } else {
             paste0("Updated: ", paste0(names(message$values), collapse = ", "))
           }
