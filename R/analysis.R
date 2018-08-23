@@ -59,9 +59,10 @@ read_log_dir <- function(dir, name = basename(dirname(dir))) {
   df
 }
 
-# Read a recording fil
+# Read a recording file
 read_recording <- function(fileName) {
-  baselineInfo <- readLines(fileName) %>%
+  baselineInfo <- fileName %>%
+    readLines() %>%
     lapply(jsonlite::fromJSON) %>%
     lapply(function(item) {
       item$begin <- lubridate::as_datetime(item$begin)
@@ -78,6 +79,7 @@ read_recording <- function(fileName) {
             as.numeric(difftime(info$begin, startTime, units = "secs"))
           else
             as.numeric(difftime(info$begin, startTime, units = "secs")) + 0.25,
+        json = list(info),
       )
     }) %>%
     bind_rows() %>%
@@ -88,16 +90,65 @@ read_recording <- function(fileName) {
       input_line_number = seq_len(nrow(.)),
       time = end - start,
       concurrency = 1,
-      label = paste0(input_line_number, ":", event)
+      label = recording_item_labels(json)
     ) %>%
+    arrange(input_line_number) %>%
+    mutate(label = factor(label, levels = label, ordered = TRUE)) %>%
     select(
-      session_id, user_id, iteration,
+      # session_id, user_id, iteration,
       input_line_number,
       event,
       start, end, time,
-      concurrency,
-      label
+      # concurrency,
+      label,
+      json
     )
+}
+
+recording_item_labels <- function(x_list) {
+  shorten_url <- function(u) {
+    if (grepl("^/[^/]+/[^/]+/", u)) {
+      parts <- strsplit(u, "/")[[1]]
+      paste0(".../", parts[length(parts)])
+    } else {
+      u
+    }
+  }
+  ret <- c()
+  input_changes <- c()
+
+  prepend_line <- function(a, i) {
+    paste0(i, ") ", a)
+  }
+
+  for (i in seq_along(x_list)) {
+    x <- x_list[[i]]
+
+    new_label <- switch(x$type,
+      "REQ_HOME" = "Get: Homepage",
+      "REQ_GET" = paste0("Get: '", shorten_url(x$url), "'"),
+      "WS_OPEN" = "<Open Websocket>",
+      "WS_RECV_INIT" = "<Initialize Websocket>",
+      "WS_SEND" = {
+        if (i > 1 && identical(x_list[[i - 1]]$type, "WS_RECV_INIT")) {
+          "<Initialize Inputs>"
+        } else {
+          message <- jsonlite::fromJSON(x$message)
+          name_vals <- names(message$data)
+          visible_name_vals <- name_vals[!grepl("^\\.", name_vals)]
+          paste0("Set: ", paste0(visible_name_vals, collapse = ", "))
+        }
+      },
+      "WS_RECV" = {
+        message <- jsonlite::fromJSON(x$message)
+        paste0("Updated: ", paste0(names(message$values), collapse = ", "))
+      },
+      "WS_CLOSE" = "<Close Websocket>",
+      prepend_line(x$type)
+    )
+    ret <- append(ret, prepend_line(new_label, i))
+  }
+  ret
 }
 
 get_times <- function(df) {
@@ -134,44 +185,41 @@ get_times <- function(df) {
 #'      `2 cores` = 'results/test-2/'
 #'   )
 #' }
-tidy_loadtest <- function(...) {
+tidy_loadtest <- function(..., verbose = TRUE) {
 
   # TODO: Validate input directories and fail intelligently!
+  verbose <- isTRUE(verbose)
 
   run_levels <- names(list(...))
 
   df <- list(...) %>%
-    lapply(file.path, "sessions") %>%
-    { mapply(., FUN = read_log_dir, names(.), USE.NAMES = FALSE, SIMPLIFY = FALSE) } %>%
-    lapply(get_times) %>%
-    bind_rows() %>%
-    filter(event != "PLAYBACK_SLEEPBEFORE", event != "PLAYER_SESSION") %>%
-    arrange(run, user_id, session_id, input_line_number, ) %>%
-    mutate(
-      label = paste0(input_line_number, ":", event),
-      type = "record"
-    ) %>%
-    select(run, type, everything())
+    {
+      mapply(
+        ., names(.),
+        USE.NAMES = FALSE, SIMPLIFY = FALSE,
+        FUN = function(recording_path, run) {
+          if (verbose) message("Processing: '", run, "'")
+          df_run <- read_log_dir(file.path(recording_path, "sessions"), run) %>%
+            get_times() %>%
+            filter(event != "PLAYBACK_SLEEPBEFORE", event != "PLAYER_SESSION") %>%
+            arrange(run, user_id, session_id, input_line_number) %>%
+            mutate(
+              label = paste0(input_line_number, ":", event),
+              type = "record"
+            ) %>%
+            select(run, type, everything())
 
-  # dfBaseline <- list(...) %>%
-  #   lapply(file.path, "recording.log") %>%
-  #   {
-  #     mapply(
-  #       ., names(.),
-  #       USE.NAMES = FALSE, SIMPLIFY = FALSE,
-  #       FUN = function(recordingPath, run) {
-  #         read_recording(recordingPath) %>%
-  #           mutate(
-  #             run = run,
-  #             type = "baseline"
-  #           )
-  #       }
-  #     )
-  #   } %>%
-  #   bind_rows() %>%
-  #   select(run, type, everything())
-  #
-  # df <- bind_rows(df, dfBaseline)
+          df_recording <- read_recording(file.path(recording_path, "recording.log")) %>%
+            mutate(
+              recording_label = label
+            ) %>%
+            select(input_line_number, recording_label)
+
+          left_join(df_run, df_recording, by = "input_line_number")
+        }
+      )
+    } %>%
+    bind_rows()
 
   fct_levels <- df$input_line_number[!duplicated(df$input_line_number)]
   fct_labels <- df$label[!duplicated(df$input_line_number)]

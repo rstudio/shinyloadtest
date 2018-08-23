@@ -1,6 +1,6 @@
 if (getRversion() >= "2.15.1") {
   # TODO remove and upgrade the dplyr fns to FN_()
-  utils::globalVariables(c("start", "end", "ready", "begin", "label", "time"))
+  utils::globalVariables(c("start", "end", "ready", "begin", "label", "recording_label", "time"))
 }
 
 #' @import ggplot2 dplyr
@@ -29,19 +29,19 @@ plot_time_boxplot <- function(df, labels = NULL) {
 
   if (!is.null(labels)) {
     labels <- enexpr(labels)
-    df <- df %>% filter(label %in% UQ(labels))
+    df <- df %>% filter(recording_label %in% UQ(labels))
   }
 
   p <- df %>%
     ggplot(aes(run, time, fill = run)) +
     geom_boxplot() +
-    facet_wrap(~label) +
+    facet_wrap(~recording_label) +
     scale_fill_brewer(type = "qual") +
     labs(subtitle = "lower is faster") +
     theme(legend.position = "bottom")
 
   if(is.null(labels) || length(labels) > 1) {
-    p <- p + facet_wrap(~label)
+    p <- p + facet_wrap(~recording_label)
   }
   p
 }
@@ -54,7 +54,7 @@ plot_concurrency_time <- function(df, labels = NULL) {
 
   if (!is.null(labels)) {
     labels <- enexpr(labels)
-    df <- df %>% filter(label %in% UQ(labels))
+    df <- df %>% filter(recording_label %in% UQ(labels))
   }
 
   p <- df %>%
@@ -67,7 +67,7 @@ plot_concurrency_time <- function(df, labels = NULL) {
     theme(legend.position = "bottom")
 
   if(is.null(labels) || length(labels) > 1) {
-    p <- p + facet_wrap(~label)
+    p <- p + facet_wrap(~recording_label)
   }
   p
 }
@@ -79,7 +79,7 @@ plot_concurrency_time <- function(df, labels = NULL) {
 #     ggplot(aes(end, time, color = run)) +
 #     geom_point() +
 #     geom_smooth() +
-#     facet_wrap(~label)
+#     facet_wrap(~recording_label)
 # }
 
 #' @describeIn plot_loadtest Event waterfall for each session within each run
@@ -87,11 +87,11 @@ plot_concurrency_time <- function(df, labels = NULL) {
 plot_timeline <- function(df) {
   non_maintenance <- df %>% filter(maintenance == FALSE) %>% as.data.frame()
   maintenance <- df %>% filter(maintenance == TRUE) %>% as.data.frame()
-  rect_df <- data.frame(xmin = 0, xmax = 0, ymin = maintenance[1,"label"], ymax = maintenance[2, "label"], fill = "fill")
+  rect_df <- data.frame(xmin = 0, xmax = 0, ymin = maintenance[1,"recording_label"], ymax = maintenance[2, "recording_label"], fill = "fill")
   maintenance %>%
     ggplot(
       aes(
-        end, label,
+        end, recording_label,
         group = session_id,
         color = concurrency
       )
@@ -104,7 +104,7 @@ plot_timeline <- function(df) {
     ## can not add due to competing color scales
     # request_scale_color(includeWarmup = TRUE) +
     # request_scale_guides() +
-    scale_y_discrete(limits = rev(levels(df$label))) +
+    scale_y_discrete(limits = rev(levels(df$recording_label))) +
     geom_line(size = 1.2) +
     scale_color_viridis_c() +
     guides(

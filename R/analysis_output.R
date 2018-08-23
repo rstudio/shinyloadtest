@@ -96,25 +96,25 @@ shiny::renderPlot({{plot_websocket_latency(df, cutoff = {max_websocket_cutoff})}
 
 # Event Duration
 
-## Inputs {{.sidebar data-width=500}}
+## Inputs {{.sidebar data-width=600}}
 
 ```{{r}}
 df_label_run <- df %>%
-  dplyr::group_by(label, run) %>%
+  dplyr::group_by(recording_label, run) %>%
   dplyr::summarise(
     min_time = min(time),
     mean_time = mean(time),
     max_time = max(time)
   )
 df_label <- df_label_run %>%
-  dplyr::group_by(label) %>%
+  dplyr::group_by(recording_label) %>%
   dplyr::summarise(
     min_time = min(min_time),
     max_time = max(max_time),
     mean_diff = diff(range(mean_time))
   ) %>%
   dplyr::arrange(desc(mean_diff))
-# inputSelectize(levels(df$label))
+# inputSelectize(levels(df$recording_label))
 ```
 
 ```{{r}}
@@ -143,15 +143,15 @@ output$durationTable <- DT::renderDataTable({{
 durationProxy <- DT::dataTableProxy("durationTable")
 observeEvent(input$durationMin, {{
   df_min <- df_label %>% dplyr::arrange(desc(min_time)) %>% head(5)
-  durationProxy %>% DT::selectRows(which(df_label$label %in% df_min$label))
+  durationProxy %>% DT::selectRows(which(df_label$recording_label %in% df_min$recording_label))
 }})
 observeEvent(input$durationMax, {{
   df_max <- df_label %>% dplyr::arrange(desc(max_time)) %>% head(5)
-  durationProxy %>% DT::selectRows(which(df_label$label %in% df_max$label))
+  durationProxy %>% DT::selectRows(which(df_label$recording_label %in% df_max$recording_label))
 }})
 observeEvent(input$durationMeanDiff, {{
   df_mean_diff <- df_label %>% dplyr::arrange(desc(mean_diff)) %>% head(5)
-  durationProxy %>% DT::selectRows(which(df_label$label %in% df_mean_diff$label))
+  durationProxy %>% DT::selectRows(which(df_label$recording_label %in% df_mean_diff$recording_label))
 }})
 ```
 
@@ -163,8 +163,8 @@ observeEvent(input$durationMeanDiff, {{
 ```{{r}}
 shiny::renderPlot({{
   if (length(input$durationTable_rows_selected) > 0) {{
-    labels_to_keep <- df_label$label[input$durationTable_rows_selected]
-    df_sub <- dplyr::filter(df, label %in% labels_to_keep)
+    labels_to_keep <- df_label$recording_label[input$durationTable_rows_selected]
+    df_sub <- dplyr::filter(df, recording_label %in% labels_to_keep)
   }} else {{
     df_sub <- df
   }}
