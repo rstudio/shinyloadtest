@@ -99,13 +99,23 @@ for(let item of testSelector.children){
 }
 testSelector.children[1].children[0].click();
 
+// https://datatables.net/examples/plug-ins/sorting_auto.html
+$.fn.dataTable.ext.type.detect.unshift(function (d) {
+  if (/Event \d+\)/.test(d)) {
+    return "shinyloadtest-label";
+  }
+  return null;
+});
+$.fn.dataTable.ext.type.order['shinyloadtest-label-pre'] = function (d) {
+  return Number(d.match(/^Event (\d+)\)/)[1]);
+};
 $("#event-duration-data-table > table").DataTable({
   paging: false,
   order: [[1, "desc"]]
-})
+});
 $("#event-concurrency-data-table > table").DataTable({
   paging: false,
   order: [[1, "desc"]]
-})
+});
 
 })()
