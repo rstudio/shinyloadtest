@@ -4,3 +4,4 @@
 ^docs/
 ^output/
 ^test_sessions/
+^\.travis\.yml$
