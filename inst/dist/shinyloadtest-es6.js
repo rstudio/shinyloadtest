@@ -1,7 +1,7 @@
 (function(){
 
 // Run through https://babeljs.io/en/repl.
-// Copy results to ./shinyloadtest.js
+// Copy results to ./js/shinyloadtest.js
 
 
 suiSegmentedButtons();
@@ -26,7 +26,7 @@ function managedChartGrid(picker, activeGrid) {
   if (!picker && !activeGrid) {
     return;
   }
-  for( node of activeGrid.children){
+  for( let node of activeGrid.children){
     charts.push(node);
   }
   const updateChartGrid = () => {
