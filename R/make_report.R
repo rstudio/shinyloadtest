@@ -1,6 +1,6 @@
 if (getRversion() >= "2.15.1") {
   # TODO remove and upgrade the dplyr fns to FN_()
-  utils::globalVariables(c("max_error", "min_time", "max_time", "mean_time", "lm", "model", "coef", "residuals", "slope", "intercept"))
+  utils::globalVariables(c("max_error", "min_time", "max_time", "mean_time", "lm", "model", "coef", "residuals", "slope", "intercept", "slope_pos", "intercept_pos", "max_error_pos"))
 }
 
 
@@ -60,7 +60,11 @@ make_report <- function(
 
   # collect base path
   if (self_contained) {
-    base_output_name <- file.path(tempdir(TRUE), basename(sub(paste0(".", tools::file_ext(output)), "", output, fixed = TRUE)))
+    base_output_name <- file.path(
+      tempdir(TRUE),
+      paste0("shinyloadtest", floor(runif(1, 1, 10000))),
+      basename(sub(paste0(".", tools::file_ext(output)), "", output, fixed = TRUE))
+    )
   } else {
     base_output_name <- sub(paste0(".", tools::file_ext(output)), "", output, fixed = TRUE)
   }
@@ -161,20 +165,26 @@ make_report <- function(
   df_boxplot <- df_maintenance %>%
     group_by(recording_label, run, input_line_number) %>%
     summarise(
-      min_time = min(time),
-      mean_time = mean(time),
-      max_time = max(time)
+      min_time = min(time, na.rm = TRUE),
+      mean_time = mean(time, na.rm = TRUE),
+      max_time = max(time, na.rm = TRUE)
     ) %>%
     group_by(recording_label, input_line_number) %>%
     summarise(
-      min_time = min(min_time),
-      max_time = max(max_time),
-      mean_diff = diff(range(mean_time))
+      min_time = min(min_time, na.rm = TRUE),
+      max_time = max(max_time, na.rm = TRUE),
+      mean_diff = diff(range(mean_time, na.rm = TRUE))
     ) %>%
     arrange(input_line_number)
 
 
+  format_num <- function(x, ...) {
+    if (is.infinite(x) && x < 0) return("")
+    formatC(x, format = "f", digits = 3, ...)
+  }
+
   # event boxplots
+  has_mean_diff <- length(levels(df$run)) > 1
   boxplot <- lapply(df_boxplot$input_line_number, function(input_line_val) {
     df_event <- df %>% filter(input_line_number == input_line_val)
     tick(paste0("Event ", input_line_val, " Boxplot"))
@@ -183,10 +193,16 @@ make_report <- function(
       save_run_svg(input_line_val, "boxplot", height = 4, width = 4)
     df_boxplot_event <- df_boxplot %>% filter(input_line_number == input_line_val)
     list(
+      label = htmltools::htmlEscape(df_boxplot_event$recording_label[[1]]),
       src = src_boxplot,
+      has_mean_diff = has_mean_diff,
+      min_time_val = df_boxplot_event$min_time[[1]] %>% format_num(),
+      max_time_val = df_boxplot_event$max_time[[1]] %>% format_num(),
+      mean_diff_val = df_boxplot_event$mean_diff[[1]] %>% format_num(),
       min_time = df_boxplot_event$min_time[[1]],
       max_time = df_boxplot_event$max_time[[1]],
-      mean_diff = df_boxplot_event$mean_diff[[1]])
+      mean_diff = df_boxplot_event$mean_diff[[1]]
+    )
   })
 
   df_model <- df_maintenance %>%
@@ -195,15 +211,21 @@ make_report <- function(
       model = list(lm(time ~ concurrency))
     ) %>%
     mutate(
-      slope = vapply(model, function(mod){ abs(coef(mod)[2]) }, numeric(1)),
-      intercept = vapply(model, function(mod){ abs(coef(mod)[1]) }, numeric(1)),
-      max_error = vapply(model, function(mod){ max(c(abs(residuals(mod)), 0), na.rm = TRUE) }, numeric(1)),
+      slope = vapply(model, function(mod){ coef(mod)[2] }, numeric(1)),
+      intercept = vapply(model, function(mod){ coef(mod)[1] }, numeric(1)),
+      max_error = vapply(model, function(mod){ max(abs(c(residuals(mod), 0)), na.rm = TRUE) }, numeric(1)),
     ) %>%
     group_by(recording_label, input_line_number) %>%
     summarise(
-      slope = max(slope),
-      intercept = max(intercept),
-      max_error = max(max_error)
+      slope_pos = which.max(c(abs(slope), -Inf)),
+      slope_val = c(slope, -Inf)[slope_pos] %>% format_num(),
+      slope = c(abs(slope), -Inf)[slope_pos],
+      intercept_pos = which.max(c(abs(intercept), -Inf)),
+      intercept_val = c(intercept, -Inf)[intercept_pos] %>% format_num(),
+      intercept = c(abs(intercept), -Inf)[intercept_pos],
+      max_error_pos = which.max(c(max_error, -Inf)),
+      max_error_val = c(max_error, -Inf)[max_error_pos] %>% format_num(),
+      max_error = c(max_error, -Inf)[max_error_pos]
     ) %>%
     arrange(input_line_number)
 
@@ -216,10 +238,14 @@ make_report <- function(
       save_run_svg(input_line_val, "concurrency", height = 4, width = 4)
     df_concurrency_event <- df_model %>% filter(input_line_number == input_line_val)
     list(
+      label = htmltools::htmlEscape(df_concurrency_event$recording_label[[1]]),
       src = src_boxplot,
       slope = df_concurrency_event$slope[[1]],
       intercept = df_concurrency_event$intercept[[1]],
-      max_error = df_concurrency_event$max_error[[1]]
+      max_error = df_concurrency_event$max_error[[1]],
+      slope_val = df_concurrency_event$slope_val[[1]],
+      intercept_val = df_concurrency_event$intercept_val[[1]],
+      max_error_val = df_concurrency_event$max_error_val[[1]]
     )
   })
 

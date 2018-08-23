@@ -41,3 +41,8 @@
 img[src$=".svgz"] {
   width: 100%;
 }
+
+
+.sui-layout-flex-vert {
+  padding: 0 20px
+}

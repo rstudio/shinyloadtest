@@ -5,6 +5,9 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ"
       crossorigin="anonymous">
     <link rel="stylesheet" href="{folder_name}/css/shinyUI.css">
+    <link rel="stylesheet" href="{folder_name}/css/shinyloadtest.css">
+    <link rel="stylesheet" type="text/css" href="{folder_name}/css/datatables.min.css"/>
+
   </head>
   <body>
     <!-- this are at the top so that any additional page specific scripts are loaded after -->
@@ -14,7 +17,7 @@
       // three vertical lines
       UIkit.icon.add({{"menu-rotated": '<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><rect y="2" x="4" height="16" width="1" /><rect y="2" x="9" height="16" width="1" /><rect y="2" x="14" height="16" width="1" /></svg>'}})
     </script>
-    <link rel="stylesheet" href="{folder_name}/css/shinyloadtest.css">
+    <script type="text/javascript" src="{folder_name}/js/datatables.min.js"></script>
 
     <div class="sui-flex-5 sui-layout-flex-horz sui-full-height">
       <div class="sui-flex-1 uk-background-muted slt-side-menu-container">
@@ -123,12 +126,14 @@
                 <thead>
                   <tr>
                     <th>Label</th>
-                    <th>Min time</th>
                     <th>Max time</th>
-                    <th>Mean Difference</th>
+                    <th>Min time</th>
+                    { if (run_length > 1) "<th>Mean Difference</th>" else "" }
                   </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody>
+                  { glue_multi_component("boxplot_table_row", boxplot$max_time) }
+                </tbody>
               </table>
             </div>
           </div>
@@ -166,12 +171,14 @@
                 <thead>
                   <tr>
                     <th>Label</th>
-                    <th>Min time</th>
-                    <th>Max time</th>
-                    <th>Mean Difference</th>
+                    <th>Slope</th>
+                    <th>Intercept</th>
+                    <th>Error</th>
                   </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody>
+                  { glue_multi_component("concurrency_table_row", concurrency$slope) }
+                </tbody>
               </table>
             </div>
           </div>

@@ -36,7 +36,8 @@ Imports:
     flexdashboard,
     rmarkdown,
     progress,
-    scales
+    scales,
+    htmltools
 Remotes: rstudio/websocket,
     rstudio/httpuv
 RoxygenNote: 6.1.0

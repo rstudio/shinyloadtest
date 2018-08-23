@@ -2,6 +2,7 @@
 
 // DO NOT EDIT BY HAND. EDIT shinyloadtest-es6.js and run through https://babeljs.io/en/repl.
 // Copy results below
+
 (function () {
 
   // Run through https://babeljs.io/en/repl.
@@ -75,70 +76,6 @@
     picker.addEventListener('input', updateChartGrid);
     // this sets the initial state of the DOM
     updateChartGrid();
-  }
-
-  // random int generator helper
-  var randInt = function randInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  };
-
-  {
-    // generate a data table because no one wants to write a realistic length one by hand
-    var tableBody = document.querySelector('#event-duration-data-table table tbody');
-    for (var i = 0; i < 50; i++) {
-      var label = 'REQ_HOME';
-      if (i > 0) {
-        switch (randInt(1, 4)) {
-          case 1:
-            label = 'WS_RECV';
-            break;
-          case 2:
-            label = 'WS_OPEN';
-            break;
-          case 3:
-            label = 'REQ_GET';
-            break;
-          case 4:
-            label = 'WS_RECV_INIT';
-            break;
-        }
-      }
-      var minTime = Math.random().toFixed(3);
-      var maxTime = Math.random().toFixed(3) + randInt(0, 20);
-      var meanDiff = Math.random().toFixed(3) + randInt(0, 7);
-      var tableRowTemplate = '<tr><td>' + (i + 1) + ':' + label + '</td><td>' + minTime + '</td>\n<td>' + maxTime + '</td><td>' + meanDiff + '</td></tr>';
-      tableBody.insertAdjacentHTML('beforeend', tableRowTemplate);
-    }
-  }
-  {
-    // generate a data table because no one wants to write a realistic length one by hand
-    var _tableBody = document.querySelector('#event-concurrency-data-table table tbody');
-    for (var _i2 = 0; _i2 < 50; _i2++) {
-      var _label = 'REQ_HOME';
-      if (_i2 > 0) {
-        switch (randInt(1, 4)) {
-          case 1:
-            _label = 'WS_RECV';
-            break;
-          case 2:
-            _label = 'WS_OPEN';
-            break;
-          case 3:
-            _label = 'REQ_GET';
-            break;
-          case 4:
-            _label = 'WS_RECV_INIT';
-            break;
-        }
-      }
-      var _minTime = Math.random().toFixed(3);
-      var _maxTime = Math.random().toFixed(3) + randInt(0, 20);
-      var _meanDiff = Math.random().toFixed(3) + randInt(0, 7);
-      var _tableRowTemplate = '<tr><td>' + (_i2 + 1) + ':' + _label + '</td><td>' + _minTime + '</td>\n<td>' + _maxTime + '</td><td>' + _meanDiff + '</td></tr>';
-      _tableBody.insertAdjacentHTML('beforeend', _tableRowTemplate);
-    }
   }
 
   // core logic to change views with a segmented button control
@@ -278,4 +215,13 @@
   }
 
   testSelector.children[1].children[0].click();
+
+  $("#event-duration-data-table > table").DataTable({
+    paging: false,
+    order: [[1, "desc"]]
+  });
+  $("#event-concurrency-data-table > table").DataTable({
+    paging: false,
+    order: [[1, "desc"]]
+  });
 })();

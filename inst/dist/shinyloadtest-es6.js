@@ -55,71 +55,6 @@ function managedChartGrid(picker, activeGrid) {
   updateChartGrid();
 }
 
-// random int generator helper
-const randInt = (min, max) => {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min +1)) + min;
-};
-
-{
-  // generate a data table because no one wants to write a realistic length one by hand
-  const tableBody = document.querySelector('#event-duration-data-table table tbody');
-  for (let i = 0; i < 50; i++){
-    let label = 'REQ_HOME';
-    if( i > 0) {
-      switch(randInt(1,4)){
-        case 1:
-          label = 'WS_RECV';
-          break;
-        case 2:
-          label = 'WS_OPEN';
-          break;
-        case 3:
-          label = 'REQ_GET';
-          break;
-        case 4:
-          label = 'WS_RECV_INIT'
-          break;
-      }
-    }
-    let minTime = Math.random().toFixed(3);
-    let maxTime = Math.random().toFixed(3) + randInt(0,20);
-    let meanDiff =  Math.random().toFixed(3) + randInt(0, 7);
-    const tableRowTemplate = `<tr><td>${i+1}:${label}</td><td>${minTime}</td>
-<td>${maxTime}</td><td>${meanDiff}</td></tr>`;
-    tableBody.insertAdjacentHTML('beforeend', tableRowTemplate);
-  }
-}
-{
-  // generate a data table because no one wants to write a realistic length one by hand
-  const tableBody = document.querySelector('#event-concurrency-data-table table tbody');
-  for (let i = 0; i < 50; i++){
-    let label = 'REQ_HOME';
-    if( i > 0) {
-      switch(randInt(1,4)){
-        case 1:
-          label = 'WS_RECV';
-          break;
-        case 2:
-          label = 'WS_OPEN';
-          break;
-        case 3:
-          label = 'REQ_GET';
-          break;
-        case 4:
-          label = 'WS_RECV_INIT'
-          break;
-      }
-    }
-    let minTime = Math.random().toFixed(3);
-    let maxTime = Math.random().toFixed(3) + randInt(0,20);
-    let meanDiff =  Math.random().toFixed(3) + randInt(0, 7);
-    const tableRowTemplate = `<tr><td>${i+1}:${label}</td><td>${minTime}</td>
-<td>${maxTime}</td><td>${meanDiff}</td></tr>`;
-    tableBody.insertAdjacentHTML('beforeend', tableRowTemplate);
-  }
-}
 
 // core logic to change views with a segmented button control
 const switchSegmentViews = (viewsContainer, selectedView) => {
@@ -163,5 +98,14 @@ for(let item of testSelector.children){
   }
 }
 testSelector.children[1].children[0].click();
+
+$("#event-duration-data-table > table").DataTable({
+  paging: false,
+  order: [[1, "desc"]]
+})
+$("#event-concurrency-data-table > table").DataTable({
+  paging: false,
+  order: [[1, "desc"]]
+})
 
 })()
