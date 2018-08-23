@@ -1,5 +1,28 @@
+# These headers must be removed from requests and responses relayed by proxies.
+hop_by_hop_headers <- c(
+  "connection",
+  "keep-alive",
+  "proxy-authenticate",
+  "proxy-authorization",
+  "te",
+  "trailer",
+  "transfer-encoding",
+  "upgrade"
+)
+
+connection_tokens <- function(connection_header) {
+  if (!is.null(connection_header)) {
+    lower <- stringr::str_to_lower(connection_header)
+    stringr::str_trim(stringr::str_split(lower, ";")[[1]])
+  } else character(0)
+}
+
+headers_to_remove <- function(connection_header) {
+  union(hop_by_hop_headers, connection_tokens(connection_header))
+}
+
 req_rook_to_curl <- function(req, domain, port) {
-  # Rename headers. Example: HTTP_CACHE_CONTROL => Cache-Control
+  # Rename headers. Example: HTTP_CACHE_CONTROL => cache-control
   r <- as.list(req)
 
   r <- r[grepl("^HTTP_", names(r))]
@@ -10,21 +33,26 @@ req_rook_to_curl <- function(req, domain, port) {
   nms <- gsub("\\b([a-z])", "\\U\\1", nms, perl = TRUE)
   names(r) <- nms
 
+  names(r) <- tolower(names(r))
+
   # Overwrite host field
   if (port == 80) {
-    r$Host <- domain
+    r$host <- domain
   } else {
-    r$Host <- paste0(domain, ":", port)
+    r$host <- paste0(domain, ":", port)
   }
+
+  r[headers_to_remove(r$connection)] <- NULL
 
   r
 }
 
 resp_httr_to_rook <- function(resp) {
+  # TODO Look into HTTP/2.0 support
   status <- as.integer(sub("^HTTP\\S+ (\\d+).*", "\\1", curl::parse_headers(resp$headers)[1]))
   headers <- curl::parse_headers_list(resp$headers)
-  headers[["transfer-encoding"]] <- NULL
-  headers[["content-encoding"]] <- "identity"
+  headers[headers_to_remove(headers$connection)] <- NULL
+  headers[["content-encoding"]] <- NULL
   list(
     status = status,
     headers = headers,
@@ -156,6 +184,11 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$localPort <- port
       private$outputFileName <- outputFileName
       private$outputFile <- file(outputFileName, "w")
+      header <- c(
+        paste0("# version: ", packageVersion("shinyloadtest")),
+        paste0("# target: ", targetAppUrl)
+      )
+      writeLines(header, private$outputFile)
       private$sessionCookies <- sessionCookies
       private$startServer()
     },

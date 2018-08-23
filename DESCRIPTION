@@ -42,5 +42,6 @@ Remotes: rstudio/websocket,
     rstudio/httpuv
 RoxygenNote: 6.1.0
 Suggests:
-    knitr
+    knitr,
+    testthat
 VignetteBuilder: knitr

@@ -30,7 +30,7 @@ devtools::install_github('rstudio/shinyloadtest')
 
 Platform | Download URL | Install Command
 -- | -- | --
-Max OS | |
+macOS | |
 Ubuntu | [download](https://s3.amazonaws.com/rstudio-shinycannon-build/2018-06-14-06%3A15%3A50_1.0.0-31565b0/deb/shinycannon_1.0.0-31565b0_amd64.deb) | `sudo gdebi shinycannon_1.0.0-31565b0_amd64.db`
 Windows | |
 
