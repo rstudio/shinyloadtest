@@ -5,3 +5,4 @@
 ^output/
 ^test_sessions/
 ^\.travis\.yml$
+^test\.html$

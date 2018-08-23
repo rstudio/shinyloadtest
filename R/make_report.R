@@ -269,7 +269,7 @@ make_report <- function(
     )
   ))
 
-  tick("Save HTML")
+  tick("Saving HTML")
 
   if (self_contained) {
     tmp_file <- tempfile(tmpdir = dirname(base_output_name), fileext = ".html")
