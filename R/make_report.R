@@ -62,7 +62,7 @@ make_report <- function(
   if (self_contained) {
     base_output_name <- file.path(
       tempdir(TRUE),
-      paste0("shinyloadtest", floor(runif(1, 1, 10000))),
+      paste0("shinyloadtest", floor(stats::runif(1, 1, 10000))),
       basename(sub(paste0(".", tools::file_ext(output)), "", output, fixed = TRUE))
     )
   } else {
