@@ -80,9 +80,10 @@ read_log_dir <- function(dir, name = basename(dirname(dir)), verbose = TRUE) {
 }
 
 # Read a recording file
-read_recording <- function(fileName) {
-  baselineInfo <- fileName %>%
-    readLines() %>%
+read_recording <- function(file_name) {
+  file_lines <- readLines(file_name)
+  file_lines <- file_lines[!grepl("^#", file_lines)]
+  baselineInfo <- file_lines %>%
     lapply(jsonlite::fromJSON) %>%
     lapply(function(item) {
       item$begin <- lubridate::as_datetime(item$begin)
@@ -149,6 +150,7 @@ recording_item_labels <- function(x_list) {
       "REQ_GET" = paste0("Get: ", shorten_url(x$url)),
       "REQ_TOK" = "Get: Shiny Token",
       "REQ_SINF" = "Get: Connection Information",
+      "REQ_POST" = "Post Request",
       "WS_RECV_BEGIN_UPLOAD" = "File Upload",
       "WS_OPEN" = "Start Session",
       "WS_RECV_INIT" = "Initialize Session",
@@ -160,9 +162,15 @@ recording_item_labels <- function(x_list) {
             "Start Connection"
           } else {
             message <- parseMessage(x$message)
-            name_vals <- names(message$data)
-            visible_name_vals <- name_vals[!grepl("^\\.", name_vals)]
-            paste0("Set: ", paste0(visible_name_vals, collapse = ", "))
+            if (identical(message$method, "uploadInit")) {
+              "Start File Upload"
+            } else if (identical(message$method, "uploadEnd")) {
+              "File Upload Complete"
+            } else {
+              name_vals <- names(message$data)
+              visible_name_vals <- name_vals[!grepl("^\\.", name_vals)]
+              paste0("Set: ", paste0(visible_name_vals, collapse = ", "))
+            }
           }
         }
       },
@@ -171,7 +179,11 @@ recording_item_labels <- function(x_list) {
           "Initialize Connection"
         } else {
           message <- parseMessage(x$message)
-          paste0("Updated: ", paste0(names(message$values), collapse = ", "))
+          if (!is.null(message$response$tag)) {
+            "Stop File Upload"
+          } else {
+            paste0("Updated: ", paste0(names(message$values), collapse = ", "))
+          }
         }
       },
       "WS_CLOSE" = "Stop Session",
