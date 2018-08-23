@@ -131,12 +131,8 @@ read_recording <- function(fileName) {
 
 recording_item_labels <- function(x_list) {
   shorten_url <- function(u) {
-    if (grepl("^/[^/]+/[^/]+/", u)) {
-      parts <- strsplit(u, "/")[[1]]
-      paste0(".../", parts[length(parts)])
-    } else {
-      u
-    }
+    parts <- strsplit(u, "/")[[1]]
+    parts[length(parts)]
   }
   ret <- c()
   input_changes <- c()
@@ -150,15 +146,18 @@ recording_item_labels <- function(x_list) {
 
     new_label <- switch(x$type,
       "REQ_HOME" = "Get: Homepage",
-      "REQ_GET" = paste0("Get: '", shorten_url(x$url), "'"),
-      "WS_OPEN" = "<Open Websocket>",
-      "WS_RECV_INIT" = "<Initialize Websocket>",
+      "REQ_GET" = paste0("Get: ", shorten_url(x$url)),
+      "REQ_TOK" = "Get: Shiny Token",
+      "REQ_SINF" = "Get: Connection Information",
+      "WS_RECV_BEGIN_UPLOAD" = "File Upload",
+      "WS_OPEN" = "Start Session",
+      "WS_RECV_INIT" = "Initialize Session",
       "WS_SEND" = {
         if (i > 1 && identical(x_list[[i - 1]]$type, "WS_RECV_INIT")) {
-          "<Initialize Inputs>"
+          "Initialize Inputs"
         } else {
           if (grepl("\\|o\\|\"]$", x$message)) {
-            "<SockJS Connect>"
+            "Start Connection"
           } else {
             message <- parseMessage(x$message)
             name_vals <- names(message$data)
@@ -169,13 +168,13 @@ recording_item_labels <- function(x_list) {
       },
       "WS_RECV" = {
         if (x$message == "o") {
-          "<SockJS Init>"
+          "Initialize Connection"
         } else {
           message <- parseMessage(x$message)
           paste0("Updated: ", paste0(names(message$values), collapse = ", "))
         }
       },
-      "WS_CLOSE" = "<Close Websocket>",
+      "WS_CLOSE" = "Stop Session",
       x$type
     )
     ret <- append(ret, prepend_line(new_label, i))
