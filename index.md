@@ -14,12 +14,6 @@ It's a common misconception that "Shiny doesn't scale." In actuality, properly-a
 
 To get started with `shinyloadtest` read through the quick start guide below.
 
-Additional (forthcoming) resources include:
-
-* Case Study: How to interpret load test results
-* How-to: Load test authenticated apps
-* FAQ
-
 ## Installation
 
 To perform a load test you'll need two pieces of software: `shinyloadtest` and `shinycannon`.
@@ -41,10 +35,10 @@ As opposed to the `shinyloadtest` R package, `shinycannon` is installed and run 
 
 On many GNU/Linux distributions, `shinycannon` can be installed using a package:
 
-Platform | Download URL | Install Command
--- | -- | --
-Ubuntu/Debian | [shinycannon_1.0.0-22cb125_amd64.deb][shinycannon_deb] | `sudo dpkg -i shinycannon_1.0.0-22cb125_amd64.deb`
-Redhat/Fedora/CentOS | [shinycannon_1.0.0-22cb125.x86_64.rpm][shinycannon_rpm] | `sudo yum install -y shinycannon_1.0.0-22cb125.x86_64.rpm`
+Platform|Download URL|Install Command
+-----|-----|----------------------------------------------------------------------------------------
+Ubuntu/Debian|[shinycannon_1.0.0-22cb125_amd64.deb][shinycannon_deb]|`sudo dpkg -i shinycannon_1.0.0-22cb125_amd64.deb`
+Redhat/Fedora/CentOS|[shinycannon_1.0.0-22cb125.x86_64.rpm][shinycannon_rpm]|`sudo yum install -y shinycannon_1.0.0-22cb125.x86_64.rpm`
 
 #### macOS
 
