@@ -10,14 +10,23 @@ deployed Shiny applications.
 
 Load testing helps developers and administrators estimate how many users their application can support. If an application requires tuning, load testing and load test result analysis can be used to identify performance bottlenecks and to guide changes to infrastructure, configuration, or code.
 
-It's a common misconception that "Shiny doesn't scale." In actuality, properly-architected Shiny applications can be scaled horizontally, a fact which Sean Lopp was recently able to demonstrate at rstudio::conf 2018. We used `shinycannon` to simulate 10,000 concurrent users using an application deployed to AWS. You can see a recording of Sean's talk and the load test demonstration here: [Scaling Shiny](https://www.rstudio.com/resources/videos/scaling-shiny/)
+It's a common misconception that "Shiny doesn't scale." In actuality, properly-architected Shiny applications can be scaled horizontally, a fact which Sean Lopp was recently able to demonstrate at rstudio::conf 2018. We used `shinycannon` to simulate 10,000 concurrent users interacting with an application deployed to AWS. You can see a recording of Sean's talk and the load test demonstration here: [Scaling Shiny](https://www.rstudio.com/resources/videos/scaling-shiny/)
 
-To get started with `shinyloadtest`, read through the quick start guide below. Additional resources
-include details of `shinyloadtest`'s log formats, a case study showing how to interpret load test results, an overview of using `shinyloadtest` with authenticated apps, and a description of how to use `shinyloadtest` to determine runtime settings in RStudio Connect or Shiny Server Pro.
+To get started with `shinyloadtest`, read through the quick start guide below.
+
+Additional resources include:
+
+* `shinyloadtest`'s log formats
+* Case Study: How to interpret load test results
+* How-to: Load test authenticated apps
+* How-to: Use `shinyloadtest` to determine runtime settings in RStudio Connect or Shiny Server Pro
 
 ## Installation
 
 To perform a load test you'll need two pieces of software: `shinyloadtest` and `shinycannon`.
+
+* `shinyloadtest` is an R package used to generate recordings and analyze results. You should install it on your development machine.
+* `shinycannon` is the command-line replay tool. You can install it on your development machine for testing, but for best results we recommend installing it on a server, and preferably not the one the application under test is also on.
 
 ### `shinyloadtest`
 
@@ -26,6 +35,8 @@ devtools::install_github('rstudio/shinyloadtest')
 ```
 
 ### `shinycannon`
+
+As opposed to the `shinyloadtest` R package, `shinycannnon` is installed and run differently depending on platform.
 
 #### Linux
 
@@ -40,7 +51,7 @@ Redhat/Fedora/CentOS | [shinycannon_1.0.0-22cb125.x86_64.rpm][shinycannon_rpm] |
 
 1. Install [Java](https://www.java.com/en/download/)
 1. Download [shinycannon-1.0.0-22cb125.sh][shinycannon_sh]
-1. Install with `sudo cp shinycannon-1.0.0-22cb125.sh /usr/local/bin/shinycannon; sudo chmod +x /usr/bin/envsubst`
+1. Install with `sudo cp shinycannon-1.0.0-22cb125.sh /usr/local/bin/shinycannon; sudo chmod +x /usr/local/bin/shinycannon`
 
 #### Windows
 
@@ -52,11 +63,9 @@ Redhat/Fedora/CentOS | [shinycannon_1.0.0-22cb125.x86_64.rpm][shinycannon_rpm] |
 
 The process for load testing a Shiny application consists of three steps:
 
-1. Record a typical user session for the app
-
-2. Replay the session in parallel, simulating many simultaneous users accessing the app
-
-3. Analyze the results of the load test
+1. **Record** a typical user session for the app
+1. **Replay** the session in parallel, simulating many simultaneous users accessing the app
+1. **Analyze** the results of the load test and determine if the app performed well enough
 
 Rinse and repeat as necessary. Each step is described below.
 
