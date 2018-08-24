@@ -12,9 +12,9 @@ Load testing helps developers and administrators estimate how many users their a
 
 It's a common misconception that "Shiny doesn't scale." In actuality, properly-architected Shiny applications can be scaled horizontally, a fact which Sean Lopp was recently able to demonstrate at rstudio::conf 2018. We used `shinycannon` to simulate 10,000 concurrent users interacting with an application deployed to AWS. You can see a recording of Sean's talk and the load test demonstration here: [Scaling Shiny](https://www.rstudio.com/resources/videos/scaling-shiny/)
 
-To get started with `shinyloadtest`, read through the quick start guide below.
+To get started with `shinyloadtest` read through the quick start guide below.
 
-Additional resources include:
+Additional (forthcoming) resources include:
 
 * `shinyloadtest`'s log formats
 * Case Study: How to interpret load test results
