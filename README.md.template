@@ -16,10 +16,9 @@ To get started with `shinyloadtest` read through the quick start guide below.
 
 Additional (forthcoming) resources include:
 
-* `shinyloadtest`'s log formats
 * Case Study: How to interpret load test results
 * How-to: Load test authenticated apps
-* How-to: Use `shinyloadtest` to determine runtime settings in RStudio Connect or Shiny Server Pro
+* FAQ
 
 ## Installation
 
@@ -36,7 +35,7 @@ devtools::install_github('rstudio/shinyloadtest')
 
 ### `shinycannon`
 
-As opposed to the `shinyloadtest` R package, `shinycannnon` is installed and run differently depending on platform.
+As opposed to the `shinyloadtest` R package, `shinycannon` is installed and run differently depending on platform.
 
 #### Linux
 
