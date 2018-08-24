@@ -33,20 +33,20 @@ On many GNU/Linux distributions, `shinycannon` can be installed using a package:
 
 Platform | Download URL | Install Command
 -- | -- | --
-Ubuntu/Debian | [shinycannon_1.0.0-22cb125_amd64.deb][shinycannon_deb] | `sudo dpkg -i shinycannon_1.0.0-22cb125_amd64.deb`
-Redhat/Fedora/CentOS | [shinycannon_1.0.0-22cb125.x86_64.rpm][shinycannon_rpm] | `sudo yum install -y shinycannon_1.0.0-22cb125.x86_64.rpm`
+Ubuntu/Debian | [shinycannon_${SHINYCANNON_VERSION}_amd64.deb][shinycannon_deb] | `sudo dpkg -i shinycannon_${SHINYCANNON_VERSION}_amd64.deb`
+Redhat/Fedora/CentOS | [shinycannon_${SHINYCANNON_VERSION}.x86_64.rpm][shinycannon_rpm] | `sudo yum install -y shinycannon_${SHINYCANNON_VERSION}.x86_64.rpm`
 
 #### macOS
 
 1. Install [Java](https://www.java.com/en/download/)
-1. Download [shinycannon-1.0.0-22cb125.sh][shinycannon_sh]
-1. Install with `sudo cp shinycannon-1.0.0-22cb125.sh /usr/local/bin/shinycannon; sudo chmod +x /usr/bin/envsubst`
+1. Download [shinycannon-${SHINYCANNON_VERSION}.sh][shinycannon_sh]
+1. Install with `sudo cp shinycannon-${SHINYCANNON_VERSION}.sh /usr/local/bin/shinycannon; sudo chmod +x $_`
 
 #### Windows
 
 1. Install [Java](https://www.java.com/en/download/)
-1. Download [shinycannon-1.0.0-22cb125.jar][shinycannon_jar] to the directory you wish to run it in
-1. Run with `java -jar shinycannon-1.0.0-22cb125.jar`
+1. Download [shinycannon-${SHINYCANNON_VERSION}.jar][shinycannon_jar] to the directory you wish to run it in
+1. Run with `java -jar shinycannon-${SHINYCANNON_VERSION}.jar`
 
 ## Quick Start
 
@@ -148,7 +148,3 @@ results %>%
 
 [community]: https://community.rstudio.com
 [shinycannon]: https://github.com/rstudio/shinycannon
-[shinycannon_deb]:	https://s2.amazonaws.com/rstudio-shinycannon-build/2018-08-16-15:45:30_1.0.0-22cb125/deb/shinycannon_1.0.0-22cb125_amd64.deb
-[shinycannon_rpm]:	https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-16-15:45:30_1.0.0-22cb125/rpm/shinycannon-1.0.0-22cb125.x86_64.rpm
-[shinycannon_jar]:	https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-16-15:45:30_1.0.0-22cb125/jar/shinycannon-1.0.0-22cb125.jar
-[shinycannon_sh]:	https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-16-15:45:30_1.0.0-22cb125/bin/shinycannon-1.0.0-22cb125.sh
