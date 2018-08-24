@@ -4,7 +4,8 @@
 \alias{make_report}
 \title{Make shinyloadtest Report}
 \usage{
-make_report(df)
+make_report(df, duration_cutoff = 10, http_latency_cutoff = 5,
+  max_websocket_cutoff = 20)
 }
 \arguments{
 \item{df}{data.frame returned from \code{\link{tidy_loadtest}}}

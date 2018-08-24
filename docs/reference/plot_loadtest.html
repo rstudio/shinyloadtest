@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Record a Session for Load Test — record_session • shinyloadtest</title>
+<title>Plotting outputs for tidy_loadtest — plot_loadtest • shinyloadtest</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Record a Session for Load Test — record_session" />
+<meta property="og:title" content="Plotting outputs for tidy_loadtest — plot_loadtest" />
 
-<meta property="og:description" content="Record a Session for Load Test" />
+<meta property="og:description" content="Many different plotting routines to display different loadtest information." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -111,57 +111,73 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Record a Session for Load Test</h1>
+    <h1>Plotting outputs for tidy_loadtest</h1>
     
-    <div class="hidden name"><code>record_session.Rd</code></div>
+    <div class="hidden name"><code>plot_loadtest.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Record a Session for Load Test</p>
+    <p>Many different plotting routines to display different loadtest information.</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>record_session</span>(<span class='no'>target_app_url</span>, <span class='kw'>host</span> <span class='kw'>=</span> <span class='st'>"127.0.0.1"</span>, <span class='kw'>port</span> <span class='kw'>=</span> <span class='fl'>8600</span>,
-  <span class='kw'>output_file</span> <span class='kw'>=</span> <span class='st'>"recording.log"</span>, <span class='kw'>open_browser</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>plot_time_boxplot</span>(<span class='no'>df</span>, <span class='kw'>labels</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+
+<span class='fu'>plot_concurrency_time</span>(<span class='no'>df</span>, <span class='kw'>labels</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+
+<span class='fu'>plot_timeline</span>(<span class='no'>df</span>)
+
+<span class='fu'>plot_hist_loadtimes</span>(<span class='no'>df</span>, <span class='kw'>max_load_time</span> <span class='kw'>=</span> <span class='fl'>5</span>)
+
+<span class='fu'>plot_gantt</span>(<span class='no'>df</span>)
+
+<span class='fu'>plot_gantt_session</span>(<span class='no'>df</span>)
+
+<span class='fu'>plot_gantt_duration</span>(<span class='no'>df</span>, <span class='kw'>cutoff</span> <span class='kw'>=</span> <span class='fl'>10</span>)
+
+<span class='fu'>plot_gantt_latency</span>(<span class='no'>df</span>)
+
+<span class='fu'>plot_http_latency</span>(<span class='no'>df</span>, <span class='kw'>cutoff</span> <span class='kw'>=</span> <span class='fl'>10</span>)
+
+<span class='fu'>plot_websocket_latency</span>(<span class='no'>df</span>, <span class='kw'>cutoff</span> <span class='kw'>=</span> <span class='fl'>10</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>target_app_url</th>
-      <td><p>The URL of the deployed application</p></td>
+      <th>df</th>
+      <td><p>data frame returned from <code><a href='tidy_loadtest.html'>tidy_loadtest</a></code></p></td>
     </tr>
     <tr>
-      <th>host</th>
-      <td><p>The host where the proxy will run. Usually localhost is used.</p></td>
+      <th>labels</th>
+      <td><p>A vector of labels to include.  If none are supplied, all labels will be used.</p></td>
     </tr>
     <tr>
-      <th>port</th>
-      <td><p>The port for the proxy. Default is 8600. Change this default if
-port 8600 is used by another service.</p></td>
+      <th>max_load_time</th>
+      <td><p>The amount of time users will wait for the page to load
+when first requesting the app.</p></td>
     </tr>
     <tr>
-      <th>output_file</th>
-      <td><p>The name for the generated log file.</p></td>
-    </tr>
-    <tr>
-      <th>open_browser</th>
-      <td><p>Whether to open a browser on the proxy
-(default=<code>TRUE</code>) or not (<code>FALSE</code>).</p></td>
+      <th>cutoff</th>
+      <td><p>Where to draw a horizontal or vertical line to display a resonable cutoff line for requests.</p></td>
     </tr>
     </table>
     
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+    <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
 
-    <p>Creates a recording file that can be used to drive a load test.</p>
-    
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>This function creates a reverse proxy listening at <code>host:port</code>
-  that stands in front of <code>target_app_url</code>. As the user interacts with
-  the app, the actions and responses are recorded in a file that can be
-  replayed later.</p>
+    <ul>
+<li><p><code>plot_time_boxplot</code>: Box plot of load times for each event in each run</p></li>
+<li><p><code>plot_concurrency_time</code>: Time on concurrency for each event for each run</p></li>
+<li><p><code>plot_timeline</code>: Event waterfall for each session within each run</p></li>
+<li><p><code>plot_hist_loadtimes</code>: Histogram of page load times</p></li>
+<li><p><code>plot_gantt</code>: Gantt chart of event duration for each session within each run</p></li>
+<li><p><code>plot_gantt_session</code>: Event gantt chart of each user session within each run</p></li>
+<li><p><code>plot_gantt_duration</code>: Event gantt chart of fastest to slowest session times within each run</p></li>
+<li><p><code>plot_gantt_latency</code>: Stacked bar chart of event duration for each session within each run</p></li>
+<li><p><code>plot_http_latency</code>: Bar chart of total HTTP latency for each session within each run</p></li>
+<li><p><code>plot_websocket_latency</code>: Bar chart of maximum calculation (websocket) latency for each session within each run</p></li>
+</ul>
     
 
   </div>
@@ -170,9 +186,7 @@ port 8600 is used by another service.</p></td>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
       
-      <li><a href="#value">Value</a></li>
-
-      <li><a href="#details">Details</a></li>
+      <li><a href="#functions">Functions</a></li>
           </ul>
 
   </div>

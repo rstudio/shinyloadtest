@@ -11,8 +11,8 @@
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
 <!-- Font Awesome icons -->
@@ -48,7 +48,7 @@
   <body>
     <div class="container template-reference-index">
       <header>
-      <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
@@ -58,7 +58,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">shinyloadtest</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.0</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">1.0.0</span>
       </span>
     </div>
 
@@ -66,33 +66,31 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fa fa-home"></span>
      
+    Home
   </a>
-</li>
-<li>
-  <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
+    Learning
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/analyzing-load-test-logs.html">Analyzing Load Test Logs</a>
+      <a href="../articles/analyzing-load-test-logs.html">Case study: interpreting load test results</a>
     </li>
     <li>
-      <a href="../articles/case-study.html">Case Study</a>
+      <a href="../articles/load-testing-authenticated-apps.html">Load testing authenticated apps</a>
     </li>
     <li>
-      <a href="../articles/load-testing-authenticated-apps.html">Load Testing Authenticated Apps</a>
-    </li>
-    <li>
-      <a href="../articles/performance-settings-in-rstudio-connect-or-shiny-server-pro.html">Performance Settings in RStudio Connect or Shiny Server Pro</a>
+      <a href="../articles/faq.html">FAQ</a>
     </li>
   </ul>
+</li>
+<li>
+  <a href="../reference/index.html">Reference</a>
 </li>
       </ul>
       
@@ -131,21 +129,15 @@
       <tr>
         
         <td>
-          <p><code><a href="hist_loadtimes.html">hist_loadtimes()</a></code> </p>
+          <p><code><a href="make_report.html">make_report()</a></code> </p>
         </td>
-        <td><p>Histogram of Page Load Times</p></td>
+        <td><p>Make shinyloadtest Report</p></td>
       </tr><tr>
         
         <td>
-          <p><code><a href="plot_concurrency_time.html">plot_concurrency_time()</a></code> </p>
+          <p><code><a href="plot_loadtest.html">plot_time_boxplot()</a></code> <code><a href="plot_loadtest.html">plot_concurrency_time()</a></code> <code><a href="plot_loadtest.html">plot_timeline()</a></code> <code><a href="plot_loadtest.html">plot_hist_loadtimes()</a></code> <code><a href="plot_loadtest.html">plot_gantt()</a></code> <code><a href="plot_loadtest.html">plot_gantt_session()</a></code> <code><a href="plot_loadtest.html">plot_gantt_duration()</a></code> <code><a href="plot_loadtest.html">plot_gantt_latency()</a></code> <code><a href="plot_loadtest.html">plot_http_latency()</a></code> <code><a href="plot_loadtest.html">plot_websocket_latency()</a></code> </p>
         </td>
-        <td><p>Concurrency Over Time</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="plot_time_boxplot.html">plot_time_boxplot()</a></code> </p>
-        </td>
-        <td><p>Boxplot of Event Duration</p></td>
+        <td><p>Plotting outputs for tidy_loadtest</p></td>
       </tr><tr>
         
         <td>
@@ -173,7 +165,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Alan Dipert, Barbara Borges.</p>
+  <p>Developed by Alan Dipert, Barbara Borges, Barret Schloerke, <a href='https://www.rstudio.com'><img src="https://tidyverse.org/rstudio-logo.svg" height="24" /></a>.</p>
 </div>
 
 <div class="pkgdown">

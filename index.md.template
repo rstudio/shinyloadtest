@@ -41,10 +41,10 @@ As opposed to the `shinyloadtest` R package, `shinycannon` is installed and run 
 
 On many GNU/Linux distributions, `shinycannon` can be installed using a package:
 
-Platform | Download URL | Install Command
--- | -- | --
-Ubuntu/Debian | [shinycannon_${SHINYCANNON_VERSION}_amd64.deb][shinycannon_deb] | `sudo dpkg -i shinycannon_${SHINYCANNON_VERSION}_amd64.deb`
-Redhat/Fedora/CentOS | [shinycannon_${SHINYCANNON_VERSION}.x86_64.rpm][shinycannon_rpm] | `sudo yum install -y shinycannon_${SHINYCANNON_VERSION}.x86_64.rpm`
+Platform|Download URL|Install Command
+-----|-----|----------------------------------------------------------------------------------------
+Ubuntu/Debian|[shinycannon_${SHINYCANNON_VERSION}_amd64.deb][shinycannon_deb]|`sudo dpkg -i shinycannon_${SHINYCANNON_VERSION}_amd64.deb`
+Redhat/Fedora/CentOS|[shinycannon_${SHINYCANNON_VERSION}.x86_64.rpm][shinycannon_rpm]|`sudo yum install -y shinycannon_${SHINYCANNON_VERSION}.x86_64.rpm`
 
 #### macOS
 

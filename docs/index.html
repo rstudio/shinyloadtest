@@ -6,11 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Load Test Shiny Applications • shinyloadtest</title>
-<!-- jquery --><script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<!-- jquery --><script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Load Test Shiny Applications">
-<meta property="og:description" content="shinyloadtest provides functions for recording user sessions, 
+<meta property="og:description" content="shinyloadtest provides functions for recording user sessions,
     playing those sessions back in parallel to simulate load, and analzying
     the results.">
 <meta name="twitter:card" content="summary">
@@ -21,7 +21,7 @@
 </head>
 <body>
     <div class="container template-home">
-      <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <header><div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">shinyloadtest</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.2.0</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">1.0.0</span>
       </span>
     </div>
 
@@ -39,33 +39,31 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fa fa-home"></span>
      
+    Home
   </a>
-</li>
-<li>
-  <a href="reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
+    Learning
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/analyzing-load-test-logs.html">Analyzing Load Test Logs</a>
+      <a href="articles/analyzing-load-test-logs.html">Case study: interpreting load test results</a>
     </li>
     <li>
-      <a href="articles/case-study.html">Case Study</a>
+      <a href="articles/load-testing-authenticated-apps.html">Load testing authenticated apps</a>
     </li>
     <li>
-      <a href="articles/load-testing-authenticated-apps.html">Load Testing Authenticated Apps</a>
-    </li>
-    <li>
-      <a href="articles/performance-settings-in-rstudio-connect-or-shiny-server-pro.html">Performance Settings in RStudio Connect or Shiny Server Pro</a>
+      <a href="articles/faq.html">FAQ</a>
     </li>
   </ul>
+</li>
+<li>
+  <a href="reference/index.html">Reference</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right"></ul>
@@ -83,61 +81,111 @@
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#load-testing-shiny-applications" class="anchor"></a>Load Testing Shiny Applications</h1></div>
 <blockquote>
-<p>This is a WIP, do not use yet. Please follow community.rstudio.com for a soft launch of the tools.</p>
+<p>This is a WIP, do not use yet. Please follow <a href="https://community.rstudio.com">community.rstudio.com</a> for a soft launch of the tools.</p>
 </blockquote>
-<p>The <code>shinyloadtest</code> package and the accompanying <code>shinycannon</code> software enable load testing deployed shiny applications.</p>
-<p>Load tests ensure that deployed Shiny applications are ready for mission critical tasks. Load testing helps identify performance bottlenecks (before users do!), test <a href="https://rstudio.github.io/promises">asynchronous Shiny code</a>, and identify optimal scaling settings or server specs (e.g. the necessary cpu and RAM to support an expected audience).</p>
-<p>Just as importantly, load testing can squash the commnon concern that Shiny doesn’t scale. In fact, we used these load testing tools to prove that more than 10,000 users could access a Shiny application at same time!</p>
-<p><a href="https://www.rstudio.com/resources/videos/scaling-shiny/?wvideo=mx214xmcqw"><img src="https://embedwistia-a.akamaihd.net/deliveries/97390a2a0512c2f959b37e3e91b0d9c81e3023c5.jpg?image_play_button_size=2x&amp;image_crop_resized=960x540&amp;image_play_button=1&amp;image_play_button_color=4287c7e0" width="400" height="225" style="width: 400px; height: 225px;"></a></p>
-<p><a href="https://www.rstudio.com/resources/videos/scaling-shiny/?wvideo=mx214xmcqw">Scaling Shiny – RStudio</a></p>
-<p>To get started with <code>shinyloadtest</code>, read through the quick start guide below. Additional resources include details of <code>shinyloadtest</code>’s log formats, a case study showing how to interpret load test results, an overview of using <code>shinyloadtest</code> with authenticated apps, and a description of how to use <code>shinyloadtest</code> to determine runtime settings in RStudio Connect or Shiny Server Pro.</p>
+<p>The <code>shinyloadtest</code> package and the accompanying <a href="https://github.com/rstudio/shinycannon"><code>shinycannon</code></a> software enable load testing deployed Shiny applications.</p>
+<p>Load testing helps developers and administrators estimate how many users their application can support. If an application requires tuning, load testing and load test result analysis can be used to identify performance bottlenecks and to guide changes to infrastructure, configuration, or code.</p>
+<p>It’s a common misconception that “Shiny doesn’t scale.” In actuality, properly-architected Shiny applications can be scaled horizontally, a fact which Sean Lopp was recently able to demonstrate at rstudio::conf 2018. We used <code>shinycannon</code> to simulate 10,000 concurrent users interacting with an application deployed to AWS. You can see a recording of Sean’s talk and the load test demonstration here: <a href="https://www.rstudio.com/resources/videos/scaling-shiny/">Scaling Shiny</a></p>
+<p>To get started with <code>shinyloadtest</code> read through the quick start guide below.</p>
+<p>Additional (forthcoming) resources include:</p>
+<ul>
+<li>Case Study: How to interpret load test results</li>
+<li>How-to: Load test authenticated apps</li>
+<li>FAQ</li>
+</ul>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>To perform a load test you’ll need two pieces of software: <code>shinyloadtest</code> and <code>shinycannon</code>.</p>
-<p>To install <code>shinyloadtest</code>:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">'rstudio/shinyloadtest'</span>)</a></code></pre></div>
-<p><code>shinycannon</code> is a standalone executable:</p>
-<table class="table">
+<ul>
+<li>
+<code>shinyloadtest</code> is an R package used to generate recordings and analyze results. You should install it on your development machine.</li>
+<li>
+<code>shinycannon</code> is the command-line replay tool. You can install it on your development machine for testing, but for best results we recommend installing it on a server, and preferably not the one the application under test is also on.</li>
+</ul>
+<div id="shinyloadtest" class="section level3">
+<h3 class="hasAnchor">
+<a href="#shinyloadtest" class="anchor"></a><code>shinyloadtest</code>
+</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools::<span class="kw">install_github</span>(<span class="st">'rstudio/shinyloadtest'</span>)</code></pre></div>
+</div>
+<div id="shinycannon" class="section level3">
+<h3 class="hasAnchor">
+<a href="#shinycannon" class="anchor"></a><code>shinycannon</code>
+</h3>
+<p>As opposed to the <code>shinyloadtest</code> R package, <code>shinycannon</code> is installed and run differently depending on platform.</p>
+<div id="linux" class="section level4">
+<h4 class="hasAnchor">
+<a href="#linux" class="anchor"></a>Linux</h4>
+<p>On many GNU/Linux distributions, <code>shinycannon</code> can be installed using a package:</p>
+<table style="width:12%;" class="table">
+<colgroup>
+<col width="4%">
+<col width="4%">
+<col width="4%">
+</colgroup>
 <thead><tr class="header">
-<th>Platform</th>
-<th>Download URL</th>
-<th>Install Command</th>
+<th align="left">Platform</th>
+<th align="left">Download URL</th>
+<th align="left">Install Command</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>Max OS</td>
-<td></td>
-<td></td>
+<td align="left">Ubuntu/Debian</td>
+<td align="left"><a href="https://s2.amazonaws.com/rstudio-shinycannon-build/2018-08-16-15:45:30_1.0.0-22cb125/deb/shinycannon_1.0.0-22cb125_amd64.deb">shinycannon_1.0.0-22cb125_amd64.deb</a></td>
+<td align="left"><code>sudo dpkg -i shinycannon_1.0.0-22cb125_amd64.deb</code></td>
 </tr>
 <tr class="even">
-<td>Ubuntu</td>
-<td><a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-06-14-06%3A15%3A50_1.0.0-31565b0/deb/shinycannon_1.0.0-31565b0_amd64.deb">download</a></td>
-<td><code>sudo gdebi shinycannon_1.0.0-31565b0_amd64.db</code></td>
-</tr>
-<tr class="odd">
-<td>Windows</td>
-<td></td>
-<td></td>
+<td align="left">Redhat/Fedora/CentOS</td>
+<td align="left"><a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-16-15:45:30_1.0.0-22cb125/rpm/shinycannon-1.0.0-22cb125.x86_64.rpm">shinycannon_1.0.0-22cb125.x86_64.rpm</a></td>
+<td align="left"><code>sudo yum install -y shinycannon_1.0.0-22cb125.x86_64.rpm</code></td>
 </tr>
 </tbody>
 </table>
+</div>
+<div id="macos" class="section level4">
+<h4 class="hasAnchor">
+<a href="#macos" class="anchor"></a>macOS</h4>
+<ol>
+<li>Install <a href="https://www.java.com/en/download/">Java</a>
+</li>
+<li>Download <a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-16-15:45:30_1.0.0-22cb125/bin/shinycannon-1.0.0-22cb125.sh">shinycannon-1.0.0-22cb125.sh</a>
+</li>
+<li>Install with <code>sudo cp shinycannon-1.0.0-22cb125.sh /usr/local/bin/shinycannon; sudo chmod +x /usr/local/bin/shinycannon</code>
+</li>
+</ol>
+</div>
+<div id="windows" class="section level4">
+<h4 class="hasAnchor">
+<a href="#windows" class="anchor"></a>Windows</h4>
+<ol>
+<li>Install <a href="https://www.java.com/en/download/">Java</a>
+</li>
+<li>Download <a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-16-15:45:30_1.0.0-22cb125/jar/shinycannon-1.0.0-22cb125.jar">shinycannon-1.0.0-22cb125.jar</a> to the directory you wish to run it in</li>
+<li>Run with <code>java -jar shinycannon-1.0.0-22cb125.jar</code>
+</li>
+</ol>
+</div>
+</div>
 </div>
 <div id="quick-start" class="section level2">
 <h2 class="hasAnchor">
 <a href="#quick-start" class="anchor"></a>Quick Start</h2>
 <p>The process for load testing a Shiny application consists of three steps:</p>
 <ol>
-<li><p>Record a typical user session for the app</p></li>
-<li><p>Replay the session in parallel, simulating many simultaneous users accessing the app</p></li>
-<li><p>Analyze the results of the load test</p></li>
+<li>
+<strong>Record</strong> a typical user session for the app</li>
+<li>
+<strong>Replay</strong> the session in parallel, simulating many simultaneous users accessing the app</li>
+<li>
+<strong>Analyze</strong> the results of the load test and determine if the app performed well enough</li>
 </ol>
 <p>Rinse and repeat as necessary. Each step is described below.</p>
 <div id="step-1-recording" class="section level3">
 <h3 class="hasAnchor">
 <a href="#step-1-recording" class="anchor"></a>Step 1: Recording</h3>
 <p>Record a session using the <code>recordSession</code> function, which takes the URL of the <strong>deployed</strong> application:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">shinyloadtest<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/shinyloadtest/topics/record_session">record_session</a></span>(<span class="st">'https://beta.rstudioconnect.com/content/3239/'</span>)</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">shinyloadtest::<span class="kw"><a href="reference/record_session.html">record_session</a></span>(<span class="st">'https://beta.rstudioconnect.com/content/3239/'</span>)</code></pre></div>
 <p>Running the function will open a browser displaying the app. Once open, interact with the application as a normal user would and then close the browser. After closing the browser, a file will be created that contains a recording of the session. This recording, written to <code>recording.log</code> by default, will serve as the basis for the load test.</p>
 </div>
 <div id="step-2-run-the-load-test" class="section level3">
@@ -150,43 +198,47 @@
 <li><p><strong>loaded-duration-minutes</strong>: The duration of the load test. <code>shinycannon</code> will re-run the recording as necessary to meet the specified duration. For example, if the recording is 5 minutes long, but the desired test duration is 18 minutes, <code>shinycannon</code> will</p></li>
 </ul>
 <p>As an example, to run a load test simulating 100 concurrent users for 20 minutes:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="ex">shinycannon</span> recording.log https://beta.rstudioconnect.com/content/3239/ --sessions=100 --loaded-duration-minutes=20s</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="ex">Logging</span> at INFO level to output_dir/detail.log</a>
-<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="ex">2018-06-15T11</span>:22:29.465037Z - Running: 0, Failed: 0, Done: 0</a>
-<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="ex">2018-06-15T11</span>:22:29.466399Z - Worker thread 1 warming up</a>
-<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="ex">2018-06-15T11</span>:22:29.476858Z - Worker thread 2 warming up</a>
-<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="ex">2018-06-15T11</span>:22:29.477245Z - Worker thread 3 warming up</a>
-<a class="sourceLine" id="cb3-8" data-line-number="8">                           <span class="ex">...</span> </a>
-<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="ex">2018-06-15T11</span>:22:29.499708Z - Waiting for warmup to complete</a>
-<a class="sourceLine" id="cb3-10" data-line-number="10">                           <span class="ex">...</span></a>
-<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="ex">2018-06-15T11</span>:22:29.516885Z - Maintaining for 20 minutes</a>
-<a class="sourceLine" id="cb3-12" data-line-number="12"><span class="ex">2018-06-15T11</span>:28:34.465847Z - Running: 100, Failed: 0, Done: 0</a>
-<a class="sourceLine" id="cb3-13" data-line-number="13">                           <span class="ex">...</span></a>
-<a class="sourceLine" id="cb3-14" data-line-number="14"><span class="ex">2018-06-15T11</span>:44:29.517080Z - Stopped maintaining, waiting for workers to stop</a>
-<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="ex">2018-06-15T11</span>:48:34.465847Z - Running: 60, Failed: 0, Done: 40</a>
-<a class="sourceLine" id="cb3-16" data-line-number="16">                           <span class="ex">...</span></a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">shinycannon</span> recording.log https://beta.rstudioconnect.com/content/3239/ --sessions=100 --loaded-duration-minutes=20s
+
+<span class="kw">Logging</span> at INFO level to output_dir/detail.log
+<span class="kw">2018-06-15T11</span>:22:29.465037Z - Running: 0, Failed: 0, Done: 0
+<span class="kw">2018-06-15T11</span>:22:29.466399Z - Worker thread 1 warming up
+<span class="kw">2018-06-15T11</span>:22:29.476858Z - Worker thread 2 warming up
+<span class="kw">2018-06-15T11</span>:22:29.477245Z - Worker thread 3 warming up
+                           <span class="kw">...</span>
+<span class="kw">2018-06-15T11</span>:22:29.499708Z - Waiting for warmup to complete
+                           <span class="kw">...</span>
+<span class="kw">2018-06-15T11</span>:22:29.516885Z - Maintaining for 20 minutes
+<span class="kw">2018-06-15T11</span>:28:34.465847Z - Running: 100, Failed: 0, Done: 0
+                           <span class="kw">...</span>
+<span class="kw">2018-06-15T11</span>:44:29.517080Z - Stopped maintaining, waiting for workers to stop
+<span class="kw">2018-06-15T11</span>:48:34.465847Z - Running: 60, Failed: 0, Done: 40
+                           <span class="kw">...</span></code></pre></div>
 <p><code>shinycannon</code> includes detailed help documentation explaining the other arguments:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="ex">shinycannon</span> --help</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">shinycannon</span> --help</code></pre></div>
 <p>During the test, <code>shinycannon</code> reports the progress and number of simulated users. The result of the test is an output directory which includes timing information for each session.</p>
 </div>
 <div id="step-3-analyze-the-results" class="section level3">
 <h3 class="hasAnchor">
 <a href="#step-3-analyze-the-results" class="anchor"></a>Step 3: Analyze the Results</h3>
 <p>The output directory created in step 2 is the focus of step 3. The <code>shinyloadtest</code> R package provides functions for analyzing the output files from the test.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">library</span>(shinyloadtest)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2">results &lt;-<span class="st"> </span><span class="kw"><a href="reference/tidy_loadtest.html">tidy_loadtest</a></span>(</a>
-<a class="sourceLine" id="cb5-3" data-line-number="3">      <span class="st">`</span><span class="dt">20 users</span><span class="st">`</span> =<span class="st"> 'load-test-results'</span>,</a>
-<a class="sourceLine" id="cb5-4" data-line-number="4">      <span class="st">`</span><span class="dt">1 user</span><span class="st">`</span> =<span class="st"> 'baseline-results'</span></a>
-<a class="sourceLine" id="cb5-5" data-line-number="5">)</a>
-<a class="sourceLine" id="cb5-6" data-line-number="6">results</a></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shinyloadtest)
+results &lt;-<span class="st"> </span><span class="kw"><a href="reference/tidy_loadtest.html">tidy_loadtest</a></span>(
+      <span class="st">`</span><span class="dt">20 users</span><span class="st">`</span> =<span class="st"> 'load-test-results'</span>,
+      <span class="st">`</span><span class="dt">1 user</span><span class="st">`</span> =<span class="st"> 'baseline-results'</span>
+)
+results</code></pre></div>
 <p><img src="inst/img/results.png"></p>
-<pre><code>results %&gt;% 
-   hist_loadtimes()
-results %&gt;% 
-   plot_time_boxplot()</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">results %&gt;%
+<span class="st">   </span><span class="kw">hist_loadtimes</span>()
+results %&gt;%
+<span class="st">   </span><span class="kw"><a href="reference/plot_loadtest.html">plot_time_boxplot</a></span>()</code></pre></div>
 <p><img src="inst/img/hist_loadtime.png"></p>
 <p><img src="inst/img/boxplot.png"></p>
+<p>Load the results into a shiny flex dashboard</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">results %&gt;%
+<span class="st">  </span><span class="kw"><a href="reference/make_report.html">make_report</a></span>() %&gt;%
+<span class="st">  </span>rmarkdown::<span class="kw">run</span>()</code></pre></div>
 </div>
 </div>
 </div>
@@ -196,7 +248,7 @@ results %&gt;%
     <div class="links">
 <h2>Links</h2>
 <ul class="list-unstyled">
-<li>Report a bug at <br><a href="NA">NA</a>
+<li>Report a bug at <br><a href="https://github.com/rstudio/shinyloadtest/issues">https://​github.com/​rstudio/​shinyloadtest/​issues</a>
 </li>
 </ul>
 </div>
@@ -211,6 +263,9 @@ results %&gt;%
 <ul class="list-unstyled">
 <li>Alan Dipert <br><small class="roles"> Author, maintainer </small>  </li>
 <li>Barbara Borges <br><small class="roles"> Author </small>  </li>
+<li>Barret Schloerke <br><small class="roles"> Author </small>  </li>
+<li>
+<a href="https://www.rstudio.com"><img src="https://tidyverse.org/rstudio-logo.svg" height="24"></a> <br><small class="roles"> Copyright holder, funder </small>  </li>
 </ul>
 </div>
 
@@ -219,7 +274,7 @@ results %&gt;%
 
 
       <footer><div class="copyright">
-  <p>Developed by Alan Dipert, Barbara Borges.</p>
+  <p>Developed by Alan Dipert, Barbara Borges, Barret Schloerke, <a href="https://www.rstudio.com"><img src="https://tidyverse.org/rstudio-logo.svg" height="24"></a>.</p>
 </div>
 
 <div class="pkgdown">
