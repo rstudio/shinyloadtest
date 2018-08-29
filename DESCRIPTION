@@ -16,7 +16,7 @@ Encoding: UTF-8
 LazyData: true
 BugReports: https://github.com/rstudio/shinyloadtest/issues
 Imports:
-    websocket,
+    websocket (>= 0.0.0.9001),
     curl,
     httpuv,
     R6,
