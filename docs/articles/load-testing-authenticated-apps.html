@@ -87,10 +87,51 @@
 
     
     
-<p>This one is short and sweet, describing the options for apps that require authentication.</p>
+<p><code>shinyloadtest</code> supports load testing applications served by <a href="https://www.rstudio.com/products/connect/">RStudio Connect</a> or <a href="https://www.rstudio.com/products/connect/">Shiny Server Pro</a> with the following authentication schemes:</p>
+<ul>
+<li>Connect
+<ul>
+<li>Password</li>
+<li>LDAP and Active Directory</li>
+<li>PAM</li>
+</ul>
+</li>
+<li>Shiny Server Pro
+<ul>
+<li>Flat-File</li>
+<li>LDAP and Active Directory</li>
+<li>PAM</li>
+</ul>
+</li>
+</ul>
+<div id="recording" class="section level2">
+<h2 class="hasAnchor">
+<a href="#recording" class="anchor"></a>Recording</h2>
+<p><code><a href="../reference/record_session.html">shinyloadtest::record_session</a></code> will automatically detect when an application is protected using a supported authentication scheme and will prompt for a username and password.</p>
+<p>If <code>record_session</code> is called from within an RStudio IDE session, two UI dialogs will appear. If it’s called from an R session in a command-line setting, prompts will appear on standard output.</p>
+<p>The supplied username and password are used for the duration of the recording to interact with the application, but these credentials are not stored in the recording file.</p>
+</div>
+<div id="load-testing" class="section level2">
+<h2 class="hasAnchor">
+<a href="#load-testing" class="anchor"></a>Load testing</h2>
+<p>Because credentials are not stored in recordings, a username and password must be supplied to <code>shinycannon</code> in order to load test authenticated applications.</p>
+<p><code>shinycannon</code> does not have <code>--user</code> and <code>--password</code> arguments for security reasons, so that these strings will not appear in a process list. Instead, <code>SHINYCANNON_USER</code> and <code>SHINYCANNON_PASS</code> environment variables must be set.</p>
+<p>On Linux and macOS, <code>shinycannon</code> can be run with these variables set like this:</p>
+<pre><code>$ export SHINYCANNON_USER=myUser
+$ export SHINYCANNON_PASS=myPass
+$ shinycannon recording.log https://shinyapp.example.com/ --workers 5 --loaded-duration-minutes 2 --output-dir run1</code></pre>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+        <div id="tocnav">
+      <h2 class="hasAnchor">
+<a href="#tocnav" class="anchor"></a>Contents</h2>
+      <ul class="nav nav-pills nav-stacked">
+<li><a href="#recording">Recording</a></li>
+      <li><a href="#load-testing">Load testing</a></li>
+      </ul>
+</div>
       </div>
 
 </div>
