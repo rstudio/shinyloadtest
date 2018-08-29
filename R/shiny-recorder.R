@@ -324,56 +324,58 @@ RecordingSession <- R6::R6Class("RecordingSession",
       wsScheme <- if (private$targetURL$scheme == "https") "wss" else "ws"
       wsUrl <- private$targetURL$setScheme(wsScheme)$appendPaths(clientWS$request$PATH_INFO)$build()
 
-      serverWS <- websocket::WebsocketClient$new(wsUrl,
+      serverWS <- websocket::WebSocket$new(wsUrl,
         headers = if (nrow(private$sessionCookies) > 0) {
           c(Cookie = pasteParams(private$sessionCookies, "; "))
-        } else c(),
-        onMessage = function(msgFromServer) {
+        } else c())
+      serverWS$onMessage(function(event) {
+        msgFromServer <- event$data
 
-          # The SockJS init message (doesn't happen with local server) needs to
-          # be recorded and results in an acknowledgement message from the
-          # client. We handle it specially here because it shouldn't be ignored,
-          # but it's also not formatted the way all other messages are. We
-          # should receive this message only once per session, immediately after
-          # WS open.
-          if (msgFromServer == "o") {
-            private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
-            clientWS$send(msgFromServer)
-            return()
-          }
-
-          # Relay but don't record ignorable messages
-          if (shouldIgnore(msgFromServer)) {
-            clientWS$send(msgFromServer)
-            return()
-          }
-
-          # From here forward, we assumed the message
-          parsed <- parseMessage(msgFromServer)
-
-          # If the message from the server is an object with a "config" key, fix
-          # up some keys with placeholders and record the message as a
-          # WS_RECV_INIT
-          if ("config" %in% names(parsed)) {
-            self$tokens[[parsed$config$sessionId]] <- "${SESSION}"
-            private$writeEvent(makeWSEvent("WS_RECV_INIT", message = replaceTokens(msgFromServer, self$tokens)))
-            clientWS$send(msgFromServer)
-            return()
-          }
-
-          # WS_RECV_BEGIN_UPLOAD (upload response)
-          if(!is.null(parsed$response$value$jobId)) {
-            self$tokens[[parsed$response$value$uploadUrl]] <- "${UPLOAD_URL}"
-            self$tokens[[parsed$response$value$jobId]] <- "${UPLOAD_JOB_ID}"
-            private$writeEvent(makeWSEvent("WS_RECV_BEGIN_UPLOAD", message = replaceTokens(msgFromServer, self$tokens)))
-            clientWS$send(msgFromServer)
-            return()
-          }
-
-          # Every other websocket event
+        # The SockJS init message (doesn't happen with local server) needs to
+        # be recorded and results in an acknowledgement message from the
+        # client. We handle it specially here because it shouldn't be ignored,
+        # but it's also not formatted the way all other messages are. We
+        # should receive this message only once per session, immediately after
+        # WS open.
+        if (msgFromServer == "o") {
           private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
           clientWS$send(msgFromServer)
-      }, onClose = function() {
+          return()
+        }
+
+        # Relay but don't record ignorable messages
+        if (shouldIgnore(msgFromServer)) {
+          clientWS$send(msgFromServer)
+          return()
+        }
+
+        # From here forward, we assumed the message
+        parsed <- parseMessage(msgFromServer)
+
+        # If the message from the server is an object with a "config" key, fix
+        # up some keys with placeholders and record the message as a
+        # WS_RECV_INIT
+        if ("config" %in% names(parsed)) {
+          self$tokens[[parsed$config$sessionId]] <- "${SESSION}"
+          private$writeEvent(makeWSEvent("WS_RECV_INIT", message = replaceTokens(msgFromServer, self$tokens)))
+          clientWS$send(msgFromServer)
+          return()
+        }
+
+        # WS_RECV_BEGIN_UPLOAD (upload response)
+        if(!is.null(parsed$response$value$jobId)) {
+          self$tokens[[parsed$response$value$uploadUrl]] <- "${UPLOAD_URL}"
+          self$tokens[[parsed$response$value$jobId]] <- "${UPLOAD_JOB_ID}"
+          private$writeEvent(makeWSEvent("WS_RECV_BEGIN_UPLOAD", message = replaceTokens(msgFromServer, self$tokens)))
+          clientWS$send(msgFromServer)
+          return()
+        }
+
+        # Every other websocket event
+        private$writeEvent(makeWSEvent("WS_RECV", message = msgFromServer))
+        clientWS$send(msgFromServer)
+      })
+      serverWS$onClose(function(event) {
         cat("Server disconnected\n")
         if (private$clientWsState == "OPEN") {
           clientWS$close()
