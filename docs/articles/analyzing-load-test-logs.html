@@ -79,7 +79,7 @@
       <h1>Analyzing Load Test Logs</h1>
                         <h4 class="author">Vignette Author</h4>
             
-            <h4 class="date">2018-08-24</h4>
+            <h4 class="date">2018-08-29</h4>
       
       
       <div class="hidden name"><code>analyzing-load-test-logs.Rmd</code></div>
@@ -91,12 +91,43 @@
 <p>There are two types of log files generated while using <code>shinyloadtest</code>. The first file is the recording log file. This file is a JSON file that captures all of the HTTP(s) and websocket traffic that occured during the recording.</p>
 <p>The second file is a session log file generated during the loadtest. A file is generated for each simulated session.</p>
 <p>The two files are tied together by a set of keys that identify unique “events” that were recorded and played back in the load test.</p>
-<p>Key | Description – | – REQ_HOME | The initial HTTP request for the application REQ | HTTP requests that represent loading static assets necessary for the app, e.g. javascript or css files. WS_SEND | WS_RECV | PLAYER |</p>
+<table style="width:8%;" class="table">
+<colgroup>
+<col width="4%">
+<col width="4%">
+</colgroup>
+<thead><tr class="header">
+<th>Key</th>
+<th>Description</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>REQ_HOME</td>
+<td>The initial HTTP request for the application</td>
+</tr>
+<tr class="even">
+<td>REQ</td>
+<td>HTTP requests that represent loading static assets necessary for the app, e.g. javascript or css files.</td>
+</tr>
+<tr class="odd">
+<td>WS_SEND</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>WS_RECV</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>PLAYER</td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <p>The <code><a href="../reference/tidy_loadtest.html">shinyloadtest::tidy_loadtest</a></code> function uses these files to generate a data frame with loadtest results. The resulting data frame contains the following columns:</p>
 <table class="table">
 <thead><tr class="header">
-<th align="left">Column</th>
-<th align="left">Description</th>
+<th>Column</th>
+<th>Description</th>
 </tr></thead>
 <tbody></tbody>
 </table>

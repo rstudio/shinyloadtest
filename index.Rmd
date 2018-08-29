@@ -111,80 +111,62 @@ Running the function will open a browser displaying the app. Once open, interact
 
 ### Step 2: Run the Load Test
 
-With the recording in hand, we're ready to run the load test. The actual test is conducted outside of R using the `shinycannon` command-line tool.
+With the recording in hand, we're ready to run the load test. The actual test is conducted outside of R using the `shinycannon` command-line tool. You can run it using your system's terminal or console program, or you can run it from the RStudio terminal tab.
 
-`shinycannon` can be used from the command line. An easy option is to use `shinycannon` from the RStudio terminal. The main arguments to `shinycannon` are:
+`shinycannon` accepts two required positional arguments:
 
-- **workers**: The number of concurrent users to simulate. `shinycannon` uses threads to represent each user.
+1. **[RECORDING-PATH]**: path to the file produced by `shinyloadtest::record_session`
+1. **[APP-URL]**: URL of the target Shiny application
 
-- **loaded-duration-minutes**: The duration of the load test. 
+In addition to these two required arguments, `shinycannon` accepts a number of optional arguments that can be specified with flags. Of these, the most interesting are:
 
+1. **--workers**: The number of concurrent users to simulate. `shinycannon` uses threads to represent each user. It defaults to 1.
+1. **--loaded-duration-minutes**: The duration of the load test, in minutes. This does not include "warmup time", which is the time shinycannon spends gradually increasing the number of workers, or "cooldown time", which is the time spent decreasing the number of workers. It defaults to 0, meaning that after all workers have "warmed up", they will immediately begin to "cool down". Generally, you'll want to set this to a duration greater than 0. `shinycannon` will re-run the recording as necessary to fill the time.
+1. **--output-dir**: Name of the directory to create and store timing information in.
 
-`shinycannon` will re-run the recording as necessary to meet the specified duration. For example, if the recording is 5 minutes long, but the desired test duration is 18 minutes, `shinycannon` will
-
-As an example, to run a load test simulating 100 concurrent users for 20 minutes:
+As an example, to run a load test simulating 5 concurrent users for at least 2 minutes, outputting to the directory `run1`:
 
 ```bash
-shinycannon recording.log https://beta.rstudioconnect.com/content/3239/ --sessions=100 --loaded-duration-minutes=20s
-
-Logging at INFO level to output_dir/detail.log
-2018-06-15T11:22:29.465037Z - Running: 0, Failed: 0, Done: 0
-2018-06-15T11:22:29.466399Z - Worker thread 1 warming up
-2018-06-15T11:22:29.476858Z - Worker thread 2 warming up
-2018-06-15T11:22:29.477245Z - Worker thread 3 warming up
-                           ...
-2018-06-15T11:22:29.499708Z - Waiting for warmup to complete
-                           ...
-2018-06-15T11:22:29.516885Z - Maintaining for 20 minutes
-2018-06-15T11:28:34.465847Z - Running: 100, Failed: 0, Done: 0
-                           ...
-2018-06-15T11:44:29.517080Z - Stopped maintaining, waiting for workers to stop
-2018-06-15T11:48:34.465847Z - Running: 60, Failed: 0, Done: 40
-                           ...
+$ shinycannon recording.log https://shinyapp.example.com/ --workers 5 --loaded-duration-minutes 2 --output-dir run1
+2018-08-29 15:06:14.191 INFO [progress] - Running: 0, Failed: 0, Done: 0
+2018-08-29 15:06:14.193 INFO [thread01] - Warming up
+2018-08-29 15:06:14.195 INFO [thread00] - Waiting for warmup to complete
+2018-08-29 15:06:19.193 INFO [progress] - Running: 1, Failed: 0, Done: 0
+2018-08-29 15:06:24.194 INFO [progress] - Running: 1, Failed: 0, Done: 0
+2018-08-29 15:06:29.083 INFO [thread02] - Warming up
+2018-08-29 15:06:29.195 INFO [progress] - Running: 1, Failed: 0, Done: 0
+2018-08-29 15:06:34.195 INFO [progress] - Running: 2, Failed: 0, Done: 0
+2018-08-29 15:06:39.196 INFO [progress] - Running: 2, Failed: 0, Done: 0
+2018-08-29 15:06:43.973 INFO [thread03] - Warming up
+2018-08-29 15:06:44.196 INFO [progress] - Running: 2, Failed: 0, Done: 0
+2018-08-29 15:06:49.196 INFO [progress] - Running: 3, Failed: 0, Done: 0
+2018-08-29 15:06:54.201 INFO [progress] - Running: 3, Failed: 0, Done: 0
+2018-08-29 15:06:58.862 INFO [thread04] - Warming up
+2018-08-29 15:06:59.201 INFO [progress] - Running: 3, Failed: 0, Done: 0
+2018-08-29 15:07:04.201 INFO [progress] - Running: 4, Failed: 0, Done: 0
+2018-08-29 15:07:09.202 INFO [progress] - Running: 4, Failed: 0, Done: 0
+2018-08-29 15:07:13.751 INFO [thread05] - Warming up
+2018-08-29 15:07:13.752 INFO [thread00] - Maintaining for 2 minutes (120000 ms)
+2018-08-29 15:07:14.202 INFO [progress] - Running: 4, Failed: 0, Done: 0
+2018-08-29 15:07:19.202 INFO [progress] - Running: 5, Failed: 0, Done: 0
+2018-08-29 15:07:24.202 INFO [progress] - Running: 5, Failed: 0, Done: 0
+...
 ```
 
 `shinycannon` includes detailed help documentation explaining the other arguments:
 
 ```bash
-shinycannon --help
+shinycannon -h
 ```
 
-During the test, `shinycannon` reports the progress and number of simulated users. The result of the test is an output directory which includes timing information for each session.
+During the test, `shinycannon` reports the progress and number of simulated users. The result of the test is an output directory (`run1` in the example above) which includes timing information for each session.
 
 ### Step 3: Analyze the Results
 
-The output directory created in step 2 is the focus of step 3. The `shinyloadtest` R package provides
+The output directory created in step 2 (`run1`) is the focus of step 3. The `shinyloadtest` R package provides
 functions for analyzing the output files from the test.
 
-```r
-library(shinyloadtest)
-results <- tidy_loadtest(
-      `20 users` = 'load-test-results',
-      `1 user` = 'baseline-results'
-)
-results
-```
-
-![](inst/img/results.png)
-
-```r
-results %>%
-   hist_loadtimes()
-results %>%
-   plot_time_boxplot()
-```
-
-![](inst/img/hist_loadtime.png)
-
-![](inst/img/boxplot.png)
-
-
-Load the results into a shiny flex dashboard
-```r
-results %>%
-  make_report() %>%
-  rmarkdown::run()
-```
+TODO
 
 [community]: https://community.rstudio.com
 [shinycannon]: https://github.com/rstudio/shinycannon

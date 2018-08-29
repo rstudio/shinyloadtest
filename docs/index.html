@@ -20,7 +20,7 @@
 <![endif]-->
 </head>
 <body>
-    <div class="container template-home">
+    <div class="container template-article">
       <header><div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
@@ -76,8 +76,13 @@
 
       
       </header><div class="row">
-  <div class="contents col-md-9">
-    <div id="load-testing-shiny-applications" class="section level1">
+  <div class="col-md-9 contents">
+    
+
+    
+    
+<!-- -*- mode: markdown; -*- -->
+<div id="load-testing-shiny-applications" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#load-testing-shiny-applications" class="anchor"></a>Load Testing Shiny Applications</h1></div>
 <blockquote>
@@ -101,7 +106,7 @@
 <h3 class="hasAnchor">
 <a href="#shinyloadtest" class="anchor"></a><code>shinyloadtest</code>
 </h3>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools::<span class="kw">install_github</span>(<span class="st">'rstudio/shinyloadtest'</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">'rstudio/shinyloadtest'</span>)</code></pre></div>
 </div>
 <div id="shinycannon" class="section level3">
 <h3 class="hasAnchor">
@@ -111,28 +116,24 @@
 <div id="linux" class="section level4">
 <h4 class="hasAnchor">
 <a href="#linux" class="anchor"></a>Linux</h4>
-<p>On many GNU/Linux distributions, <code>shinycannon</code> can be installed using a package:</p>
+<p>Depending on your distribution, <code>shinycannon</code> can be installed using one of the following packages.</p>
 <table class="table">
-<colgroup>
-<col width="5%">
-<col width="5%">
-<col width="88%">
-</colgroup>
+<caption>Linux Packages</caption>
 <thead><tr class="header">
-<th align="left">Platform</th>
-<th align="left">Download URL</th>
+<th align="left">Distribution</th>
+<th align="left">Download Link</th>
 <th align="left">Install Command</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td align="left">Ubuntu/Debian</td>
-<td align="left"><a href="https://s2.amazonaws.com/rstudio-shinycannon-build/2018-08-16-15:45:30_1.0.0-22cb125/deb/shinycannon_1.0.0-22cb125_amd64.deb">shinycannon_1.0.0-22cb125_amd64.deb</a></td>
-<td align="left"><code>sudo dpkg -i shinycannon_1.0.0-22cb125_amd64.deb</code></td>
+<td align="left"><a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-27-16:19:03_1.0.0-dd7474d/deb/shinycannon_1.0.0-dd7474d_amd64.deb">shinycannon_1.0.0-dd7474d_amd64.deb</a></td>
+<td align="left"><code>sudo dpkg -i shinycannon_1.0.0-dd7474d_amd64.deb</code></td>
 </tr>
 <tr class="even">
 <td align="left">Redhat/Fedora/CentOS</td>
-<td align="left"><a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-16-15:45:30_1.0.0-22cb125/rpm/shinycannon-1.0.0-22cb125.x86_64.rpm">shinycannon_1.0.0-22cb125.x86_64.rpm</a></td>
-<td align="left"><code>sudo yum install -y shinycannon_1.0.0-22cb125.x86_64.rpm</code></td>
+<td align="left"><a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-27-16:19:03_1.0.0-dd7474d/rpm/shinycannon-1.0.0-dd7474d.x86_64.rpm">shinycannon-1.0.0-dd7474d.x86_64.rpm</a></td>
+<td align="left"><code>sudo yum install -y shinycannon-1.0.0-dd7474d.x86_64.rpm</code></td>
 </tr>
 </tbody>
 </table>
@@ -140,24 +141,24 @@
 <div id="macos" class="section level4">
 <h4 class="hasAnchor">
 <a href="#macos" class="anchor"></a>macOS</h4>
-<ol>
+<ol style="list-style-type: decimal">
 <li>Install <a href="https://www.java.com/en/download/">Java</a>
 </li>
-<li>Download <a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-16-15:45:30_1.0.0-22cb125/bin/shinycannon-1.0.0-22cb125.sh">shinycannon-1.0.0-22cb125.sh</a>
+<li>Download <a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-27-16:19:03_1.0.0-dd7474d/bin/shinycannon-1.0.0-dd7474d.sh">shinycannon-1.0.0-dd7474d.sh</a>
 </li>
-<li>Install with <code>sudo cp shinycannon-1.0.0-22cb125.sh /usr/local/bin/shinycannon; sudo chmod +x /usr/local/bin/shinycannon</code>
+<li>Install with <code>sudo cp shinycannon-1.0.0-dd7474d.sh /usr/local/bin/shinycannon; sudo chmod +x /usr/local/bin/shinycannon</code>
 </li>
+<li>Run <code>shinycannon -h</code> to see help output, or <code>shinycannon [RECORDING-PATH] [APP-URL]</code> to generate load.</li>
 </ol>
 </div>
 <div id="windows" class="section level4">
 <h4 class="hasAnchor">
 <a href="#windows" class="anchor"></a>Windows</h4>
-<ol>
+<ol style="list-style-type: decimal">
 <li>Install <a href="https://www.java.com/en/download/">Java</a>
 </li>
-<li>Download <a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-16-15:45:30_1.0.0-22cb125/jar/shinycannon-1.0.0-22cb125.jar">shinycannon-1.0.0-22cb125.jar</a> to the directory you wish to run it in</li>
-<li>Run with <code>java -jar shinycannon-1.0.0-22cb125.jar</code>
-</li>
+<li>Download <a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-27-16:19:03_1.0.0-dd7474d/jar/shinycannon-1.0.0-dd7474d.jar">shinycannon-1.0.0-dd7474d.jar</a> to the directory you wish to run it in</li>
+<li>Run <code>java -jar shinycannon-1.0.0-dd7474d.jar -h</code> to see help output, or <code>java -jar shinycannon-1.0.0-dd7474d.jar [RECORDING-PATH] [APP-URL]</code> to generate load.</li>
 </ol>
 </div>
 </div>
@@ -166,7 +167,7 @@
 <h2 class="hasAnchor">
 <a href="#quick-start" class="anchor"></a>Quick Start</h2>
 <p>The process for load testing a Shiny application consists of three steps:</p>
-<ol>
+<ol style="list-style-type: decimal">
 <li>
 <strong>Record</strong> a typical user session for the app</li>
 <li>
@@ -178,67 +179,72 @@
 <div id="step-1-recording" class="section level3">
 <h3 class="hasAnchor">
 <a href="#step-1-recording" class="anchor"></a>Step 1: Recording</h3>
-<p>Record a session using the <code>recordSession</code> function, which takes the URL of the <strong>deployed</strong> application:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">shinyloadtest::<span class="kw"><a href="reference/record_session.html">record_session</a></span>(<span class="st">'https://beta.rstudioconnect.com/content/3239/'</span>)</code></pre></div>
-<p>Running the function will open a browser displaying the app. Once open, interact with the application as a normal user would and then close the browser. After closing the browser, a file will be created that contains a recording of the session. This recording, written to <code>recording.log</code> by default, will serve as the basis for the load test.</p>
+<p>Record a session using the <code>record_session</code> function in the <code>shinyloadtest</code> package, which takes the URL of the <strong>deployed</strong> application as an argument:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">shinyloadtest<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/shinyloadtest/topics/record_session">record_session</a></span>(<span class="st">'https://shinyapp.example.com/'</span>)</code></pre></div>
+<p>You should substitute <code>https://shinyapp.example.com/</code> for the URL of the Shiny app you’d like to record. If your application requires authentication you should consult the <a href="articles/load-testing-authenticated-apps.html">authentication article</a>. You should also be aware that <a href="articles/limitations.html">certain Shiny features</a> are not compatible with shinyloadtest.</p>
+<p>Running the function will open a browser displaying the app. Once open, interact with the application as a normal user would and then close the browser. After closing the browser window or tab, a file will be created that contains a recording of the session. This recording, written to <code>recording.log</code> by default, will serve as the basis for the load test.</p>
 </div>
 <div id="step-2-run-the-load-test" class="section level3">
 <h3 class="hasAnchor">
 <a href="#step-2-run-the-load-test" class="anchor"></a>Step 2: Run the Load Test</h3>
-<p>With the recording in hand, we’re ready to run the load test. The actual test is conducted outside of R using the stand alone <code>shinycannon</code> tool.</p>
-<p><code>shinycannon</code> can be used from the command line. An easy option is to use <code>shinycannon</code> from the RStudio terminal. The main arguments to <code>shinycannon</code> are:</p>
-<ul>
-<li><p><strong>sessions</strong>: The number of concurrent users to simulate. <code>shinycannon</code> uses separate parallel threads to represent each user.</p></li>
-<li><p><strong>loaded-duration-minutes</strong>: The duration of the load test. <code>shinycannon</code> will re-run the recording as necessary to meet the specified duration. For example, if the recording is 5 minutes long, but the desired test duration is 18 minutes, <code>shinycannon</code> will</p></li>
-</ul>
-<p>As an example, to run a load test simulating 100 concurrent users for 20 minutes:</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">shinycannon</span> recording.log https://beta.rstudioconnect.com/content/3239/ --sessions=100 --loaded-duration-minutes=20s
-
-<span class="kw">Logging</span> at INFO level to output_dir/detail.log
-<span class="kw">2018-06-15T11</span>:22:29.465037Z - Running: 0, Failed: 0, Done: 0
-<span class="kw">2018-06-15T11</span>:22:29.466399Z - Worker thread 1 warming up
-<span class="kw">2018-06-15T11</span>:22:29.476858Z - Worker thread 2 warming up
-<span class="kw">2018-06-15T11</span>:22:29.477245Z - Worker thread 3 warming up
-                           <span class="kw">...</span>
-<span class="kw">2018-06-15T11</span>:22:29.499708Z - Waiting for warmup to complete
-                           <span class="kw">...</span>
-<span class="kw">2018-06-15T11</span>:22:29.516885Z - Maintaining for 20 minutes
-<span class="kw">2018-06-15T11</span>:28:34.465847Z - Running: 100, Failed: 0, Done: 0
-                           <span class="kw">...</span>
-<span class="kw">2018-06-15T11</span>:44:29.517080Z - Stopped maintaining, waiting for workers to stop
-<span class="kw">2018-06-15T11</span>:48:34.465847Z - Running: 60, Failed: 0, Done: 40
-                           <span class="kw">...</span></code></pre></div>
+<p>With the recording in hand, we’re ready to run the load test. The actual test is conducted outside of R using the <code>shinycannon</code> command-line tool. You can run it using your system’s terminal or console program, or you can run it from the RStudio terminal tab.</p>
+<p><code>shinycannon</code> accepts two required positional arguments:</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>[RECORDING-PATH]</strong>: path to the file produced by <code><a href="reference/record_session.html">shinyloadtest::record_session</a></code>
+</li>
+<li>
+<strong>[APP-URL]</strong>: URL of the target Shiny application</li>
+</ol>
+<p>In addition to these two required arguments, <code>shinycannon</code> accepts a number of optional arguments that can be specified with flags. Of these, the most interesting are:</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>–workers</strong>: The number of concurrent users to simulate. <code>shinycannon</code> uses threads to represent each user. It defaults to 1.</li>
+<li>
+<strong>–loaded-duration-minutes</strong>: The duration of the load test, in minutes. This does not include “warmup time”, which is the time shinycannon spends gradually increasing the number of workers, or “cooldown time”, which is the time spent decreasing the number of workers. It defaults to 0, meaning that after all workers have “warmed up”, they will immediately begin to “cool down”. Generally, you’ll want to set this to a duration greater than 0. <code>shinycannon</code> will re-run the recording as necessary to fill the time.</li>
+<li>
+<strong>–output-dir</strong>: Name of the directory to create and store timing information in.</li>
+</ol>
+<p>As an example, to run a load test simulating 5 concurrent users for at least 2 minutes, outputting to the directory <code>run1</code>:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">shinycannon</span> recording.log https://shinyapp.example.com/ --workers 5 --loaded-duration-minutes 2 --output-dir run1
+<span class="ex">2018-08-29</span> 15:06:14.191 INFO [progress] - Running: 0, Failed: 0, Done: 0
+<span class="ex">2018-08-29</span> 15:06:14.193 INFO [thread01] - Warming up
+<span class="ex">2018-08-29</span> 15:06:14.195 INFO [thread00] - Waiting for warmup to complete
+<span class="ex">2018-08-29</span> 15:06:19.193 INFO [progress] - Running: 1, Failed: 0, Done: 0
+<span class="ex">2018-08-29</span> 15:06:24.194 INFO [progress] - Running: 1, Failed: 0, Done: 0
+<span class="ex">2018-08-29</span> 15:06:29.083 INFO [thread02] - Warming up
+<span class="ex">2018-08-29</span> 15:06:29.195 INFO [progress] - Running: 1, Failed: 0, Done: 0
+<span class="ex">2018-08-29</span> 15:06:34.195 INFO [progress] - Running: 2, Failed: 0, Done: 0
+<span class="ex">2018-08-29</span> 15:06:39.196 INFO [progress] - Running: 2, Failed: 0, Done: 0
+<span class="ex">2018-08-29</span> 15:06:43.973 INFO [thread03] - Warming up
+<span class="ex">2018-08-29</span> 15:06:44.196 INFO [progress] - Running: 2, Failed: 0, Done: 0
+<span class="ex">2018-08-29</span> 15:06:49.196 INFO [progress] - Running: 3, Failed: 0, Done: 0
+<span class="ex">2018-08-29</span> 15:06:54.201 INFO [progress] - Running: 3, Failed: 0, Done: 0
+<span class="ex">2018-08-29</span> 15:06:58.862 INFO [thread04] - Warming up
+<span class="ex">2018-08-29</span> 15:06:59.201 INFO [progress] - Running: 3, Failed: 0, Done: 0
+<span class="ex">2018-08-29</span> 15:07:04.201 INFO [progress] - Running: 4, Failed: 0, Done: 0
+<span class="ex">2018-08-29</span> 15:07:09.202 INFO [progress] - Running: 4, Failed: 0, Done: 0
+<span class="ex">2018-08-29</span> 15:07:13.751 INFO [thread05] - Warming up
+<span class="ex">2018-08-29</span> 15:07:13.752 INFO [thread00] - Maintaining for 2 minutes (120000 ms)
+<span class="ex">2018-08-29</span> 15:07:14.202 INFO [progress] - Running: 4, Failed: 0, Done: 0
+<span class="ex">2018-08-29</span> 15:07:19.202 INFO [progress] - Running: 5, Failed: 0, Done: 0
+<span class="ex">2018-08-29</span> 15:07:24.202 INFO [progress] - Running: 5, Failed: 0, Done: 0
+<span class="ex">...</span></code></pre></div>
 <p><code>shinycannon</code> includes detailed help documentation explaining the other arguments:</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">shinycannon</span> --help</code></pre></div>
-<p>During the test, <code>shinycannon</code> reports the progress and number of simulated users. The result of the test is an output directory which includes timing information for each session.</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">shinycannon</span> -h</code></pre></div>
+<p>During the test, <code>shinycannon</code> reports the progress and number of simulated users. The result of the test is an output directory (<code>run1</code> in the example above) which includes timing information for each session.</p>
 </div>
 <div id="step-3-analyze-the-results" class="section level3">
 <h3 class="hasAnchor">
 <a href="#step-3-analyze-the-results" class="anchor"></a>Step 3: Analyze the Results</h3>
-<p>The output directory created in step 2 is the focus of step 3. The <code>shinyloadtest</code> R package provides functions for analyzing the output files from the test.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(shinyloadtest)
-results &lt;-<span class="st"> </span><span class="kw"><a href="reference/tidy_loadtest.html">tidy_loadtest</a></span>(
-      <span class="st">`</span><span class="dt">20 users</span><span class="st">`</span> =<span class="st"> 'load-test-results'</span>,
-      <span class="st">`</span><span class="dt">1 user</span><span class="st">`</span> =<span class="st"> 'baseline-results'</span>
-)
-results</code></pre></div>
-<p><img src="inst/img/results.png"></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">results %&gt;%
-<span class="st">   </span><span class="kw">hist_loadtimes</span>()
-results %&gt;%
-<span class="st">   </span><span class="kw"><a href="reference/plot_loadtest.html">plot_time_boxplot</a></span>()</code></pre></div>
-<p><img src="inst/img/hist_loadtime.png"></p>
-<p><img src="inst/img/boxplot.png"></p>
-<p>Load the results into a shiny flex dashboard</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">results %&gt;%
-<span class="st">  </span><span class="kw"><a href="reference/make_report.html">make_report</a></span>() %&gt;%
-<span class="st">  </span>rmarkdown::<span class="kw">run</span>()</code></pre></div>
+<p>The output directory created in step 2 (<code>run1</code>) is the focus of step 3. The <code>shinyloadtest</code> R package provides functions for analyzing the output files from the test.</p>
+<p>TODO</p>
 </div>
 </div>
 </div>
   </div>
 
-  <div class="col-md-3" id="sidebar">
+  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <div class="links">
 <h2>Links</h2>
 <ul class="list-unstyled">
@@ -263,7 +269,8 @@ results %&gt;%
 </ul>
 </div>
 
-  </div>
+      </div>
+
 </div>
 
 
