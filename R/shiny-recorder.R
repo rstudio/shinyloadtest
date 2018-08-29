@@ -392,7 +392,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       })
       clientWS$onClose(function() {
         cat("Client disconnected\n")
-        if (!(serverWS$getState() %in% c("CLOSED", "CLOSING"))) {
+        if (serverWS$readyState() <= 1L) {
           serverWS$close()
         }
         private$writeEvent(makeWSEvent("WS_CLOSE"))
