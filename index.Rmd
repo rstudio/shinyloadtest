@@ -46,17 +46,27 @@ shinycannon_files <- tibble(url = readLines("RELEASE_URLS.txt")) %>%
     name = basename(url),
     ext = file_ext(name),
     version = regmatches(name, regexpr("[0-9]+\\.[0-9]+\\.[0-9]+-[0-9a-f]{7}", name)),
-    `Download` = sprintf("<a href='%s'>%s</a>", url, name)
+    `Download Link` = sprintf("<a href='%s'>%s</a>", url, name)
   )
 
+package_types <- tibble(
+  ext = c("deb", "rpm"),
+  Distribution = c("Ubuntu/Debian", "Redhat/Fedora/CentOS"),
+  command_str = c("<code>sudo dpkg -i %s</code>", "<code>sudo yum install -y %s</code>")
+)
+
 linux_packages <- shinycannon_files %>%
-  inner_join(tibble(
-    ext = c("deb", "rpm"),
-    `Distribution` = c("Ubuntu/Debian", "Redhat/Fedora/CentOS"),
-    `command_str` = c("<code>sudo dpkg -i %s</code>", "<code>sudo yum install -y %s</code>")
-    )) %>%
+  inner_join(package_types) %>%
   mutate(`Install Command` = sprintf(command_str, name)) %>%
-  select(`Distribution`, `Download`, `Install Command`)
+  select(`Distribution`, `Download Link`, `Install Command`)
+
+shinycannon_sh <- shinycannon_files %>%
+  filter(ext == "sh") %>%
+  unlist()
+
+shinycannon_jar <- shinycannon_files %>%
+  filter(ext == "jar") %>%
+  unlist()
 ```
 
 ```{r echo=FALSE}
@@ -66,14 +76,15 @@ kable(linux_packages, caption = "Linux Packages")
 #### macOS
 
 1. Install [Java](https://www.java.com/en/download/)
-1. Download [shinycannon-${SHINYCANNON_VERSION}.sh][shinycannon_sh]
-1. Install with `sudo cp shinycannon-${SHINYCANNON_VERSION}.sh /usr/local/bin/shinycannon; sudo chmod +x /usr/local/bin/shinycannon`
+1. Download `r shinycannon_sh[["Download Link"]]`
+1. Install with `sudo cp `r shinycannon_sh[["name"]]` /usr/local/bin/shinycannon; sudo chmod +x /usr/local/bin/shinycannon`
+1. Run `shinycannon -h` to see help output, or `shinycannon [RECORDING-PATH] [APP-URL]` to generate load.
 
 #### Windows
 
 1. Install [Java](https://www.java.com/en/download/)
-1. Download [shinycannon-${SHINYCANNON_VERSION}.jar][shinycannon_jar] to the directory you wish to run it in
-1. Run with `java -jar shinycannon-${SHINYCANNON_VERSION}.jar`
+1. Download `r shinycannon_jar[["Download Link"]]` to the directory you wish to run it in
+1. Run `java -jar `r shinycannon_jar[["name"]]` -h` to see help output, or `java -jar `r shinycannon_jar[["name"]]` [RECORDING-PATH] [APP-URL]` to generate load.
 
 ## Quick Start
 
@@ -87,25 +98,29 @@ Rinse and repeat as necessary. Each step is described below.
 
 ### Step 1: Recording
 
-Record a session using the `recordSession` function, which takes the URL of the **deployed** application:
-
+Record a session using the `record_session` function in the `shinyloadtest` package, which takes the URL of the **deployed** application as an argument:
 
 ```r
-shinyloadtest::record_session('https://beta.rstudioconnect.com/content/3239/')
+shinyloadtest::record_session('https://shinyapp.example.com/')
 ```
 
-Running the function will open a browser displaying the app. Once open, interact with the application as a normal user would and then close the browser. After closing the browser, a file will be created that contains a recording of the session. This recording, written to `recording.log` by default, will serve as the basis for the load test.
+You should substitute `https://shinyapp.example.com/` for the URL of the Shiny app you'd like to record. If your application requires authentication you should consult the [authentication article][authentication]. You should also be aware that [certain Shiny features][limitations] are not compatible with shinyloadtest.
+
+Running the function will open a browser displaying the app. Once open, interact with the application as a normal user would and then close the browser. After closing the browser window or tab, a file will be created that contains a recording of the session. This recording, written to `recording.log` by default, will serve as the basis for the load test.
 
 
 ### Step 2: Run the Load Test
 
-With the recording in hand, we're ready to run the load test. The actual test is conducted outside of R using the stand alone `shinycannon` tool.
+With the recording in hand, we're ready to run the load test. The actual test is conducted outside of R using the `shinycannon` command-line tool.
 
 `shinycannon` can be used from the command line. An easy option is to use `shinycannon` from the RStudio terminal. The main arguments to `shinycannon` are:
 
-- **sessions**: The number of concurrent users to simulate. `shinycannon` uses separate parallel threads to represent each user.
+- **workers**: The number of concurrent users to simulate. `shinycannon` uses threads to represent each user.
 
-- **loaded-duration-minutes**: The duration of the load test. `shinycannon` will re-run the recording as necessary to meet the specified duration. For example, if the recording is 5 minutes long, but the desired test duration is 18 minutes, `shinycannon` will
+- **loaded-duration-minutes**: The duration of the load test. 
+
+
+`shinycannon` will re-run the recording as necessary to meet the specified duration. For example, if the recording is 5 minutes long, but the desired test duration is 18 minutes, `shinycannon` will
 
 As an example, to run a load test simulating 100 concurrent users for 20 minutes:
 
@@ -173,3 +188,5 @@ results %>%
 
 [community]: https://community.rstudio.com
 [shinycannon]: https://github.com/rstudio/shinycannon
+[limitations]: articles/limitations.html
+[authentication]: articles/load-testing-authenticated-apps.html
