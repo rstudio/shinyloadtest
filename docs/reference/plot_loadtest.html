@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Tidy eval helpers — tidyeval • shinyloadtest</title>
+<title>Plotting outputs for tidy_loadtest — plot_loadtest • shinyloadtest</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,13 +30,9 @@
 
 
 
-<meta property="og:title" content="Tidy eval helpers — tidyeval" />
+<meta property="og:title" content="Plotting outputs for tidy_loadtest — plot_loadtest" />
 
-<meta property="og:description" content="These functions provide tidy eval-compatible ways to capture
-symbols (sym(), syms(), ensym()), expressions (expr(),
-exprs(), enexpr()), and quosures (quo(), quos(), enquo()).
-To learn more about tidy eval and how to use these tools, read
-http://rlang.tidyverse.org/articles/tidy-evaluation.html" />
+<meta property="og:description" content="Many different plotting routines to display different loadtest information." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -118,28 +114,83 @@ http://rlang.tidyverse.org/articles/tidy-evaluation.html" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Tidy eval helpers</h1>
+    <h1>Plotting outputs for tidy_loadtest</h1>
     
-    <div class="hidden name"><code>tidyeval.Rd</code></div>
+    <div class="hidden name"><code>plot_loadtest.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>These functions provide tidy eval-compatible ways to capture
-symbols (<code>sym()</code>, <code>syms()</code>, <code>ensym()</code>), expressions (<code>expr()</code>,
-<code>exprs()</code>, <code>enexpr()</code>), and quosures (<code>quo()</code>, <code>quos()</code>, <code>enquo()</code>).
-To learn more about tidy eval and how to use these tools, read
-<a href='http://rlang.tidyverse.org/articles/tidy-evaluation.html'>http://rlang.tidyverse.org/articles/tidy-evaluation.html</a></p>
+    <p>Many different plotting routines to display different loadtest information.</p>
     
     </div>
 
-        
+    <pre class="usage"><span class='fu'>plot_time_boxplot</span>(<span class='no'>df</span>, <span class='kw'>labels</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+
+<span class='fu'>plot_concurrency_time</span>(<span class='no'>df</span>, <span class='kw'>labels</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+
+<span class='fu'>plot_timeline</span>(<span class='no'>df</span>)
+
+<span class='fu'>plot_hist_loadtimes</span>(<span class='no'>df</span>, <span class='kw'>max_load_time</span> <span class='kw'>=</span> <span class='fl'>5</span>)
+
+<span class='fu'>plot_gantt</span>(<span class='no'>df</span>)
+
+<span class='fu'>plot_gantt_session</span>(<span class='no'>df</span>)
+
+<span class='fu'>plot_gantt_duration</span>(<span class='no'>df</span>, <span class='kw'>cutoff</span> <span class='kw'>=</span> <span class='fl'>10</span>)
+
+<span class='fu'>plot_gantt_latency</span>(<span class='no'>df</span>)
+
+<span class='fu'>plot_http_latency</span>(<span class='no'>df</span>, <span class='kw'>cutoff</span> <span class='kw'>=</span> <span class='fl'>10</span>)
+
+<span class='fu'>plot_websocket_latency</span>(<span class='no'>df</span>, <span class='kw'>cutoff</span> <span class='kw'>=</span> <span class='fl'>10</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>df</th>
+      <td><p>data frame returned from <code><a href='tidy_loadtest.html'>tidy_loadtest</a></code></p></td>
+    </tr>
+    <tr>
+      <th>labels</th>
+      <td><p>A vector of labels to include.  If none are supplied, all labels will be used.</p></td>
+    </tr>
+    <tr>
+      <th>max_load_time</th>
+      <td><p>The amount of time users will wait for the page to load
+when first requesting the app.</p></td>
+    </tr>
+    <tr>
+      <th>cutoff</th>
+      <td><p>Where to draw a horizontal or vertical line to display a resonable cutoff line for requests.</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
+
+    <ul>
+<li><p><code>plot_time_boxplot</code>: Box plot of load times for each event in each run</p></li>
+<li><p><code>plot_concurrency_time</code>: Time on concurrency for each event for each run</p></li>
+<li><p><code>plot_timeline</code>: Event waterfall for each session within each run</p></li>
+<li><p><code>plot_hist_loadtimes</code>: Histogram of page load times</p></li>
+<li><p><code>plot_gantt</code>: Gantt chart of event duration for each session within each run</p></li>
+<li><p><code>plot_gantt_session</code>: Event gantt chart of each user session within each run</p></li>
+<li><p><code>plot_gantt_duration</code>: Event gantt chart of fastest to slowest session times within each run</p></li>
+<li><p><code>plot_gantt_latency</code>: Stacked bar chart of event duration for each session within each run</p></li>
+<li><p><code>plot_http_latency</code>: Bar chart of total HTTP latency for each session within each run</p></li>
+<li><p><code>plot_websocket_latency</code>: Bar chart of maximum calculation (websocket) latency for each session within each run</p></li>
+</ul>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-                </ul>
+      <li><a href="#arguments">Arguments</a></li>
+      
+      <li><a href="#functions">Functions</a></li>
+          </ul>
 
   </div>
 </div>

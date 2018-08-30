@@ -1,0 +1,174 @@
+<!-- -*- mode: markdown; -*- -->
+
+# Load Testing Shiny Applications
+
+> This is a WIP, do not use yet. Please follow [community.rstudio.com][community] for a
+soft launch of the tools.
+
+The `shinyloadtest` package and the accompanying [`shinycannon`][shinycannon] software enable load testing
+deployed Shiny applications.
+
+Load testing helps developers and administrators estimate how many users their application can support. If an application requires tuning, load testing and load test result analysis can be used to identify performance bottlenecks and to guide changes to infrastructure, configuration, or code.
+
+It's a common misconception that "Shiny doesn't scale." In actuality, properly-architected Shiny applications can be scaled horizontally, a fact which Sean Lopp was recently able to demonstrate at rstudio::conf 2018. We used `shinycannon` to simulate 10,000 concurrent users interacting with an application deployed to AWS. You can see a recording of Sean's talk and the load test demonstration here: [Scaling Shiny](https://www.rstudio.com/resources/videos/scaling-shiny/)
+
+To get started with `shinyloadtest` read through the quick start guide below.
+
+## Installation
+
+To perform a load test you'll need two pieces of software: `shinyloadtest` and `shinycannon`.
+
+* `shinyloadtest` is an R package used to generate recordings and analyze results. You should install it on your development machine.
+* `shinycannon` is the command-line replay tool. You can install it on your development machine for testing, but for best results we recommend installing it on a server, and preferably not the one the application under test is also on.
+
+### `shinyloadtest`
+
+```R
+devtools::install_github('rstudio/shinyloadtest')
+```
+
+### `shinycannon`
+
+As opposed to the `shinyloadtest` R package, `shinycannon` is installed and run differently depending on platform.
+
+#### Linux
+
+Depending on your distribution, `shinycannon` can be installed using one of the following packages.
+
+```{r include=FALSE}
+library(tibble)
+library(dplyr)
+library(magrittr)
+library(tools)
+library(knitr)
+shinycannon_files <- tibble(url = readLines("RELEASE_URLS.txt")) %>%
+  mutate(
+    name = basename(url),
+    ext = file_ext(name),
+    version = regmatches(name, regexpr("[0-9]+\\.[0-9]+\\.[0-9]+-[0-9a-f]{7}", name)),
+    `Download Link` = sprintf("<a href='%s'>%s</a>", url, name)
+  )
+
+package_types <- tibble(
+  ext = c("deb", "rpm"),
+  Distribution = c("Ubuntu/Debian", "Redhat/Fedora/CentOS"),
+  command_str = c("<code>sudo dpkg -i %s</code>", "<code>sudo yum install -y %s</code>")
+)
+
+linux_packages <- shinycannon_files %>%
+  inner_join(package_types) %>%
+  mutate(`Install Command` = sprintf(command_str, name)) %>%
+  select(`Distribution`, `Download Link`, `Install Command`)
+
+shinycannon_sh <- shinycannon_files %>%
+  filter(ext == "sh") %>%
+  unlist()
+
+shinycannon_jar <- shinycannon_files %>%
+  filter(ext == "jar") %>%
+  unlist()
+```
+
+```{r echo=FALSE}
+kable(linux_packages, caption = "Linux Packages")
+```
+
+#### macOS
+
+1. Install [Java](https://www.java.com/en/download/)
+1. Download `r shinycannon_sh[["Download Link"]]`
+1. Install with `sudo cp `r shinycannon_sh[["name"]]` /usr/local/bin/shinycannon; sudo chmod +x /usr/local/bin/shinycannon`
+1. Run `shinycannon -h` to see help output, or `shinycannon [RECORDING-PATH] [APP-URL]` to generate load.
+
+#### Windows
+
+1. Install [Java](https://www.java.com/en/download/)
+1. Download `r shinycannon_jar[["Download Link"]]` to the directory you wish to run it in
+1. Run `java -jar `r shinycannon_jar[["name"]]` -h` to see help output, or `java -jar `r shinycannon_jar[["name"]]` [RECORDING-PATH] [APP-URL]` to generate load.
+
+## Quick Start
+
+The process for load testing a Shiny application consists of three steps:
+
+1. **Record** a typical user session for the app
+1. **Replay** the session in parallel, simulating many simultaneous users accessing the app
+1. **Analyze** the results of the load test and determine if the app performed well enough
+
+Rinse and repeat as necessary. Each step is described below.
+
+### Step 1: Recording
+
+Record a session using the `record_session` function in the `shinyloadtest` package, which takes the URL of the **deployed** application as an argument:
+
+```r
+shinyloadtest::record_session('https://shinyapp.example.com/')
+```
+
+You should substitute `https://shinyapp.example.com/` for the URL of the Shiny app you'd like to record. If your application requires authentication you should consult the [authentication article][authentication]. You should also be aware that [certain Shiny features][limitations] are not compatible with shinyloadtest.
+
+Running the function will open a browser displaying the app. Once open, interact with the application as a normal user would and then close the browser. After closing the browser window or tab, a file will be created that contains a recording of the session. This recording, written to `recording.log` by default, will serve as the basis for the load test.
+
+
+### Step 2: Run the Load Test
+
+With the recording in hand, we're ready to run the load test. The actual test is conducted outside of R using the `shinycannon` command-line tool. You can run it using your system's terminal or console program, or you can run it from the RStudio terminal tab.
+
+`shinycannon` accepts two required positional arguments:
+
+1. **[RECORDING-PATH]**: path to the file produced by `shinyloadtest::record_session`
+1. **[APP-URL]**: URL of the target Shiny application
+
+In addition to these two required arguments, `shinycannon` accepts a number of optional arguments that can be specified with flags. Of these, the most interesting are:
+
+1. **--workers**: The number of concurrent users to simulate. `shinycannon` uses threads to represent each user. It defaults to 1.
+1. **--loaded-duration-minutes**: The duration of the load test, in minutes. This does not include "warmup time", which is the time shinycannon spends gradually increasing the number of workers, or "cooldown time", which is the time spent decreasing the number of workers. It defaults to 0, meaning that after all workers have "warmed up", they will immediately begin to "cool down". Generally, you'll want to set this to a duration greater than 0. `shinycannon` will re-run the recording as necessary to fill the time.
+1. **--output-dir**: Name of the directory to create and store timing information in.
+
+As an example, to run a load test simulating 5 concurrent users for at least 2 minutes, outputting to the directory `run1`:
+
+```bash
+$ shinycannon recording.log https://shinyapp.example.com/ --workers 5 --loaded-duration-minutes 2 --output-dir run1
+2018-08-29 15:06:14.191 INFO [progress] - Running: 0, Failed: 0, Done: 0
+2018-08-29 15:06:14.193 INFO [thread01] - Warming up
+2018-08-29 15:06:14.195 INFO [thread00] - Waiting for warmup to complete
+2018-08-29 15:06:19.193 INFO [progress] - Running: 1, Failed: 0, Done: 0
+2018-08-29 15:06:24.194 INFO [progress] - Running: 1, Failed: 0, Done: 0
+2018-08-29 15:06:29.083 INFO [thread02] - Warming up
+2018-08-29 15:06:29.195 INFO [progress] - Running: 1, Failed: 0, Done: 0
+2018-08-29 15:06:34.195 INFO [progress] - Running: 2, Failed: 0, Done: 0
+2018-08-29 15:06:39.196 INFO [progress] - Running: 2, Failed: 0, Done: 0
+2018-08-29 15:06:43.973 INFO [thread03] - Warming up
+2018-08-29 15:06:44.196 INFO [progress] - Running: 2, Failed: 0, Done: 0
+2018-08-29 15:06:49.196 INFO [progress] - Running: 3, Failed: 0, Done: 0
+2018-08-29 15:06:54.201 INFO [progress] - Running: 3, Failed: 0, Done: 0
+2018-08-29 15:06:58.862 INFO [thread04] - Warming up
+2018-08-29 15:06:59.201 INFO [progress] - Running: 3, Failed: 0, Done: 0
+2018-08-29 15:07:04.201 INFO [progress] - Running: 4, Failed: 0, Done: 0
+2018-08-29 15:07:09.202 INFO [progress] - Running: 4, Failed: 0, Done: 0
+2018-08-29 15:07:13.751 INFO [thread05] - Warming up
+2018-08-29 15:07:13.752 INFO [thread00] - Maintaining for 2 minutes (120000 ms)
+2018-08-29 15:07:14.202 INFO [progress] - Running: 4, Failed: 0, Done: 0
+2018-08-29 15:07:19.202 INFO [progress] - Running: 5, Failed: 0, Done: 0
+2018-08-29 15:07:24.202 INFO [progress] - Running: 5, Failed: 0, Done: 0
+...
+```
+
+`shinycannon` includes detailed help documentation explaining the other arguments:
+
+```bash
+shinycannon -h
+```
+
+During the test, `shinycannon` reports the progress and number of simulated users. The result of the test is an output directory (`run1` in the example above) which includes timing information for each session.
+
+### Step 3: Analyze the Results
+
+The output directory created in step 2 (`run1`) is the focus of step 3. The `shinyloadtest` R package provides
+functions for analyzing the output files from the test.
+
+TODO
+
+[community]: https://community.rstudio.com
+[shinycannon]: https://github.com/rstudio/shinycannon
+[limitations]: articles/limitations-of-shinyloadtest.html
+[authentication]: articles/load-testing-authenticated-apps.html
