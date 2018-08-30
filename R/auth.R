@@ -45,11 +45,8 @@ isProtected <- function(appUrl) {
 }
 
 loginUrlFor <- function(appUrl, appServer) {
-  if (appServer == "rsc") {
-    p <- xml2::url_parse(appUrl)
-    paste0(p[1,"scheme"], "://", p[1,"server"], ":", p[1,"port"],  "/__login__", collapse = "")
-  } else if (appServer == "ssp") {
-    paste0(appUrl, "__login__")
+  if (appServer %in% c("rsc", "ssp")) {
+    URLBuilder$new(appUrl)$appendPaths("__login__")$build()
   } else {
     stop(paste0("Unknown appServer:", appServer))
   }
