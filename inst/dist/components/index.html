@@ -80,19 +80,19 @@
           <div class="sui-flex-0 slt-view-control">
             <div class="uk-button-group sui-segmented-button" id=latency-report-controller>
               <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=total-http>Total HTTP</button>
-              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=max-websocket>Maximum Websocket</button>
+              <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=max-websocket>Maximum WebSocket</button>
             </div>
           </div>
           <div class="sui-flex-5 slt-section-group" id="latency-chart-view">
             <div id="total-http">
               <div class="uk-padding uk-padding-remove-bottom">
-                <p class="uk-text-meta">INSERT http CAPTION</p>
+                <p class="uk-text-meta">Total HTTP and supporting files (JS/CSS) latency (load time) is displayed for each session and run combination.  Each vertical bar represents the amount of time a session's Shiny application had to wait before it is able to ask the server for information. A resonable amount of time to wait as been set to {http_latency_cutoff}s. Warmup and cooldown sessions are displayed outside the dotted maintenance period lines.</p>
               </div>
               <img src="{src_http}"/>
             </div>
             <div id="max-websocket">
               <div class="uk-padding uk-padding-remove-bottom">
-                <p class="uk-text-meta">INSERT websocket CAPTION</p>
+                <p class="uk-text-meta">Maximum WebSocket latency (calculation time) is displayed for each session and run combination.  The maximum time is shown to convey the longest amount of time a user would have to wait for a response from the Shiny server.  Warmup and cooldown sessions are displayed outside the dotted maintenance period lines.</p>
               </div>
               <img src="{src_websocket}"/>
             </div>
@@ -109,13 +109,13 @@
           </div>
           <div class="sui-flex-5 slt-section-group" id="duration-chart-view">
             <div id="slowest-max">
-              { glue_component("picker", list(class="slt-box-picker-container", id="slowest-max-picker", value = min(c(12, length(boxplot$max_time))),  min = 1, max = length(boxplot$max_time), comment = "slowest maximum times")) }
+              { glue_component("picker_duration", list(id="slowest-max-picker", len = length(boxplot$max_time), comment = "slowest maximum times", info = "Event plots are arranged by the slowest <b>maximum</b> time within each plot.")) }
               <div class="uk-flex uk-grid-match uk-grid-small uk-child-width-1-4@m slt-chart-grid" uk-grid id="slowest-max-grid">
                 { glue_multi_component("boxplot_thumbnail", boxplot$max_time) }
               </div>
             </div>
             <div id="slowest-min">
-              { glue_component("picker", list(class="slt-box-picker-container", id="slowest-min-picker", value = min(c(12, length(boxplot$min_time))),  min = 1, max = length(boxplot$min_time), comment = "slowest minimum times")) }
+              { glue_component("picker_duration", list(id="slowest-min-picker", len = length(boxplot$min_time), comment = "slowest minimum times", info = "Event plots are arranged by the slowest <b>minimum</b> time within each plot.")) }
               <div class="uk-flex uk-grid-match uk-grid-small uk-child-width-1-4@m slt-chart-grid" uk-grid id="slowest-min-grid">
                 { glue_multi_component("boxplot_thumbnail", boxplot$min_time)}
               </div>
@@ -149,19 +149,19 @@
           </div>
           <div class="sui-flex-5 slt-section-group" id="concurrency-chart-view">
             <div id="concurrency-slope">
-              { glue_component("picker", list(class="slt-box-picker-container", id="concurrency-slope-picker", value = min(c(12, length(concurrency$slope))),  min = 1, max = length(concurrency$slope), comment = "largest linear model slopes")) }
+              { glue_component("picker_concurrency", list(id="concurrency-slope-picker", len = length(concurrency$slope), comment = "largest slope magnitudes", src_legend = src_legend, info = "Event plots are arranged by the largest <b>slope magnitude</b> found when fitting a linear model to each run.")) }
               <div class="uk-flex uk-grid-match uk-grid-small uk-child-width-1-4@m slt-chart-grid" uk-grid id="concurrency-slope-grid">
                 { glue_multi_component("boxplot_thumbnail", concurrency$slope)}
               </div>
             </div>
             <div id="concurrency-intercept">
-              { glue_component("picker", list(class="slt-box-picker-container", id="concurrency-intercept-picker", value = min(c(12, length(concurrency$intercept))),  min = 1, max = length(concurrency$intercept), comment = "largest linear model intercepts")) }
+              { glue_component("picker_concurrency", list(id="concurrency-intercept-picker", len = length(concurrency$intercept), comment = "largest intercept magnitudes", src_legend = src_legend, info = "Event plots are arranged by the largest <b>intercept magnitude</b> found when fitting a linear model to each run")) }
               <div class="uk-flex uk-grid-match uk-grid-small uk-child-width-1-4@m slt-chart-grid" uk-grid id="concurrency-intercept-grid">
                 { glue_multi_component("boxplot_thumbnail", concurrency$intercept)}
               </div>
             </div>
             <div id="concurrency-error">
-              { glue_component("picker", list(class="slt-box-picker-container", id="concurrency-error-picker", value = min(c(12, length(concurrency$max_error))),  min = 1, max = length(concurrency$max_error), comment = "largest linear model residuals")) }
+              { glue_component("picker_concurrency", list(id="concurrency-error-picker", len = length(concurrency$max_error), comment = "largest error magnitudes", src_legend = src_legend, info = "Event plots are arranged by the largest <b>error magnitude</b> found when fitting a linear model to each run.")) }
               <div class="uk-flex uk-grid-match uk-grid-small uk-child-width-1-4@m slt-chart-grid" uk-grid id="concurrency-error-grid">
                 { glue_multi_component("boxplot_thumbnail", concurrency$max_error)}
               </div>
