@@ -58,6 +58,9 @@
       <a href="articles/load-testing-authenticated-apps.html">Load testing authenticated apps</a>
     </li>
     <li>
+      <a href="articles/limitations-of-shinyloadtest.html">Limitations</a>
+    </li>
+    <li>
       <a href="articles/faq.html">FAQ</a>
     </li>
   </ul>
@@ -181,7 +184,7 @@
 <a href="#step-1-recording" class="anchor"></a>Step 1: Recording</h3>
 <p>Record a session using the <code>record_session</code> function in the <code>shinyloadtest</code> package, which takes the URL of the <strong>deployed</strong> application as an argument:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">shinyloadtest<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/shinyloadtest/topics/record_session">record_session</a></span>(<span class="st">'https://shinyapp.example.com/'</span>)</code></pre></div>
-<p>You should substitute <code>https://shinyapp.example.com/</code> for the URL of the Shiny app you’d like to record. If your application requires authentication you should consult the <a href="articles/load-testing-authenticated-apps.html">authentication article</a>. You should also be aware that <a href="articles/limitations.html">certain Shiny features</a> are not compatible with shinyloadtest.</p>
+<p>You should substitute <code>https://shinyapp.example.com/</code> for the URL of the Shiny app you’d like to record. If your application requires authentication you should consult the <a href="articles/load-testing-authenticated-apps.html">authentication article</a>. You should also be aware that <a href="articles/limitations-of-shinyloadtest.html">certain Shiny features</a> are not compatible with shinyloadtest.</p>
 <p>Running the function will open a browser displaying the app. Once open, interact with the application as a normal user would and then close the browser. After closing the browser window or tab, a file will be created that contains a recording of the session. This recording, written to <code>recording.log</code> by default, will serve as the basis for the load test.</p>
 </div>
 <div id="step-2-run-the-load-test" class="section level3">

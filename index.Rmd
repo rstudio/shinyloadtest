@@ -170,5 +170,5 @@ TODO
 
 [community]: https://community.rstudio.com
 [shinycannon]: https://github.com/rstudio/shinycannon
-[limitations]: articles/limitations.html
+[limitations]: articles/limitations-of-shinyloadtest.html
 [authentication]: articles/load-testing-authenticated-apps.html
