@@ -75,7 +75,7 @@ test_that("hop-by-hop headers removed from httr responses", {
           0x6c, 0x73, 0x65, 0x2c, 0x22, 0x65, 0x6e, 0x74, 0x72, 0x6f, 0x70, 0x79, 0x22, 0x3a, 0x33, 0x33, 0x36, 0x35, 0x34, 0x38, 0x30, 0x32, 0x35, 0x31, 0x7d))
     )
   headers <- curl::parse_headers_list(httr_resp$headers)
-  to_remove <- headers_to_remove(headers$connect)
+  to_remove <- headers_to_remove(headers$connection)
   rook_resp <- resp_httr_to_rook(httr_resp)
   expect_length(base::intersect(to_remove, names(rook_resp$headers)), 0)
 })
