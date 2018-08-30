@@ -40,7 +40,8 @@ Imports:
     rmarkdown,
     progress,
     scales,
-    htmltools
+    htmltools,
+    gtable
 Remotes: rstudio/websocket,
     rstudio/httpuv
 RoxygenNote: 6.1.0
