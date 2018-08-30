@@ -20,6 +20,7 @@ knitr::opts_chunk$set(
 ## Deployment limitations
 
 1. **WebSockets are required**: On Connect and Shiny Server Pro, [SockJS](https://github.com/sockjs/sockjs-client) is used instead of plain WebSockets in order to support browsers and load balancers that don't support WebSockets. Even though Shiny works in the absence of WebSocket support, `shinyloadtest` does not.
+1. **shinyapps.io unsupported**: Applications deployed on [http://www.shinyapps.io/](http://www.shinyapps.io/) can't be recorded or load tested.
 
 ## Application limitations
 
