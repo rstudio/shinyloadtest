@@ -3,8 +3,6 @@ if (getRversion() >= "2.15.1") {
   utils::globalVariables(c("input_line_number", "run", "session_id", "user_id", "iteration", "event", "timestamp", "concurrency", "center", "event_class", "total_latency", ".", "type", "min_start", "max_end", "worker_id", "json"))
 }
 
-cutoffColor <- "red"
-
 # Utility functions -------------------------------------------------------
 
 strip_suffix <- function(str) {
@@ -82,7 +80,10 @@ read_log_dir <- function(dir, name = basename(dirname(dir)), verbose = TRUE) {
 # Read a recording file
 read_recording <- function(file_name) {
   file_lines <- readLines(file_name)
-  file_lines <- file_lines[!grepl("^#", file_lines)]
+  input_line_number <- seq_along(file_lines)
+  not_comments <- (!grepl("^#", file_lines))
+  file_lines <- file_lines[not_comments]
+  input_line_number <- input_line_number[not_comments]
   baselineInfo <- file_lines %>%
     lapply(jsonlite::fromJSON) %>%
     lapply(function(item) {
@@ -105,16 +106,20 @@ read_recording <- function(file_name) {
     }) %>%
     bind_rows()
 
-  baselineData$label <- recording_item_labels(baselineData$json)
-
   baselineData %>%
     mutate(
-      session_id = -1,
-      user_id = -1,
-      iteration = -1,
-      input_line_number = seq_len(nrow(.)),
+      json = lapply(json, function(json_item) {
+        if (!is.null(json_item$message) && !identical(json_item$message, "o")) {
+          json_item$message_parsed <- parseMessage(json_item$message)
+        } else {
+          json_item$message_parsed <- list()
+        }
+        json_item
+      })
+    ) %>%
+    mutate(
+      input_line_number = input_line_number,
       time = end - start,
-      concurrency = 1,
       label = recording_item_labels(json)
     ) %>%
     arrange(input_line_number) %>%
@@ -130,6 +135,7 @@ read_recording <- function(file_name) {
     )
 }
 
+WS_CLOSE_LABEL <- "Stop Session"
 recording_item_labels <- function(x_list) {
   shorten_url <- function(u) {
     parts <- strsplit(u, "/")[[1]]
@@ -161,7 +167,7 @@ recording_item_labels <- function(x_list) {
           if (grepl("\\|o\\|\"]$", x$message)) {
             "Initialize Connection"
           } else {
-            message <- parseMessage(x$message)
+            message <- x$message_parsed
             if (identical(message$method, "uploadInit")) {
               "Start File Upload"
             } else if (identical(message$method, "uploadEnd")) {
@@ -178,7 +184,7 @@ recording_item_labels <- function(x_list) {
         if (x$message == "o") {
           "Start Connection"
         } else {
-          message <- parseMessage(x$message)
+          message <- x$message_parsed
           if (!is.null(message$response$tag)) {
             "Completed File Upload"
           } else {
@@ -186,7 +192,7 @@ recording_item_labels <- function(x_list) {
           }
         }
       },
-      "WS_CLOSE" = "Stop Session",
+      "WS_CLOSE" = WS_CLOSE_LABEL,
       x$type
     )
     ret <- append(ret, prepend_line(new_label, i))
@@ -224,12 +230,12 @@ get_times <- function(df) {
 #' @export
 #' @examples
 #' \dontrun{
-#'   tidy_loadtest(
-#'      `1 core` = 'results/test-1/',
-#'      `2 cores` = 'results/test-2/'
+#'   load_runs(
+#'      `1 core` = 'results/run-1/',
+#'      `2 cores` = 'results/run-2/'
 #'   )
 #' }
-tidy_loadtest <- function(..., verbose = TRUE) {
+load_runs <- function(..., verbose = TRUE) {
 
   # TODO: Validate input directories and fail intelligently!
   verbose <- isTRUE(verbose)
@@ -248,30 +254,25 @@ tidy_loadtest <- function(..., verbose = TRUE) {
             get_times() %>%
             filter(event != "PLAYBACK_SLEEPBEFORE", event != "PLAYER_SESSION") %>%
             arrange(run, user_id, session_id, input_line_number) %>%
-            mutate(
-              label = paste0(input_line_number, ":", event),
-              type = "record"
-            ) %>%
-            select(run, type, everything())
+            select(run, everything())
 
           recording_path <- file.path(recording_path, "recording.log")
           if (is.null(first_recording$name)) {
             first_recording$name <<- run
-            first_recording$value <<- readLines(recording_path)
+            first_recording$lines <<- readLines(recording_path)
+            recording <- read_recording(recording_path)
+            first_recording$data <<- recording %>% select(input_line_number, label, json)
+            first_recording$max_end <<- max(recording$end)
           } else {
             recording <- readLines(recording_path)
-            if (!identical(recording, first_recording$value)) {
+            if (!identical(recording, first_recording$lines)) {
               stop(
                 "Recording for `", run, "` does not equal the recording for `", first_recording$name, "`.\n",
-                "Please use the same recording when calling tidy_loadtest()"
+                "Please use the same recording when calling load_runs()"
               )
             }
           }
-          df_recording <- read_recording(recording_path) %>%
-            mutate(
-              recording_label = label
-            ) %>%
-            select(input_line_number, recording_label)
+          df_recording <- first_recording$data
 
           df_run$id <- seq_len(nrow(df_run))
           df_filtered <- filter_df(df_run)
@@ -283,6 +284,7 @@ tidy_loadtest <- function(..., verbose = TRUE) {
             ) %>%
             select(-id)
 
+          # adjust times to start at 0 when maintenance starts
           min_maintenance_time <- df_run %>%
             filter(maintenance == TRUE) %>%
             select_("start") %>%
@@ -296,18 +298,13 @@ tidy_loadtest <- function(..., verbose = TRUE) {
           left_join(df_run, df_recording, by = "input_line_number")
         }
       )
-    }
-
-  df <- df %>% bind_rows()
-
-  fct_levels <- df$input_line_number[!duplicated(df$input_line_number)]
-  fct_labels <- df$label[!duplicated(df$input_line_number)]
-  df <- df %>%
+    } %>%
+    bind_rows() %>%
     mutate(
-      label = factor(input_line_number, fct_levels, fct_labels, ordered = TRUE),
       run = factor(run, run_levels, ordered = TRUE)
     )
 
+  attr(df, "recording_duration") <- max(first_recording$max_end)
   df
 }
 

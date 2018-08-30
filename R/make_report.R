@@ -6,19 +6,19 @@ if (getRversion() >= "2.15.1") {
 
 #' Make shinyloadtest Report
 #'
-#' @param df data.frame returned from \code{\link{tidy_loadtest}}
+#' @param df data.frame returned from \code{\link{shinyloadtest}}
 #' @param output File where HTML output should be saved
-#' @param duration_cutoff Cutoff value for session duration plot
+#' @param duration_cutoff Cutoff value for session duration plot. Defaults to the recording duration used to simulate \code{df} or 60 seconds.
 #' @param http_latency_cutoff Cutoff value for total http latency plot
 #' @param max_websocket_cutoff Cutoff value for max websocket latency plot
 #' @param verbose Boolean that determines if progress output is displayed
 #' @param self_contained Boolean that determines if the final output should be a self contained html file
 #' @param open_browser Whether to open the created output in the browser
 #' @export
-make_report <- function(
+shinyloadtest_report <- function(
   df,
-  output = "test.html",
-  duration_cutoff = 10,
+  output = "shinyloadtest_report.html",
+  duration_cutoff = c(attr(df, "recording_duration"), 60)[1],
   http_latency_cutoff = 5,
   max_websocket_cutoff = 20,
   open_browser = TRUE,
@@ -31,6 +31,7 @@ make_report <- function(
 
   verbose <- isTRUE(verbose)
   self_contained <- isTRUE(self_contained)
+  missing_duration_cutoff <- missing(duration_cutoff)
   if (verbose) {
     pr <- progress::progress_bar$new(
       format = ":name - :evt [:bar] :current/:total eta::eta",
@@ -39,6 +40,7 @@ make_report <- function(
         2 + # time tab
         (length(levels(df$run)) * 3) + # per run plots
         length(unique(df$input_line_number)) + # per event boxplot
+        1 + # concurrency legend
         length(unique(df$input_line_number)) + # per event concurrency
         1 + # generate html
         1 + # save html
@@ -104,12 +106,12 @@ make_report <- function(
     ) / 720
   tick("HTTP Latency")
   src_http <- df %>%
-    plot_http_latency(cutoff = http_latency_cutoff) %>%
+    slt_http_latency(cutoff = http_latency_cutoff) %>%
     save_svg_file("http_latency", width = 15, height = latency_height)
 
   tick("Websocket Latency")
   src_websocket <- df %>%
-    plot_websocket_latency(cutoff = max_websocket_cutoff) %>%
+    slt_websocket_latency(cutoff = max_websocket_cutoff) %>%
     save_svg_file("websocket_latency", width = 15, height = latency_height)
 
   # gantt chart plots
@@ -122,19 +124,19 @@ make_report <- function(
 
     tick(paste0(run_val, " Session Gantt"))
     src_gantt <- {
-        plot_gantt(df_run) + xlim(min_gantt_time, max_gantt_time)
+        slt_user(df_run) + xlim(min_gantt_time, max_gantt_time)
       } %>%
       save_run_svg(run_val_clean, "gantt", height = 7 * (26.625 * length(unique(df_run$user_id)) + 78) / 504)
 
     tick(paste0(run_val, " Session Duration"))
     src_duration <- {
-        plot_gantt_duration(df_run, cutoff = duration_cutoff) + xlim(0, max_duration)
+        slt_session_duration(df_run, cutoff = duration_cutoff) + xlim(0, max_duration)
       } %>%
       save_run_svg(run_val_clean, "duration")
 
     tick(paste0(run_val, " Event Waterfall"))
     src_waterfall <- {
-        plot_timeline(df_run, limits = range(df_maintenance$concurrency, na.rm = TRUE)) + xlim(min_gantt_time, max_gantt_time)
+        slt_waterfall(df_run, limits = c(0, max(df_maintenance$concurrency, na.rm = TRUE))) + xlim(min_gantt_time, max_gantt_time)
       } %>%
       save_run_svg(
         run_val_clean,
@@ -142,7 +144,7 @@ make_report <- function(
         width = 15,
         height = 7 * (
           (
-            340 / 37 * length(levels(df$recording_label)) +
+            340 / 37 * length(levels(df$label)) +
             5.48
           ) +
           86.17
@@ -151,6 +153,9 @@ make_report <- function(
 
     list(
       n = length(unique(df_run$user_id)),
+      n_session = length(unique(df_run$session_id)),
+      missing_duration_cutoff = missing_duration_cutoff,
+      duration_cutoff = duration_cutoff,
       id = run_val_clean,
       id_gantt = paste0(run_val_clean, "-gantt"),
       id_duration = paste0(run_val_clean, "-duration"),
@@ -163,13 +168,13 @@ make_report <- function(
   })
 
   df_boxplot <- df_maintenance %>%
-    group_by(recording_label, run, input_line_number) %>%
+    group_by(label, run, input_line_number) %>%
     summarise(
       min_time = min(time, na.rm = TRUE),
       mean_time = mean(time, na.rm = TRUE),
       max_time = max(time, na.rm = TRUE)
     ) %>%
-    group_by(recording_label, input_line_number) %>%
+    group_by(label, input_line_number) %>%
     summarise(
       min_time = min(min_time, na.rm = TRUE),
       max_time = max(max_time, na.rm = TRUE),
@@ -189,11 +194,11 @@ make_report <- function(
     df_event <- df %>% filter(input_line_number == input_line_val)
     tick(paste0("Event ", input_line_val, " Boxplot"))
     src_boxplot <- df_event %>%
-      plot_time_boxplot() %>%
+      slt_time_boxplot() %>%
       save_run_svg(input_line_val, "boxplot", height = 4, width = 4)
     df_boxplot_event <- df_boxplot %>% filter(input_line_number == input_line_val)
     list(
-      label = htmltools::htmlEscape(df_boxplot_event$recording_label[[1]]),
+      label = htmltools::htmlEscape(df_boxplot_event$label[[1]]),
       src = src_boxplot,
       has_mean_diff = has_mean_diff,
       min_time_val = df_boxplot_event$min_time[[1]] %>% format_num(),
@@ -206,7 +211,7 @@ make_report <- function(
   })
 
   df_model <- df_maintenance %>%
-    group_by(recording_label, run, input_line_number) %>%
+    group_by(label, run, input_line_number) %>%
     summarise(
       model = list(lm(time ~ concurrency))
     ) %>%
@@ -215,7 +220,7 @@ make_report <- function(
       intercept = vapply(model, function(mod){ coef(mod)[1] }, numeric(1)),
       max_error = vapply(model, function(mod){ max(abs(c(residuals(mod), 0)), na.rm = TRUE) }, numeric(1)),
     ) %>%
-    group_by(recording_label, input_line_number) %>%
+    group_by(label, input_line_number) %>%
     summarise(
       slope_pos = which.max(c(abs(slope), -Inf)),
       slope_val = c(slope, -Inf)[slope_pos] %>% format_num(),
@@ -234,11 +239,13 @@ make_report <- function(
     df_event <- df %>% filter(input_line_number == input_line_val)
     tick(paste0("Event ", input_line_val, " Concurrency"))
     src_boxplot <- df_event %>%
-      plot_concurrency_time() %>%
+      {
+        slt_time_concurrency(.) + theme(legend.position = "none")
+      } %>%
       save_run_svg(input_line_val, "concurrency", height = 4, width = 4)
     df_concurrency_event <- df_model %>% filter(input_line_number == input_line_val)
     list(
-      label = htmltools::htmlEscape(df_concurrency_event$recording_label[[1]]),
+      label = htmltools::htmlEscape(df_concurrency_event$label[[1]]),
       src = src_boxplot,
       slope = df_concurrency_event$slope[[1]],
       intercept = df_concurrency_event$intercept[[1]],
@@ -249,14 +256,39 @@ make_report <- function(
     )
   })
 
+  tick("Concurrency Legend")
+  src_legend <- df %>%
+    filter(input_line_number == df_model$input_line_number[[1]]) %>%
+    {
+      slt_time_concurrency(.) +
+        theme(legend.position = "bottom") +
+        labs(fill = "", color = "")
+    } %>% {
+      barret <<- .
+      .
+    } %>%
+    extract_legend() %>%
+    {
+      legend_info  <- .
+      # ratio <- legend_info$width_inches / legend_info$height_inches
+      save_svg_file(
+        legend_info$legend_grob,
+        "concurrency_legend",
+        height = legend_info$height_inches, width = legend_info$width_inches
+      )
+    }
+
 
   tick("Generate HTML")
   output_txt <- glue_index(list(
     folder_name = basename(base_output_name),
     src_http = src_http,
     src_websocket = src_websocket,
+    src_legend = if (length(levels(df$run)) > 1) src_legend else NULL,
     gantt = gantt,
     run_length = length(levels(df$run)),
+    http_latency_cutoff = http_latency_cutoff,
+    max_websocket_cutoff = max_websocket_cutoff,
     boxplot = list(
       min_time = boxplot[order(df_boxplot$min_time, decreasing = TRUE)],
       max_time = boxplot[order(df_boxplot$max_time, decreasing = TRUE)],
@@ -298,7 +330,7 @@ to_svgz <- function(in_path, out_path = tempfile()) {
 
   invisible(out_path)
 }
-save_svg <- function(p, output, width = 15, height = 10, ...) {
+save_svg <- function(p, output, width = 15, height = 10, units = "in", ...) {
   if (file.exists(output)) return(output)
   output_tmp <- tempfile(fileext = ".svg")
   on.exit({
