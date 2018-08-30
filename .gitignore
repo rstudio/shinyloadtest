@@ -2,6 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-test/*
-test.html
+shinyloadtest_report/*
+shinyloadtest_report.html
 output/*

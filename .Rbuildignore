@@ -5,4 +5,5 @@
 ^output/
 ^test_sessions/
 ^\.travis\.yml$
-^test\.html$
+^shinyloadtest_report/
+^shinyloadtest_report\.html$
