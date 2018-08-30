@@ -1,6 +1,5 @@
 ---
-title: "Performance Settings in RStudio Connect or Shiny Server Pro"
-author: "Vignette Author"
+title: "shinyloadtest FAQ"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -16,4 +15,4 @@ knitr::opts_chunk$set(
 )
 ```
 
-Describe the process for performance tuning the runtime settings (utilization scheduler) for an application in RStudio Connect or Shiny Server Pro making use of `shinyloadtest`.
+TODO

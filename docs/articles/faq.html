@@ -5,11 +5,11 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Load Testing Authenticated Apps • shinyloadtest</title>
+<title>shinyloadtest FAQ • shinyloadtest</title>
 <!-- jquery --><script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Load Testing Authenticated Apps">
+<script src="../pkgdown.js"></script><meta property="og:title" content="shinyloadtest FAQ">
 <meta property="og:description" content="">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--[if lt IE 9]>
@@ -79,62 +79,21 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1>Load Testing Authenticated Apps</h1>
+      <h1>shinyloadtest FAQ</h1>
             
             <h4 class="date">2018-08-29</h4>
       
       
-      <div class="hidden name"><code>load-testing-authenticated-apps.Rmd</code></div>
+      <div class="hidden name"><code>faq.Rmd</code></div>
 
     </div>
 
     
     
-<p><code>shinyloadtest</code> supports load testing applications served by <a href="https://www.rstudio.com/products/connect/">RStudio Connect</a> or <a href="https://www.rstudio.com/products/connect/">Shiny Server Pro</a> with the following authentication configurations:</p>
-<ul>
-<li>Connect
-<ul>
-<li>Password</li>
-<li>LDAP and Active Directory</li>
-<li>PAM</li>
-</ul>
-</li>
-<li>Shiny Server Pro
-<ul>
-<li>Flat-File</li>
-<li>LDAP and Active Directory</li>
-<li>PAM</li>
-</ul>
-</li>
-</ul>
-<div id="recording" class="section level2">
-<h2 class="hasAnchor">
-<a href="#recording" class="anchor"></a>Recording</h2>
-<p><code><a href="../reference/record_session.html">shinyloadtest::record_session</a></code> will automatically detect when an application is protected using a supported authentication scheme and will prompt for a username and password.</p>
-<p>If <code>record_session</code> is called from within an RStudio IDE session, two UI dialogs will appear. If it’s called from an R session in a command-line setting, prompts will appear on standard output.</p>
-<p>The supplied username and password are used for the duration of the recording to interact with the application, but these credentials are not stored in the recording file.</p>
-</div>
-<div id="load-testing" class="section level2">
-<h2 class="hasAnchor">
-<a href="#load-testing" class="anchor"></a>Load testing</h2>
-<p>Because credentials are not stored in recordings, a username and password must be supplied to <code>shinycannon</code> in order to load test authenticated applications.</p>
-<p><code>shinycannon</code> does not have <code>--user</code> and <code>--password</code> arguments for security reasons, so that these strings will not appear in a process list. Instead, <code>SHINYCANNON_USER</code> and <code>SHINYCANNON_PASS</code> environment variables must be set.</p>
-<p>On Linux and macOS, <code>shinycannon</code> can be run with these variables set like this:</p>
-<pre><code>$ export SHINYCANNON_USER=myUser
-$ export SHINYCANNON_PASS=myPass
-$ shinycannon recording.log https://shinyapp.example.com/ --workers 5 --loaded-duration-minutes 2 --output-dir run1</code></pre>
-</div>
+<p>TODO</p>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-        <div id="tocnav">
-      <h2 class="hasAnchor">
-<a href="#tocnav" class="anchor"></a>Contents</h2>
-      <ul class="nav nav-pills nav-stacked">
-<li><a href="#recording">Recording</a></li>
-      <li><a href="#load-testing">Load testing</a></li>
-      </ul>
-</div>
       </div>
 
 </div>
