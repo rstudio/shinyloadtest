@@ -313,7 +313,6 @@ RecordingSession <- R6::R6Class("RecordingSession",
       handler(req)
     },
     handleWSOpen = function(clientWS) {
-      cat("WS open!")
       private$clientWsState <- "OPEN"
 
       match <- stringr::str_match(clientWS$request$PATH_INFO, "/(\\w+/\\w+)/websocket$")
