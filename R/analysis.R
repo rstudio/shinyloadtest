@@ -240,11 +240,19 @@ load_runs <- function(..., verbose = TRUE) {
   # TODO: Validate input directories and fail intelligently!
   verbose <- isTRUE(verbose)
 
-  run_levels <- names(list(...))
+  run_dirs <- list(...)
+  if (length(names(run_dirs)) == 0) {
+    names(run_dirs) <- vapply(run_dirs, basename, character(1))
+  } else {
+    is_missing_name <- names(run_dirs) == ""
+    if (any(is_missing_name)) {
+      names(run_dirs)[is_missing_name] <- vapply(run_dirs[is_missing_name], basename, character(1))
+    }
+  }
 
   first_recording <- list()
 
-  df <- list(...) %>%
+  df <- run_dirs %>%
     {
       mapply(
         ., names(.),
@@ -301,7 +309,7 @@ load_runs <- function(..., verbose = TRUE) {
     } %>%
     bind_rows() %>%
     mutate(
-      run = factor(run, run_levels, ordered = TRUE)
+      run = factor(run, names(run_dirs), ordered = TRUE)
     )
 
   attr(df, "recording_duration") <- max(first_recording$max_end)
