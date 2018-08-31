@@ -23,7 +23,7 @@
       <div class="sui-flex-1 uk-background-muted slt-side-menu-container">
         <ul class="uk-nav sui-nav-sidebar">
           <li>
-            <h1>Shiny:loadtest</h1>
+            <h1>shinyloadtest</h1>
           </li>
           <li class="slt-side-menu-item">
             <a href=#sessions><span uk-icon=server class="stl-side-menu-icon"></span>Sessions</a>
@@ -149,19 +149,19 @@
           </div>
           <div class="sui-flex-5 slt-section-group" id="concurrency-chart-view">
             <div id="concurrency-slope">
-              { glue_component("picker_concurrency", list(id="concurrency-slope-picker", len = length(concurrency$slope), comment = "largest slope magnitudes", src_legend = src_legend, info = "Event plots are arranged by the largest <b>slope magnitude</b> found when fitting a linear model to each run.")) }
+              { glue_component("picker_concurrency", list(id="concurrency-slope-picker", len = length(concurrency$slope), comment = "largest slope magnitudes", src_legend = src_legend, info = "Event plots are arranged by the largest <b>slope magnitude</b> found when fitting a line to each run.")) }
               <div class="uk-flex uk-grid-match uk-grid-small uk-child-width-1-4@m slt-chart-grid" uk-grid id="concurrency-slope-grid">
                 { glue_multi_component("boxplot_thumbnail", concurrency$slope)}
               </div>
             </div>
             <div id="concurrency-intercept">
-              { glue_component("picker_concurrency", list(id="concurrency-intercept-picker", len = length(concurrency$intercept), comment = "largest intercept magnitudes", src_legend = src_legend, info = "Event plots are arranged by the largest <b>intercept magnitude</b> found when fitting a linear model to each run")) }
+              { glue_component("picker_concurrency", list(id="concurrency-intercept-picker", len = length(concurrency$intercept), comment = "largest intercept magnitudes", src_legend = src_legend, info = "Event plots are arranged by the largest <b>intercept magnitude</b> found when fitting a line to each run")) }
               <div class="uk-flex uk-grid-match uk-grid-small uk-child-width-1-4@m slt-chart-grid" uk-grid id="concurrency-intercept-grid">
                 { glue_multi_component("boxplot_thumbnail", concurrency$intercept)}
               </div>
             </div>
             <div id="concurrency-error">
-              { glue_component("picker_concurrency", list(id="concurrency-error-picker", len = length(concurrency$max_error), comment = "largest error magnitudes", src_legend = src_legend, info = "Event plots are arranged by the largest <b>error magnitude</b> found when fitting a linear model to each run.")) }
+              { glue_component("picker_concurrency", list(id="concurrency-error-picker", len = length(concurrency$max_error), comment = "largest error magnitudes", src_legend = src_legend, info = "Event plots are arranged by the largest <b>error magnitude</b> found when fitting a line to each run.")) }
               <div class="uk-flex uk-grid-match uk-grid-small uk-child-width-1-4@m slt-chart-grid" uk-grid id="concurrency-error-grid">
                 { glue_multi_component("boxplot_thumbnail", concurrency$max_error)}
               </div>
