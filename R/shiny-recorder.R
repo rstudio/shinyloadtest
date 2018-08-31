@@ -194,7 +194,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
     },
     stop = function() {
       if (!(is.null(private$localServer))) {
-        cat("Stopping server\n")
+        message("Stopping server")
         httpuv::stopServer(private$localServer)
         httpuv::interrupt()
         private$localServer <- NULL
@@ -250,12 +250,12 @@ RecordingSession <- R6::R6Class("RecordingSession",
       url <- private$makeUrl(req)
 
       dataFileName <- NULL
-      # If there wasn't a post body, req$rook.input is probably a
-      # NullInputStream without a .length field
-      if (".length" %in% names(req$rook.input) && req$rook.input$.length > 0) {
+      # See if there is data to upload
+      # TODO: Detect chunked transfer encoding and error out
+      if (!is.null(req$HTTP_CONTENT_LENGTH) && as.integer(req$HTTP_CONTENT_LENGTH) > 0) {
         # TODO Figure out how to use CURL_INFILESIZE_LARGE to upload files
         # larger than 2GB.
-        curl::handle_setopt(h, post = TRUE, infilesize = req$rook.input$.length)
+        curl::handle_setopt(h, post = TRUE, infilesize = as.integer(req$HTTP_CONTENT_LENGTH))
         dataFileName <- sprintf("%s.post.%d", private$outputFileName, private$postFileCounter)
         writeCon <- file(dataFileName, "wb")
         curl::handle_setopt(h, readfunction = function(n) {
@@ -313,6 +313,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       handler(req)
     },
     handleWSOpen = function(clientWS) {
+      message("Client connected")
       private$clientWsState <- "OPEN"
 
       match <- stringr::str_match(clientWS$request$PATH_INFO, "/(\\w+/\\w+)/websocket$")
@@ -375,22 +376,39 @@ RecordingSession <- R6::R6Class("RecordingSession",
         clientWS$send(msgFromServer)
       })
       serverWS$onClose(function(event) {
-        cat("Server disconnected\n")
+        message("Server disconnected")
         if (private$clientWsState == "OPEN") {
           clientWS$close()
           private$clientWsState <- "CLOSED"
         }
       })
+      serverWS$onOpen(function(event) {
+        msgs <- serverSendBuffer
+        serverSendBuffer <<- list()
+        for (msg in msgs) {
+          serverWS$send(msg)
+        }
+      })
+
+      serverSendBuffer <- list()
+      serverSend <- function(msg) {
+        if (serverWS$readyState() != 1L || length(serverSendBuffer) > 0) {
+          serverSendBuffer <<- c(serverSendBuffer, list(msg))
+        } else {
+          serverWS$send(msg)
+        }
+      }
+
       clientWS$onMessage(function(isBinary, msgFromClient) {
         if (shouldIgnore(msgFromClient)) {
-          serverWS$send(msgFromClient)
+          serverSend(msgFromClient)
           return()
         }
         private$writeEvent(makeWSEvent("WS_SEND", message = replaceTokens(msgFromClient, self$tokens)))
-        serverWS$send(msgFromClient)
+        serverSend(msgFromClient)
       })
       clientWS$onClose(function() {
-        cat("Client disconnected\n")
+        message("Client disconnected")
         if (serverWS$readyState() <= 1L) {
           serverWS$close()
         }
@@ -424,12 +442,19 @@ record_session <- function(target_app_url, host = "127.0.0.1", port = 8600,
   output_file = "recording.log", open_browser = TRUE) {
     sessionCookies <- if (isProtected(target_app_url)) {
       username <- getPass::getPass("Enter your username: ")
+      if (is.null(username)) {
+        return(invisible(FALSE))
+      }
       password <- getPass::getPass("Enter your password: ")
+      if (is.null(password)) {
+        return(invisible(FALSE))
+      }
       postLogin(target_app_url, username, password)
     } else data.frame()
     session <- RecordingSession$new(target_app_url, host, port, output_file, sessionCookies)
+    on.exit(session$stop())
     message("Listening on ", host, ":", port)
     if (open_browser) utils::browseURL(paste0("http://", host, ":", port))
-    on.exit(session$stop())
     httpuv::service(Inf)
+    invisible(TRUE)
 }
