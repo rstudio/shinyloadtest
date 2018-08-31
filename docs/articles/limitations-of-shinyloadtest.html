@@ -81,7 +81,7 @@
     <div class="page-header toc-ignore">
       <h1>Limitations of shinyloadtest</h1>
             
-            <h4 class="date">2018-08-30</h4>
+            <h4 class="date">2018-08-29</h4>
       
       
       <div class="hidden name"><code>limitations-of-shinyloadtest.Rmd</code></div>
@@ -97,8 +97,6 @@
 <ol style="list-style-type: decimal">
 <li>
 <strong>WebSockets are required</strong>: On Connect and Shiny Server Pro, <a href="https://github.com/sockjs/sockjs-client">SockJS</a> is used instead of plain WebSockets in order to support browsers and load balancers that don’t support WebSockets. Even though Shiny works in the absence of WebSocket support, <code>shinyloadtest</code> does not.</li>
-<li>
-<strong>shinyapps.io unsupported</strong>: Applications deployed on <a href="http://www.shinyapps.io/" class="uri">http://www.shinyapps.io/</a> can’t be recorded or load tested.</li>
 </ol>
 </div>
 <div id="application-limitations" class="section level2">
