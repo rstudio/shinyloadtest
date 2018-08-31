@@ -11,6 +11,8 @@ navbar:
       menu:
       - text: "Case study: interpreting load test results"
         href: articles/analyzing-load-test-logs.html
+      - text: "Case study: scaling an app"
+        href: articles/case-study-scaling.html
       - text: "Load testing authenticated apps"
         href: articles/load-testing-authenticated-apps.html
       - text: "Limitations"
