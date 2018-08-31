@@ -37,12 +37,16 @@ Imports:
     lubridate,
     DT,
     flexdashboard,
-    scales
+    rmarkdown,
+    progress,
+    scales,
+    htmltools,
+    gtable,
+    svglite
 Remotes: rstudio/websocket,
     rstudio/httpuv
 RoxygenNote: 6.1.0
 Suggests:
     knitr,
-    rmarkdown,
     testthat
 VignetteBuilder: knitr

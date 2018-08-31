@@ -1,0 +1,6 @@
+<div id="{id_duration}">
+  <div class="uk-padding uk-padding-remove-bottom">
+    <p class="uk-text-meta">{n_session} maintenance session{if (n_session > 1) "s" else ""} ordered from fastest to slowest completion time.  {if (missing_duration_cutoff) paste0("The red line marks how long the original recording session took to complete (~", round(duration_cutoff), "s).") else ""}  Sessions should end around the same time as each other for consistent behavior.</p>
+  </div>
+  <img src="{src_duration}"/>
+</div>

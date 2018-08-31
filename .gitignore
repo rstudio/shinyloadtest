@@ -2,4 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+shinyloadtest_report/*
+shinyloadtest_report.html
+output/*
 README.md.temp

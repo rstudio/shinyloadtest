@@ -1,0 +1,48 @@
+.slt-visible-chart {
+  display: block !important;
+}
+
+.slt-chart-grid > div {
+  display: none;
+}
+.slt-section-group > div {
+  /* display: none; */
+}
+
+.slt-box-picker-container > input {
+  text-align: right;
+  margin-right: 0.5rem;
+  font-size: 1.5rem;
+  line-height: 1.4;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  max-width: 70px;
+  border: none;
+  color: #75aadb;
+  border-bottom: 1px solid #75aadb; }
+
+.slt-chart-grid {
+  padding: 0 2rem 2rem; }
+.slt-chart-grid-chart {
+  -webkit-box-shadow: 0 0 10px #e2ecf4;
+          box-shadow: 0 0 10px #e2ecf4;
+  background-color: white; }
+
+
+.uk-grid {
+  box-sizing: content-box;
+}
+.uk-grid > * {
+  padding-bottom: 15px;
+}
+
+/* https://www.creativebloq.com/how-to/10-golden-rules-for-responsive-svgs */
+img[src$=".svgz"] {
+  width: 100%;
+}
+
+
+.sui-layout-flex-vert {
+  padding: 0 20px
+}

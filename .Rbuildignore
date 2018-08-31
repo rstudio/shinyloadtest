@@ -2,3 +2,13 @@
 ^\.Rproj\.user$
 ^\.travis\.yml\.old
 ^docs/
+^output/
+^test_sessions/
+^\.travis\.yml$
+^shinyloadtest_report/
+^shinyloadtest_report\.html$
+^index\.Rmd$
+^index\.md$
+^Makefile
+^RELEASE_URLS\.txt$
+^_pkgdown.yml$
