@@ -1,5 +1,5 @@
 ---
-title: "Case Study"
+title: "Case study: Scaling an app"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 
 In this case study, we'll introduce a workflow — *the optimization loop* — and apply the workflow to the process of optimizing the [cranwhales](https://github.com/rstudio/cranwhales) demo application.
 
-For a lighter treatment of `shinyloadtest` that will get you using it faster, you may consider the [the introductory tutorial](..) instead.
+For a lighter treatment of `shinyloadtest` that will get you using it faster, you may consider starting with [the introductory tutorial](..) instead.
 
 ## The Optimization Loop
 
@@ -42,7 +42,7 @@ For the purposes of this case study, we'll pretend that [cranwhales](https://git
 
 cranwhales was written by [Joe Cheng](https://twitter.com/jcheng) to demonstrate Shiny's [async capabilities](https://blog.rstudio.com/2018/06/26/shiny-1-1-0/). We use it here because it's close to a typical Shiny app in size and scope, and because it's already given an optimization treatment in [Joe's async case study](https://rstudio.github.io/promises/articles/casestudy.html).
 
-Joe's case study focuses on the **optimize** step and the mechanics of improving performance with an emphasis on using async to do so. Here, we'll instead focus on the **benchmark** and **analyze** steps as enabled by `shinyloadtest` and `shinycannon`, and lean on Joe's prior work to get us through the **recommend** and **optimize** steps. We hope to "close the loop", if you will 😉
+Joe's case study focuses on the **optimize** step and the mechanics of improving performance with an emphasis on using async to do so. Here, we'll instead focus on the **benchmark** and **analyze** steps as enabled by `shinyloadtest` and `shinycannon`.
 
 ## Deployment
 
@@ -50,7 +50,7 @@ cranwhales is currently [deployed on shinyapps.io](https://gallery.shinyapps.io/
 
 ## Benchmark
 
-The first step is benchmarking, and benchmarking is done in several sub-steps:
+The first step is benchmarking, and we'll do it in several sub-steps:
 
 1. Record a realistic session using `shinyloadtest::record_session`
 1. Run `shinycannon` with 1 user, producing a directory of "baseline" metric data
@@ -157,7 +157,7 @@ For now, let's focus on the "Session Duration" tab. You'll notice tab bar at the
 
 In each plot, time is the X axis and sessions are stacked atop one another on the Y axis.
 
-On the first plot, we see 4 sessions, and each one completes roughly around the red line. The red line denotes the end of the recording. So, in the 1 worker run, the sessions seem to take roughly as long as they did for us to record. That indicates to us that the experience of using the application for these 4 sessions was probably similar to the one we experienced making the recording.
+On the first plot, we see 4 sessions, and each one completes roughly around the red line. The red line denotes the length of the recording. So, in the 1 worker run, the sessions seem to take roughly as long as they did for us to record. That indicates to us that the experience of using the application for these 4 sessions was similar to the one we experienced making the recording.
 
 On the second plot, we see 12 sessions stacked, and the slowest one took roughly twice as long to play than it did for us to record. Many others also took significantly longer. This indicates to us a significant decrease in the responsiveness of the application as the number of concurrent users increases.
 
@@ -173,7 +173,7 @@ Dedicating more resources to the app is the easiest way to improve its performan
 The decision is up to you. Changing settings is straightforward, but optimizing code is not. Fortunately, if you choose this path, you have many learning resources at your disposal, including:
 
 1. `profvis`: In [this webinar](https://www.rstudio.com/resources/webinars/profvis-profiling-tools-for-faster-r-code/), Winston Chang demonstrates using the profvis package to efficiently identify and improve slow paths in code.
-1. In [this rstudio::conf](https://www.rstudio.com/resources/videos/make-shiny-fast-by-doing-as-little-work-as-possible/), Alan Dipert describes the Shiny team's efforts to improve the scalability of another demo app, CRAN explorer.
+1. In [this rstudio::conf talk](https://www.rstudio.com/resources/videos/make-shiny-fast-by-doing-as-little-work-as-possible/), Alan Dipert describes the Shiny team's efforts to improve the scalability of another demo app, CRAN explorer.
 1. In [this other rstudio::conf talk](https://www.rstudio.com/resources/videos/scaling-shiny-apps-with-async-programming/), Joe Cheng describes how async can be used to improve the scalability of Shiny apps.
 
 For the purposes of this case study, let's say that we're really busy, and it makes sense for us to just crank up the scheduler settings now, and investigate the code later.
