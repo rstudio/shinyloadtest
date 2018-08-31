@@ -166,9 +166,28 @@ During the test, `shinycannon` reports the progress and number of simulated user
 The output directory created in step 2 (`run1`) is the focus of step 3. The `shinyloadtest` R package provides
 functions for analyzing the output files from the test.
 
-TODO
+A tidy data frame of run simulation information can be created using `shinyloadtest::load_runs`.
 
-[community]: https://community.rstudio.com
-[shinycannon]: https://github.com/rstudio/shinycannon
-[limitations]: articles/limitations-of-shinyloadtest.html
-[authentication]: articles/load-testing-authenticated-apps.html
+```r
+df <- shinyloadtest::load_runs("5 workers" = "./run1")
+```
+
+Once the data is loaded into R, a report can be generated using:
+
+```r
+shinyloadtest::make_report(df, "run1.html")
+```
+
+This self contained html report will be opened in your browser for inspection.  For further analysis explaination, please visit ['Analysing load test logs'](articles/analyzing-load-test-logs.html).
+
+
+# Helpful Links
+
+* [RStudio Community](https://community.rstudio.com)
+* [shinycannon](https://github.com/rstudio/shinycannon)
+* Vignettes:
+  * [Analysing load test logs](articles/analyzing-load-test-logs.html)
+  * [Load test case study](articles/case-study.html)
+  * [Limitations of `shinyloadtest`](articles/limitations-of-shinyloadtest.html)
+  * [Load testing authenticated apps](articles/load-testing-authenticated-apps.html)
+  * [FAQ](articles/faq.html)
