@@ -15,14 +15,14 @@ knitr::opts_chunk$set(
 )
 ```
 
-`shinyloadtest` is designed to work with a wide variety of application types and deployments, but there are certain types of application and deployment configuration that it is known not to support.
+`shinyloadtest` is designed to work with a wide variety of application types and deployments, but there are certain types of application and deployment configurations that it is known not to support.
 
 ## Deployment limitations
 
-1. **WebSockets are required**: On Connect and Shiny Server Pro, [SockJS](https://github.com/sockjs/sockjs-client) is used instead of plain WebSockets in order to support browsers and load balancers that don't support WebSockets. Even though Shiny works in the absence of WebSocket support, `shinyloadtest` does not.
+1. **WebSockets are required**: On RStudio Connect and Shiny Server Pro, [SockJS](https://github.com/sockjs/sockjs-client) is used instead of plain WebSockets in order to support browsers and load balancers that don't support WebSockets. Even though Shiny works in the absence of WebSocket support, `shinyloadtest` does not.
 1. **shinyapps.io unsupported**: Applications deployed on [http://www.shinyapps.io/](http://www.shinyapps.io/) can't be recorded or load tested.
 =======
 
 ## Application limitations
 
-1. **Apps must be deterministic**: The recording file made by `record_session` contains messages from the server in the order they were received. If the messages are received in a different order by `shinycannon` when it's playing the recording back, that session will be considered a failure. So, applications under test should be **deterministic**. That is, they shouldn't depend on data sources or files or variables that might differ across sessions.
+1. **Apps must be deterministic**: The recording file made by `record_session` contains messages from the server in the order they were received. If messages are received in a different order by `shinycannon` when it's playing the recording back, that session will be considered a failure. If the same change in inputs does not always lead to outputs being updated in the same order, shinyloadtest will not work.
