@@ -125,7 +125,7 @@ Once `shinycannon` has started, you should see output like the following:
 Now that we have baseline metrics, we should conduct a more ambitious run for contrast. Perhaps in our organization we can expect up to 5 people to use cranwhales at the same time, so to simulate that possibility we'll run `shinycannon` again with `--workers 5`:
 
 ```
-shinycannon recording.log https://rsc.example.com/content/1234/ --workers 1 --loaded-duration-minutes 5 --output-dir run5
+shinycannon recording.log https://rsc.example.com/content/1234/ --workers 5 --loaded-duration-minutes 5 --output-dir run5
 ```
 
 ## Analyze
@@ -134,26 +134,27 @@ At this point we have two runs worth of metrics in our `run1` and `run5` output 
 
 ```
 library(shinyloadtest)
-df <- load_runs(`Run 1` = "run1", `Run 5` = "run5")
+df <- load_runs("Run 1" = "run1", "Run 5" = "run5")
 ```
 
 With the data in a frame, we can generate an HTML report:
 
 ```
-shinyloadtest_report(df, "report.html")
+shinyloadtest_report(df, "report1.html")
 ```
 
-When you open `report.html` in your browser, you'll see something like this:
+When you open `report1.html` in your browser, you'll see something like this:
 
 ![](../docs/inst/img/report_example.png)
+
+> If you don't want to generate the report yourself, you can view an example here: [case_study_report1.html](case_study_report1.html)
 
 There's a lot to take in here. If you're interested in the meaning of everything you see, check out the [analyzing load test logs vignette](analyzing-load-test-logs.html).
 
 For now, let's focus on the "Session Duration" tab. You'll notice tab bar at the top of the page that lets you quickly toggle between the Run 1 and Run 2 session durations. Here they are:
 
 ![run1-duration](../docs/inst/img/run1_duration.svg)
-
-![run2-duration](../docs/inst/img/run2_duration.svg)
+![run1-duration](../docs/inst/img/run2_duration.svg)
 
 In each plot, time is the X axis and sessions are stacked atop one another on the Y axis.
 
@@ -203,12 +204,14 @@ Now, back in R, we can generate a new report and compare `run5` to `run5-new-set
 
 ```
 library(shinyloadtest)
-df <- load_runs(`Run 5` = "run5", `Run 5 new` = "run5-new-settings")
+df <- load_runs("Run 5" = "run5", "Run 5 new" = "run5-new-settings")
 shinyloadtest_report(df, "report2.html")
 ```
 
-![run1-duration](../docs/inst/img/run2_duration.svg)
-![run1-duration](../docs/inst/img/run2_new_duration.svg)
+> If you don't want to generate the report yourself, you can view an example here: [case_study_report2.html](case_study_report2.html)
+
+![run2-duration](../docs/inst/img/run2_duration.svg)
+![run2-duration](../docs/inst/img/run2_new_duration.svg)
 Just as we hoped, performance is much improved. After adding processes, sessions didn't take as long to run. Because they didn't take as long to run, more of them were able to complete in our 5-minute maintenance period.
 
 # Conclusion
@@ -217,6 +220,6 @@ In this case study we introduced *the optimization loop* workflow and demonstrat
 
 We ran a baseline test to establish the performance of our application in the single-user case, and then ran a subsequent test to see how it did with multiple users.
 
-We were dissatisfied with its multi-user performance, and considered whether to improve the application's performance or simply allocate it more resources. In the interest of expedience we chose to allocate more resources. Then we benchmarked and analyzed again and observed a satisfactory improvement.
+We were dissatisfied with its multi-user performance, and considered whether to improve the application's performance or simply allocate it more resources. We chose to allocate more resources. Then we benchmarked and analyzed again and observed a satisfactory improvement.
 
 If in the future our application needed to support many more users, we could apply this process again. We might decide next time to invest in the performance of the code instead of just tweaking configuration.
