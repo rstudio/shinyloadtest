@@ -82,7 +82,7 @@
       <h1>Analyzing Load Test Logs</h1>
                         <h4 class="author">Vignette Author</h4>
             
-            <h4 class="date">2018-08-29</h4>
+            <h4 class="date">2018-08-31</h4>
       
       
       <div class="hidden name"><code>analyzing-load-test-logs.Rmd</code></div>
@@ -94,10 +94,10 @@
 <p>There are two types of log files generated while using <code>shinyloadtest</code>. The first file is the recording log file. This file is a JSON file that captures all of the HTTP(s) and websocket traffic that occured during the recording.</p>
 <p>The second file is a session log file generated during the loadtest. A file is generated for each simulated session.</p>
 <p>The two files are tied together by a set of keys that identify unique “events” that were recorded and played back in the load test.</p>
-<table style="width:8%;" class="table">
+<table class="table">
 <colgroup>
-<col width="4%">
-<col width="4%">
+<col width="50%">
+<col width="50%">
 </colgroup>
 <thead><tr class="header">
 <th>Key</th>
@@ -126,7 +126,7 @@
 </tr>
 </tbody>
 </table>
-<p>The <code><a href="../reference/tidy_loadtest.html">shinyloadtest::tidy_loadtest</a></code> function uses these files to generate a data frame with loadtest results. The resulting data frame contains the following columns:</p>
+<p>The <code>shinyloadtest::tidy_loadtest</code> function uses these files to generate a data frame with loadtest results. The resulting data frame contains the following columns:</p>
 <table class="table">
 <thead><tr class="header">
 <th>Column</th>
@@ -147,7 +147,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Alan Dipert, Barbara Borges, Barret Schloerke, <a href="https://www.rstudio.com"><img src="https://tidyverse.org/rstudio-logo.svg" height="24"></a>.</p>
+  <p>Developed by Alan Dipert, Barret Schloerke, Barbara Borges, <a href="https://www.rstudio.com"><img src="https://tidyverse.org/rstudio-logo.svg" height="24"></a>.</p>
 </div>
 
 <div class="pkgdown">
