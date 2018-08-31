@@ -1,6 +1,5 @@
 ---
 title: "Analyzing Load Test Logs"
-author: "Vignette Author"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -139,7 +138,7 @@ suppressPackageStartupMessages(library(dplyr, quiet = TRUE))
 suppressPackageStartupMessages(library(shinyloadtest, quiet = TRUE))
 df %>%
   filter(run == "4 users") %>%
-  plot_gantt()
+  slt_session_duration()
 ```
 
 Maintenance period: During a load test, user sessions are not all started at exactly the same time. Instead, user requests are staggered over a warmup period. Once the targeted number of concurrent sessions is reached, the maintenance period begins during which time shinycannon maintains the number of user sessions. After the desired test duration is reached, user sessions begin ending during a cooldown period. Sessions that are desaturated in color occurred during the warmup or cooldown. The maintenance period is marked with vertical dotted lines spanning every simulated user.
@@ -149,7 +148,7 @@ In the example above, four users were stagger started and simulated for 10 minut
 ```{r, echo = FALSE, fig.height = 5}
 df %>%
   filter(run == "16 users") %>%
-  plot_gantt()
+  slt_session_duration()
 ```
 
 Both runs were executed against a Shiny application supported by a single process.  With very high resource contention, a larger proportion of time was spent calculating in the `16 users` run.
@@ -179,7 +178,7 @@ Both runs were executed against a Shiny application supported by a single proces
 The `Session Duration` tab displays all maintenance period sessions ordered by total duration vertically from fastest to slowest.  
 
 ```{r, echo = FALSE}
-df %>% filter(run == "4 users") %>% plot_gantt_duration(cutoff = attr(df, "recording_duration"))
+df %>% filter(run == "4 users") %>% slt_session_duration(cutoff = attr(df, "recording_duration"))
 ```
 
 Ideally, most of the sessions should be completed in about the same amount of time as the recording.log execution time.  The vertical red line line defaults to the `recording.log` duration, but can be set when calling `make_report(df, duration_cutoff = 10)`.  In the example above, most sessions finish around the same amount of time as the `recording.log` duration.
@@ -187,7 +186,7 @@ Ideally, most of the sessions should be completed in about the same amount of ti
 It is good to have to have each session duration (row) look like the next.  If certain rows are much wider than the others, server resource contention might be occurring.  Looking at the `16 user` run, the same recording is on average 4x slower than the `recording.log` duration with one session taking twice as long as the average `16 user` session.  
 
 ```{r, echo = FALSE}
-df %>% filter(run == "16 users") %>% plot_gantt_duration(cutoff = attr(df, "recording_duration"))
+df %>% filter(run == "16 users") %>% slt_session_duration(cutoff = attr(df, "recording_duration"))
 ```
 
 
@@ -198,14 +197,14 @@ The `Event Waterfall` tab displays an event waterfall of each recording session.
 Looking at the 4 user run below, the lines are fairly uniform in shape and are mostly parallel to each other.
 
 ```{r, echo = FALSE, fig.height=5}
-df %>% filter(run == "4 users") %>% plot_timeline()
+df %>% filter(run == "4 users") %>% slt_waterfall()
 ```
 
 If we look at another run where a file was uploaded and many POST requests were made for a DT table, there are many horizontal lines that are not parallel to each other. This happens when execution for that step took **much** more time than the other sessions.  The lines that jut horizontally indicate erratic behavior.
 
 ```{r, echo = FALSE, fig.height=10}
 upload <- load_runs(`upload-dt` = "../test_sessions/upload-dt/", verbose = FALSE)
-upload %>% plot_timeline()
+upload %>% slt_waterfall()
 ```
 
 
@@ -216,13 +215,13 @@ The `Latency` tab displays two plots.  The first plot displays the total HTTP ti
 The total HTTP latency plot helps to diagnose how long a user has to wait before a website has appeared on their browser.  Ideally, this should be no time at all, as the server is just providing static files.
 
 ```{r, echo = FALSE, fig.height=7}
-df %>% plot_http_latency()
+df %>% slt_http_latency()
 ```
 
 The maximum SockJS latency plot helps to diagnose the maximum amount of time a user has to wait before an input is updated or output is recalculated.  Ideally, this should be shorter than our attention spans.
 
 ```{r, echo = FALSE, fig.height=7}
-df %>% plot_websocket_latency()
+df %>% slt_websocket_latency()
 ```
 
 In the example above, the `16 users` run has a very strong pattern in it's maximum calculation time.  Knowing that the `16 users` run has the same recording as the `1 user` and `4 users` runs, it would appear that the `16 users` server is under too much load as the same calculations should be computed within 1 second (as in the `1 user` run).  
@@ -238,13 +237,13 @@ The `Event Duration` tab has three to four tabs available to choose from:
 * Data table - A tabular display of the slowest max time, slowest min time, and (possibly) largest mean difference
 
 ```{r, echo = FALSE}
-df %>% filter(input_line_number == 1) %>% plot_time_boxplot()
+df %>% filter(input_line_number == 1) %>% slt_time_boxplot()
 ```
 
 Ideally, the boxplots should not differ for any event and are close to 0 seconds elapsed.  As resource contention goes up, event time might go up.  Hopefully, there are no extreme outliers above the center mass of the boxplot as shown below.
 
 ```{r, echo = FALSE}
-df %>% filter(input_line_number == 4) %>% plot_time_boxplot()
+df %>% filter(input_line_number == 4) %>% slt_time_boxplot()
 ```
 
 
@@ -261,14 +260,14 @@ The `Event Concurrency` tab has four tabs available to choose from:
 Ideally, we want a flat linear model with no slope.  This means that the calculations of our shiny application will scale as user concurrency goes up.  
 
 ```{r, echo = FALSE}
-df %>% filter(input_line_number == 16) %>% plot_concurrency_time()
+df %>% filter(input_line_number == 16) %>% slt_time_concurrency()
 ```
 
 
 However, if a strong linear trend exists as concurrency is increased, users will be waiting longer as more users are accessing the shiny application.
 
 ```{r, echo = FALSE}
-df %>% filter(input_line_number == 34) %>% plot_concurrency_time()
+df %>% filter(input_line_number == 34) %>% slt_time_concurrency()
 ```
 
 
