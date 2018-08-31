@@ -176,9 +176,9 @@ The application doesn't seem to have performed well with 5 concurrent users, but
 1. We could [tune the app's RStudio Connect configuration](https://support.rstudio.com/hc/en-us/articles/231874748-Scaling-and-Performance-Tuning-in-RStudio-Connect). In this case, the easiest way to improve the performance in the 5-user case is to modify the app's scheduler settings, dedicating 1 process per user and limiting the number of processes to 5.
 1. We could improve the performance of the application at the code level.
 
-Dedicating more resources to the app is the easiest way to improve its performance, but it's also the most costly resource-wise, and depending on what's slow, might not even help. Dedicating your developer time to improving the application is harder, and also potentially costly in terms of your time, but improves the scalability of your app in the long run. 
+Dedicating more resources to the app is the easiest way to improve its performance, but it's also the most costly resource-wise, and depending on what's slow, might not even help. Dedicating your developer time is potentially costly in terms of your time, but improves the scalability of your app in the long run. 
 
-Throwing hardware at the problem is an easy fix in our case, but it might also be really easy to make your app dramatically faster with only small code changes, like by doing some work once when your app starts instead of every time a reactive changes. Here are some resources for learning more about Shiny app performance:
+Throwing hardware at the problem is an easy fix in our case, but there's usually a strong chance that it's really easy to make your app dramatically faster with only small code changes. For example, you might just need to do some work once when your app starts instead of every time a reactive changes. Here are some resources for learning more about Shiny app performance:
 
 1. `profvis`: In [this webinar](https://www.rstudio.com/resources/webinars/profvis-profiling-tools-for-faster-r-code/), Winston Chang demonstrates using the profvis package to efficiently identify and improve slow paths in code.
 1. In [this rstudio::conf talk](https://www.rstudio.com/resources/videos/make-shiny-fast-by-doing-as-little-work-as-possible/), Alan Dipert describes the Shiny team's efforts to improve the scalability of another demo app, CRAN explorer.
