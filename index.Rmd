@@ -1,18 +1,18 @@
 <!-- -*- mode: markdown; -*- -->
 
-# Load Testing Shiny Applications
-
-> This is a WIP, do not use yet. Please follow [community.rstudio.com][community] for a
+> This is a WIP, do not use yet. Please follow [community.rstudio.com](https://community.rstudio.com) for a
 soft launch of the tools.
 
-The `shinyloadtest` package and the accompanying [`shinycannon`][shinycannon] software enable load testing
+# Load Testing Shiny Applications
+
+The `shinyloadtest` package and the accompanying [`shinycannon`](https://github.com/rstudio/shinycannon) software enable load testing
 deployed Shiny applications.
 
 Load testing helps developers and administrators estimate how many users their application can support. If an application requires tuning, load testing and load test result analysis can be used to identify performance bottlenecks and to guide changes to infrastructure, configuration, or code.
 
-It's a common misconception that "Shiny doesn't scale." In actuality, properly-architected Shiny applications can be scaled horizontally, a fact which Sean Lopp was recently able to demonstrate at rstudio::conf 2018. We used `shinycannon` to simulate 10,000 concurrent users interacting with an application deployed to AWS. You can see a recording of Sean's talk and the load test demonstration here: [Scaling Shiny](https://www.rstudio.com/resources/videos/scaling-shiny/)
+It's a common misconception that __"Shiny doesn't scale."__ In actuality, properly-architected Shiny applications can be scaled horizontally, a fact which Sean Lopp was recently able to demonstrate at rstudio::conf 2018. We used `shinycannon` to simulate 10,000 concurrent users interacting with an application deployed to AWS. You can see a recording of Sean's talk and the load test demonstration here: [Scaling Shiny](https://www.rstudio.com/resources/videos/scaling-shiny/)
 
-To get started with `shinyloadtest` read through the quick start guide below.
+To get started with `shinyloadtest`, read through the quick start guide below.
 
 ## Installation
 
