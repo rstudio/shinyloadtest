@@ -105,7 +105,7 @@
 <li>
 <strong>Benchmark</strong>: Pick a number <em>n</em>, how many users your application must concurrently support. Simulate <em>n</em> users interacting with your application and collect latency metrics. Use <code><a href="../reference/record_session.html">shinyloadtest::record_session</a></code> to record a realistic interaction, and the <code>shinycannon</code> tool to simulate <em>n</em> users performing the recorded interaction.</li>
 <li>
-<strong>Analyze</strong>: Visualize and interpret the metrics. <code>shinyloadtest::load_runs</code> is used for this part. If it looks like <em>n</em> users can be supported, stop here. Otherwise, go to the next step.</li>
+<strong>Analyze</strong>: Visualize and interpret the metrics. <code><a href="../reference/load_runs.html">shinyloadtest::load_runs</a></code> is used for this part. If it looks like <em>n</em> users can be supported, stop here. Otherwise, go to the next step.</li>
 <li>
 <strong>Recommend</strong>: Based on analysis, propose a way for the capacity of the application to be increased. Patterns in the metrics can help you identify what change in the application or its configuration would be most beneficial. It could be a code change, like <a href="https://rstudio.github.io/promises/articles/casestudy.html">converting the app to async</a>, or a configuration change, like increasing the number of R processes allocated to the application in RStudio Connect or Shiny Server Pro.</li>
 <li>
@@ -194,7 +194,10 @@ record_session("https://rsc.example.com/content/1234/")</code></pre>
 <h3 class="hasAnchor">
 <a href="#comparison-run" class="anchor"></a>Comparison run</h3>
 <p>Now that we have baseline metrics, we should conduct a more ambitious run for contrast. Perhaps in our organization we can expect up to 5 people to use cranwhales at the same time, so to simulate that possibility we’ll run <code>shinycannon</code> again with <code>--workers 5</code>:</p>
-<pre><code>shinycannon recording.log https://rsc.example.com/content/1234/ --workers 1 --loaded-duration-minutes 5 --output-dir run5</code></pre>
+<blockquote>
+<p>Load testing can be useful even if your target number is small, like 5.</p>
+</blockquote>
+<pre><code>shinycannon recording.log https://rsc.example.com/content/1234/ --workers 5 --loaded-duration-minutes 5 --output-dir run5</code></pre>
 </div>
 </div>
 <div id="analyze" class="section level2">
@@ -202,33 +205,35 @@ record_session("https://rsc.example.com/content/1234/")</code></pre>
 <a href="#analyze" class="anchor"></a>Analyze</h2>
 <p>At this point we have two runs worth of metrics in our <code>run1</code> and <code>run5</code> output directories. Let’s get back in an R console and process the data into a dataframe:</p>
 <pre><code>library(shinyloadtest)
-df &lt;- load_runs(`Run 1` = "run1", `Run 5` = "run5")</code></pre>
-<p>With the data in a frame, we can generate an HTML report:</p>
-<pre><code>shinyloadtest_report(df, "report.html")</code></pre>
-<p>When you open <code>report.html</code> in your browser, you’ll see something like this:</p>
+df &lt;- load_runs("Run 1" = "run1", "Run 5" = "run5")</code></pre>
+<p>With the data in a tidy data frame, we can generate an HTML report:</p>
+<pre><code><a href="../reference/shinyloadtest_report.html">shinyloadtest_report(df, "report1.html")</a></code></pre>
+<p>When you open <code>report1.html</code> in your browser, you’ll see something like this:</p>
 <p><img src="../docs/inst/img/report_example.png"></p>
+<blockquote>
+<p>If you don’t want to generate the report yourself, you can view an example here: <a href="case_study_report1.html" class="uri">case_study_report1.html</a></p>
+</blockquote>
 <p>There’s a lot to take in here. If you’re interested in the meaning of everything you see, check out the <a href="analyzing-load-test-logs.html">analyzing load test logs vignette</a>.</p>
-<p>For now, let’s focus on the “Session Duration” tab. You’ll notice tab bar at the top of the page that lets you quickly toggle between the Run 1 and Run 2 session durations. Here they are:</p>
-<div class="figure">
-<img src="../docs/inst/img/run1_duration.svg" alt="run1-duration"><p class="caption">run1-duration</p>
-</div>
-<div class="figure">
-<img src="../docs/inst/img/run2_duration.svg" alt="run2-duration"><p class="caption">run2-duration</p>
-</div>
+<p>For now, let’s focus on the “Session Duration” tab. You’ll notice a tab bar at the top of the page that lets you quickly toggle between the Run 1 and Run 2 session durations. Here they are:</p>
+<p><img src="../docs/inst/img/run1_duration.svg" alt="run1-duration"><img src="../docs/inst/img/run2_duration.svg" alt="run1-duration"></p>
 <p>In each plot, time is the X axis and sessions are stacked atop one another on the Y axis.</p>
 <p>On the first plot, we see 4 sessions, and each one completes roughly around the red line. The red line denotes the length of the recording. So, in the 1 worker run, the sessions seem to take roughly as long as they did for us to record. That indicates to us that the experience of using the application for these 4 sessions was similar to the one we experienced making the recording.</p>
 <p>On the second plot, we see 12 sessions stacked, and the slowest one took roughly twice as long to play than it did for us to record. Many others also took significantly longer. This indicates to us a significant decrease in the responsiveness of the application as the number of concurrent users increases.</p>
+<blockquote>
+<p><code>--workers 1</code> resulted in 4 sessions, and <code>--workers 5</code> resulted in 12 sessions. Why is that? It’s because each worker repeated the recording as many times as it could in 5 minutes. So, the relationship between workers and sessions is one to many.</p>
+</blockquote>
+<p>If your target number <strong>n</strong> is very large, you may find it easier to start by looking at the Latency tab which shows histograms of latency for the page load time and the latency of user interactions with the app.</p>
 </div>
 <div id="recommend" class="section level2">
 <h2 class="hasAnchor">
 <a href="#recommend" class="anchor"></a>Recommend</h2>
-<p>The application doesn’t seem to have performed well with 5 concurrent users, but it’s important to keep in mind that performance is relative to the kind of application you’re optimizing and to the needs of your users. If we do decide the app is too slow and we want to try to improve it, there are two paths to possibly pursue:</p>
+<p>The application doesn’t seem to have performed well with 5 concurrent users, but it’s important to keep in mind that performance is relative to the kind of application you’re optimizing and to the needs of your users. If we do decide the app is too slow and we want to try to improve it, there are two courses of action we can consider:</p>
 <ol style="list-style-type: decimal">
-<li>We could change the app’s RStudio Connect configuration. In this case, the easiest way to improve the performance in the 5-user case is to modify the app’s scheduler settings, dedicating 1 process per user and limiting the number of processes to 5.</li>
+<li>We could <a href="https://support.rstudio.com/hc/en-us/articles/231874748-Scaling-and-Performance-Tuning-in-RStudio-Connect">tune the app’s RStudio Connect configuration</a>. In this case, the easiest way to improve the performance in the 5-user case is to modify the app’s scheduler settings, dedicating 1 process per user and limiting the number of processes to 5.</li>
 <li>We could improve the performance of the application at the code level.</li>
 </ol>
 <p>Dedicating more resources to the app is the easiest way to improve its performance, but it’s also the most costly resource-wise, and depending on what’s slow, might not even help. Dedicating your developer time to improving the application is harder, and also potentially costly in terms of your time, but improves the scalability of your app in the long run.</p>
-<p>The decision is up to you. Changing settings is straightforward, but optimizing code is not. Fortunately, if you choose this path, you have many learning resources at your disposal, including:</p>
+<p>Throwing hardware at the problem is an easy fix in our case, but it might also be really easy to make your app dramatically faster with only small code changes, like by doing some work once when your app starts instead of every time a reactive changes. Here are some resources for learning more about Shiny app performance:</p>
 <ol style="list-style-type: decimal">
 <li>
 <code>profvis</code>: In <a href="https://www.rstudio.com/resources/webinars/profvis-profiling-tools-for-faster-r-code/">this webinar</a>, Winston Chang demonstrates using the profvis package to efficiently identify and improve slow paths in code.</li>
@@ -260,16 +265,19 @@ df &lt;- load_runs(`Run 1` = "run1", `Run 5` = "run5")</code></pre>
 <a href="#analyze-again" class="anchor"></a>Analyze again</h2>
 <p>Now, back in R, we can generate a new report and compare <code>run5</code> to <code>run5-new-settings</code>:</p>
 <pre><code>library(shinyloadtest)
-df &lt;- load_runs(`Run 5` = "run5", `Run 5 new` = "run5-new-settings")
+df &lt;- load_runs("Run 5" = "run5", "Run 5 new" = "run5-new-settings")
 shinyloadtest_report(df, "report2.html")</code></pre>
-<p><img src="../docs/inst/img/run2_duration.svg" alt="run1-duration"><img src="../docs/inst/img/run2_new_duration.svg" alt="run1-duration"> Just as we hoped, performance is much improved. After adding processes, sessions didn’t take as long to run. Because they didn’t take as long to run, more of them were able to complete in our 5-minute maintenance period.</p>
+<blockquote>
+<p>If you don’t want to generate the report yourself, you can view an example here: <a href="case_study_report2.html" class="uri">case_study_report2.html</a></p>
+</blockquote>
+<p><img src="../docs/inst/img/run2_duration.svg" alt="run2-duration"><img src="../docs/inst/img/run2_new_duration.svg" alt="run2-duration"> Just as we hoped, performance is much improved. After adding processes, sessions didn’t take as long to run. Because they didn’t take as long to run, more of them were able to complete in our 5-minute maintenance period.</p>
 </div>
 <div id="conclusion" class="section level1">
 <h1 class="hasAnchor">
 <a href="#conclusion" class="anchor"></a>Conclusion</h1>
 <p>In this case study we introduced <em>the optimization loop</em> workflow and demonstrated how <code>shinyloadtest</code> and <code>shinycannon</code> can be used together to assess an application’s performance and guide its optimization.</p>
-<p>We ran a baseline test to establish the performance of our application in the single-user case, and then ran a subsequent test to see how it did with multiple users.</p>
-<p>We were dissatisfied with its multi-user performance, and considered whether to improve the application’s performance or simply allocate it more resources. In the interest of expedience we chose to allocate more resources. Then we benchmarked and analyzed again and observed a satisfactory improvement.</p>
+<p>We ran a baseline test to establish the performance of our application in the single-user case, and then ran a subsequent test to see how it did with multiple concurrent users.</p>
+<p>We were dissatisfied with its multi-user performance, and considered whether to improve the application’s performance or simply allocate it more resources. We chose to allocate more resources. Then we benchmarked and analyzed again and observed a satisfactory improvement.</p>
 <p>If in the future our application needed to support many more users, we could apply this process again. We might decide next time to invest in the performance of the code instead of just tweaking configuration.</p>
 </div>
   </div>
@@ -297,7 +305,7 @@ shinyloadtest_report(df, "report2.html")</code></pre>
 
 
       <footer><div class="copyright">
-  <p>Developed by Alan Dipert, Barbara Borges, Barret Schloerke, <a href="https://www.rstudio.com"><img src="https://tidyverse.org/rstudio-logo.svg" height="24"></a>.</p>
+  <p>Developed by Alan Dipert, Barret Schloerke, Barbara Borges, <a href="https://www.rstudio.com"><img src="https://tidyverse.org/rstudio-logo.svg" height="24"></a>.</p>
 </div>
 
 <div class="pkgdown">

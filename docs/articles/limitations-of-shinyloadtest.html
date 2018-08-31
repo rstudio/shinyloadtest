@@ -53,6 +53,9 @@
       <a href="../articles/analyzing-load-test-logs.html">Case study: interpreting load test results</a>
     </li>
     <li>
+      <a href="../articles/case-study-scaling.html">Case study: scaling an app</a>
+    </li>
+    <li>
       <a href="../articles/load-testing-authenticated-apps.html">Load testing authenticated apps</a>
     </li>
     <li>
@@ -90,13 +93,15 @@
 
     
     
-<p><code>shinyloadtest</code> is designed to work with a wide variety of application types and deployments, but there are certain types of application and deployment configuration that it is known not to support.</p>
+<p><code>shinyloadtest</code> is designed to work with a wide variety of application types and deployments, but there are certain types of application and deployment configurations that it is known not to support.</p>
 <div id="deployment-limitations" class="section level2">
 <h2 class="hasAnchor">
 <a href="#deployment-limitations" class="anchor"></a>Deployment limitations</h2>
 <ol style="list-style-type: decimal">
 <li>
-<strong>WebSockets are required</strong>: On Connect and Shiny Server Pro, <a href="https://github.com/sockjs/sockjs-client">SockJS</a> is used instead of plain WebSockets in order to support browsers and load balancers that don’t support WebSockets. Even though Shiny works in the absence of WebSocket support, <code>shinyloadtest</code> does not.</li>
+<strong>WebSockets are required</strong>: On RStudio Connect and Shiny Server Pro, <a href="https://github.com/sockjs/sockjs-client">SockJS</a> is used instead of plain WebSockets in order to support browsers and load balancers that don’t support WebSockets. Even though Shiny works in the absence of WebSocket support, <code>shinyloadtest</code> does not.</li>
+<li>
+<strong>shinyapps.io unsupported</strong>: Applications deployed on <a href="http://www.shinyapps.io/" class="uri">http://www.shinyapps.io/</a> can’t be recorded or load tested.</li>
 </ol>
 </div>
 <div id="application-limitations" class="section level2">
@@ -104,7 +109,7 @@
 <a href="#application-limitations" class="anchor"></a>Application limitations</h2>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Apps must be deterministic</strong>: The recording file made by <code>record_session</code> contains messages from the server in the order they were received. If the messages are received in a different order by <code>shinycannon</code> when it’s playing the recording back, that session will be considered a failure. So, applications under test should be <strong>deterministic</strong>. That is, they shouldn’t depend on data sources or files or variables that might differ across sessions.</li>
+<strong>Apps must be deterministic</strong>: The recording file made by <code>record_session</code> contains messages from the server in the order they were received. If messages are received in a different order by <code>shinycannon</code> when it’s playing the recording back, that session will be considered a failure. If the same change in inputs does not always lead to outputs being updated in the same order, shinyloadtest will not work.</li>
 </ol>
 </div>
   </div>
