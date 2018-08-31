@@ -41,7 +41,8 @@ Imports:
     progress,
     scales,
     htmltools,
-    gtable
+    gtable,
+    svglite
 Remotes: rstudio/websocket,
     rstudio/httpuv
 RoxygenNote: 6.1.0
