@@ -14,6 +14,8 @@ It's a common misconception that __"Shiny doesn't scale."__ In actuality, proper
 
 To get started with `shinyloadtest`, read through the quick start guide below.
 
+![Analysis Example](../docs/inst/img/slt_report_screenshot.png)
+
 ## Installation
 
 To perform a load test you'll need two pieces of software: `shinyloadtest` and `shinycannon`.

@@ -88,7 +88,7 @@ Together, these files constitute a **recording**. They are the input to `shinyca
 
 Now that you've made a recording, you're ready for your first `shinycannon` run. For the first run, you should just test with 1 user. This will generate metrics analogous to those you experienced when you made your recording, and will serve as a baseline for subsequent runs.
 
-> Note: It's best to run shinycannon on a machine close to the target machine on the network. We don't want RStudio Connect and shinycannon to contend for resources on the same machine. You should also ensure the machine you run shinycannon on has enough memory and bandwidth. shinycannon requires about 512kb of memory per worker, so (allowing for OS memory usage) a machine with 4GB of RAM should support in the ballpark of 5000-8000 worker threads.
+> Note: It's best to run shinycannon on a machine close to the target machine on the network. We don't want RStudio Connect and shinycannon to contend for resources on the same machine.
 
 In the directory where your `recording.log*` files are, run `shinycannon` like this:
 
