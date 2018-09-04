@@ -4,8 +4,8 @@ Title: Load Test Shiny Applications
 Version: 1.0.0
 Authors@R: c(
             person("Alan", "Dipert", role = c("aut", "cre"), email = "alan@rstudio.com"),
-            person("Barbara", "Borges", role = c("aut")),
             person("Barret", "Schloerke", role = c("aut"), email = "barret@rstudio.com"),
+            person("Barbara", "Borges", role = c("aut")),
             person("RStudio", role = c("cph", "fnd"))
             )
 Description: shinyloadtest provides functions for recording user sessions,
