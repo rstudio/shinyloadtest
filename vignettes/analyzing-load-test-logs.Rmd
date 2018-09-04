@@ -1,9 +1,9 @@
 ---
 title: "Analyzing Load Test Logs"
-date: "`r Sys.Date()`"
+date: "2018-09-05"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Analyzing Load Test Logs}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
