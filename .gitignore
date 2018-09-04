@@ -5,3 +5,4 @@
 shinyloadtest_report/*
 shinyloadtest_report.html
 output/*
+inst/doc
