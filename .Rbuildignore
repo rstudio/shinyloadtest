@@ -12,3 +12,4 @@
 ^Makefile
 ^RELEASE_URLS\.txt$
 ^_pkgdown.yml$
+^scripts/
