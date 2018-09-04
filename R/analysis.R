@@ -37,7 +37,7 @@ read_log_dir <- function(dir, name = basename(dirname(dir)), verbose = TRUE) {
   verbose <- isTRUE(verbose)
   files <- list.files(dir, pattern = "*.csv", full.names = TRUE)
   if (length(files) == 0) {
-    stop("No files found for dir: ", dir)
+    stop("No files found for run dir: ", dir, call. = FALSE)
   }
   if (verbose) {
     pr <- progress::progress_bar$new(
@@ -276,7 +276,7 @@ load_runs <- function(..., verbose = TRUE) {
             if (!identical(recording, first_recording$lines)) {
               stop(
                 "Recording for `", run, "` does not equal the recording for `", first_recording$name, "`.\n",
-                "Please use the same recording when calling load_runs()"
+                "Please use the same recording when calling load_runs()", call. = FALSE
               )
             }
           }
