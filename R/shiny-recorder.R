@@ -409,7 +409,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #' @details This function creates a reverse proxy listening at \code{host:port}
 #'   that stands in front of \code{target_app_url}. As the user interacts with
 #'   the app, the actions and responses are recorded in a file that can be
-#'   replayed later.
+#'   replayed later. By default, a web browser is opened automatically so that
+#'   you can begin recording immediately, without manually starting a browser
+#'   and navigating to \code{host:port}.
 #' @param target_app_url The URL of the deployed application
 #' @param host The host where the proxy will run. Usually localhost is used.
 #' @param output_file The name for the generated log file.
