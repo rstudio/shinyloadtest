@@ -156,7 +156,7 @@ record_session("https://rsc.example.com/content/1234/")</code></pre>
 <a href="#baseline-run" class="anchor"></a>Baseline run</h3>
 <p>Now that you’ve made a recording, you’re ready for your first <code>shinycannon</code> run. For the first run, you should just test with 1 user. This will generate metrics analogous to those you experienced when you made your recording, and will serve as a baseline for subsequent runs.</p>
 <blockquote>
-<p>Note: It’s best to run shinycannon on a machine close to the target machine on the network. We don’t want RStudio Connect and shinycannon to contend for resources on the same machine. You should also ensure the machine you run shinycannon on has enough memory and bandwidth. shinycannon requires about 512kb of memory per worker, so (allowing for OS memory usage) a machine with 4GB of RAM should support in the ballpark of 5000-8000 worker threads.</p>
+<p>Note: It’s best to run shinycannon on a machine close to the target machine on the network. We don’t want RStudio Connect and shinycannon to contend for resources on the same machine.</p>
 </blockquote>
 <p>In the directory where your <code>recording.log*</code> files are, run <code>shinycannon</code> like this:</p>
 <pre><code>shinycannon recording.log https://rsc.example.com/content/1234/ --workers 1 --loaded-duration-minutes 5 --output-dir run1</code></pre>

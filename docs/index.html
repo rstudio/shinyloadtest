@@ -98,6 +98,9 @@
 <p>Load testing helps developers and administrators estimate how many users their application can support. If an application requires tuning, load testing and load test result analysis can be used to identify performance bottlenecks and to guide changes to infrastructure, configuration, or code.</p>
 <p>It’s a common misconception that <strong>“Shiny doesn’t scale.”</strong> In actuality, properly-architected Shiny applications can be scaled horizontally, a fact which Sean Lopp was recently able to demonstrate at rstudio::conf 2018. We used <code>shinycannon</code> to simulate 10,000 concurrent users interacting with an application deployed to AWS. You can see a recording of Sean’s talk and the load test demonstration here: <a href="https://www.rstudio.com/resources/videos/scaling-shiny/">Scaling Shiny</a></p>
 <p>To get started with <code>shinyloadtest</code>, read through the quick start guide below.</p>
+<div class="figure">
+<img src="articles/images/slt_report_screenshot.png" alt="Analysis Example"><p class="caption">Analysis Example</p>
+</div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
@@ -133,13 +136,13 @@
 <tbody>
 <tr class="odd">
 <td align="left">Ubuntu/Debian</td>
-<td align="left"><a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-27-16:19:03_1.0.0-dd7474d/deb/shinycannon_1.0.0-dd7474d_amd64.deb">shinycannon_1.0.0-dd7474d_amd64.deb</a></td>
-<td align="left"><code>sudo dpkg -i shinycannon_1.0.0-dd7474d_amd64.deb</code></td>
+<td align="left"><a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-09-02-07:08:29_1.0.0-e514481/deb/shinycannon_1.0.0-e514481_amd64.deb">shinycannon_1.0.0-e514481_amd64.deb</a></td>
+<td align="left"><code>sudo dpkg -i shinycannon_1.0.0-e514481_amd64.deb</code></td>
 </tr>
 <tr class="even">
 <td align="left">Redhat/Fedora/CentOS</td>
-<td align="left"><a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-27-16:19:03_1.0.0-dd7474d/rpm/shinycannon-1.0.0-dd7474d.x86_64.rpm">shinycannon-1.0.0-dd7474d.x86_64.rpm</a></td>
-<td align="left"><code>sudo yum install -y shinycannon-1.0.0-dd7474d.x86_64.rpm</code></td>
+<td align="left"><a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-09-02-07:08:29_1.0.0-e514481/rpm/shinycannon-1.0.0-e514481.x86_64.rpm">shinycannon-1.0.0-e514481.x86_64.rpm</a></td>
+<td align="left"><code>sudo yum install -y shinycannon-1.0.0-e514481.x86_64.rpm</code></td>
 </tr>
 </tbody>
 </table>
@@ -150,9 +153,9 @@
 <ol style="list-style-type: decimal">
 <li>Install <a href="https://www.java.com/en/download/">Java</a>
 </li>
-<li>Download <a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-27-16:19:03_1.0.0-dd7474d/bin/shinycannon-1.0.0-dd7474d.sh">shinycannon-1.0.0-dd7474d.sh</a>
+<li>Download <a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-09-02-07:08:29_1.0.0-e514481/bin/shinycannon-1.0.0-e514481.sh">shinycannon-1.0.0-e514481.sh</a>
 </li>
-<li>Install with <code>sudo cp shinycannon-1.0.0-dd7474d.sh /usr/local/bin/shinycannon; sudo chmod +x /usr/local/bin/shinycannon</code>
+<li>Install with <code>sudo cp shinycannon-1.0.0-e514481.sh /usr/local/bin/shinycannon; sudo chmod +x /usr/local/bin/shinycannon</code>
 </li>
 <li>Run <code>shinycannon -h</code> to see help output, or <code>shinycannon [RECORDING-PATH] [APP-URL]</code> to generate load.</li>
 </ol>
@@ -163,8 +166,8 @@
 <ol style="list-style-type: decimal">
 <li>Install <a href="https://www.java.com/en/download/">Java</a>
 </li>
-<li>Download <a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-27-16:19:03_1.0.0-dd7474d/jar/shinycannon-1.0.0-dd7474d.jar">shinycannon-1.0.0-dd7474d.jar</a> to the directory you wish to run it in</li>
-<li>Run <code>java -jar shinycannon-1.0.0-dd7474d.jar -h</code> to see help output, or <code>java -jar shinycannon-1.0.0-dd7474d.jar [RECORDING-PATH] [APP-URL]</code> to generate load.</li>
+<li>Download <a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-09-02-07:08:29_1.0.0-e514481/jar/shinycannon-1.0.0-e514481.jar">shinycannon-1.0.0-e514481.jar</a> to the directory you wish to run it in</li>
+<li>Run <code>java -jar shinycannon-1.0.0-e514481.jar -h</code> to see help output, or <code>java -jar shinycannon-1.0.0-e514481.jar [RECORDING-PATH] [APP-URL]</code> to generate load.</li>
 </ol>
 </div>
 </div>
