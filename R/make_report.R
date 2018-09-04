@@ -26,12 +26,19 @@ shinyloadtest_report <- function(
   verbose = TRUE
 ) {
   if(!grepl(".html$", output)) {
-    stop("'output' should end in '.html'")
+    stop("'output' should end in '.html'", call. = FALSE)
   }
 
   verbose <- isTRUE(verbose)
   self_contained <- isTRUE(self_contained)
   missing_duration_cutoff <- missing(duration_cutoff)
+
+  if (self_contained) {
+    if (rmarkdown::pandoc_version() < "2.2") {
+      stop("Please upgrade your pandoc version to be at least v2.2", call. = FALSE)
+    }
+  }
+
   if (verbose) {
     pr <- progress::progress_bar$new(
       format = ":name - :evt [:bar] :current/:total eta::eta",

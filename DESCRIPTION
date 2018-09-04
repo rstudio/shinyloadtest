@@ -50,3 +50,4 @@ Suggests:
     knitr,
     testthat
 VignetteBuilder: knitr
+BuildVignettes: no

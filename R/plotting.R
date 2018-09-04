@@ -181,6 +181,15 @@ slt_waterfall <- function(df, limits = c(0, max(df$concurrency, na.rm = TRUE))) 
   maintenance <- df %>% filter(maintenance == TRUE) %>% as.data.frame()
   rect_df <- data.frame(xmin = 0, xmax = 0, ymin = maintenance[1,"label"], ymax = maintenance[2, "label"], fill = "fill")
 
+  # shorten labels longer than 100 characters
+  labels <- levels(df$label)
+  long_label_len <- 100
+  are_long_labels <- nchar(labels) > long_label_len
+  if (any(are_long_labels)) {
+    labels[are_long_labels] <- paste0(substr(labels[are_long_labels], 1, long_label_len - 2), "...")
+  }
+  levels(df$label) <- labels
+
   y_limits <- rev(levels(df$label))
   y_limits <- y_limits[!grepl(WS_CLOSE_LABEL, y_limits, fixed = TRUE)]
 

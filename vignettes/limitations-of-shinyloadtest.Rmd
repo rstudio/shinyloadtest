@@ -1,9 +1,9 @@
 ---
 title: "Limitations of shinyloadtest"
-date: "`r Sys.Date()`"
+date: "2018-09-05"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Limitations of shinyloadtest}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
