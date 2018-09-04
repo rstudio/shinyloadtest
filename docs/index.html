@@ -109,7 +109,7 @@
 <h3 class="hasAnchor">
 <a href="#shinyloadtest" class="anchor"></a><code>shinyloadtest</code>
 </h3>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">'rstudio/shinyloadtest'</span>)</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">'rstudio/shinyloadtest'</span>)</a></code></pre></div>
 </div>
 <div id="shinycannon" class="section level3">
 <h3 class="hasAnchor">
@@ -130,13 +130,13 @@
 <tbody>
 <tr class="odd">
 <td align="left">Ubuntu/Debian</td>
-<td align="left"><a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-27-16:19:03_1.0.0-dd7474d/deb/shinycannon_1.0.0-dd7474d_amd64.deb">shinycannon_1.0.0-dd7474d_amd64.deb</a></td>
-<td align="left"><code>sudo dpkg -i shinycannon_1.0.0-dd7474d_amd64.deb</code></td>
+<td align="left"><a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-09-02-07:08:29_1.0.0-e514481/deb/shinycannon_1.0.0-e514481_amd64.deb">shinycannon_1.0.0-e514481_amd64.deb</a></td>
+<td align="left"><code>sudo dpkg -i shinycannon_1.0.0-e514481_amd64.deb</code></td>
 </tr>
 <tr class="even">
 <td align="left">Redhat/Fedora/CentOS</td>
-<td align="left"><a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-27-16:19:03_1.0.0-dd7474d/rpm/shinycannon-1.0.0-dd7474d.x86_64.rpm">shinycannon-1.0.0-dd7474d.x86_64.rpm</a></td>
-<td align="left"><code>sudo yum install -y shinycannon-1.0.0-dd7474d.x86_64.rpm</code></td>
+<td align="left"><a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-09-02-07:08:29_1.0.0-e514481/rpm/shinycannon-1.0.0-e514481.x86_64.rpm">shinycannon-1.0.0-e514481.x86_64.rpm</a></td>
+<td align="left"><code>sudo yum install -y shinycannon-1.0.0-e514481.x86_64.rpm</code></td>
 </tr>
 </tbody>
 </table>
@@ -147,9 +147,9 @@
 <ol style="list-style-type: decimal">
 <li>Install <a href="https://www.java.com/en/download/">Java</a>
 </li>
-<li>Download <a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-27-16:19:03_1.0.0-dd7474d/bin/shinycannon-1.0.0-dd7474d.sh">shinycannon-1.0.0-dd7474d.sh</a>
+<li>Download <a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-09-02-07:08:29_1.0.0-e514481/bin/shinycannon-1.0.0-e514481.sh">shinycannon-1.0.0-e514481.sh</a>
 </li>
-<li>Install with <code>sudo cp shinycannon-1.0.0-dd7474d.sh /usr/local/bin/shinycannon; sudo chmod +x /usr/local/bin/shinycannon</code>
+<li>Install with <code>sudo cp shinycannon-1.0.0-e514481.sh /usr/local/bin/shinycannon; sudo chmod +x /usr/local/bin/shinycannon</code>
 </li>
 <li>Run <code>shinycannon -h</code> to see help output, or <code>shinycannon [RECORDING-PATH] [APP-URL]</code> to generate load.</li>
 </ol>
@@ -160,8 +160,8 @@
 <ol style="list-style-type: decimal">
 <li>Install <a href="https://www.java.com/en/download/">Java</a>
 </li>
-<li>Download <a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-08-27-16:19:03_1.0.0-dd7474d/jar/shinycannon-1.0.0-dd7474d.jar">shinycannon-1.0.0-dd7474d.jar</a> to the directory you wish to run it in</li>
-<li>Run <code>java -jar shinycannon-1.0.0-dd7474d.jar -h</code> to see help output, or <code>java -jar shinycannon-1.0.0-dd7474d.jar [RECORDING-PATH] [APP-URL]</code> to generate load.</li>
+<li>Download <a href="https://s3.amazonaws.com/rstudio-shinycannon-build/2018-09-02-07:08:29_1.0.0-e514481/jar/shinycannon-1.0.0-e514481.jar">shinycannon-1.0.0-e514481.jar</a> to the directory you wish to run it in</li>
+<li>Run <code>java -jar shinycannon-1.0.0-e514481.jar -h</code> to see help output, or <code>java -jar shinycannon-1.0.0-e514481.jar [RECORDING-PATH] [APP-URL]</code> to generate load.</li>
 </ol>
 </div>
 </div>
@@ -183,7 +183,7 @@
 <h3 class="hasAnchor">
 <a href="#step-1-recording" class="anchor"></a>Step 1: Recording</h3>
 <p>Record a session using the <code>record_session</code> function in the <code>shinyloadtest</code> package, which takes the URL of the <strong>deployed</strong> application as an argument:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">shinyloadtest<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/shinyloadtest/topics/record_session">record_session</a></span>(<span class="st">'https://shinyapp.example.com/'</span>)</code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">shinyloadtest<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/shinyloadtest/topics/record_session">record_session</a></span>(<span class="st">'https://shinyapp.example.com/'</span>)</a></code></pre></div>
 <p>You should substitute <code>https://shinyapp.example.com/</code> for the URL of the Shiny app you’d like to record. If your application requires authentication you should consult the <a href="articles/load-testing-authenticated-apps.html">authentication article</a>. You should also be aware that <a href="articles/limitations-of-shinyloadtest.html">certain Shiny features</a> are not compatible with shinyloadtest.</p>
 <p>Running the function will open a browser displaying the app. Once open, interact with the application as a normal user would and then close the browser. After closing the browser window or tab, a file will be created that contains a recording of the session. This recording, written to <code>recording.log</code> by default, will serve as the basis for the load test.</p>
 </div>
@@ -209,32 +209,32 @@
 <strong>–output-dir</strong>: Name of the directory to create and store timing information in.</li>
 </ol>
 <p>As an example, to run a load test simulating 5 concurrent users for at least 2 minutes, outputting to the directory <code>run1</code>:</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash">$ <span class="ex">shinycannon</span> recording.log https://shinyapp.example.com/ --workers 5 --loaded-duration-minutes 2 --output-dir run1
-<span class="ex">2018-08-29</span> 15:06:14.191 INFO [progress] - Running: 0, Failed: 0, Done: 0
-<span class="ex">2018-08-29</span> 15:06:14.193 INFO [thread01] - Warming up
-<span class="ex">2018-08-29</span> 15:06:14.195 INFO [thread00] - Waiting for warmup to complete
-<span class="ex">2018-08-29</span> 15:06:19.193 INFO [progress] - Running: 1, Failed: 0, Done: 0
-<span class="ex">2018-08-29</span> 15:06:24.194 INFO [progress] - Running: 1, Failed: 0, Done: 0
-<span class="ex">2018-08-29</span> 15:06:29.083 INFO [thread02] - Warming up
-<span class="ex">2018-08-29</span> 15:06:29.195 INFO [progress] - Running: 1, Failed: 0, Done: 0
-<span class="ex">2018-08-29</span> 15:06:34.195 INFO [progress] - Running: 2, Failed: 0, Done: 0
-<span class="ex">2018-08-29</span> 15:06:39.196 INFO [progress] - Running: 2, Failed: 0, Done: 0
-<span class="ex">2018-08-29</span> 15:06:43.973 INFO [thread03] - Warming up
-<span class="ex">2018-08-29</span> 15:06:44.196 INFO [progress] - Running: 2, Failed: 0, Done: 0
-<span class="ex">2018-08-29</span> 15:06:49.196 INFO [progress] - Running: 3, Failed: 0, Done: 0
-<span class="ex">2018-08-29</span> 15:06:54.201 INFO [progress] - Running: 3, Failed: 0, Done: 0
-<span class="ex">2018-08-29</span> 15:06:58.862 INFO [thread04] - Warming up
-<span class="ex">2018-08-29</span> 15:06:59.201 INFO [progress] - Running: 3, Failed: 0, Done: 0
-<span class="ex">2018-08-29</span> 15:07:04.201 INFO [progress] - Running: 4, Failed: 0, Done: 0
-<span class="ex">2018-08-29</span> 15:07:09.202 INFO [progress] - Running: 4, Failed: 0, Done: 0
-<span class="ex">2018-08-29</span> 15:07:13.751 INFO [thread05] - Warming up
-<span class="ex">2018-08-29</span> 15:07:13.752 INFO [thread00] - Maintaining for 2 minutes (120000 ms)
-<span class="ex">2018-08-29</span> 15:07:14.202 INFO [progress] - Running: 4, Failed: 0, Done: 0
-<span class="ex">2018-08-29</span> 15:07:19.202 INFO [progress] - Running: 5, Failed: 0, Done: 0
-<span class="ex">2018-08-29</span> 15:07:24.202 INFO [progress] - Running: 5, Failed: 0, Done: 0
-<span class="ex">...</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" data-line-number="1">$ <span class="ex">shinycannon</span> recording.log https://shinyapp.example.com/ --workers 5 --loaded-duration-minutes 2 --output-dir run1</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="ex">2018-08-29</span> 15:06:14.191 INFO [progress] - Running: 0, Failed: 0, Done: 0</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="ex">2018-08-29</span> 15:06:14.193 INFO [thread01] - Warming up</a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="ex">2018-08-29</span> 15:06:14.195 INFO [thread00] - Waiting for warmup to complete</a>
+<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="ex">2018-08-29</span> 15:06:19.193 INFO [progress] - Running: 1, Failed: 0, Done: 0</a>
+<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="ex">2018-08-29</span> 15:06:24.194 INFO [progress] - Running: 1, Failed: 0, Done: 0</a>
+<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="ex">2018-08-29</span> 15:06:29.083 INFO [thread02] - Warming up</a>
+<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="ex">2018-08-29</span> 15:06:29.195 INFO [progress] - Running: 1, Failed: 0, Done: 0</a>
+<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="ex">2018-08-29</span> 15:06:34.195 INFO [progress] - Running: 2, Failed: 0, Done: 0</a>
+<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="ex">2018-08-29</span> 15:06:39.196 INFO [progress] - Running: 2, Failed: 0, Done: 0</a>
+<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="ex">2018-08-29</span> 15:06:43.973 INFO [thread03] - Warming up</a>
+<a class="sourceLine" id="cb3-12" data-line-number="12"><span class="ex">2018-08-29</span> 15:06:44.196 INFO [progress] - Running: 2, Failed: 0, Done: 0</a>
+<a class="sourceLine" id="cb3-13" data-line-number="13"><span class="ex">2018-08-29</span> 15:06:49.196 INFO [progress] - Running: 3, Failed: 0, Done: 0</a>
+<a class="sourceLine" id="cb3-14" data-line-number="14"><span class="ex">2018-08-29</span> 15:06:54.201 INFO [progress] - Running: 3, Failed: 0, Done: 0</a>
+<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="ex">2018-08-29</span> 15:06:58.862 INFO [thread04] - Warming up</a>
+<a class="sourceLine" id="cb3-16" data-line-number="16"><span class="ex">2018-08-29</span> 15:06:59.201 INFO [progress] - Running: 3, Failed: 0, Done: 0</a>
+<a class="sourceLine" id="cb3-17" data-line-number="17"><span class="ex">2018-08-29</span> 15:07:04.201 INFO [progress] - Running: 4, Failed: 0, Done: 0</a>
+<a class="sourceLine" id="cb3-18" data-line-number="18"><span class="ex">2018-08-29</span> 15:07:09.202 INFO [progress] - Running: 4, Failed: 0, Done: 0</a>
+<a class="sourceLine" id="cb3-19" data-line-number="19"><span class="ex">2018-08-29</span> 15:07:13.751 INFO [thread05] - Warming up</a>
+<a class="sourceLine" id="cb3-20" data-line-number="20"><span class="ex">2018-08-29</span> 15:07:13.752 INFO [thread00] - Maintaining for 2 minutes (120000 ms)</a>
+<a class="sourceLine" id="cb3-21" data-line-number="21"><span class="ex">2018-08-29</span> 15:07:14.202 INFO [progress] - Running: 4, Failed: 0, Done: 0</a>
+<a class="sourceLine" id="cb3-22" data-line-number="22"><span class="ex">2018-08-29</span> 15:07:19.202 INFO [progress] - Running: 5, Failed: 0, Done: 0</a>
+<a class="sourceLine" id="cb3-23" data-line-number="23"><span class="ex">2018-08-29</span> 15:07:24.202 INFO [progress] - Running: 5, Failed: 0, Done: 0</a>
+<a class="sourceLine" id="cb3-24" data-line-number="24"><span class="ex">...</span></a></code></pre></div>
 <p><code>shinycannon</code> includes detailed help documentation explaining the other arguments:</p>
-<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="ex">shinycannon</span> -h</code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="ex">shinycannon</span> -h</a></code></pre></div>
 <p>During the test, <code>shinycannon</code> reports the progress and number of simulated users. The result of the test is an output directory (<code>run1</code> in the example above) which includes timing information for each session.</p>
 </div>
 <div id="step-3-analyze-the-results" class="section level3">
