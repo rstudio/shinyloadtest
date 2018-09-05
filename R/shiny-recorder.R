@@ -133,6 +133,8 @@ makeHTTPEvent_GET <- function(tokens, req, resp_curl, begin, end) {
   match <- stringr::str_match(req$PATH_INFO, "/__sockjs__/(?:.*/)?n=(\\w+)")
   if (!is.na(match[[1]])) {
     tokens[[match[[2]]]] <- "${ROBUST_ID}"
+    # Crude workaround for https://github.com/rstudio/shinyloadtest/issues/41
+    Sys.sleep(0.75)
     return(makeReq("REQ_SINF"))
   }
 
