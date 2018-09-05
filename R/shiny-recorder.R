@@ -271,7 +271,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
       }
 
       begin <- Sys.time()
-      resp_curl <- curl::curl_fetch_disk(url, tempfile(), handle = h)
+      outfile <- tempfile()
+      resp_curl <- curl::curl_fetch_disk(url, outfile, handle = h)
+      resp_curl$content <- readBin(outfile, "raw", file.info(outfile)$size)
       end <- Sys.time()
 
       private$mergeCookies(h)
@@ -296,7 +298,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
       url <- private$makeUrl(req)
 
       begin <- Sys.time()
-      resp_curl <- curl::curl_fetch_disk(url, tempfile(), handle = h)
+      outfile <- tempfile()
+      resp_curl <- curl::curl_fetch_disk(url, outfile, handle = h)
+      resp_curl$content <- readBin(outfile, "raw", file.info(outfile)$size)
       end <- Sys.time()
 
       private$mergeCookies(h)
