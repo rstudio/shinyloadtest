@@ -1,8 +1,3 @@
-<!-- -*- mode: markdown; -*- -->
-
-> This is a WIP, do not use yet. Please follow [community.rstudio.com](https://community.rstudio.com) for a
-soft launch of the tools.
-
 # Load Testing Shiny Applications
 
 The `shinyloadtest` package and the accompanying [`shinycannon`](https://github.com/rstudio/shinycannon) software enable load testing
