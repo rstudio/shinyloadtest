@@ -9,7 +9,7 @@ It's a common misconception that __"Shiny doesn't scale."__ In actuality, proper
 
 To get started with `shinyloadtest`, read through the quick start guide below.
 
-![Analysis Example](./docs/articles/images/slt_report_screenshot.png)
+![Analysis Example](./man/figures/slt_report_screenshot.png)
 
 ## Installation
 
