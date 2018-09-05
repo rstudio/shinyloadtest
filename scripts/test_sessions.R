@@ -1,8 +1,7 @@
-
+library(shinyloadtest)
 library(magrittr)
 
-open_browser <- TRUE
-
+open_browser <- if (length(Sys.getenv("HEADLESS")) > 0) FALSE else TRUE
 
 (function() {
   withr::with_dir("vignettes/test_sessions", {
