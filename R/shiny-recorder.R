@@ -73,25 +73,34 @@ getWorkerId <- function(page) {
 }
 
 # Messages from the server start with a[, messages from the client start with [
-messagePattern <- '^(a?\\[")([0-9A-F*]+#)?([0-9]+)(\\|m\\|)(.*)("\\])$'
+messagePattern <- '^(a?\\[")([0-9A-F*]+#)?([0-9]+)(\\|[mc]\\|)(.*)("\\])$'
+closePattern <- '^c\\[([0-9]+),(".*")\\]$'
 
 # Parses a JSON message from the server or client; returns the object from the nested JSON, if any
 parseMessage <- function(msg) {
   res <- stringr::str_match(msg, messagePattern)
   encodedMsg <- res[1,6]
-  # If the regex failed, then msg is probably a bare JSON string that can be
-  # decoded directly. It might also be an older-style SSP message without subapp
-  # support (like "[\"0|o|\"]")
-  if (is.na(encodedMsg)) {
-    jsonlite::fromJSON(msg)
-  # If the regex succeeded but the subapp id was nonzero, crash with a helpful message.
-  } else if (res[1,4] != "0") {
-    stop("Subapp id was != 0 and subapp recording is not supported")
+  if (!is.na(encodedMsg)) {
+    if (res[1,4] != "0") {
+      # If the regex succeeded but the subapp id was nonzero, crash with a helpful message.
+      stop("Subapp id was != 0 and subapp recording is not supported")
+    } else {
+      # If the regex succeeded subapp id = 0, we have the payload as an almost-double-JSON-encoded
+      # object - it just needs to be wrapped in a set of double-quotes.
+      wrappedMsg <- paste0('"', encodedMsg, '"')
+      jsonlite::fromJSON(jsonlite::fromJSON(wrappedMsg))
+    }
   } else {
-    # If the regex succeeded subapp id = 0, we have the payload as an almost-double-JSON-encoded
-    # object - it just needs to be wrapped in a set of double-quotes.
-    wrappedMsg <- paste0('"', encodedMsg, '"')
-    jsonlite::fromJSON(jsonlite::fromJSON(wrappedMsg))
+    res2 <- stringr::str_match(msg, closePattern)
+    if (!is.na(res2[1,2])) {
+      # This is a SockJS-level close message, for now we just ignore these.
+      list()
+    } else {
+      # If the regex failed, then msg is probably a bare JSON string that can be
+      # decoded directly. It might also be an older-style SSP message without subapp
+      # support (like "[\"0|o|\"]")
+      jsonlite::fromJSON(msg)
+    }
   }
 }
 
