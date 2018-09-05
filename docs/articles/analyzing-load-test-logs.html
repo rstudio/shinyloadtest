@@ -265,12 +265,11 @@
 <a class="sourceLine" id="cb2-3" data-line-number="3">  <span class="st">"4 users"</span> =<span class="st"> "./demo4"</span>,</a>
 <a class="sourceLine" id="cb2-4" data-line-number="4">  <span class="st">"16 users"</span> =<span class="st"> "./demo16"</span></a>
 <a class="sourceLine" id="cb2-5" data-line-number="5">)</a>
-<a class="sourceLine" id="cb2-6" data-line-number="6">shinyloadtest<span class="op">::</span><span class="kw">make_report</span>(df, <span class="st">"report.html"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb2-6" data-line-number="6">shinyloadtest<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/shinyloadtest/topics/shinyloadtest_report">shinyloadtest_report</a></span>(df, <span class="st">"report.html"</span>)</a></code></pre></div>
 <div id="sessions" class="section level2">
 <h2 class="hasAnchor">
 <a href="#sessions" class="anchor"></a>Sessions</h2>
 <p>The <code>Sessions</code> tab of the <code>shinyloadtest</code> report displays each simulated session performed by each user. Each run displays their respective <a href="https://en.wikipedia.org/wiki/Gantt_chart">gantt chart</a> by clicking on the named buttons near the top of the webpage.</p>
-<pre><code>#&gt; Warning: package 'dplyr' was built under R version 3.5.1</code></pre>
 <p><img src="analyzing-load-test-logs_files/figure-html/unnamed-chunk-4-1.png" width="80%" style="display: block; margin: auto;"></p>
 <p>Maintenance period: During a load test, user sessions are not all started at exactly the same time. Instead, user requests are staggered over a warmup period. Once the targeted number of concurrent sessions is reached, the maintenance period begins during which time shinycannon maintains the number of user sessions. After the desired test duration is reached, user sessions begin ending during a cooldown period. Sessions that are desaturated in color occurred during the warmup or cooldown. The maintenance period is marked with vertical dotted lines spanning every simulated user.</p>
 <p>In the example above, four users were stagger started and simulated for 10 minutes. The majority of the time is spent calculating new values for the outputs in the recording. The session gantt chart below displays the same recording but with sixteen users.</p>
@@ -298,7 +297,7 @@
 <a href="#session-duration" class="anchor"></a>Session Duration</h2>
 <p>The <code>Session Duration</code> tab displays all maintenance period sessions ordered by total duration vertically from fastest to slowest.</p>
 <p><img src="analyzing-load-test-logs_files/figure-html/unnamed-chunk-6-1.png" width="80%" style="display: block; margin: auto;"></p>
-<p>Ideally, most of the sessions should be completed in about the same amount of time as the recording.log execution time. The vertical red line line defaults to the <code>recording.log</code> duration, but can be set when calling <code>make_report(df, duration_cutoff = 10)</code>. In the example above, most sessions finish around the same amount of time as the <code>recording.log</code> duration.</p>
+<p>Ideally, most of the sessions should be completed in about the same amount of time as the recording.log execution time. The vertical red line line defaults to the <code>recording.log</code> duration, but can be set when calling <code><a href="../reference/shinyloadtest_report.html">shinyloadtest_report(df, duration_cutoff = 10)</a></code>. In the example above, most sessions finish around the same amount of time as the <code>recording.log</code> duration.</p>
 <p>It is good to have to have each session duration (row) look like the next. If certain rows are much wider than the others, server resource contention might be occurring. Looking at the <code>16 user</code> run, the same recording is on average 4x slower than the <code>recording.log</code> duration with one session taking twice as long as the average <code>16 user</code> session.</p>
 <p><img src="analyzing-load-test-logs_files/figure-html/unnamed-chunk-7-1.png" width="80%" style="display: block; margin: auto;"></p>
 </div>
@@ -314,7 +313,7 @@
 <div id="latency" class="section level2">
 <h2 class="hasAnchor">
 <a href="#latency" class="anchor"></a>Latency</h2>
-<p>The <code>Latency</code> tab displays two plots. The first plot displays the total HTTP time for each session. The second plot displays the maximum calculation time. Both plots display a cutoff value that can be set when calling <code>make_report(df, http_latency_cutoff = 5, max_websocket_cutoff = 20)</code>. Similar to the <code>Sessions</code> tab, sessions that are desaturated in color are sessions that started before (warmup) or ended after (cooldown) the maintenance period.</p>
+<p>The <code>Latency</code> tab displays two plots. The first plot displays the total HTTP time for each session. The second plot displays the maximum calculation time. Both plots display a cutoff value that can be set when calling <code><a href="../reference/shinyloadtest_report.html">shinyloadtest_report(df, http_latency_cutoff = 5, max_websocket_cutoff = 20)</a></code>. Similar to the <code>Sessions</code> tab, sessions that are desaturated in color are sessions that started before (warmup) or ended after (cooldown) the maintenance period.</p>
 <p>The total HTTP latency plot helps to diagnose how long a user has to wait before a website has appeared on their browser. Ideally, this should be no time at all, as the server is just providing static files.</p>
 <p><img src="analyzing-load-test-logs_files/figure-html/unnamed-chunk-10-1.png" width="80%" style="display: block; margin: auto;"></p>
 <p>The maximum SockJS latency plot helps to diagnose the maximum amount of time a user has to wait before an input is updated or output is recalculated. Ideally, this should be shorter than our attention spans.</p>

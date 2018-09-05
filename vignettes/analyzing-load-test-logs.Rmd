@@ -127,7 +127,7 @@ df <- shinyloadtest::load_runs(
   `4 users` = "./test_sessions/demo4",
   `16 users` = "./test_sessions/demo16"
 )
-# ignore <- shinyloadtest::make_report(df, "report.html", verbose = FALSE, open_browser = FALSE)
+# ignore <- shinyloadtest::shinyloadtest_report(df, "report.html", verbose = FALSE, open_browser = FALSE)
 ```
 ```{r, eval = FALSE}
 df <- shinyloadtest::load_runs(
@@ -135,7 +135,7 @@ df <- shinyloadtest::load_runs(
   "4 users" = "./demo4",
   "16 users" = "./demo16"
 )
-shinyloadtest::make_report(df, "report.html")
+shinyloadtest::shinyloadtest_report(df, "report.html")
 ```
 
 ## Sessions
@@ -190,7 +190,7 @@ The `Session Duration` tab displays all maintenance period sessions ordered by t
 df %>% filter(run == "4 users") %>% slt_session_duration(cutoff = attr(df, "recording_duration"))
 ```
 
-Ideally, most of the sessions should be completed in about the same amount of time as the recording.log execution time.  The vertical red line line defaults to the `recording.log` duration, but can be set when calling `make_report(df, duration_cutoff = 10)`.  In the example above, most sessions finish around the same amount of time as the `recording.log` duration.
+Ideally, most of the sessions should be completed in about the same amount of time as the recording.log execution time.  The vertical red line line defaults to the `recording.log` duration, but can be set when calling `shinyloadtest_report(df, duration_cutoff = 10)`.  In the example above, most sessions finish around the same amount of time as the `recording.log` duration.
 
 It is good to have to have each session duration (row) look like the next.  If certain rows are much wider than the others, server resource contention might be occurring.  Looking at the `16 user` run, the same recording is on average 4x slower than the `recording.log` duration with one session taking twice as long as the average `16 user` session.
 
@@ -219,7 +219,7 @@ upload %>% slt_waterfall()
 
 ## Latency
 
-The `Latency` tab displays two plots.  The first plot displays the total HTTP time for each session.  The second plot displays the maximum calculation time.  Both plots display a cutoff value that can be set when calling `make_report(df, http_latency_cutoff = 5, max_websocket_cutoff = 20)`. Similar to the `Sessions` tab, sessions that are desaturated in color are sessions that started before (warmup) or ended after (cooldown) the maintenance period.
+The `Latency` tab displays two plots.  The first plot displays the total HTTP time for each session.  The second plot displays the maximum calculation time.  Both plots display a cutoff value that can be set when calling `shinyloadtest_report(df, http_latency_cutoff = 5, max_websocket_cutoff = 20)`. Similar to the `Sessions` tab, sessions that are desaturated in color are sessions that started before (warmup) or ended after (cooldown) the maintenance period.
 
 The total HTTP latency plot helps to diagnose how long a user has to wait before a website has appeared on their browser.  Ideally, this should be no time at all, as the server is just providing static files.
 
