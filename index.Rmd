@@ -9,7 +9,7 @@ It's a common misconception that __"Shiny doesn't scale."__ In actuality, proper
 
 To get started with `shinyloadtest`, read through the quick start guide below.
 
-![Analysis Example](./docs/articles/images/slt_report_screenshot.png)
+![Analysis Example](./man/figures/slt_report_screenshot.png)
 
 ## Installation
 
@@ -172,7 +172,7 @@ df <- shinyloadtest::load_runs("5 workers" = "./run1")
 Once the data is loaded into R, a report can be generated using:
 
 ```r
-shinyloadtest::make_report(df, "run1.html")
+shinyloadtest::shinyloadtest_report(df, "run1.html")
 ```
 
 This self contained html report will be opened in your browser for inspection.  For further analysis explaination, please visit ['Analysing load test logs'](articles/analyzing-load-test-logs.html).
