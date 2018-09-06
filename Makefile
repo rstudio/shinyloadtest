@@ -6,6 +6,7 @@ all: RELEASE_URLS.txt
 # Should be done manually when a new version of shinycannon is released.
 # RELEASE_URLS.txt is read by index.Rmd
 RELEASE_URLS.txt:
+	rm -f $@
 	wget https://s3.amazonaws.com/rstudio-shinycannon-build/$@
 
 site:
@@ -16,6 +17,5 @@ site:
 	Rscript scripts/build_docs.R
 
 clean:
-	rm -r output
-	ls -d vignettes/test_sessions/*/ | xargs rm -r
-	rm -f RELEASE_URLS.txt
+	rm -rf output Rplots.pdf
+	find vignettes/test_sessions/ -mindepth 1 -type d -delete
