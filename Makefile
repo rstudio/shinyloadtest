@@ -12,10 +12,10 @@ RELEASE_URLS.txt:
 site:
 	R -e 'devtools::document()'
 	R CMD INSTALL --no-multiarch --with-keep.source .
-	HEADLESS=TRUE Rscript scripts/test_sessions.R
+	HEADLESS=TRUE Rscript scripts/test_sessions.R && rm Rplots.pdf
 	Rscript scripts/build_vignettes.R
 	Rscript scripts/build_docs.R
 
 clean:
-	rm -rf output Rplots.pdf
+	rm -rf output
 	find vignettes/test_sessions/ -mindepth 1 -type d -delete
