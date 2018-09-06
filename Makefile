@@ -1,6 +1,11 @@
-all: RELEASE_URLS.txt
+all: help
 
-.PHONY=clean site
+.PHONY=clean site help
+
+help:
+	@echo "make RELEASE_URLS.txt: update the shinycannon download links. You should do this after releasing shinycannon."
+	@echo "make site: build docs/vignettes and the doc site, which is hosted on github"
+	@echo "make clean: clean the docs and doc site"
 
 # Updates RELEASE_URLS.txt file.
 # Should be done manually when a new version of shinycannon is released.
