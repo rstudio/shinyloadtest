@@ -11,9 +11,11 @@ RELEASE_URLS.txt:
 site:
 	R -e 'devtools::document()'
 	R CMD INSTALL --no-multiarch --with-keep.source .
-	# TODO split unzipping runs from making reports
 	HEADLESS=TRUE Rscript scripts/test_sessions.R
+	Rscript scripts/build_vignettes.R
 	Rscript scripts/build_docs.R
 
 clean:
+	rm -r output
+	ls -d vignettes/test_sessions/*/ | xargs rm -r
 	rm -f RELEASE_URLS.txt
