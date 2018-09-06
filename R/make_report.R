@@ -70,7 +70,7 @@ shinyloadtest_report <- function(
   # collect base path
   if (self_contained) {
     base_output_name <- file.path(
-      tempdir(TRUE),
+      tempdir(),
       paste0("shinyloadtest", floor(stats::runif(1, 1, 10000))),
       basename(sub(paste0(".", tools::file_ext(output)), "", output, fixed = TRUE))
     )
