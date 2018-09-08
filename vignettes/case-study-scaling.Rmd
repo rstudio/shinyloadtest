@@ -2,10 +2,14 @@
 title: "Case study: Scaling an app"
 date: "2018-09-05"
 output: rmarkdown::html_vignette
+resource_files:
+  - case_studies/case_study_report1.html
+  - case_studies/case_study_report2.html
 vignette: >
   %\VignetteIndexEntry{Case study: Scaling an app}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+
 ---
 
 ```{r setup, include = FALSE}
@@ -150,7 +154,7 @@ When you open `report1.html` in your browser, you'll see something like this:
 
 ![](./images/report_example.png)
 
-> If you don't want to generate the report yourself, you can view an example here: [case_study_report1.html](case_study_report1.html)
+> If you don't want to generate the report yourself, you can view an example here: [case_study_report1.html](https://rstudio.github.io/shinyloadtest/articles/case_studies/case_study_report1.html)
 
 There's a lot to take in here. If you're interested in the meaning of everything you see, check out the [analyzing load test logs vignette](analyzing-load-test-logs.html).
 
@@ -215,7 +219,7 @@ df <- load_runs("Run 5" = "run5", "Run 5 new" = "run5-new-settings")
 shinyloadtest_report(df, "report2.html")
 ```
 
-> If you don't want to generate the report yourself, you can view an example here: [case_study_report2.html](case_study_report2.html)
+> If you don't want to generate the report yourself, you can view an example here: [case_study_report2.html](https://rstudio.github.io/shinyloadtest/articles/case_studies/case_study_report2.html)
 
 ![run2-duration](./images/run2_duration.svg)
 ![run2-duration](./images/run2_new_duration.svg)
