@@ -270,7 +270,6 @@
 <h2 class="hasAnchor">
 <a href="#sessions" class="anchor"></a>Sessions</h2>
 <p>The <code>Sessions</code> tab of the <code>shinyloadtest</code> report displays each simulated session performed by each user. Each run displays their respective <a href="https://en.wikipedia.org/wiki/Gantt_chart">gantt chart</a> by clicking on the named buttons near the top of the webpage.</p>
-<pre><code>#&gt; Warning: package 'dplyr' was built under R version 3.5.1</code></pre>
 <p><img src="analyzing-load-test-logs_files/figure-html/unnamed-chunk-4-1.png" width="80%" style="display: block; margin: auto;"></p>
 <p>Maintenance period: During a load test, user sessions are not all started at exactly the same time. Instead, user requests are staggered over a warmup period. Once the targeted number of concurrent sessions is reached, the maintenance period begins during which time shinycannon maintains the number of user sessions. After the desired test duration is reached, user sessions begin ending during a cooldown period. Sessions that are desaturated in color occurred during the warmup or cooldown. The maintenance period is marked with vertical dotted lines spanning every simulated user.</p>
 <p>In the example above, four users were stagger started and simulated for 10 minutes. The majority of the time is spent calculating new values for the outputs in the recording. The session gantt chart below displays the same recording but with sixteen users.</p>
