@@ -10,4 +10,4 @@ For installation instructions, please see [the documentation](https://rstudio.gi
 
 ## License
 
-MIT
+GPLv3
