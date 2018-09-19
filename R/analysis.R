@@ -295,7 +295,8 @@ load_runs <- function(..., verbose = TRUE) {
           # adjust times to start at 0 when maintenance starts
           min_maintenance_time <- df_run %>%
             filter(maintenance == TRUE) %>%
-            select_("start") %>%
+            magrittr::extract2("start") %>%
+            c(0) %>% # make sure there is at least a start time of 0
             min()
           df_run <- df_run %>%
             mutate(
