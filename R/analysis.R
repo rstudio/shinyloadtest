@@ -329,7 +329,7 @@ maintenance_df_ids <- function(
       df_run <- df %>% filter(run == runVal)
 
       # if there is only one iteration... return the whole data frame
-      if (identical(max(df_run$iteration), 0)) {
+      if (isTRUE(all.equal(max(df_run$iteration), 0))) {
         return(df_run$id)
       }
 
