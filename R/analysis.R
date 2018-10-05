@@ -283,25 +283,26 @@ load_runs <- function(..., verbose = TRUE) {
           df_recording <- first_recording$data
 
           df_run$id <- seq_len(nrow(df_run))
-          df_filtered <- filter_df(df_run)
+          df_maintenance_ids <- maintenance_df_ids(df_run)
 
           df_run <- df_run %>%
             ungroup() %>%
             mutate(
-              maintenance = id %in% df_filtered$id
+              maintenance = id %in% df_maintenance_ids
             ) %>%
             select(-id)
 
-          # adjust times to start at 0 when maintenance starts
           min_maintenance_time <- df_run %>%
             filter(maintenance == TRUE) %>%
-            select_("start") %>%
+            magrittr::extract2("start") %>%
             min()
-          df_run <- df_run %>%
-            mutate(
-              start = start - min_maintenance_time,
-              end = end - min_maintenance_time
-            )
+          if (!is.infinite(min_maintenance_time)) {
+            df_run <- df_run %>%
+              mutate(
+                start = start - min_maintenance_time,
+                end = end - min_maintenance_time
+              )
+          }
 
           left_join(df_run, df_recording, by = "input_line_number")
         }
@@ -318,43 +319,48 @@ load_runs <- function(..., verbose = TRUE) {
 
 
 
-filter_df_start_time <- function(df) {
-  df_start <- df %>%
-    group_by(user_id) %>%
-    summarise(start_time = min(start))
-  max(df_start$start_time)
-}
-filter_df_end_time <- function(df) {
-  df_end <- df %>%
-    group_by(user_id) %>%
-    summarise(end_time = max(end))
-  min(df_end$end_time)
-}
-filter_df <- function(
-  df,
-  start_time,
-  end_time
+maintenance_df_ids <- function(
+  df
 ) {
-  is_missing_start_time <- missing(start_time)
-  is_missing_end_time <- missing(end_time)
   lapply(
     unique(df$run),
     function(runVal) {
 
       df_run <- df %>% filter(run == runVal)
 
-      if (is_missing_start_time) start_time <- filter_df_start_time(df_run)
-      if (is_missing_end_time) end_time <- filter_df_end_time(df_run)
+      # if there is only one iteration... return the whole data frame
+      if (isTRUE(all.equal(max(df_run$iteration), 0))) {
+        return(df_run$id)
+      }
+
+      # for each 'user', get the max(first start) and min(last end)
+      df_time <- df %>%
+        group_by(user_id) %>%
+        summarise(
+          start_time = min(start),
+          end_time = max(end)
+        )
+      start_time <- max(df_time$start_time)
+      end_time <- min(df_time$end_time)
 
       df_times <- df_run %>%
         group_by(session_id) %>%
         summarise(min_start = min(start), max_end = max(end)) %>%
         filter(min_start >= start_time, max_end <= end_time)
 
-      df_run %>%
+      ret <- df_run %>%
         ungroup() %>%
         filter(session_id %in% df_times$session_id)
+      if (nrow(ret) == 0) {
+        message(
+          "  Could not find a valid maintenance period.\n",
+          "  Make sure at least one complete iteration exists between the latest user start time and the earliest user end time.\n",
+          "  Setting the maintenance period to be whole run."
+        )
+        return(df_run$id)
+      }
+      ret$id
     }
   ) %>%
-    bind_rows()
+    unlist()
 }
