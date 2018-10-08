@@ -1,6 +1,6 @@
 all: help
 
-.PHONY=clean site help
+.PHONY=clean site help urls
 
 help:
 	@echo "make RELEASE_URLS.txt: update the shinycannon download links. You should do this after releasing shinycannon."
@@ -10,9 +10,9 @@ help:
 # Updates RELEASE_URLS.txt file.
 # Should be done manually when a new version of shinycannon is released.
 # RELEASE_URLS.txt is read by index.Rmd
-RELEASE_URLS.txt:
-	rm -f $@
-	wget https://s3.amazonaws.com/rstudio-shinycannon-build/$@
+urls:
+	rm -f RELEASE_URLS.txt
+	wget https://s3.amazonaws.com/rstudio-shinycannon-build/RELEASE_URLS.txt
 
 site:
 	R -e 'devtools::document()'
