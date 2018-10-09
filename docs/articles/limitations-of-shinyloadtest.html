@@ -110,6 +110,8 @@
 <ol style="list-style-type: decimal">
 <li>
 <strong>Apps must be deterministic</strong>: The recording file made by <code>record_session</code> contains messages from the server in the order they were received. If messages are received in a different order by <code>shinycannon</code> when it’s playing the recording back, that session will be considered a failure. If the same change in inputs does not always lead to outputs being updated in the same order, shinyloadtest will not work.</li>
+<li>
+<strong>RMarkdown documents with runtime Shiny are unsupported</strong>: Shiny apps embedded in <a href="https://rmarkdown.rstudio.com/">RMarkdown</a> (.rmd) documents are not currently supported.</li>
 </ol>
 </div>
   </div>

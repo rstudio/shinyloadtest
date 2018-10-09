@@ -25,3 +25,4 @@ knitr::opts_chunk$set(
 ## Application limitations
 
 1. **Apps must be deterministic**: The recording file made by `record_session` contains messages from the server in the order they were received. If messages are received in a different order by `shinycannon` when it's playing the recording back, that session will be considered a failure. If the same change in inputs does not always lead to outputs being updated in the same order, shinyloadtest will not work.
+1. **RMarkdown documents with runtime Shiny are unsupported**: Shiny apps embedded in [RMarkdown](https://rmarkdown.rstudio.com/) (.rmd) documents are not currently supported.
