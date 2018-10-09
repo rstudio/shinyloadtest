@@ -176,6 +176,7 @@ hr {
 
 <ol>
 <li><strong>Apps must be deterministic</strong>: The recording file made by <code>record_session</code> contains messages from the server in the order they were received. If messages are received in a different order by <code>shinycannon</code> when it&#39;s playing the recording back, that session will be considered a failure. If the same change in inputs does not always lead to outputs being updated in the same order, shinyloadtest will not work.</li>
+<li><strong>R Markdown documents with <code>runtime: shiny</code> unsupported</strong>: R Markdown documents that <a href="https://bookdown.org/yihui/rmarkdown/shiny-start.html">embed Shiny applications</a> are currently unsupported.</li>
 </ol>
 
 </body>
