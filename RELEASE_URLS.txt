@@ -1,4 +1,4 @@
-https://s3.amazonaws.com/rstudio-shinycannon-build/2018-10-16-06:39:47_1.0.0-78b58bc/deb/shinycannon_1.0.0-78b58bc_amd64.deb
-https://s3.amazonaws.com/rstudio-shinycannon-build/2018-10-16-06:39:47_1.0.0-78b58bc/rpm/shinycannon-1.0.0-78b58bc.x86_64.rpm
-https://s3.amazonaws.com/rstudio-shinycannon-build/2018-10-16-06:39:47_1.0.0-78b58bc/jar/shinycannon-1.0.0-78b58bc.jar
-https://s3.amazonaws.com/rstudio-shinycannon-build/2018-10-16-06:39:47_1.0.0-78b58bc/bin/shinycannon-1.0.0-78b58bc.sh
+https://s3.amazonaws.com/rstudio-shinycannon-build/2018-10-19-15:43:10_1.0.0-9ba769e/deb/shinycannon_1.0.0-9ba769e_amd64.deb
+https://s3.amazonaws.com/rstudio-shinycannon-build/2018-10-19-15:43:10_1.0.0-9ba769e/rpm/shinycannon-1.0.0-9ba769e.x86_64.rpm
+https://s3.amazonaws.com/rstudio-shinycannon-build/2018-10-19-15:43:10_1.0.0-9ba769e/jar/shinycannon-1.0.0-9ba769e.jar
+https://s3.amazonaws.com/rstudio-shinycannon-build/2018-10-19-15:43:10_1.0.0-9ba769e/bin/shinycannon-1.0.0-9ba769e.sh
