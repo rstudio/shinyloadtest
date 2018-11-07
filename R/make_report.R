@@ -346,7 +346,7 @@ save_svg <- function(p, output, width = 15, height = 10, units = "in", ...) {
       plot = p,
       width = width,
       height = height,
-      limitsize = FALSE, # image size is programatically increased and can be very tall
+      limitsize = FALSE, # image size is programmatically increased and can be very tall
       ...
     )
     # TODO make file smaller!
