@@ -341,7 +341,14 @@ save_svg <- function(p, output, width = 15, height = 10, units = "in", ...) {
     unlink(output_tmp)
   })
   suppressMessages({
-    ggplot2::ggsave(filename = output_tmp, plot = p, width = width, height = height, ...)
+    ggplot2::ggsave(
+      filename = output_tmp,
+      plot = p,
+      width = width,
+      height = height,
+      limitsize = FALSE, # image size is programatically increased and can be very tall
+      ...
+    )
     # TODO make file smaller!
   })
   # to_svgz(output_tmp, output)
