@@ -104,7 +104,13 @@ shinyloadtest_report <- function(
     file.path(basename(base_output_name), svg_folder, paste0(file, ".svg"))
   }
 
-  df_maintenance <- df %>% filter(maintenance == TRUE)
+  df_maintenance <- df %>%
+    filter(maintenance == TRUE) %>%
+    # Must drop unused factor levels, or else we end up with
+    # NA rows under dplyr 0.8 and later due to
+    # https://github.com/tidyverse/dplyr/issues/341
+    # https://github.com/tidyverse/dplyr/pull/3492
+    mutate(label = droplevels(label))
 
   latency_height <- 10 * (
       (
