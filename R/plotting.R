@@ -148,6 +148,9 @@ slt_time_concurrency <- function(df, labels = NULL) {
     df <- df %>% filter(label %in% UQ(labels))
   }
 
+  # More dplyr 0.8 compatibility
+  df <- df %>% mutate(label = droplevels(label))
+
   p <- df %>%
     ggplot(aes(concurrency, time, fill = run, color = run)) +
     geom_point() +
