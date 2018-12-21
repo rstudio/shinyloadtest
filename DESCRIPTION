@@ -43,9 +43,8 @@ Imports:
     htmltools,
     gtable,
     svglite
-Remotes: rstudio/websocket,
-    rstudio/httpuv
-RoxygenNote: 6.1.0
+Remotes: rstudio/websocket
+RoxygenNote: 6.1.1
 Suggests:
     knitr,
     testthat
