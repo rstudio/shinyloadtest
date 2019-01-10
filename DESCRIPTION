@@ -9,7 +9,7 @@ Authors@R: c(
             person("RStudio", role = c("cph", "fnd"))
             )
 Description: shinyloadtest provides functions for recording user sessions,
-    playing those sessions back in parallel to simulate load, and analzying
+    playing those sessions back in parallel to simulate load, and analyzing
     the results.
 License: GPL-3
 Encoding: UTF-8
