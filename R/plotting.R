@@ -598,12 +598,12 @@ slt_http_latency <- function(df, cutoff = 10) {
     # geom_hline(data = data.frame(y = cutoff, col = cutoff_color), mapping = aes(yintercept = y, color = I("transparent")), show.legend = TRUE) +
     geom_hline(yintercept = cutoff, color = cutoff_color) +
     request_scale_fill(
-      includeWarmup = TRUE, includeCutoff = TRUE,
-      limits = c("Homepage", "JS/CSS", "Warmup / Cooldown", "Cutoff")) +
+      includeWarmup = TRUE, includeCutoff = FALSE,
+      limits = c("Homepage", "JS/CSS", "Warmup / Cooldown")) +
     request_scale_color(
       includeWarmup = TRUE,
-      includeCutoff = TRUE,
-      limits = c("Homepage", "JS/CSS", "Warmup / Cooldown", "Cutoff")) +
+      includeCutoff = FALSE,
+      limits = c("Homepage", "JS/CSS", "Warmup / Cooldown")) +
     # scale_linetype_manual("asdf", values = c("Homepage" = "blank", "JS/CSS" = "blank", "Warmup / Cooldown" = "dotted", "Cutoff" = "solid"), limits = c("Homepage", "JS/CSS", "Warmup / Cooldown", "Cutoff")) +
     request_scale_guides(includeLineType = FALSE) +
     # geom_step(position = position_stack(reverse = TRUE)) +
