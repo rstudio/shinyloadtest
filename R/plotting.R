@@ -223,7 +223,7 @@ slt_waterfall <- function(df, limits = c(0, max(df$concurrency, na.rm = TRUE))) 
     ) +
     theme(legend.position = "bottom")
 
-  facet_on_run(p, maintenance)
+  facet_on_run(p, maintenance, run_levels = levels(df$run))
 }
 
 
@@ -231,9 +231,10 @@ slt_waterfall <- function(df, limits = c(0, max(df$concurrency, na.rm = TRUE))) 
 #' @export
 slt_hist_loadtimes <- function(df, max_load_time = 5) {
   p <- df %>%
-    filter(maintenance == TRUE) %>%
+    convert_run_to_chr() %>%
     group_by(run, session_id) %>%
     summarise(begin = min(start), ready = start[event == "WS_OPEN"], finish = max(end)) %>%
+    convert_run_to_fctr(df) %>%
     ggplot(aes(ready - begin)) +
     geom_histogram() +
     geom_vline(xintercept = max_load_time, color = "red") +
@@ -280,9 +281,11 @@ request_colors <- function() {
 maintenance_color <- "#2e2e2e"
 maintenance_vline <- function(data, mapping, ...) {
   data <- data %>%
+    convert_run_to_chr() %>%
     group_by(run) %>%
     filter(maintenance == TRUE) %>%
-    summarise(start = min(start), end = max(end), maintenance = "Warmup / Cooldown")
+    summarise(start = min(start), end = max(end), maintenance = "Warmup / Cooldown") %>%
+    convert_run_to_fctr(data)
 
   data$maintenance = "Warmup / Cooldown"
   mapping$colour <- aes(color = maintenance)$colour
@@ -290,17 +293,21 @@ maintenance_vline <- function(data, mapping, ...) {
 }
 maintenance_vline_only <- function(data, mapping, ...) {
   data <- data %>%
+    convert_run_to_chr() %>%
     group_by(run) %>%
     filter(maintenance == TRUE) %>%
-    summarise(start = min(start), end = max(end), maintenance = "Warmup / Cooldown")
+    summarise(start = min(start), end = max(end), maintenance = "Warmup / Cooldown") %>%
+    convert_run_to_fctr(data)
 
   geom_vline(data = data, mapping = mapping, size = 1, linetype = "dotted", color = maintenance_color, ...)
 }
 maintenance_session_vline <- function(data, mapping, ...) {
   data <- data %>%
+    convert_run_to_chr() %>%
     group_by(run) %>%
     filter(maintenance == TRUE) %>%
-    summarise(start = min(as.numeric(session_id)) - 0.5, end = max(as.numeric(session_id)) + 0.5, maintenance = "Warmup / Cooldown")
+    summarise(start = min(as.numeric(session_id)) - 0.5, end = max(as.numeric(session_id)) + 0.5, maintenance = "Warmup / Cooldown") %>%
+    convert_run_to_fctr(data)
 
   data$maintenance = "Warmup / Cooldown"
   mapping$colour <- aes(color = maintenance)$colour
@@ -358,14 +365,15 @@ request_scale_guides <- function(
 }
 
 
-facet_on_run <- function(p, df, col = "run", rows = vars(run), ...) {
+facet_on_run <- function(p, df, col = "run", rows = vars(run), ..., run_levels = levels(df$run)) {
   if (length(unique(df[[col]])) > 1) {
     p <- p + facet_grid(rows = rows, ...)
+    # p$data$run <- factor(p$data$run, levels = run_levels)
   }
   p
 }
-facet_on_run_free <- function(p, df, col = "run", rows = vars(run)) {
-  facet_on_run(p, df, col, rows, scales = "free_y", space = "free_y")
+facet_on_run_free <- function(p, df, col = "run", rows = vars(run), ...) {
+  facet_on_run(p, df, col, rows, scales = "free_y", space = "free_y", ...)
 }
 
 #' @describeIn slt_plot Gantt chart of event duration for each user within each run
@@ -399,7 +407,7 @@ slt_user <- function(df) {
     ) +
     theme(legend.position = "bottom")
 
-  facet_on_run_free(p, df_gantt)
+  facet_on_run_free(p, df_gantt, run_levels = levels(df$run))
 }
 
 #' @describeIn slt_plot Event gantt chart of each user session within each run
@@ -431,18 +439,20 @@ slt_session <- function(df) {
       xlab("Elapsed time (sec)") +
       theme(legend.position = "bottom")
 
-  facet_on_run_free(p, df_session)
+  facet_on_run_free(p, df_session, run_levels = levels(df$run))
 }
 
 
 
 gantt_duration_data <- function(df) {
   df %>%
+    convert_run_to_chr() %>%
     filter(maintenance == TRUE) %>%
     filter(event != "WS_RECV_INIT") %>%
     group_by(run, session_id, user_id, iteration) %>%
     mutate(end = end - min(start), start = start - min(start)) %>%
-    ungroup()
+    ungroup() %>%
+    convert_run_to_fctr(df)
 }
 #' @describeIn slt_plot Event gantt chart of fastest to slowest session times within each run
 #' @export
@@ -450,13 +460,15 @@ slt_session_duration <- function(df, cutoff = c(attr(df, "recording_duration"), 
   df1 <- gantt_duration_data(df)
 
   sessions <- df1 %>%
+    convert_run_to_chr() %>%
     filter(event != "WS_RECV_INIT") %>%
     group_by(run, session_id, user_id, iteration) %>%
     summarise(max = max(end)) %>%
     arrange(run, desc(max)) %>%
     group_by(run) %>%
     mutate(order = 1:length(session_id)) %>%
-    ungroup()
+    ungroup() %>%
+    convert_run_to_fctr(df)
 
   df1 <- df1 %>%
     inner_join(sessions, by = c("run", "session_id", "user_id", "iteration"))
@@ -489,7 +501,7 @@ slt_session_duration <- function(df, cutoff = c(attr(df, "recording_duration"), 
       ) +
       theme(legend.position = "bottom")
 
-  facet_on_run_free(p, df1)
+  facet_on_run_free(p, df1, run_levels = levels(df$run))
 }
 
 
@@ -497,6 +509,7 @@ slt_session_duration <- function(df, cutoff = c(attr(df, "recording_duration"), 
 latency_df <- function(df) {
   session_levels <- df$session_id %>% unique() %>% sort()
   df_sum <- df %>%
+    convert_run_to_chr() %>%
     filter(event != "WS_RECV_INIT") %>%
     # mutate(session_id = factor(session_id, levels = rev(unique(session_id)))) %>%
     mutate(user_id = paste0("w:", user_id)) %>%
@@ -506,7 +519,8 @@ latency_df <- function(df) {
       levels = c("Homepage", "JS/CSS", "Start session", "Calculate"))) %>%
     group_by(run, session_id, event, user_id, maintenance) %>%
     summarise(total_latency = sum(time), max_latency = max(time)) %>%
-    mutate(colorCol = request_color_column(maintenance, event))
+    mutate(colorCol = request_color_column(maintenance, event)) %>%
+    convert_run_to_fctr(df)
   df_sum
 }
 
@@ -575,7 +589,7 @@ slt_session_latency <- function(df) {
     ) +
     theme(legend.position = "bottom")
 
-  facet_on_run(p, df_sum)
+  facet_on_run(p, df_sum, run_levels = levels(df$run))
 }
 
 #' @describeIn slt_plot Bar chart of total HTTP latency for each session within each run
@@ -647,7 +661,7 @@ slt_websocket_latency <- function(df, cutoff = 10) {
   #   p <- p + theme(legend.position = "bottom")
   # }
 
-  facet_on_run(p, df_sum)
+  facet_on_run(p, df_sum, run_levels = levels(df$run))
 }
 
 

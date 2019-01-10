@@ -104,7 +104,11 @@ shinyloadtest_report <- function(
     file.path(basename(base_output_name), svg_folder, paste0(file, ".svg"))
   }
 
-  df_maintenance <- df %>% filter(maintenance == TRUE)
+  df_maintenance <- df %>%
+    convert_run_to_chr() %>%
+    convert_label_to_chr() %>%
+    filter(maintenance == TRUE) %>%
+    convert_run_to_fctr(df)
 
   latency_height <- 10 * (
       (
@@ -127,7 +131,10 @@ shinyloadtest_report <- function(
   max_duration <- max(gantt_duration_data(df)$end)
   gantt <- lapply(levels(df$run), function(run_val) {
     run_val_clean <- run_val %>% tolower() %>% gsub("[^a-z0-9]", "-", .) %>% paste0("run-", .)
-    df_run <- df %>% filter(run == run_val)
+    df_run <- df %>%
+      convert_run_to_chr() %>%
+      filter(run == run_val) %>%
+      convert_run_to_fctr(df)
 
     tick(paste0(run_val, " Session Gantt"))
     src_gantt <- {
