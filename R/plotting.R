@@ -496,12 +496,24 @@ slt_session_duration <- function(df, cutoff = c(attr(df, "recording_duration"), 
 
 latency_df <- function(df) {
   session_levels <- df$session_id %>% unique() %>% sort()
+
+  rename_event <- function(event) {
+    switch(event,
+      REQ_HOME = "Homepage",
+      REQ_GET = "JS/CSS",
+      WS_OPEN = "Start session",
+      WS_RECV = "Calculate",
+      WS_SEND = "Calculate",
+      event
+    )
+  }
+
   df_sum <- df %>%
     filter(event != "WS_RECV_INIT") %>%
     # mutate(session_id = factor(session_id, levels = rev(unique(session_id)))) %>%
     mutate(user_id = paste0("w:", user_id)) %>%
     mutate(session_id = factor(session_id, levels = session_levels)) %>%
-    mutate(event = c(REQ_HOME="Homepage", REQ_GET="JS/CSS", WS_OPEN="Start session", WS_RECV="Calculate", WS_SEND="Calculate")[event]) %>%
+    mutate(event = vapply(event, rename_event, character(1))) %>%
     mutate(event = factor(event,
       levels = c("Homepage", "JS/CSS", "Start session", "Calculate"))) %>%
     group_by(run, session_id, event, user_id, maintenance) %>%
