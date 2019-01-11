@@ -117,9 +117,11 @@ shinyloadtest_report <- function(
     save_svg_file("http_latency", width = 15, height = latency_height)
 
   tick("Websocket Latency")
-  src_websocket <- df %>%
-    slt_websocket_latency(cutoff = max_websocket_cutoff) %>%
-    save_svg_file("websocket_latency", width = 15, height = latency_height)
+  suppressWarnings({
+    src_websocket <- df %>%
+      slt_websocket_latency(cutoff = max_websocket_cutoff) %>%
+      save_svg_file("websocket_latency", width = 15, height = latency_height)
+  })
 
   # gantt chart plots
   min_gantt_time <- min(df$start)
@@ -176,19 +178,22 @@ shinyloadtest_report <- function(
   })
 
   df_boxplot <- df_maintenance %>%
-    group_by_drop(label, run, input_line_number) %>%
+    ungroup() %>%
+    group_by(label = droplevels(label), run = droplevels(run), input_line_number) %>%
     summarise(
       min_time = min(time, na.rm = TRUE),
       mean_time = mean(time, na.rm = TRUE),
       max_time = max(time, na.rm = TRUE)
     ) %>%
-    group_by_drop(label, input_line_number) %>%
+    ungroup() %>%
+    group_by(label = droplevels(label), input_line_number) %>%
     summarise(
       min_time = min(min_time, na.rm = TRUE),
       max_time = max(max_time, na.rm = TRUE),
       mean_diff = diff(range(mean_time, na.rm = TRUE))
     ) %>%
-    arrange(input_line_number)
+    arrange(input_line_number) %>%
+    ungroup()
 
 
   format_num <- function(x, ...) {
@@ -219,7 +224,8 @@ shinyloadtest_report <- function(
   })
 
   df_model <- df_maintenance %>%
-    group_by_drop(label, run, input_line_number) %>%
+    ungroup() %>%
+    group_by(label = droplevels(label), run = droplevels(run), input_line_number) %>%
     summarise(
       model = list(lm(time ~ concurrency))
     ) %>%
@@ -228,7 +234,8 @@ shinyloadtest_report <- function(
       intercept = vapply(model, function(mod){ coef(mod)[1] }, numeric(1)),
       max_error = vapply(model, function(mod){ max(abs(c(residuals(mod), 0)), na.rm = TRUE) }, numeric(1)),
     ) %>%
-    group_by_drop(label, input_line_number) %>%
+    ungroup() %>%
+    group_by(label = droplevels(label), input_line_number) %>%
     summarise(
       slope_pos = which.max(c(abs(slope), -Inf)),
       slope_val = c(slope, -Inf)[slope_pos] %>% format_num(),
@@ -240,7 +247,8 @@ shinyloadtest_report <- function(
       max_error_val = c(max_error, -Inf)[max_error_pos] %>% format_num(),
       max_error = c(max_error, -Inf)[max_error_pos]
     ) %>%
-    arrange(input_line_number)
+    arrange(input_line_number) %>%
+    ungroup()
 
   # event concurrency
   concurrency <- lapply(df_model$input_line_number, function(input_line_val) {

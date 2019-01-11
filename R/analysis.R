@@ -203,7 +203,8 @@ recording_item_labels <- function(x_list) {
 get_times <- function(df) {
   df %>%
     filter(!is.na(input_line_number)) %>%
-    group_by_drop(run, session_id, user_id, iteration, input_line_number) %>%
+    # run is a character here
+    group_by(run, session_id, user_id, iteration, input_line_number) %>%
     summarise(event = strip_suffix(event[1]),
               start = min(timestamp),
               end = max(timestamp),
@@ -335,7 +336,7 @@ maintenance_df_ids <- function(
 
       # for each 'user', get the max(first start) and min(last end)
       df_time <- df %>%
-        group_by_drop(user_id) %>%
+        group_by(user_id) %>%
         summarise(
           start_time = min(start),
           end_time = max(end)
@@ -344,7 +345,7 @@ maintenance_df_ids <- function(
       end_time <- min(df_time$end_time)
 
       df_times <- df_run %>%
-        group_by_drop(session_id) %>%
+        group_by(session_id) %>%
         summarise(min_start = min(start), max_end = max(end)) %>%
         filter(min_start >= start_time, max_end <= end_time)
 
