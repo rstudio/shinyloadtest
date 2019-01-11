@@ -104,11 +104,7 @@ shinyloadtest_report <- function(
     file.path(basename(base_output_name), svg_folder, paste0(file, ".svg"))
   }
 
-  df_maintenance <- df %>%
-    convert_run_to_chr() %>%
-    convert_label_to_chr() %>%
-    filter(maintenance == TRUE) %>%
-    convert_run_to_fctr(df)
+  df_maintenance <- df %>% filter(maintenance == TRUE)
 
   latency_height <- 10 * (
       (
@@ -132,9 +128,7 @@ shinyloadtest_report <- function(
   gantt <- lapply(levels(df$run), function(run_val) {
     run_val_clean <- run_val %>% tolower() %>% gsub("[^a-z0-9]", "-", .) %>% paste0("run-", .)
     df_run <- df %>%
-      convert_run_to_chr() %>%
-      filter(run == run_val) %>%
-      convert_run_to_fctr(df)
+      filter(run == run_val)
 
     tick(paste0(run_val, " Session Gantt"))
     src_gantt <- {
@@ -182,13 +176,13 @@ shinyloadtest_report <- function(
   })
 
   df_boxplot <- df_maintenance %>%
-    group_by(label, run, input_line_number) %>%
+    group_by_drop(label, run, input_line_number) %>%
     summarise(
       min_time = min(time, na.rm = TRUE),
       mean_time = mean(time, na.rm = TRUE),
       max_time = max(time, na.rm = TRUE)
     ) %>%
-    group_by(label, input_line_number) %>%
+    group_by_drop(label, input_line_number) %>%
     summarise(
       min_time = min(min_time, na.rm = TRUE),
       max_time = max(max_time, na.rm = TRUE),
@@ -225,7 +219,7 @@ shinyloadtest_report <- function(
   })
 
   df_model <- df_maintenance %>%
-    group_by(label, run, input_line_number) %>%
+    group_by_drop(label, run, input_line_number) %>%
     summarise(
       model = list(lm(time ~ concurrency))
     ) %>%
@@ -234,7 +228,7 @@ shinyloadtest_report <- function(
       intercept = vapply(model, function(mod){ coef(mod)[1] }, numeric(1)),
       max_error = vapply(model, function(mod){ max(abs(c(residuals(mod), 0)), na.rm = TRUE) }, numeric(1)),
     ) %>%
-    group_by(label, input_line_number) %>%
+    group_by_drop(label, input_line_number) %>%
     summarise(
       slope_pos = which.max(c(abs(slope), -Inf)),
       slope_val = c(slope, -Inf)[slope_pos] %>% format_num(),
