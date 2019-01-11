@@ -43,7 +43,9 @@ Imports:
     htmltools,
     gtable,
     svglite
-Remotes: rstudio/websocket
+Remotes:
+  rstudio/websocket,
+  tidyverse/dplyr#4091
 RoxygenNote: 6.1.1
 Suggests:
     knitr,
