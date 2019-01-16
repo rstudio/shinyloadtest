@@ -29,6 +29,11 @@ URLBuilder <- R6::R6Class("URLBuilder",
       copy$port <- port
       copy
     },
+    setQuery = function(query = "") {
+      copy <-  self$clone()
+      copy$query <- query
+      copy
+    },
     # TODO Complexity with slashes only belongs in place where appending/joining to existing path
     setPaths = function(paths, raw = TRUE, append = FALSE) {
       stopifnot(is.character(paths))
