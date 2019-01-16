@@ -467,7 +467,13 @@ record_session <- function(target_app_url, host = "127.0.0.1", port = 8600,
     session <- RecordingSession$new(target_app_url, host, port, output_file, sessionCookies)
     on.exit(session$stop())
     message("Listening on ", host, ":", port)
-    if (open_browser) utils::browseURL(paste0("http://", host, ":", port))
+
+    if (open_browser){
+      navUrl <- URLBuilder$new(target_app_url)$setHost(host)$setPort(port)$setScheme("http")$setPaths("")$build()
+      message("Navigating to: ", navUrl)
+      utils::browseURL(navUrl)
+    }
+
     httpuv::service(Inf)
     invisible(TRUE)
 }
