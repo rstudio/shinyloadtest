@@ -307,7 +307,6 @@ RecordingSession <- R6::R6Class("RecordingSession",
       url <- private$makeUrl(req)
       begin <- Sys.time()
       resp_curl <- curl::curl_fetch_memory(url, handle = h)
-
       end <- Sys.time()
       private$mergeCookies(h)
 
