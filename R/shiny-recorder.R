@@ -187,7 +187,7 @@ shouldIgnoreGET <- function(path) {
 RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
     initialize = function(targetAppUrl, host, port, outputFileName, sessionCookies) {
-      private$targetURL <- URLBuilder$new(targetAppUrl)$setQuery()
+      private$targetURL <- URLBuilder$new(targetAppUrl)
       if (grepl("shinyapps.io$", private$targetURL$host)) {
         stop("Recording shinyapps.io apps is not supported")
       }
@@ -237,9 +237,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$sessionCookies <- df
     },
     makeUrl = function(req) {
-      #Check to see if the
-
-      query <- if(length(req$QUERY_STRING) > 0 ) gsub("\\?", "", req$QUERY_STRING) else ""
+      query <- gsub("\\?", "", req$QUERY_STRING)
       private$targetURL$appendPaths(req$PATH_INFO)$setQuery(query)$build()
     },
     makeCurlHandle = function(req) {
@@ -311,7 +309,6 @@ RecordingSession <- R6::R6Class("RecordingSession",
       resp_curl <- curl::curl_fetch_memory(url, handle = h)
 
       end <- Sys.time()
-
       private$mergeCookies(h)
 
       event <- makeHTTPEvent_GET(self$tokens, req, resp_curl, begin, end)
@@ -430,7 +427,6 @@ RecordingSession <- R6::R6Class("RecordingSession",
       })
     },
     startServer = function() {
-
       private$localServer <- httpuv::startServer(private$localHost, private$localPort,
         list(call = private$handleCall, onWSOpen = private$handleWSOpen))
     }
