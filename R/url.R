@@ -48,17 +48,11 @@ URLBuilder <- R6::R6Class("URLBuilder",
       self$setPaths(paths, raw = raw, append = TRUE)
     },
     build = function() {
-      scheme <- paste0(ifelse(is.na(self$scheme), "http", self$scheme), "://")
+      scheme <- paste0(ifelse(self$scheme == "", "http", self$scheme), "://")
       host_port <- paste0(self$host, ifelse(is.na(self$port), "", paste0(":", self$port)))
       paths <- paste(collapse = "/", self$paths)
-      # handling for a query passed on the url
-      if(self$query != ""){
-
-        query <- paste0("?",self$query)
-      } else {
-        query <- ""
-      }
-      paste0(scheme, host_port, "/", paths,query)
+      query <- ifelse(self$query == "", "", paste0("?", self$query))
+      paste0(scheme, host_port, "/", paths, query)
     },
     length = NA,
     scheme = NA,
