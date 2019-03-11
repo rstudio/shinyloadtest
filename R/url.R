@@ -11,6 +11,7 @@ URLBuilder <- R6::R6Class("URLBuilder",
         self$port <- strtoi(parsed[,"port"])
         self$paths <- stringr::str_split(parsed[,"path"], "/")[[1]]
         self$paths <- self$paths[self$paths != "" & !is.na(self$paths)]
+        self$query <- parsed[,"query"]
       }
     },
     setScheme = function(scheme) {
@@ -28,6 +29,11 @@ URLBuilder <- R6::R6Class("URLBuilder",
       copy$port <- port
       copy
     },
+    setQuery = function(query = "") {
+      copy <-  self$clone()
+      copy$query <- query
+      copy
+    },
     # TODO Complexity with slashes only belongs in place where appending/joining to existing path
     setPaths = function(paths, raw = TRUE, append = FALSE) {
       stopifnot(is.character(paths))
@@ -42,15 +48,17 @@ URLBuilder <- R6::R6Class("URLBuilder",
       self$setPaths(paths, raw = raw, append = TRUE)
     },
     build = function() {
-      scheme <- paste0(ifelse(is.na(self$scheme), "http", self$scheme), "://")
+      scheme <- paste0(ifelse(self$scheme == "", "http", self$scheme), "://")
       host_port <- paste0(self$host, ifelse(is.na(self$port), "", paste0(":", self$port)))
       paths <- paste(collapse = "/", self$paths)
-      paste0(scheme, host_port, "/", paths)
+      query <- ifelse(self$query == "", "", paste0("?", self$query))
+      paste0(scheme, host_port, "/", paths, query)
     },
     length = NA,
     scheme = NA,
     host = NA,
     port = NA,
-    paths = character(0)
+    paths = character(0),
+    query = NA
   )
 )
