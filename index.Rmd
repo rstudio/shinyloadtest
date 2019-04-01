@@ -15,7 +15,7 @@ To get started with `shinyloadtest`, read through the quick start guide below.
 
 To perform a load test you'll need two pieces of software: `shinyloadtest` and `shinycannon`.
 
-* `shinyloadtest` is an R package used to generate recordings and analyze results. You should install it on your development machine.
+* `shinyloadtest` is an R package used to generate recordings and analyze results. You should install it on your development machine. If you are installing `shinyloadtest` within a Linux environment, you will need to install `OpenSSL >= 1.0.1` and its associated development libraries as those are required by the [`websocket`](https://github.com/rstudio/websocket) package. On Debian/Ubuntu systems, install the `libssl1.0` and `libssl1.0-dev` software packages. On Redhat/Fedora/CentOS systems, install the `openssl` and `openssl-devel` software packages.
 * `shinycannon` is the command-line replay tool. You can install it on your development machine for testing, but for best results we recommend installing it on a server, and preferably not the one the application under test is also on.
 
 ### `shinyloadtest`
