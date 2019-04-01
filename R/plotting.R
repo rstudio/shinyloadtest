@@ -231,8 +231,7 @@ slt_waterfall <- function(df, limits = c(0, max(df$concurrency, na.rm = TRUE))) 
 #' @export
 slt_hist_loadtimes <- function(df, max_load_time = 5) {
   p <- df %>%
-    ungroup() %>%
-    group_by(run = droplevels(run), session_id) %>%
+    group_by(run = run, session_id) %>%
     summarise(begin = min(start), ready = start[event == "WS_OPEN"], finish = max(end)) %>%
     ggplot(aes(ready - begin)) +
     geom_histogram() +
@@ -280,8 +279,7 @@ request_colors <- function() {
 maintenance_color <- "#2e2e2e"
 maintenance_vline <- function(data, mapping, ...) {
   data <- data %>%
-    ungroup() %>%
-    group_by(run = droplevels(run)) %>%
+    group_by(run) %>%
     filter(maintenance == TRUE) %>%
     summarise(start = min(start), end = max(end), maintenance = "Warmup / Cooldown")
 
@@ -291,8 +289,7 @@ maintenance_vline <- function(data, mapping, ...) {
 }
 maintenance_vline_only <- function(data, mapping, ...) {
   data <- data %>%
-    ungroup() %>%
-    group_by(run = droplevels(run)) %>%
+    group_by(run) %>%
     filter(maintenance == TRUE) %>%
     summarise(start = min(start), end = max(end), maintenance = "Warmup / Cooldown")
 
@@ -300,8 +297,7 @@ maintenance_vline_only <- function(data, mapping, ...) {
 }
 maintenance_session_vline <- function(data, mapping, ...) {
   data <- data %>%
-    ungroup() %>%
-    group_by(run = droplevels(run)) %>%
+    group_by(run) %>%
     filter(maintenance == TRUE) %>%
     summarise(start = min(as.numeric(session_id)) - 0.5, end = max(as.numeric(session_id)) + 0.5, maintenance = "Warmup / Cooldown")
 
@@ -443,10 +439,9 @@ slt_session <- function(df) {
 
 gantt_duration_data <- function(df) {
   df %>%
-    ungroup() %>%
     filter(maintenance == TRUE) %>%
     filter(event %in% c("REQ_HOME", "REQ_GET", "WS_OPEN", "WS_RECV", "WS_SEND")) %>%
-    group_by(run = droplevels(run), session_id, user_id, iteration) %>%
+    group_by(run, session_id, user_id, iteration) %>%
     mutate(end = end - min(start), start = start - min(start)) %>%
     ungroup()
 }
@@ -456,12 +451,10 @@ slt_session_duration <- function(df, cutoff = c(attr(df, "recording_duration"), 
   df1 <- gantt_duration_data(df)
 
   sessions <- df1 %>%
-    ungroup() %>%
-    group_by(run = droplevels(run), session_id, user_id, iteration) %>%
+    group_by(run, session_id, user_id, iteration) %>%
     summarise(max = max(end)) %>%
     arrange(run, desc(max)) %>%
-    ungroup() %>%
-    group_by(run = droplevels(run)) %>%
+    group_by(run) %>%
     mutate(order = 1:length(session_id)) %>%
     ungroup()
 
@@ -504,7 +497,6 @@ slt_session_duration <- function(df, cutoff = c(attr(df, "recording_duration"), 
 latency_df <- function(df) {
   session_levels <- df$session_id %>% unique() %>% sort()
   df_sum <- df %>%
-    ungroup() %>%
     filter(event %in% c("REQ_HOME", "REQ_GET", "WS_OPEN", "WS_RECV", "WS_SEND")) %>%
     # mutate(session_id = factor(session_id, levels = rev(unique(session_id)))) %>%
     mutate(user_id = paste0("w:", user_id)) %>%
@@ -512,8 +504,7 @@ latency_df <- function(df) {
     mutate(event = c(REQ_HOME="Homepage", REQ_GET="JS/CSS", WS_OPEN="Start session", WS_RECV="Calculate", WS_SEND="Calculate")[event]) %>%
     mutate(event = factor(event,
       levels = c("Homepage", "JS/CSS", "Start session", "Calculate"))) %>%
-    ungroup() %>%
-    group_by(run = droplevels(run), session_id, event, user_id, maintenance) %>%
+    group_by(run, session_id, event, user_id, maintenance) %>%
     summarise(total_latency = sum(time), max_latency = max(time)) %>%
     mutate(colorCol = request_color_column(maintenance, event))
   df_sum

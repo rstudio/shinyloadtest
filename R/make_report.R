@@ -183,15 +183,13 @@ shinyloadtest_report <- function(
   })
 
   df_boxplot <- df_maintenance %>%
-    ungroup() %>%
-    group_by(label = droplevels(label), run = droplevels(run), input_line_number) %>%
+    group_by(label, run, input_line_number) %>%
     summarise(
       min_time = min(time, na.rm = TRUE),
       mean_time = mean(time, na.rm = TRUE),
       max_time = max(time, na.rm = TRUE)
     ) %>%
-    ungroup() %>%
-    group_by(label = droplevels(label), input_line_number) %>%
+    group_by(label, input_line_number) %>%
     summarise(
       min_time = min(min_time, na.rm = TRUE),
       max_time = max(max_time, na.rm = TRUE),
@@ -229,8 +227,7 @@ shinyloadtest_report <- function(
   })
 
   df_model <- df_maintenance %>%
-    ungroup() %>%
-    group_by(label = droplevels(label), run = droplevels(run), input_line_number) %>%
+    group_by(label, run, input_line_number) %>%
     summarise(
       model = list(lm(time ~ concurrency))
     ) %>%
@@ -239,8 +236,7 @@ shinyloadtest_report <- function(
       intercept = vapply(model, function(mod){ coef(mod)[1] }, numeric(1)),
       max_error = vapply(model, function(mod){ max(abs(c(residuals(mod), 0)), na.rm = TRUE) }, numeric(1)),
     ) %>%
-    ungroup() %>%
-    group_by(label = droplevels(label), input_line_number) %>%
+    group_by(label, input_line_number) %>%
     summarise(
       slope_pos = which.max(c(abs(slope), -Inf)),
       slope_val = c(slope, -Inf)[slope_pos] %>% format_num(),

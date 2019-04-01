@@ -203,7 +203,6 @@ recording_item_labels <- function(x_list) {
 get_times <- function(df) {
   df %>%
     filter(!is.na(input_line_number)) %>%
-    # run is a character here
     group_by(run, session_id, user_id, iteration, input_line_number) %>%
     summarise(event = strip_suffix(event[1]),
               start = min(timestamp),
