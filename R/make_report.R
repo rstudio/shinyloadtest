@@ -128,8 +128,13 @@ shinyloadtest_report <- function(
   max_gantt_time <- max(df$end)
   max_duration <- max(gantt_duration_data(df)$end)
   gantt <- lapply(levels(df$run), function(run_val) {
-    run_val_clean <- run_val %>% tolower() %>% gsub("[^a-z0-9]", "-", .) %>% paste0("run-", .)
-    df_run <- df %>%
+    run_val_clean <-
+      run_val %>%
+      tolower() %>%
+      gsub("[^a-z0-9]", "-", .) %>%
+      paste0("run-", .)
+    df_run <-
+      df %>%
       filter(run == run_val)
 
     tick(paste0(run_val, " Session Gantt"))
