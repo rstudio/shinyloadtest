@@ -223,7 +223,7 @@ slt_waterfall <- function(df, limits = c(0, max(df$concurrency, na.rm = TRUE))) 
     ) +
     theme(legend.position = "bottom")
 
-  facet_on_run(p, maintenance, run_levels = levels(df$run))
+  facet_on_run(p, maintenance)
 }
 
 
@@ -357,10 +357,9 @@ request_scale_guides <- function(
 }
 
 
-facet_on_run <- function(p, df, col = "run", rows = vars(run), ..., run_levels = levels(df$run)) {
+facet_on_run <- function(p, df, col = "run", rows = vars(run), ...) {
   if (length(unique(df[[col]])) > 1) {
     p <- p + facet_grid(rows = rows, ...)
-    # p$data$run <- factor(p$data$run, levels = run_levels)
   }
   p
 }
@@ -399,7 +398,7 @@ slt_user <- function(df) {
     ) +
     theme(legend.position = "bottom")
 
-  facet_on_run_free(p, df_gantt, run_levels = levels(df$run))
+  facet_on_run_free(p, df_gantt)
 }
 
 #' @describeIn slt_plot Event gantt chart of each user session within each run
@@ -432,7 +431,7 @@ slt_session <- function(df) {
       xlab("Elapsed time (sec)") +
       theme(legend.position = "bottom")
 
-  facet_on_run_free(p, df_session, run_levels = levels(df$run))
+  facet_on_run_free(p, df_session)
 }
 
 
@@ -489,7 +488,7 @@ slt_session_duration <- function(df, cutoff = c(attr(df, "recording_duration"), 
       ) +
       theme(legend.position = "bottom")
 
-  facet_on_run_free(p, df1, run_levels = levels(df$run))
+  facet_on_run_free(p, df1)
 }
 
 
@@ -587,7 +586,7 @@ slt_session_latency <- function(df) {
     ) +
     theme(legend.position = "bottom")
 
-  facet_on_run(p, df_sum, run_levels = levels(df$run))
+  facet_on_run(p, df_sum)
 }
 
 #' @describeIn slt_plot Bar chart of total HTTP latency for each session within each run
@@ -659,7 +658,7 @@ slt_websocket_latency <- function(df, cutoff = 10) {
   #   p <- p + theme(legend.position = "bottom")
   # }
 
-  facet_on_run(p, df_sum, run_levels = levels(df$run))
+  facet_on_run(p, df_sum)
 }
 
 
