@@ -231,7 +231,7 @@ slt_waterfall <- function(df, limits = c(0, max(df$concurrency, na.rm = TRUE))) 
 #' @export
 slt_hist_loadtimes <- function(df, max_load_time = 5) {
   p <- df %>%
-    group_by(run = run, session_id) %>%
+    group_by(run, session_id) %>%
     summarise(begin = min(start), ready = start[event == "WS_OPEN"], finish = max(end)) %>%
     ggplot(aes(ready - begin)) +
     geom_histogram() +
