@@ -27,7 +27,7 @@ Imports:
     getPass,
     ggplot2,
     tibble,
-    dplyr,
+    dplyr (>= 0.8.0.1),
     readr,
     magrittr,
     viridis,
@@ -43,7 +43,8 @@ Imports:
     htmltools,
     gtable,
     svglite
-Remotes: rstudio/websocket
+Remotes:
+  rstudio/websocket
 RoxygenNote: 6.1.1
 Suggests:
     knitr,

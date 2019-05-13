@@ -117,17 +117,25 @@ shinyloadtest_report <- function(
     save_svg_file("http_latency", width = 15, height = latency_height)
 
   tick("Websocket Latency")
-  src_websocket <- df %>%
-    slt_websocket_latency(cutoff = max_websocket_cutoff) %>%
-    save_svg_file("websocket_latency", width = 15, height = latency_height)
+  suppressWarnings({
+    src_websocket <- df %>%
+      slt_websocket_latency(cutoff = max_websocket_cutoff) %>%
+      save_svg_file("websocket_latency", width = 15, height = latency_height)
+  })
 
   # gantt chart plots
   min_gantt_time <- min(df$start)
   max_gantt_time <- max(df$end)
   max_duration <- max(gantt_duration_data(df)$end)
   gantt <- lapply(levels(df$run), function(run_val) {
-    run_val_clean <- run_val %>% tolower() %>% gsub("[^a-z0-9]", "-", .) %>% paste0("run-", .)
-    df_run <- df %>% filter(run == run_val)
+    run_val_clean <-
+      run_val %>%
+      tolower() %>%
+      gsub("[^a-z0-9]", "-", .) %>%
+      paste0("run-", .)
+    df_run <-
+      df %>%
+      filter(run == run_val)
 
     tick(paste0(run_val, " Session Gantt"))
     src_gantt <- {
@@ -187,7 +195,8 @@ shinyloadtest_report <- function(
       max_time = max(max_time, na.rm = TRUE),
       mean_diff = diff(range(mean_time, na.rm = TRUE))
     ) %>%
-    arrange(input_line_number)
+    arrange(input_line_number) %>%
+    ungroup()
 
 
   format_num <- function(x, ...) {
@@ -239,7 +248,8 @@ shinyloadtest_report <- function(
       max_error_val = c(max_error, -Inf)[max_error_pos] %>% format_num(),
       max_error = c(max_error, -Inf)[max_error_pos]
     ) %>%
-    arrange(input_line_number)
+    arrange(input_line_number) %>%
+    ungroup()
 
   # event concurrency
   concurrency <- lapply(df_model$input_line_number, function(input_line_val) {

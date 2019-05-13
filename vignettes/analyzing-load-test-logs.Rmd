@@ -173,9 +173,9 @@ Both runs were executed against a Shiny application supported by a single proces
 <!-- ```{r} -->
 <!-- library(dplyr) -->
 <!-- df %>%  -->
-<!--   group_by(run, session_id, user_id) %>%  -->
+<!--   group_by(run, session_id, user_id, .drop = TRUE) %>%  -->
 <!--   summarise(duration = max(end) - min(start)) %>% -->
-<!--   group_by(run) %>%  -->
+<!--   group_by(run, .drop = TRUE) %>%  -->
 <!--   summarize( -->
 <!--     avg_duration = mean(duration),  -->
 <!--     stagger_start = avg_duration / length(unique(user_id))) -->

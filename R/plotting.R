@@ -231,7 +231,6 @@ slt_waterfall <- function(df, limits = c(0, max(df$concurrency, na.rm = TRUE))) 
 #' @export
 slt_hist_loadtimes <- function(df, max_load_time = 5) {
   p <- df %>%
-    filter(maintenance == TRUE) %>%
     group_by(run, session_id) %>%
     summarise(begin = min(start), ready = start[event == "WS_OPEN"], finish = max(end)) %>%
     ggplot(aes(ready - begin)) +
@@ -364,15 +363,15 @@ facet_on_run <- function(p, df, col = "run", rows = vars(run), ...) {
   }
   p
 }
-facet_on_run_free <- function(p, df, col = "run", rows = vars(run)) {
-  facet_on_run(p, df, col, rows, scales = "free_y", space = "free_y")
+facet_on_run_free <- function(p, df, col = "run", rows = vars(run), ...) {
+  facet_on_run(p, df, col, rows, scales = "free_y", space = "free_y", ...)
 }
 
 #' @describeIn slt_plot Gantt chart of event duration for each user within each run
 #' @export
 slt_user <- function(df) {
   df_gantt <- df %>%
-    filter(event != "WS_RECV_INIT", event != "WS_CLOSE") %>%
+    filter(event %in% c("REQ_HOME", "REQ_GET", "WS_OPEN", "WS_RECV", "WS_SEND")) %>%
     mutate(user_id = factor(user_id, levels = rev(unique(user_id)))) %>%
     mutate(center = (end + start) / 2) %>%
     mutate(event = factor(event,
@@ -406,7 +405,8 @@ slt_user <- function(df) {
 #' @export
 slt_session <- function(df) {
   df_session <- df %>%
-    filter(event != "WS_RECV_INIT") %>%
+    ungroup() %>%
+    filter(event %in% c("REQ_HOME", "REQ_GET", "WS_OPEN", "WS_RECV", "WS_SEND")) %>%
     mutate(user_id = factor(user_id, levels = sort(unique(user_id)))) %>%
     mutate(session_id = factor(session_id, levels = rev(sort(unique(session_id))))) %>%
     mutate(center = (end + start) / 2) %>%
@@ -439,7 +439,7 @@ slt_session <- function(df) {
 gantt_duration_data <- function(df) {
   df %>%
     filter(maintenance == TRUE) %>%
-    filter(event != "WS_RECV_INIT") %>%
+    filter(event %in% c("REQ_HOME", "REQ_GET", "WS_OPEN", "WS_RECV", "WS_SEND")) %>%
     group_by(run, session_id, user_id, iteration) %>%
     mutate(end = end - min(start), start = start - min(start)) %>%
     ungroup()
@@ -450,7 +450,6 @@ slt_session_duration <- function(df, cutoff = c(attr(df, "recording_duration"), 
   df1 <- gantt_duration_data(df)
 
   sessions <- df1 %>%
-    filter(event != "WS_RECV_INIT") %>%
     group_by(run, session_id, user_id, iteration) %>%
     summarise(max = max(end)) %>%
     arrange(run, desc(max)) %>%
@@ -509,7 +508,7 @@ latency_df <- function(df) {
   }
 
   df_sum <- df %>%
-    filter(event != "WS_RECV_INIT") %>%
+    filter(event %in% c("REQ_HOME", "REQ_GET", "WS_OPEN", "WS_RECV", "WS_SEND")) %>%
     # mutate(session_id = factor(session_id, levels = rev(unique(session_id)))) %>%
     mutate(user_id = paste0("w:", user_id)) %>%
     mutate(session_id = factor(session_id, levels = session_levels)) %>%
