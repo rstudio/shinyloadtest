@@ -6,3 +6,5 @@ shinyloadtest_report/*
 shinyloadtest_report.html
 output/*
 .DS_Store
+*.swp
+*.swo
