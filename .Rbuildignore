@@ -13,3 +13,5 @@
 ^RELEASE_URLS\.txt$
 ^_pkgdown.yml$
 ^scripts/
+^doc$
+^Meta$
