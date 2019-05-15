@@ -147,7 +147,7 @@ suppressPackageStartupMessages(base::library(dplyr, quiet = TRUE))
 suppressPackageStartupMessages(base::library(shinyloadtest, quiet = TRUE))
 df %>%
   filter(run == "4 users") %>%
-  slt_session_duration()
+  slt_user()
 ```
 
 Maintenance period: During a load test, user sessions are not all started at exactly the same time. Instead, user requests are staggered over a warmup period. Once the targeted number of concurrent sessions is reached, the maintenance period begins during which time shinycannon maintains the number of user sessions. After the desired test duration is reached, user sessions begin ending during a cooldown period. Sessions that are desaturated in color occurred during the warmup or cooldown. The maintenance period is marked with vertical dotted lines spanning every simulated user.
