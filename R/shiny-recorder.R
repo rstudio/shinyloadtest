@@ -184,6 +184,12 @@ shouldIgnoreGET <- function(path) {
   length(unlist(stringr::str_match_all(path, ignoreGET))) > 0
 }
 
+CLIENT_WS_STATE <- list(
+  UNOPENED = "UNOPENED",
+  OPEN = "OPEN",
+  CLOSED = "CLOSED"
+)
+
 RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
     initialize = function(targetAppUrl, host, port, outputFileName, sessionCookies) {
@@ -224,7 +230,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
     outputFileName = NULL,
     outputFile = NULL,
     sessionCookies = data.frame(),
-    clientWsState = NULL,
+    clientWsState = CLIENT_WS_STATE$UNOPENED,
     postFileCounter = 0,
     writeEvent = function(evt) {
       writeLines(format(evt), private$outputFile)
@@ -323,7 +329,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
     },
     handleWSOpen = function(clientWS) {
       message("Client connected")
-      private$clientWsState <- "OPEN"
+      private$clientWsState <- CLIENT_WS_STATE$OPEN
 
       match <- stringr::str_match(clientWS$request$PATH_INFO, "/(\\w+/\\w+)/websocket$")
       if (!is.na(match[[1]])) self$tokens[[match[[2]]]] <- "${SOCKJSID}"
@@ -386,9 +392,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
       })
       serverWS$onClose(function(event) {
         message("Server disconnected")
-        if (private$clientWsState == "OPEN") {
+        if (private$clientWsState == CLIENT_WS_STATE$OPEN) {
           clientWS$close()
-          private$clientWsState <- "CLOSED"
+          private$clientWsState <- CLIENT_WS_STATE$CLOSED
         }
       })
       serverWS$onOpen(function(event) {
@@ -397,6 +403,11 @@ RecordingSession <- R6::R6Class("RecordingSession",
         for (msg in msgs) {
           serverWS$send(msg)
         }
+      })
+      serverWS$onError(function(event) {
+        message(paste0("Server WebSocket error: ", event$message))
+        clientWS$close()
+        private$clientWsState <- CLIENT_WS_STATE$CLOSED
       })
 
       serverSendBuffer <- list()
