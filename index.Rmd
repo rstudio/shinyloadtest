@@ -101,7 +101,7 @@ Record a session using the `record_session` function in the `shinyloadtest` pack
 shinyloadtest::record_session('https://shinyapp.example.com/')
 ```
 
-You should substitute `https://shinyapp.example.com/` for the URL of the Shiny app you'd like to record. If your application requires authentication you should consult the [authentication article][authentication]. You should also be aware that [certain Shiny features][limitations] are not compatible with shinyloadtest.
+You should substitute `https://shinyapp.example.com/` for the URL of the Shiny app you'd like to record. If your application requires authentication you should consult the [authentication article](articles/load-testing-authenticated-apps.html). You should also be aware that [certain Shiny features](articles/limitations-of-shinyloadtest.html) are not compatible with shinyloadtest.
 
 Running the function will open a browser displaying the app. Once open, interact with the application as a normal user would and then close the browser. After closing the browser window or tab, a file will be created that contains a recording of the session. This recording, written to `recording.log` by default, will serve as the basis for the load test.
 
