@@ -6,7 +6,7 @@ help:
 	@echo "make RELEASE_URLS.txt: update the shinycannon download links. You should do this after releasing shinycannon."
 	@echo "make site: build docs/vignettes and the doc site, which is hosted on github"
 	@echo "make devcheck: runs devtools::check() without building vignettes, since we have a separate/special process for doing that (make site, above)"
-	@echo "make build: runs devtools::build() without building vignettes, since we have a separate/special process for doing that (make site, above)"
+	@echo "make devbuild: runs devtools::build() without building vignettes, since we have a separate/special process for doing that (make site, above)"
 	@echo "make clean: clean the docs and doc site"
 
 # Updates RELEASE_URLS.txt file.
