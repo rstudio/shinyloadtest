@@ -122,7 +122,7 @@ Once `shinycannon` has started, you should see output like the following:
 - Messages labeled `[progress]` are status messages printed every 5 seconds until the run is complete.
 - Messages labeled `[thread00]` are produced by the parent thread supervising the run, and contain information about state transitions. A run moves through 3 states as it progresses: warming up, maintaining, and cooling down. The warmup and cooldown periods are those during which workers are gradually starting or stopping. Maintenance is the period during which all workers are running, and its length is governed by the `--loaded-duration-minutes` option.
 
-> Note: If you see any messages of severity ERROR, the run hasn't necessarily failed, but the metrics it produces may not be usable. You should investigate the error and re-run. Every shinycannon output directory contains a `debug.log` file which may be useful to look at as you investigate.
+> Note: If you see any messages of severity ERROR, the run hasn't necessarily failed, but the metrics it produces may not be usable. You should investigate the error and re-run. The `--debug` flag will result in the creation of a `debug.log` file in the output directory, which may be useful for debugging but can get really big.
 
 ### Comparison run
 
