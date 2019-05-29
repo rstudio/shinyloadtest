@@ -45,13 +45,13 @@ open_browser <- if (length(Sys.getenv("HEADLESS")) > 0) FALSE else TRUE
     "Run 1" = "vignettes/test_sessions/scaling_case_study_run1/",
     "Run 5" = "vignettes/test_sessions/scaling_case_study_run5/"
   ) %>%
-    shinyloadtest_report("vignettes/case_studies/case_study_report1.html", open_browser = open_browser)
+    shinyloadtest_report("vignettes/case_studies/case_study_report1.html", self_contained = TRUE, open_browser = open_browser)
 
   # Second report mentioned in scaling case study
   load_runs(
     "Run 5" = "vignettes/test_sessions/scaling_case_study_run5/",
     "Run 5 new" = "vignettes/test_sessions/scaling_case_study_run5_new_settings/"
   ) %>%
-    shinyloadtest_report("vignettes/case_studies/case_study_report2.html", open_browser = open_browser)
+    shinyloadtest_report("vignettes/case_studies/case_study_report2.html", self_contained = TRUE, open_browser = open_browser)
 
 })()
