@@ -192,7 +192,7 @@ CLIENT_WS_STATE <- list(
 
 RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
-    initialize = function(targetAppUrl, host, port, outputFileName, sessionCookies) {
+    initialize = function(targetAppUrl, host, port, outputFileName) {
       private$targetURL <- URLBuilder$new(targetAppUrl)
       if (grepl("shinyapps.io$", private$targetURL$host)) {
         stop("Recording shinyapps.io apps is not supported")
@@ -206,7 +206,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
         paste0("# target: ", targetAppUrl)
       )
       writeLines(header, private$outputFile)
-      private$sessionCookies <- sessionCookies
+      initializeSessionCookies()
       private$startServer()
     },
     stop = function() {
@@ -236,6 +236,19 @@ RecordingSession <- R6::R6Class("RecordingSession",
       writeLines(format(evt), private$outputFile)
       flush(private$outputFile)
     },
+    initializeSessionCookies = function() {
+      private$sessionCookies <- if (isProtected(private$targetURL)) {
+        username <- getPass::getPass("Enter your username: ")
+        if (is.null(username)) {
+          return(invisible(FALSE))
+        }
+        password <- getPass::getPass("Enter your password: ")
+        if (is.null(password)) {
+          return(invisible(FALSE))
+        }
+        postLogin(target_app_url, username, password)
+      } else data.frame()
+    }
     mergeCookies = function(handle) {
       df <- curl::handle_cookies(handle)[,c("name", "value")]
       df <- rbind(private$sessionCookies, df)
@@ -462,18 +475,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #' @export
 record_session <- function(target_app_url, host = "127.0.0.1", port = 8600,
   output_file = "recording.log", open_browser = TRUE) {
-    sessionCookies <- if (isProtected(target_app_url)) {
-      username <- getPass::getPass("Enter your username: ")
-      if (is.null(username)) {
-        return(invisible(FALSE))
-      }
-      password <- getPass::getPass("Enter your password: ")
-      if (is.null(password)) {
-        return(invisible(FALSE))
-      }
-      postLogin(target_app_url, username, password)
-    } else data.frame()
-    session <- RecordingSession$new(target_app_url, host, port, output_file, sessionCookies)
+    session <- RecordingSession$new(target_app_url, host, port, output_file)
     on.exit(session$stop())
     message("Listening on ", host, ":", port)
 

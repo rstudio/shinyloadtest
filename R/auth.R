@@ -16,8 +16,13 @@ pasteParams <- function(df, collapse) {
   }
 }
 
-# Returns string "unknown", "ssp", "rsc"
 # TODO "shinyapps.io"
+SERVER_TYPE <- list(
+  RSC = "RStudio Server Connect",
+  SSP = "Shiny Server or Shiny Server Pro",
+  UNK = "Unknown"
+)
+
 servedBy <- function(appUrl) {
   h <- curl::new_handle()
   curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0)
@@ -26,11 +31,11 @@ servedBy <- function(appUrl) {
   headers <- curl::parse_headers_list(resp$headers)
   if (nrow(df[which(df$name == "SSP-XSRF"),]) == 1
     || isTRUE(headers[["x-powered-by"]] %in% c("Express", "Shiny Server", "Shiny Server Pro"))) {
-    return("ssp")
+    return(SERVER_TYPE$SSP)
   } else if (nrow(df[which(df$name == "rscid"),]) == 1) {
-    return("rsc")
+    return(SERVER_TYPE$RSC)
   }
-  "unknown"
+  SERVER_TYPE$UNK
 }
 
 isProtected <- function(appUrl) {
@@ -82,16 +87,18 @@ postLogin <- function(appUrl, username, password) {
     name = c("username", "password"), value = c(username, password))
   )
   cookies <- curl::handle_cookies(h)[,c("name", "value")]
-  if (appServer == "rsc") {
+  if (appServer == SERVER_TYPE$RSC) {
     handlePost(handle = curl::new_handle(), loginUrl = loginUrl,
       postfields = paste0('{"username": "', username, '", "password": "', password, '"}'),
       cookies = cookies, cookieName = "rsconnect"
     )
-  } else if (appServer == "ssp") {
+  } else if (appServer == SERVER_TYPE$SSP) {
     handlePost(handle = curl::new_handle(), loginUrl = loginUrl,
       postfields = utils::URLencode(pasteParams(inputs, "&")),
       cookies = cookies, cookieName = "session_state"
     )
+  } else {
+    stop("Don't know how login to unknown server type")
   }
 }
 
