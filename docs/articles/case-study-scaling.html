@@ -188,7 +188,7 @@ record_session("https://rsc.example.com/content/1234/")</a></code></pre>
 <li>Messages labeled <code>[thread00]</code> are produced by the parent thread supervising the run, and contain information about state transitions. A run moves through 3 states as it progresses: warming up, maintaining, and cooling down. The warmup and cooldown periods are those during which workers are gradually starting or stopping. Maintenance is the period during which all workers are running, and its length is governed by the <code>--loaded-duration-minutes</code> option.</li>
 </ul>
 <blockquote>
-<p>Note: If you see any messages of severity ERROR, the run hasn’t necessarily failed, but the metrics it produces may not be usable. You should investigate the error and re-run. Every shinycannon output directory contains a <code>debug.log</code> file which may be useful to look at as you investigate.</p>
+<p>Note: If you see any messages of severity ERROR, the run hasn’t necessarily failed, but the metrics it produces may not be usable. You should investigate the error and re-run. The <code>--debug</code> flag will result in the creation of a <code>debug.log</code> file in the output directory, which may be useful for debugging but can get really big.</p>
 </blockquote>
 </div>
 <div id="comparison-run" class="section level3">
