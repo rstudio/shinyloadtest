@@ -15,6 +15,17 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 BugReports: https://github.com/rstudio/shinyloadtest/issues
+Collate:
+  'enum.R'
+  'analysis.R'
+  'auth.R'
+  'make_report.R'
+  'plotting.R'
+  'shiny-recorder.R'
+  'url.R'
+  'util.R'
+  'utils-pipe.R'
+  'utils-tidy-eval.R'
 Imports:
     websocket (>= 0.0.0.9001),
     curl,

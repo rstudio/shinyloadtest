@@ -184,11 +184,7 @@ shouldIgnoreGET <- function(path) {
   length(unlist(stringr::str_match_all(path, ignoreGET))) > 0
 }
 
-CLIENT_WS_STATE <- list(
-  UNOPENED = "UNOPENED",
-  OPEN = "OPEN",
-  CLOSED = "CLOSED"
-)
+CLIENT_WS_STATE <- enum(UNOPENED, OPEN, CLOSED)
 
 RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
@@ -206,7 +202,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
         paste0("# target: ", targetAppUrl)
       )
       writeLines(header, private$outputFile)
-      initializeSessionCookies()
+      private$initializeSessionCookies()
       private$startServer()
     },
     stop = function() {

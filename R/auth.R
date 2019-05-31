@@ -16,12 +16,11 @@ pasteParams <- function(df, collapse) {
   }
 }
 
-SERVER_TYPE <- list(
+SERVER_TYPE <- enum(
   RSC = "RStudio Server Connect",
   SSP = "Shiny Server or Shiny Server Pro",
   SAI = "shinyapps.io",
-  SHN = "R/Shiny",
-  UNK = "Unknown"
+  SHN = "R/Shiny"
 )
 
 servedBy <- function(appUrl) {
@@ -40,17 +39,12 @@ servedBy <- function(appUrl) {
   srcs <- srcs[!is.na(srcs)]
 
   hasShinyJS <- any(grepl("/shiny.min.js$", srcs))
-  hasShinyClientJS <- any(grepl("/shiny-server-client.js$", srcs))
 
-  if (hasShinyJS && hasShinyClientJS) {
-    if (nrow(df[which(df$name == "SSP-XSRF"),]) == 1
-      || isTRUE(headers[["x-powered-by"]] %in% c("Express", "Shiny Server", "Shiny Server Pro"))) {
-      return(SERVER_TYPE$SSP)
-    } else if (nrow(df[which(df$name == "rscid"),]) == 1) {
-      return(SERVER_TYPE$RSC)
-    } else {
-      return(SERVER_TYPE$UNK)
-    }
+  if (nrow(df[which(df$name == "SSP-XSRF"),]) == 1
+    || isTRUE(headers[["x-powered-by"]] %in% c("Express", "Shiny Server", "Shiny Server Pro"))) {
+    return(SERVER_TYPE$SSP)
+  } else if (nrow(df[which(df$name == "rscid"),]) == 1) {
+    return(SERVER_TYPE$RSC)
   } else if (hasShinyJS) {
     return(SERVER_TYPE$SHN)
   } else {
@@ -107,19 +101,21 @@ postLogin <- function(appUrl, username, password) {
     name = c("username", "password"), value = c(username, password))
   )
   cookies <- curl::handle_cookies(h)[,c("name", "value")]
-  if (appServer == SERVER_TYPE$RSC) {
-    handlePost(handle = curl::new_handle(), loginUrl = loginUrl,
-      postfields = paste0('{"username": "', username, '", "password": "', password, '"}'),
-      cookies = cookies, cookieName = "rsconnect"
-    )
-  } else if (appServer == SERVER_TYPE$SSP) {
-    handlePost(handle = curl::new_handle(), loginUrl = loginUrl,
-      postfields = utils::URLencode(pasteParams(inputs, "&")),
-      cookies = cookies, cookieName = "session_state"
-    )
-  } else {
-    stop("Don't know how login to unknown server type")
-  }
+
+  enum_case(appServer,
+    RSC = handlePost(
+            handle = curl::new_handle(),
+            loginUrl = loginUrl,
+            postfields = paste0('{"username": "', username, '", "password": "', password, '"}'),
+            cookies = cookies, cookieName = "rsconnect"
+          ),
+    SSP = handlePost(
+            handle = curl::new_handle(),
+            loginUrl = loginUrl,
+            postfields = utils::URLencode(pasteParams(inputs, "&")),
+            cookies = cookies, cookieName = "session_state"
+          )
+  )
 }
 
 getApp <- function(appUrl, cookie) {

@@ -1,21 +1,30 @@
-enum_field <- function(name) {
+enum_field <- function(name, description) {
   env <- as.environment(list(
     name = name,
+    description = description,
     parent = NULL,
     set_parent = function(parent) (env$parent <- parent)
   ))
-  structure(env, class = "shinyloadtest.enum_field")
+  structure(env, class = "shinyloadtest_enum_field")
 }
 
-`==.shinyloadtest.enum_field` <- identical
+`==.shinyloadtest_enum_field` <- identical
+
+`format.shinyloadtest_enum_field` <- function(field) {
+  sprintf("<enum_field: %s = '%s'>", field$name, field$description)
+}
+
+`print.shinyloadtest_enum_field` <- function(field) {
+  cat(format(field), "\n")
+}
 
 enum <- function(...) {
-  # TODO Use rlang for ... here
-  fields <- as.character(eval(substitute(alist(...))))
-  stopifnot(all(grepl("^[[:upper:]]+$", fields)))
-  stopifnot(base::setequal(fields, unique(fields)))
-  enum_fields <- lapply(fields, function(f) enum_field(f))
-  self <- structure(list(fields = enum_fields), class = "shinyloadtest.enum")
+  fields <- rlang::enexprs(..., .named = TRUE, .homonyms = "error")
+  stopifnot(all(grepl("^[[:upper:]]+$", names(fields))))
+  enum_fields <- lapply(names(fields), function(name) {
+    enum_field(name, as.character(fields[[name]]))
+  })
+  self <- structure(list(fields = enum_fields), class = "shinyloadtest_enum")
   for (field in enum_fields) field$set_parent(self)
   self
 }
@@ -24,13 +33,13 @@ enum_fieldnames <- function(enum) {
   vapply(enum[["fields"]], function(field) field$name, character(1))
 }
 
-`$.shinyloadtest.enum` <- function(x, fld) {
-  for (f in x[["fields"]]) if (f$name == fld) return(f)
-  stop(paste0("Unknown field '", fld, "' of enum"))
+`$.shinyloadtest_enum` <- function(x, field_name) {
+  for (f in x[["fields"]]) if (f$name == field_name) return(f)
+  stop(paste0("Unknown field '", field_name, "' of enum"))
 }
 
 enum_case <- function(field, ...) {
-  stopifnot(class(field) == "shinyloadtest.enum_field")
+  stopifnot(class(field) == "shinyloadtest_enum_field")
   cases <- rlang::enexprs(..., .named = TRUE, .homonyms = "error")
   unknown_fields <- base::setdiff(names(cases), enum_fieldnames(field$parent))
   if (length(unknown_fields)) stop(paste("Unknown field names", unknown_fields))
