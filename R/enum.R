@@ -7,11 +7,7 @@ enum_field <- function(name) {
   structure(env, class = "shinyloadtest.enum_field")
 }
 
-`==.shinyloadtest.enum_field` <- function(f1, f2) {
-  if (!(class(f2) == "shinyloadtest.enum_field")) return(FALSE)
-  stopifnot(!is.null(f1$parent) && !is.null(f2$parent))
-  (f1$parent == f2$parent) && (f1$name == f2$name)
-}
+`==.shinyloadtest.enum_field` <- identical
 
 enum <- function(...) {
   # TODO Use rlang for ... here
@@ -27,8 +23,6 @@ enum <- function(...) {
 enum_fieldnames <- function(enum) {
   vapply(enum[["fields"]], function(field) field$name, character(1))
 }
-
-`==.shinyloadtest.enum` <- identical
 
 `$.shinyloadtest.enum` <- function(x, fld) {
   for (f in x[["fields"]]) if (f$name == fld) return(f)
