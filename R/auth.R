@@ -16,26 +16,46 @@ pasteParams <- function(df, collapse) {
   }
 }
 
-# TODO "shinyapps.io"
 SERVER_TYPE <- list(
   RSC = "RStudio Server Connect",
   SSP = "Shiny Server or Shiny Server Pro",
+  SAI = "shinyapps.io",
+  SHN = "R/Shiny",
   UNK = "Unknown"
 )
 
 servedBy <- function(appUrl) {
+
+  if (grepl("\\.shinyapps\\.io$", URLBuilder$new(appUrl)$host)) return(SERVER_TYPE$SAI)
+
   h <- curl::new_handle()
   curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0)
   resp <- curl::curl_fetch_memory(appUrl, handle = h)
   df <- curl::handle_cookies(h)
   headers <- curl::parse_headers_list(resp$headers)
-  if (nrow(df[which(df$name == "SSP-XSRF"),]) == 1
-    || isTRUE(headers[["x-powered-by"]] %in% c("Express", "Shiny Server", "Shiny Server Pro"))) {
-    return(SERVER_TYPE$SSP)
-  } else if (nrow(df[which(df$name == "rscid"),]) == 1) {
-    return(SERVER_TYPE$RSC)
+
+  html <- xml2::read_html(rawToChar(resp$content))
+  scripts <- xml2::xml_find_all(html, "//script")
+  srcs <- unlist(lapply(scripts, function(script) xml2::xml_attr(script, "src")))
+  srcs <- srcs[!is.na(srcs)]
+
+  hasShinyJS <- any(grepl("/shiny.min.js$", srcs))
+  hasShinyClientJS <- any(grepl("/shiny-server-client.js$", srcs))
+
+  if (hasShinyJS && hasShinyClientJS) {
+    if (nrow(df[which(df$name == "SSP-XSRF"),]) == 1
+      || isTRUE(headers[["x-powered-by"]] %in% c("Express", "Shiny Server", "Shiny Server Pro"))) {
+      return(SERVER_TYPE$SSP)
+    } else if (nrow(df[which(df$name == "rscid"),]) == 1) {
+      return(SERVER_TYPE$RSC)
+    } else {
+      return(SERVER_TYPE$UNK)
+    }
+  } else if (hasShinyJS) {
+    return(SERVER_TYPE$SHN)
+  } else {
+    stop(paste("Target URL", appUrl, "does not appear to be a Shiny application."))
   }
-  SERVER_TYPE$UNK
 }
 
 isProtected <- function(appUrl) {
