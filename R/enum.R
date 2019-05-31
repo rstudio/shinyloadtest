@@ -60,7 +60,7 @@ enum_case <- function(field, ...) {
 # A conditional construct, `enum_case`, is provided to dispatch
 # on a field and to perform exhaustiveness checking at runtime:
 #
-# some_field <- frobs$FOO
+# some_field <- Frobs$FOO
 # enum_case(some_field,
 #   FOO = "foo",
 #   BAR = "bar"
@@ -72,7 +72,7 @@ enum_case <- function(field, ...) {
 # An error message is also produced if a field is mentioned that doesn't exist
 # in the enum:
 #
-# some_field <- frobs$FOO
+# some_field <- Frobs$FOO
 # enum_case(some_field,
 #   FOO = "foo",
 #   BAR = "bar",
