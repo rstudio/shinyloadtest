@@ -24,6 +24,13 @@ types$LOL # Error in `$.shinyloadtest.enum`(types, LOL) : Unknown field 'LOL' of
 
 enum_case <- function(enum, ...) {
   stopifnot(class(enum) == "shinyloadtest.enum")
-  # TODO dispatch on clauses, ensure exhaustiveness
+  # TODO check exhaustiveness, eval matching field handler
 }
+
+# enum_case(types,
+#   FOO = "foo",
+#   BAR = "bar"
+# )
+#
+# Error: field BAZ of enum 'types' is not handled
 
