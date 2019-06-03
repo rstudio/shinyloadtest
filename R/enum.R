@@ -20,10 +20,9 @@ enum <- function(...) {
 }
 
 `$.shinyloadtest_enum` <- function(x, i) {
-  if (!(i %in% names(x))) stop("Invalid enum value")
+  if (!(i %in% names(x))) stop("Unknown enum value")
   NextMethod()
 }
-`[[.shinyloadtest_enum` <- `$.shinyloadtest_enum`
 
 enum_case <- function(field, ...) {
   stopifnot(class(field) == "shinyloadtest_enum_value")
@@ -31,10 +30,10 @@ enum_case <- function(field, ...) {
   all_val <- attr(field, "all_val")
 
   unknown_values <- base::setdiff(names(cases), all_val)
-  if (length(unknown_values)) stop(paste("unknown enum value", unknown_values, collapse = ", "))
+  if (length(unknown_values)) stop(paste("Unknown enum value", unknown_values, collapse = ", "))
 
   missing_values <- base::setdiff(attr(field, "all_val"), names(cases))
-  if (length(missing_values)) stop(paste("missing enum value", missing_values, collapse = ", "))
+  if (length(missing_values)) stop(paste("Missing enum value", missing_values, collapse = ", "))
 
   rlang::eval_tidy(cases[[attr(field, "val")]])
 }
