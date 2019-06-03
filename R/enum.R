@@ -1,51 +1,42 @@
-enum_field <- function(name, description) {
-  env <- as.environment(list(
-    name = name,
-    description = description,
-    parent = NULL,
-    set_parent = function(parent) (env$parent <- parent)
-  ))
-  structure(env, class = "shinyloadtest_enum_field")
+enum_value <- function(x, enum_id) {
+  structure(x, enum_id = enum_id, class = "shinyloadtest_enum_value")
 }
 
-`==.shinyloadtest_enum_field` <- identical
-
-`format.shinyloadtest_enum_field` <- function(field) {
-  sprintf("<enum_field: %s = '%s'>", field$name, field$description)
+`==.shinyloadtest_enum_value` <- function(x, y) {
+  if (class(y) != "shinyloadtest_enum_value") return(FALSE)
+  identical(x, y) && (attr(x, "enum_id") == attr(y, "enum_id"))
 }
 
-`print.shinyloadtest_enum_field` <- function(field) {
-  cat(format(field), "\n")
-}
+enum_counter <- 0
 
 enum <- function(...) {
-  fields <- rlang::enexprs(..., .named = TRUE, .homonyms = "error")
-  stopifnot(all(grepl("^[[:upper:]]+$", names(fields))))
-  enum_fields <- lapply(names(fields), function(name) {
-    enum_field(name, as.character(fields[[name]]))
-  })
-  self <- structure(list(fields = enum_fields), class = "shinyloadtest_enum")
-  for (field in enum_fields) field$set_parent(self)
-  self
+  val_sym <- rlang::ensyms(...)
+  val_str <- vapply(val_sym, as.character, character(1))
+  enum_counter <<- enum_counter + 1
+  structure(
+    setNames(lapply(val_str, enum_value, enum_counter), val_str),
+    class = "shinyloadtest_enum"
+  )
 }
 
-enum_fieldnames <- function(enum) {
-  vapply(enum[["fields"]], function(field) field$name, character(1))
+`$.shinyloadtest_enum` <- function(x, i) {
+  if (!(i %in% names(x))) stop("Invalid enum value")
+  NextMethod()
 }
-
-`$.shinyloadtest_enum` <- function(x, field_name) {
-  for (f in x[["fields"]]) if (f$name == field_name) return(f)
-  stop(paste0("Unknown field '", field_name, "' of enum"))
-}
+`[[.shinyloadtest_enum` <- `$.shinyloadtest_enum`
 
 enum_case <- function(field, ...) {
-  stopifnot(class(field) == "shinyloadtest_enum_field")
+  stopifnot(class(field) == "shinyloadtest_enum_value")
   cases <- rlang::enexprs(..., .named = TRUE, .homonyms = "error")
-  unknown_fields <- base::setdiff(names(cases), enum_fieldnames(field$parent))
-  if (length(unknown_fields)) stop(paste("Unknown field names", unknown_fields))
-  missing_fields <- base::setdiff(enum_fieldnames(field$parent), names(cases))
-  if (length(missing_fields)) stop(paste("Missing field names", missing_fields))
-  rlang::eval_tidy(cases[[field$name]])
+  all_val <- attr(field, "all_val")
+
+  unknown_values <- base::setdiff(names(cases), all_val)
+  if (length(unknown_values)) stop(paste("unknown enum value", unknown_values, collapse = ", "))
+
+  missing_values <- base::setdiff(attr(field, "all_val"), names(cases))
+  if (length(missing_values)) stop(paste("missing enum value", missing_values, collapse = ", "))
+
+  rlang::eval_tidy(cases[[attr(field, "val")]])
 }
 
 # The idea here is we have a class representing a set of named, distinct, uppercase fields:
@@ -70,7 +61,7 @@ enum_case <- function(field, ...) {
 # )
 #
 # Error in enum_case(some_field, FOO = "foo", BAR = "bar") :
-#   Missing field names BAZ
+#   missing enum value BAZ
 #
 # An error message is also produced if a field is mentioned that doesn't exist
 # in the enum:
@@ -84,7 +75,7 @@ enum_case <- function(field, ...) {
 # )
 #
 # Error in enum_case(some_field, FOO = "foo", BAR = "bar", BAZ = "baz",  :
-#  Unknown field names QUX
+#  unknown enum value QUX
 #
 # Since the exhaustiveness checking is at runtime, the use of enums doesn't provide
 # any safety guarantees that couldn't be provided by e.g. assertions. However,
