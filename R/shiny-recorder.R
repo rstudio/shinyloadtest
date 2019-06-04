@@ -105,11 +105,9 @@ parseMessage <- function(msg) {
 }
 
 replaceTokens <- function(str, tokens) {
-  if (length(tokens) > 0) {
+  if (length(tokens)) {
     stringr::str_replace_all(str, unlist(as.list(tokens)))
-  } else {
-    str
-  }
+  } else str
 }
 
 makeHTTPEvent_GET <- function(tokens, req, resp_curl, begin, end) {
@@ -190,7 +188,8 @@ RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
     initialize = function(targetAppUrl, host, port, outputFileName) {
       private$targetURL <- URLBuilder$new(targetAppUrl)
-      if (grepl("shinyapps.io$", private$targetURL$host)) {
+      private$targetType <- servedBy(private$targetURL)
+      if (private$targetType == SERVER_TYPE$SAI) {
         stop("Recording shinyapps.io apps is not supported")
       }
       private$localHost <- host
@@ -220,6 +219,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
   ),
   private = list(
     targetURL = NULL,
+    targetType = NULL,
     localHost = NULL,
     localPort = NULL,
     localServer = NULL,
