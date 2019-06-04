@@ -236,14 +236,8 @@ RecordingSession <- R6::R6Class("RecordingSession",
       urlString <- private$targetURL$build()
       private$sessionCookies <- if (isProtected(urlString)) {
         username <- getPass::getPass("Enter your username: ")
-        if (is.null(username)) {
-          return(invisible(FALSE))
-        }
         password <- getPass::getPass("Enter your password: ")
-        if (is.null(password)) {
-          return(invisible(FALSE))
-        }
-        postLogin(urlString, username, password)
+        postLogin(private$targetURL, private$targetType, username, password)
       } else data.frame()
     },
     mergeCookies = function(handle) {
