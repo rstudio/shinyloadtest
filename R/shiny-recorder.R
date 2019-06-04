@@ -201,6 +201,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
         paste0("# target: ", targetAppUrl)
       )
       writeLines(header, private$outputFile)
+      flush(private$outputFile)
       private$initializeSessionCookies()
       private$startServer()
     },
