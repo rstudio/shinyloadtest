@@ -32,6 +32,7 @@ enum <- function(...) {
   NextMethod()
 }
 `[[.shinyloadtest_enum` <- `$.shinyloadtest_enum`
+`==.shinyloadtest_enum` <- identical
 
 enum_case <- function(field, ...) {
   stopifnot(inherits(field, "shinyloadtest_enum_value"))
