@@ -48,7 +48,6 @@ Remotes:
 RoxygenNote: 6.1.1
 Suggests:
     knitr,
-    pkgdown,
     testthat
 VignetteBuilder: knitr
 BuildVignettes: no
