@@ -65,7 +65,7 @@ The first step is benchmarking, and we'll do it in several sub-steps:
 
 First you should install the `shinyloadtest` R package if you haven't yet:
 
-```
+```{r, eval = FALSE}
 devtools::install_github('rstudio/shinyloadtest')
 ```
 
@@ -75,7 +75,7 @@ Next, obtain the "solo" URL of the deployed app in RStudio Connect. You can do t
 
 Back in the R console, run `record_session` with the solo URL as an argument:
 
-```
+```{r, eval = FALSE}
 library(shinyloadtest)
 record_session("https://rsc.example.com/content/1234/")
 ```
@@ -139,14 +139,14 @@ shinycannon recording.log https://rsc.example.com/content/1234/ --workers 5 --lo
 
 At this point we have two runs worth of metrics in our `run1` and `run5` output directories. Let's get back in an R console and process the data into a dataframe:
 
-```
+```{r, eval = FALSE}
 library(shinyloadtest)
 df <- load_runs("Run 1" = "run1", "Run 5" = "run5")
 ```
 
 With the data in a tidy data frame, we can generate an HTML report:
 
-```
+```{r, eval = FALSE}
 shinyloadtest_report(df, "report1.html")
 ```
 
@@ -213,7 +213,7 @@ shinycannon recording.log https://rsc.example.com/content/1234/ --workers 5 --lo
 
 Now, back in R, we can generate a new report and compare `run5` to `run5-new-settings`:
 
-```
+```{r, eval = FALSE}
 library(shinyloadtest)
 df <- load_runs("Run 5" = "run5", "Run 5 new" = "run5-new-settings")
 shinyloadtest_report(df, "report2.html")
