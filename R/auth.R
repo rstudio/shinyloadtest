@@ -55,7 +55,7 @@ servedBy <- function(appUrl) {
 isProtected <- function(appUrl) {
   h <- curl::new_handle()
   curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0)
-  resp <- curl::curl_fetch_memory(appUrl, handle = h)
+  resp <- curl::curl_fetch_memory(appUrl$build(), handle = h)
   # NOTE: Connect returns a 404 if the app exists but requires authentication.
   # So we don't have a way to distinguish between an appUrl that doesn't exist
   # and an app that's protected.

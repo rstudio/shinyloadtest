@@ -234,8 +234,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       flush(private$outputFile)
     },
     initializeSessionCookies = function() {
-      urlString <- private$targetURL$build()
-      private$sessionCookies <- if (isProtected(urlString)) {
+      private$sessionCookies <- if (isProtected(private$targetURL)) {
         username <- getPass::getPass("Enter your username: ")
         password <- getPass::getPass("Enter your password: ")
         postLogin(private$targetURL, private$targetType, username, password)
