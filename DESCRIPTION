@@ -24,30 +24,28 @@ Collate:
   'shiny-recorder.R'
   'url.R'
   'util.R'
-  'utils-pipe.R'
-  'utils-tidy-eval.R'
 Imports:
-    websocket,
-    curl,
-    httpuv,
     R6,
-    jsonlite,
-    stringr,
-    rlang (>= 0.1.2),
-    xml2,
+    curl,
+    dplyr (>= 0.8.0.1),
     getPass,
     ggplot2,
-    tibble,
-    dplyr (>= 0.8.0.1),
-    readr,
-    magrittr,
     glue,
-    lubridate,
-    rmarkdown,
-    progress,
-    scales,
+    gtable,
     htmltools,
-    gtable
+    httpuv,
+    jsonlite,
+    lubridate,
+    magrittr,
+    progress,
+    readr,
+    rlang (>= 0.1.2),
+    rmarkdown,
+    scales,
+    stringr,
+    tibble,
+    websocket,
+    xml2
 Remotes:
   rstudio/websocket,
   rstudio/httpuv@8492695
