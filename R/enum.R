@@ -12,10 +12,10 @@ enum_value <- function(x, enum_id, all_val) {
   identical(x, y) && (attr(x, "enum_id") == attr(y, "enum_id"))
 }
 
+enum_count <- rlang::env(n = 0)
+
 enum_counter <- function() {
-  count <- attr(enum_counter, "count")
-  count <- if (is.null(count)) 0 else count
-  (attr(enum_counter, "count") <<- count + 1)
+  (enum_count$n <- enum_count$n + 1)
 }
 
 enum <- function(...) {
