@@ -9,7 +9,7 @@ enum_value <- function(x, enum_id, all_val) {
 
 `==.shinyloadtest_enum_value` <- function(x, y) {
   if (class(y) != "shinyloadtest_enum_value") return(FALSE)
-  base::identical(x, y) && (attr(x, "enum_id") == attr(y, "enum_id"))
+  identical(x, y) && (attr(x, "enum_id") == attr(y, "enum_id"))
 }
 
 enum_count <- rlang::env(n = 0)
@@ -32,7 +32,9 @@ enum <- function(...) {
   NextMethod()
 }
 `[[.shinyloadtest_enum` <- `$.shinyloadtest_enum`
-`==.shinyloadtest_enum` <- identical
+`==.shinyloadtest_enum` <- function(x, y) {
+  identical(x, y)
+}
 
 enum_case <- function(field, ...) {
   stopifnot(inherits(field, "shinyloadtest_enum_value"))
