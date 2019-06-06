@@ -118,7 +118,7 @@ slt_time_boxplot <- function(df, labels = NULL) {
 
   if (!is.null(labels)) {
     labels <- enexpr(labels)
-    df <- df %>% filter(label %in% UQ(labels))
+    df <- df %>% filter(label %in% rlang::UQ(labels))
   }
 
   p <- df %>%
@@ -145,7 +145,7 @@ slt_time_concurrency <- function(df, labels = NULL) {
 
   if (!is.null(labels)) {
     labels <- enexpr(labels)
-    df <- df %>% filter(label %in% UQ(labels))
+    df <- df %>% filter(label %in% rlang::UQ(labels))
   }
 
   p <- df %>%
