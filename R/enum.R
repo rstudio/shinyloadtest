@@ -9,7 +9,7 @@ enum_value <- function(x, enum_id, all_val) {
 
 `==.shinyloadtest_enum_value` <- function(x, y) {
   if (class(y) != "shinyloadtest_enum_value") return(FALSE)
-  identical(x, y) && (attr(x, "enum_id") == attr(y, "enum_id"))
+  base::identical(x, y) && (attr(x, "enum_id") == attr(y, "enum_id"))
 }
 
 enum_count <- rlang::env(n = 0)
@@ -22,7 +22,7 @@ enum <- function(...) {
   val_sym <- rlang::ensyms(...)
   val_str <- vapply(val_sym, as.character, character(1))
   structure(
-    setNames(lapply(val_str, enum_value, enum_counter(), val_str), val_str),
+    stats::setNames(lapply(val_str, enum_value, enum_counter(), val_str), val_str),
     class = "shinyloadtest_enum"
   )
 }
