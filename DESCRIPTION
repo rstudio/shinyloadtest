@@ -27,7 +27,7 @@ Collate:
   'utils-pipe.R'
   'utils-tidy-eval.R'
 Imports:
-    websocket (>= 0.0.0.9001),
+    websocket,
     curl,
     httpuv,
     R6,
@@ -41,17 +41,13 @@ Imports:
     dplyr (>= 0.8.0.1),
     readr,
     magrittr,
-    shiny,
     glue,
-    RColorBrewer,
     lubridate,
-    DT,
     rmarkdown,
     progress,
     scales,
     htmltools,
-    gtable,
-    svglite
+    gtable
 Remotes:
   rstudio/websocket,
   rstudio/httpuv@8492695
