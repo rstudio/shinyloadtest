@@ -184,7 +184,7 @@ shouldIgnoreGET <- function(path) {
 
 CLIENT_WS_STATE <- enum(UNOPENED, OPEN, CLOSED)
 
-RecordingSession <- R6Class("RecordingSession",
+RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
     initialize = function(targetAppUrl, host, port, outputFileName) {
       private$targetURL <- URLBuilder$new(targetAppUrl)
