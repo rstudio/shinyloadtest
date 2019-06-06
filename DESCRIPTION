@@ -55,7 +55,8 @@ Imports:
     gtable,
     svglite
 Remotes:
-  rstudio/websocket
+  rstudio/websocket,
+  rstudio/httpuv@8492695
 RoxygenNote: 6.1.1
 Suggests:
     knitr,
