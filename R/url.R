@@ -1,4 +1,4 @@
-URLBuilder <- R6::R6Class("URLBuilder",
+URLBuilder <- R6Class("URLBuilder",
   public = list(
     initialize = function(str) {
       if (!missing(str)) {
