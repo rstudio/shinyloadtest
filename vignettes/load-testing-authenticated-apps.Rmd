@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-`shinyloadtest` supports load testing applications served by [RStudio Connect](https://www.rstudio.com/products/connect/) or [Shiny Server Pro](https://www.rstudio.com/products/connect/) with the following authentication configurations:
+`shinyloadtest` supports load testing applications served by [RStudio Connect](https://www.rstudio.com/products/connect/) or [Shiny Server Pro](https://www.rstudio.com/products/shiny-server-pro/) with the following authentication configurations:
 
 * Connect
     * Password
