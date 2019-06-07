@@ -22,6 +22,7 @@ Collate:
   'shiny-recorder.R'
   'url.R'
   'util.R'
+  'util-pipe.R'
 Imports:
     R6,
     curl,
