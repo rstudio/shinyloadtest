@@ -198,7 +198,8 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$outputFile <- file(outputFileName, "w")
       header <- c(
         paste0("# version: ", packageVersion("shinyloadtest")),
-        paste0("# target: ", targetAppUrl)
+        paste0("# target_url: ", targetAppUrl),
+        paste0("# target_type: ", format_server_type(private$targetType))
       )
       writeLines(header, private$outputFile)
       flush(private$outputFile)

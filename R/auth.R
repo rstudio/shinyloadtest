@@ -17,11 +17,20 @@ pasteParams <- function(df, collapse) {
 }
 
 SERVER_TYPE <- enum(
-  RSC, # RStudio Server Connect
-  SSP, # Shiny Server or Shiny Server Pro
-  SAI, # shinyapps.io
-  SHN  # R/Shiny
+  RSC,
+  SSP,
+  SAI,
+  SHN
 )
+
+format_server_type <- function(field) {
+  enum_case(field,
+    RSC = "RStudio Server Connect",
+    SSP = "Shiny Server or Shiny Server Pro",
+    SAI = "shinyapps.io",
+    SHN = "R/Shiny"
+  )
+}
 
 servedBy <- function(appUrl) {
 
