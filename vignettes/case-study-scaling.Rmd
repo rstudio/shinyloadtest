@@ -50,7 +50,7 @@ Joe's case study focuses on the **optimize** step and the mechanics of improving
 
 ## Deployment
 
-cranwhales is currently [deployed on shinyapps.io](https://gallery.shinyapps.io/cranwhales/), but we'll assume for this case study that you've deployed cranwhales to your own [RStudio Connect](https://www.rstudio.com/products/connect/) instance with default runtime/scheduler settings. `shinyloadtest` is capable of benchmarking and generating load against apps that require authentication (with some [caveats](load-testing-authenticated-apps.html)) but we'll assume your deployment of cranwhales is accessible without authentication.
+cranwhales is currently [deployed on shinyapps.io](https://gallery.shinyapps.io/cranwhales/), but we'll assume for this case study that you've deployed cranwhales to your own [RStudio Connect](https://www.rstudio.com/products/connect/) instance with default runtime/scheduler settings. `shinyloadtest` is capable of benchmarking and generating load against apps that [require authentication](load-testing-authenticated-apps.Rmd) but we'll assume your deployment of cranwhales is accessible without authentication.
 
 ## Benchmark
 
