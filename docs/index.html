@@ -112,7 +112,7 @@
 <h3 class="hasAnchor">
 <a href="#shinyloadtest" class="anchor"></a><code>shinyloadtest</code>
 </h3>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">'rstudio/shinyloadtest'</span>)</a></code></pre></div>
+<pre><code><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">devtools::install_github('rstudio/shinyloadtest')</a></code></pre>
 </div>
 <div id="shinycannon" class="section level3">
 <h3 class="hasAnchor">
@@ -186,7 +186,7 @@
 <h3 class="hasAnchor">
 <a href="#step-1-recording" class="anchor"></a>Step 1: Recording</h3>
 <p>Record a session using the <code>record_session</code> function in the <code>shinyloadtest</code> package, which takes the URL of the <strong>deployed</strong> application as an argument:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">shinyloadtest<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/shinyloadtest/topics/record_session">record_session</a></span>(<span class="st">'https://shinyapp.example.com/'</span>)</a></code></pre></div>
+<pre><code><a href="reference/record_session.html">shinyloadtest::record_session('https://shinyapp.example.com/')</a></code></pre>
 <p>You should substitute <code>https://shinyapp.example.com/</code> for the URL of the Shiny app you’d like to record. If your application requires authentication you should consult the <a href="articles/load-testing-authenticated-apps.html">authentication article</a>. You should also be aware that <a href="articles/limitations-of-shinyloadtest.html">certain Shiny features</a> are not compatible with shinyloadtest.</p>
 <p>Running the function will open a browser displaying the app. Once open, interact with the application as a normal user would and then close the browser. After closing the browser window or tab, a file will be created that contains a recording of the session. This recording, written to <code>recording.log</code> by default, will serve as the basis for the load test.</p>
 </div>
@@ -247,7 +247,7 @@
 <p>A tidy data frame of run simulation information can be created using <code><a href="reference/load_runs.html">shinyloadtest::load_runs</a></code>.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">df &lt;-<span class="st"> </span>shinyloadtest<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/shinyloadtest/topics/load_runs">load_runs</a></span>(<span class="st">"5 workers"</span> =<span class="st"> "./run1"</span>)</a></code></pre></div>
 <p>Once the data is loaded into R, a report can be generated using:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">shinyloadtest<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/shinyloadtest/topics/shinyloadtest_report">shinyloadtest_report</a></span>(df, <span class="st">"run1.html"</span>)</a></code></pre></div>
+<pre><code><a href="reference/shinyloadtest_report.html">shinyloadtest::shinyloadtest_report(df, "run1.html")</a></code></pre>
 <p>This self contained html report will be opened in your browser for inspection. For further analysis explaination, please visit <a href="articles/analyzing-load-test-logs.html">‘Analysing load test logs’</a>.</p>
 </div>
 </div>
