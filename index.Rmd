@@ -97,7 +97,7 @@ Rinse and repeat as necessary. Each step is described below.
 
 Record a session using the `record_session` function in the `shinyloadtest` package, which takes the URL of the **deployed** application as an argument:
 
-```r
+```{r, eval = FALSE}
 shinyloadtest::record_session('https://shinyapp.example.com/')
 ```
 
