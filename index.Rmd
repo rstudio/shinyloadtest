@@ -20,7 +20,7 @@ To perform a load test you'll need two pieces of software: `shinyloadtest` and `
 
 ### `shinyloadtest`
 
-```R
+```
 devtools::install_github('rstudio/shinyloadtest')
 ```
 
@@ -97,7 +97,7 @@ Rinse and repeat as necessary. Each step is described below.
 
 Record a session using the `record_session` function in the `shinyloadtest` package, which takes the URL of the **deployed** application as an argument:
 
-```r
+```
 shinyloadtest::record_session('https://shinyapp.example.com/')
 ```
 
@@ -165,13 +165,13 @@ functions for analyzing the output files from the test.
 
 A tidy data frame of run simulation information can be created using `shinyloadtest::load_runs`.
 
-```r
+```R
 df <- shinyloadtest::load_runs("5 workers" = "./run1")
 ```
 
 Once the data is loaded into R, a report can be generated using:
 
-```r
+```
 shinyloadtest::shinyloadtest_report(df, "run1.html")
 ```
 

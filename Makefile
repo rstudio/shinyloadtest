@@ -31,4 +31,4 @@ devbuild:
 
 clean:
 	rm -rf output
-	find vignettes/test_sessions/ -mindepth 1 -type d -exec rm -rf {} ';'
+	find vignettes/test_sessions/ -mindepth 1 -type d -exec rm -rf '{}' ';'
