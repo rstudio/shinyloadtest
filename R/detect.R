@@ -24,12 +24,13 @@ servedBy <- function(appUrl) {
   df <- curl::handle_cookies(h)
   headers <- curl::parse_headers_list(resp$headers)
 
-  html <- xml2::read_html(rawToChar(resp$content))
-  scripts <- xml2::xml_find_all(html, "//script")
-  srcs <- unlist(lapply(scripts, function(script) xml2::xml_attr(script, "src")))
-  srcs <- srcs[!is.na(srcs)]
-
-  hasShinyJS <- any(grepl("/shiny.min.js$", srcs))
+  hasShinyJS <- tryCatch({
+    html <- xml2::read_html(rawToChar(resp$content))
+    scripts <- xml2::xml_find_all(html, "/html/head/script")
+    srcs <- unlist(lapply(scripts, function(script) xml2::xml_attr(script, "src")))
+    srcs <- srcs[!is.na(srcs)]
+    any(grepl("/shiny.min.js$", srcs))
+  }, error = function(e) FALSE)
 
   if (nrow(df[which(df$name == "SSP-XSRF"),]) == 1
     || isTRUE(headers[["x-powered-by"]] %in% c("Express", "Shiny Server", "Shiny Server Pro"))) {
