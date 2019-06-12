@@ -16,6 +16,7 @@ BugReports: https://github.com/rstudio/shinyloadtest/issues
 Collate:
   'enum.R'
   'analysis.R'
+  'detect.R'
   'auth.R'
   'make_report.R'
   'plotting.R'
