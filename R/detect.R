@@ -34,7 +34,7 @@ servedBy <- function(appUrl) {
     scripts <- xml2::xml_find_all(html, "/html/head/script")
     srcs <- unlist(lapply(scripts, function(script) xml2::xml_attr(script, "src")))
     srcs <- srcs[!is.na(srcs)]
-    any(grepl("/shiny.min.js$", srcs))
+    any(grepl("/shiny(\\.min)?\\.js$", srcs))
   }, error = function(e) FALSE)
 
   if (nrow(df[which(df$name == "SSP-XSRF"),]) == 1
