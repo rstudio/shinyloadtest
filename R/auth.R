@@ -45,7 +45,10 @@ handlePost <- function(handle, loginUrl, postfields, cookies, cookieName) {
     ssl_verifyhost = 0,
     ssl_verifypeer = 0
   )
-  curl::curl_fetch_memory(loginUrl$build(), handle = handle)
+
+  resp <- curl::curl_fetch_memory(loginUrl$build(), handle = handle)
+  if (resp$status_code != 200) stop("Authentication failed")
+
   curl::handle_cookies(handle)[,c("name", "value")]
 }
 
