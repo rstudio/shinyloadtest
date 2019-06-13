@@ -194,6 +194,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
       }
       private$localHost <- host
       private$localPort <- port
+
+      private$initializeSessionCookies()
+
       private$outputFileName <- outputFileName
       private$outputFile <- file(outputFileName, "w")
       header <- c(
@@ -203,7 +206,6 @@ RecordingSession <- R6::R6Class("RecordingSession",
       )
       writeLines(header, private$outputFile)
       flush(private$outputFile)
-      private$initializeSessionCookies()
       private$startServer()
     },
     stop = function() {
@@ -235,11 +237,15 @@ RecordingSession <- R6::R6Class("RecordingSession",
       flush(private$outputFile)
     },
     initializeSessionCookies = function() {
-      private$sessionCookies <- if (isProtected(private$targetURL)) {
+      cookies <- data.frame()
+      if (isProtected(private$targetURL)) {
         username <- getPass::getPass("Enter your username: ")
+        if (is.null(username)) stop("Login aborted (username not provided)")
         password <- getPass::getPass("Enter your password: ")
-        postLogin(private$targetURL, private$targetType, username, password)
-      } else data.frame()
+        if (is.null(password)) stop("Login aborted (password not provided)")
+        cookies <- postLogin(private$targetURL, private$targetType, username, password)
+      }
+      private$sessionCookies <- cookies
     },
     mergeCookies = function(handle) {
       df <- curl::handle_cookies(handle)[,c("name", "value")]
