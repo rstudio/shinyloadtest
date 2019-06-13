@@ -37,7 +37,7 @@ servedBy <- function(appUrl) {
     any(grepl("/shiny(\\.min)?\\.js$", srcs))
   }, error = function(e) FALSE)
 
-  if (nrow(df[which(df$name == "SSP-XSRF"),]) == 1
+  if (nrow(df[df$name == "SSP-XSRF",]) == 1
     || isTRUE(headers[["x-powered-by"]] %in% c("Express", "Shiny Server", "Shiny Server Pro"))) {
     return(SERVER_TYPE$SSP)
   } else if (nrow(df[which(df$name == "rscid"),]) == 1) {
