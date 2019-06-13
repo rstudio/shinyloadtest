@@ -12,11 +12,10 @@ enum_value <- function(x, enum_id, all_val) {
   identical(x, y) && (attr(x, "enum_id") == attr(y, "enum_id"))
 }
 
-enum_count <- rlang::env(n = 0)
-
-enum_counter <- function() {
-  (enum_count$n <- enum_count$n + 1)
-}
+enum_counter <- local({
+  n <- 0L
+  function() (n <<- n + 1L)
+})
 
 enum <- function(...) {
   val_sym <- rlang::ensyms(...)
