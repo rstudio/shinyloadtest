@@ -19,7 +19,12 @@ servedBy <- function(appUrl) {
   if (grepl("\\.shinyapps\\.io$", appUrl$host)) return(SERVER_TYPE$SAI)
 
   h <- curl::new_handle()
-  curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0)
+  curl::handle_setopt(
+    h,
+    ssl_verifyhost = FALSE,
+    ssl_verifypeer = FALSE,
+    followlocation = TRUE
+  )
   resp <- curl::curl_fetch_memory(appUrl$build(), handle = h)
   df <- curl::handle_cookies(h)
   headers <- curl::parse_headers_list(resp$headers)
