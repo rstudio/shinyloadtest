@@ -105,11 +105,9 @@ parseMessage <- function(msg) {
 }
 
 replaceTokens <- function(str, tokens) {
-  if (length(tokens) > 0) {
+  if (length(tokens)) {
     stringr::str_replace_all(str, unlist(as.list(tokens)))
-  } else {
-    str
-  }
+  } else str
 }
 
 makeHTTPEvent_GET <- function(tokens, req, resp_curl, begin, end) {
@@ -184,29 +182,30 @@ shouldIgnoreGET <- function(path) {
   length(unlist(stringr::str_match_all(path, ignoreGET))) > 0
 }
 
-CLIENT_WS_STATE <- list(
-  UNOPENED = "UNOPENED",
-  OPEN = "OPEN",
-  CLOSED = "CLOSED"
-)
+CLIENT_WS_STATE <- enum(UNOPENED, OPEN, CLOSED)
 
 RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
-    initialize = function(targetAppUrl, host, port, outputFileName, sessionCookies) {
+    initialize = function(targetAppUrl, host, port, outputFileName) {
       private$targetURL <- URLBuilder$new(targetAppUrl)
-      if (grepl("shinyapps.io$", private$targetURL$host)) {
+      private$targetType <- servedBy(private$targetURL)
+      if (private$targetType == SERVER_TYPE$SAI) {
         stop("Recording shinyapps.io apps is not supported")
       }
       private$localHost <- host
       private$localPort <- port
+
+      private$initializeSessionCookies()
+
       private$outputFileName <- outputFileName
       private$outputFile <- file(outputFileName, "w")
       header <- c(
-        paste0("# version: ", packageVersion("shinyloadtest")),
-        paste0("# target: ", targetAppUrl)
+        paste0("# version: 1"),
+        paste0("# target_url: ", targetAppUrl),
+        paste0("# target_type: ", format_server_type(private$targetType))
       )
       writeLines(header, private$outputFile)
-      private$sessionCookies <- sessionCookies
+      flush(private$outputFile)
       private$startServer()
     },
     stop = function() {
@@ -224,6 +223,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
   ),
   private = list(
     targetURL = NULL,
+    targetType = NULL,
     localHost = NULL,
     localPort = NULL,
     localServer = NULL,
@@ -235,6 +235,17 @@ RecordingSession <- R6::R6Class("RecordingSession",
     writeEvent = function(evt) {
       writeLines(format(evt), private$outputFile)
       flush(private$outputFile)
+    },
+    initializeSessionCookies = function() {
+      cookies <- data.frame()
+      if (isProtected(private$targetURL)) {
+        username <- getPass::getPass("Enter your username: ")
+        if (is.null(username)) stop("Login aborted (username not provided)")
+        password <- getPass::getPass("Enter your password: ")
+        if (is.null(password)) stop("Login aborted (password not provided)")
+        cookies <- postLogin(private$targetURL, private$targetType, username, password)
+      }
+      private$sessionCookies <- cookies
     },
     mergeCookies = function(handle) {
       df <- curl::handle_cookies(handle)[,c("name", "value")]
@@ -462,18 +473,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #' @export
 record_session <- function(target_app_url, host = "127.0.0.1", port = 8600,
   output_file = "recording.log", open_browser = TRUE) {
-    sessionCookies <- if (isProtected(target_app_url)) {
-      username <- getPass::getPass("Enter your username: ")
-      if (is.null(username)) {
-        return(invisible(FALSE))
-      }
-      password <- getPass::getPass("Enter your password: ")
-      if (is.null(password)) {
-        return(invisible(FALSE))
-      }
-      postLogin(target_app_url, username, password)
-    } else data.frame()
-    session <- RecordingSession$new(target_app_url, host, port, output_file, sessionCookies)
+    session <- RecordingSession$new(target_app_url, host, port, output_file)
     on.exit(session$stop())
     message("Listening on ", host, ":", port)
 

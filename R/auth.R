@@ -16,27 +16,10 @@ pasteParams <- function(df, collapse) {
   }
 }
 
-# Returns string "unknown", "ssp", "rsc"
-# TODO "shinyapps.io"
-servedBy <- function(appUrl) {
-  h <- curl::new_handle()
-  curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0)
-  resp <- curl::curl_fetch_memory(appUrl, handle = h)
-  df <- curl::handle_cookies(h)
-  headers <- curl::parse_headers_list(resp$headers)
-  if (nrow(df[which(df$name == "SSP-XSRF"),]) == 1
-    || isTRUE(headers[["x-powered-by"]] %in% c("Express", "Shiny Server", "Shiny Server Pro"))) {
-    return("ssp")
-  } else if (nrow(df[which(df$name == "rscid"),]) == 1) {
-    return("rsc")
-  }
-  "unknown"
-}
-
 isProtected <- function(appUrl) {
   h <- curl::new_handle()
   curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0)
-  resp <- curl::curl_fetch_memory(appUrl, handle = h)
+  resp <- curl::curl_fetch_memory(appUrl$build(), handle = h)
   # NOTE: Connect returns a 404 if the app exists but requires authentication.
   # So we don't have a way to distinguish between an appUrl that doesn't exist
   # and an app that's protected.
@@ -45,8 +28,8 @@ isProtected <- function(appUrl) {
 }
 
 loginUrlFor <- function(appUrl, appServer) {
-  if (appServer %in% c("rsc", "ssp")) {
-    URLBuilder$new(appUrl)$appendPaths("__login__")$build()
+  if (appServer %in% c(SERVER_TYPE$RSC, SERVER_TYPE$SSP)) {
+    appUrl$appendPaths("__login__")
   } else {
     stop(paste0("Unknown appServer:", appServer))
   }
@@ -62,37 +45,53 @@ handlePost <- function(handle, loginUrl, postfields, cookies, cookieName) {
     ssl_verifyhost = 0,
     ssl_verifypeer = 0
   )
-  curl::curl_fetch_memory(loginUrl, handle = handle)
+
+  resp <- curl::curl_fetch_memory(loginUrl$build(), handle = handle)
+  if (resp$status_code != 200) stop("Authentication failed")
+
   curl::handle_cookies(handle)[,c("name", "value")]
 }
 
 # Returns the cookies that should be attached to all subsequent HTTP requests,
 # including the initial websocket request. Currently implemented for RSC and
 # SSP.
-postLogin <- function(appUrl, username, password) {
+postLogin <- function(appUrl, appServer, username, password) {
 
-  appServer <- servedBy(appUrl)
   loginUrl <- loginUrlFor(appUrl, appServer)
 
   h <- curl::new_handle()
   curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0)
-  resp <- curl::curl_fetch_memory(appUrl, handle = h)
+  resp <- curl::curl_fetch_memory(appUrl$build(), handle = h)
   login_html <- xml2::read_html(rawToChar(resp$content))
   inputs <- rbind(getInputs(login_html, appServer), data.frame(
     name = c("username", "password"), value = c(username, password))
   )
   cookies <- curl::handle_cookies(h)[,c("name", "value")]
-  if (appServer == "rsc") {
-    handlePost(handle = curl::new_handle(), loginUrl = loginUrl,
-      postfields = paste0('{"username": "', username, '", "password": "', password, '"}'),
-      cookies = cookies, cookieName = "rsconnect"
-    )
-  } else if (appServer == "ssp") {
-    handlePost(handle = curl::new_handle(), loginUrl = loginUrl,
-      postfields = utils::URLencode(pasteParams(inputs, "&")),
-      cookies = cookies, cookieName = "session_state"
-    )
-  }
+
+  enum_case(appServer,
+    RSC = handlePost(
+            handle = curl::new_handle(),
+            loginUrl = loginUrl,
+            postfields = jsonlite::toJSON(
+              list(
+                username = username,
+                password = password
+              ),
+              auto_unbox = TRUE
+            ),
+            cookies = cookies,
+            cookieName = "rsconnect"
+          ),
+    SSP = handlePost(
+            handle = curl::new_handle(),
+            loginUrl = loginUrl,
+            postfields = utils::URLencode(pasteParams(inputs, "&")),
+            cookies = cookies,
+            cookieName = "session_state"
+          ),
+    SAI = stop("Logging in to shinyapps.io is unsupported"),
+    SHN = stop("Plain Shiny apps don't support authentication")
+  )
 }
 
 getApp <- function(appUrl, cookie) {

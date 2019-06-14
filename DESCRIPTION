@@ -1,50 +1,54 @@
 Package: shinyloadtest
 Type: Package
 Title: Load Test Shiny Applications
-Version: 1.0.0
+Version: 1.0.0.9000
 Authors@R: c(
             person("Alan", "Dipert", role = c("aut", "cre"), email = "alan@rstudio.com"),
             person("Barret", "Schloerke", role = c("aut"), email = "barret@rstudio.com"),
             person("Barbara", "Borges", role = c("aut")),
             person("RStudio", role = c("cph", "fnd"))
             )
-Description: shinyloadtest provides functions for recording user sessions,
-    playing those sessions back in parallel to simulate load, and analyzing
-    the results.
+Description: Facilities for recording Shiny application sessions and analyzing load test results.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 BugReports: https://github.com/rstudio/shinyloadtest/issues
+Collate:
+  'enum.R'
+  'analysis.R'
+  'detect.R'
+  'auth.R'
+  'make_report.R'
+  'plotting.R'
+  'shiny-recorder.R'
+  'url.R'
+  'util.R'
+  'util-pipe.R'
 Imports:
-    websocket (>= 0.0.0.9001),
-    curl,
-    httpuv,
     R6,
-    jsonlite,
-    stringr,
-    rlang (>= 0.1.2),
-    xml2,
+    curl,
+    dplyr (>= 0.8.0.1),
     getPass,
     ggplot2,
-    tibble,
-    dplyr (>= 0.8.0.1),
-    readr,
-    magrittr,
-    viridis,
-    shiny,
     glue,
-    RColorBrewer,
-    lubridate,
-    DT,
-    flexdashboard,
-    rmarkdown,
-    progress,
-    scales,
-    htmltools,
     gtable,
-    svglite
+    htmltools,
+    httpuv (>= 1.5.1.9000),
+    jsonlite,
+    lubridate,
+    magrittr,
+    progress,
+    readr,
+    rlang (>= 0.1.2),
+    rmarkdown,
+    scales,
+    stringr,
+    tibble,
+    websocket,
+    xml2
 Remotes:
-  rstudio/websocket
+  rstudio/websocket,
+  rstudio/httpuv@8492695
 RoxygenNote: 6.1.1
 Suggests:
     knitr,

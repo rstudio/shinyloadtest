@@ -80,7 +80,7 @@ library(shinyloadtest)
 record_session("https://rsc.example.com/content/1234/")
 ```
 
-This starts a local web server listening on http://127.0.0.1:8600/ and should also open a new browser window to this URL. This local web server is a proxy that relays content to and from your RStudio Connect instance, recording interactions so that they can be played back later. It's in this window that you should model what you imagine would be a typical user interaction. Click around, change things, and observe new outputs.
+This starts a local web server listening on `http://127.0.0.1:8600/` and should also open a new browser window to this URL. This local web server is a proxy that relays content to and from your RStudio Connect instance, recording interactions so that they can be played back later. It's in this window that you should model what you imagine would be a typical user interaction. Click around, change things, and observe new outputs.
 
 Do this for 1-2 minutes. When you're done, close the browser tab. You should notice the function return in the R console.
 

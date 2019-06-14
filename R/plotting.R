@@ -118,7 +118,7 @@ slt_time_boxplot <- function(df, labels = NULL) {
 
   if (!is.null(labels)) {
     labels <- enexpr(labels)
-    df <- df %>% filter(label %in% UQ(labels))
+    df <- df %>% filter(label %in% rlang::UQ(labels))
   }
 
   p <- df %>%
@@ -145,7 +145,7 @@ slt_time_concurrency <- function(df, labels = NULL) {
 
   if (!is.null(labels)) {
     labels <- enexpr(labels)
-    df <- df %>% filter(label %in% UQ(labels))
+    df <- df %>% filter(label %in% rlang::UQ(labels))
   }
 
   p <- df %>%
@@ -211,7 +211,6 @@ slt_waterfall <- function(df, limits = c(0, max(df$concurrency, na.rm = TRUE))) 
     # request_scale_guides() +
     scale_y_discrete(limits = y_limits) +
     geom_line(size = 0.5) +
-    # scale_color_viridis_c() +
     scale_colour_gradientn(colours = rev(c(run_fill_colors[c(3, 13, 6)], run_accent_colors[2])), limits = limits) +
     guides(
       color = guide_colorbar(order = 1),
