@@ -17,6 +17,8 @@ navbar:
         href: articles/load-testing-authenticated-apps.html
       - text: "Limitations"
         href: articles/limitations-of-shinyloadtest.html
+      - text: "Troubleshooting SSL"
+        href: articles/troubleshooting-ssl.html
       - text: FAQ
         href: articles/faq.html
     - text: Reference
