@@ -1,11 +1,11 @@
 
 getInputs <- function(html, server) {
-  if (server == "ssp") {
+  if (server == SERVER_TYPE$SSP) {
     inputs <- xml2::xml_find_all(html, "//input[@type='hidden']")
     attrs <- xml2::xml_attrs(inputs)
     attrs <- lapply(attrs, function(vec) c(name = vec[["name"]], value = vec[["value"]]))
     as.data.frame(do.call(rbind, attrs), stringsAsFactors = FALSE)
-  }
+  } else data.frame()
 }
 
 pasteParams <- function(df, collapse) {
@@ -47,7 +47,7 @@ handlePost <- function(handle, loginUrl, postfields, cookies, cookieName) {
   )
 
   resp <- curl::curl_fetch_memory(loginUrl$build(), handle = handle)
-  if (resp$status_code != 200) stop("Authentication failed")
+  if (!(resp$status_code %in% c(200, 302))) stop("Authentication failed")
 
   curl::handle_cookies(handle)[,c("name", "value")]
 }
