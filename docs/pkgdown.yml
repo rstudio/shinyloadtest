@@ -7,4 +7,5 @@ articles:
   faq: faq.html
   limitations-of-shinyloadtest: limitations-of-shinyloadtest.html
   load-testing-authenticated-apps: load-testing-authenticated-apps.html
+  troubleshooting-ssl: troubleshooting-ssl.html
 
