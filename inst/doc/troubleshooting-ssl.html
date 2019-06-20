@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<meta name="date" content="2019-06-19" />
+
+<title>Troubleshooting SSL</title>
+
+
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Troubleshooting SSL</h1>
+<h4 class="date">2019-06-19</h4>
+
+
+
+<p>If you ran <code>shinycannon</code> and received an error like the following:</p>
+<pre><code>javax.net.ssl.SSLHandshakeException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target</code></pre>
+<p>…the target server’s SSL certificate was not recognized by the installation of Java that <code>shinycannon</code> is running in.</p>
+<p>The first thing you should try is upgrading Java on your machine. Newer versions of Java come with updated certificate stores.</p>
+<p>If that doesn’t work, and if you are confident the target server is legitimate (for example, it’s run from within your organization) you can rectify the problem by adding the target server’s certificate to Java’s certificate store using the steps below.</p>
+<p>Otherwise, you should consider contacting the target server’s administrator because <strong>the machine may have been compromised</strong>.</p>
+<div id="add-certificate" class="section level2">
+<h2>Add Certificate</h2>
+<div id="download" class="section level3">
+<h3>Download</h3>
+<p>Download the certificate to the machine running <code>shinycannon</code> using the following command, substituting <code>example.com</code> for the hostname or address of the target server:</p>
+<p><em>If the target host is an IP address, you should omit the <code>-servername</code> parameter.</em></p>
+<p><strong>Linux</strong>:</p>
+<pre><code>openssl s_client -connect example.com:443 -servername example.com:443 &lt; /dev/null | sed -ne &#39;/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p&#39; &gt; public.crt</code></pre>
+<p><strong>Windows</strong>:</p>
+<p><em>If you haven’t, you should install <a href="http://gnuwin32.sourceforge.net/packages/sed.htm">Sed for Windows</a> and <a href="https://www.openssl.org/">OpenSSL</a></em></p>
+<pre><code>openssl s_client -connect google.com:443 -servername google.com:443 &lt; NUL | sed -ne &#39;/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p&#39; &gt; public.crt</code></pre>
+</div>
+<div id="find-java_home" class="section level3">
+<h3>Find <code>JAVA_HOME</code></h3>
+<p>Determine your system’s JAVA_HOME location with the following command:</p>
+<p><em>On Linux, the $JAVA_HOME environment variable may already be set. If it is, use it instead.</em></p>
+<pre><code>jrunscript -e &#39;java.lang.System.out.println(java.lang.System.getProperty(&quot;java.home&quot;));&#39;</code></pre>
+</div>
+<div id="install-certificate" class="section level3">
+<h3>Install Certificate</h3>
+<p>Install the certificate with the following command, substituting <code>&lt;JAVA_HOME&gt;</code> for your system’s <code>JAVA_HOME</code> value, and <code>&lt;server_name&gt;</code> for some name of your choosing:</p>
+<p><em>On Linux, you must be root or use <code>sudo</code>.</em></p>
+<pre><code>&lt;JAVA_HOME&gt;/bin/keytool -import -alias &lt;server_name&gt; -keystore &lt;JAVA_HOME&gt;/jre/lib/security/cacerts -file public.crt</code></pre>
+<p>You may be prompted for a password. By default it is <code>changeit</code>.</p>
+<p>You may be prompted about whether to trust the certificate. Type <code>yes</code> and hit enter.</p>
+</div>
+<div id="try-again" class="section level3">
+<h3>Try again</h3>
+<p>Try <code>shinycannon</code> again, ensuring <code>SHINYCANNON_USER</code> and <code>SHINYCANNON_PASS</code> are set if your target application requires authentication.</p>
+<p><em>These instructions were adapted from the following document: <a href="https://confluence.atlassian.com/kb/how-to-import-a-public-ssl-certificate-into-a-jvm-867025849.html" class="uri">https://confluence.atlassian.com/kb/how-to-import-a-public-ssl-certificate-into-a-jvm-867025849.html</a></em></p>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
