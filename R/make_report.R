@@ -6,9 +6,9 @@ if (getRversion() >= "2.15.1") {
 
 #' Make shinyloadtest Report
 #'
-#' @param df data.frame returned from \code{\link{load_runs}}
+#' @param df data.frame returned from [load_runs()]
 #' @param output File where HTML output should be saved
-#' @param duration_cutoff Cutoff value for session duration plot. Defaults to the recording duration used to simulate \code{df} or 60 seconds.
+#' @param duration_cutoff Cutoff value for session duration plot. Defaults to the recording duration used to simulate `df` or 60 seconds.
 #' @param http_latency_cutoff Cutoff value for total http latency plot
 #' @param max_websocket_cutoff Cutoff value for max websocket latency plot
 #' @param verbose Boolean that determines if progress output is displayed

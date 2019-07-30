@@ -10,7 +10,7 @@ shinyloadtest_report(df, output = "shinyloadtest_report.html",
   open_browser = TRUE, self_contained = TRUE, verbose = TRUE)
 }
 \arguments{
-\item{df}{data.frame returned from \code{\link{load_runs}}}
+\item{df}{data.frame returned from \code{\link[=load_runs]{load_runs()}}}
 
 \item{output}{File where HTML output should be saved}
 

@@ -455,17 +455,19 @@ RecordingSession <- R6::R6Class("RecordingSession",
 )
 
 #' Record a Session for Load Test
-#' @details This function creates a reverse proxy listening at \code{host:port}
-#'   that stands in front of \code{target_app_url}. As the user interacts with
-#'   the app, the actions and responses are recorded in a file that can be
-#'   replayed later. By default, a web browser is opened automatically so that
-#'   you can begin recording immediately, without manually starting a browser
-#'   and navigating to \code{host:port}.
+#'
+#' This function creates a reverse proxy listening at `host:port`
+#' that stands in front of `target_app_url`. As the user interacts with
+#' the app, the actions and responses are recorded in a file that can be
+#' replayed later. By default, a web browser is opened automatically so that
+#' you can begin recording immediately, without manually starting a browser
+#' and navigating to `host:port`.
+#'
 #' @param target_app_url The URL of the deployed application
 #' @param host The host where the proxy will run. Usually localhost is used.
 #' @param output_file The name for the generated log file.
 #' @param open_browser Whether to open a browser on the proxy
-#'   (default=\code{TRUE}) or not (\code{FALSE}).
+#'   (default=`TRUE`) or not (`FALSE`).
 #' @param port The port for the proxy. Default is 8600. Change this default if
 #'   port 8600 is used by another service.
 #'
