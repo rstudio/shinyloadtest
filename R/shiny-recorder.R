@@ -457,14 +457,13 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #' Record a Session for Load Test
 #'
 #' This function creates a [reverse
-#' proxy](https://en.wikipedia.org/wiki/Reverse_proxy) listening at `host:port`
-#' that intercepts and records activity between your web browser and the Shiny
-#' application at `target_app_url`.
+#' proxy](https://en.wikipedia.org/wiki/Reverse_proxy) at `http://host:port`
+#' (http://127.0.0.1:8600 by default) that intercepts and records activity
+#' between your web browser and the Shiny application at `target_app_url`.
 #'
 #' By default, after creating the reverse proxy, a web browser is opened
-#' automatically. This behavior is controlled by `open_browser`. As you interact
-#' with the application in the web browser, activity is written to the
-#' `output_file`, which defaults to `recording.log`.
+#' automatically. As you interact with the application in the web browser,
+#' activity is written to the `output_file` (`recording.log` by default).
 #'
 #' To shut down the reverse proxy and complete the recording, close the web
 #' browser tab or window.
@@ -475,18 +474,18 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #'
 #' @section `fileInput`/`DT`/`HTTP POST` support:
 #'
-#' Shiny's [shiny::fileInput()] input for uploading files, the `DT` package, and
-#' potentially other packages make HTTP POST requests to the target application.
-#' Because POST requests can be large, they are not stored directly in the
-#' recording file. Instead, new files adjacent to the recording are created when
-#' an HTTP POST request is intercepted.
+#'   Shiny's [shiny::fileInput()] input for uploading files, the `DT` package,
+#'   and potentially other packages make HTTP POST requests to the target
+#'   application. Because POST requests can be large, they are not stored
+#'   directly in the recording file. Instead, new files adjacent to the
+#'   recording are created for each HTTP POST request intercepted.
 #'
-#' The adjacent files are named after the recording with the pattern
-#' `<output_file>.post.<N>`, where `<output_file>` is the chosen recording file
-#' name and `<N>` is the number of the request.
+#'   The adjacent files are named after the recording with the pattern
+#'   `<output_file>.post.<N>`, where `<output_file>` is the chosen recording
+#'   file name and `<N>` is the number of the request.
 #'
-#' If present, these adjacent files must be kept alongside the recording file
-#' when the recording is played back with the `shinycannon` tool.
+#'   If present, these adjacent files must be kept alongside the recording file
+#'   when the recording is played back with the `shinycannon` tool.
 #'
 #' @param target_app_url The URL of the deployed application.
 #' @param host The host where the proxy will run. Usually localhost is used.

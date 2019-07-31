@@ -25,15 +25,14 @@ Creates a recording file that can be used as input to the
 \code{shinycannon} command-line load generation tool.
 }
 \description{
-This function creates a \href{https://en.wikipedia.org/wiki/Reverse_proxy}{reverse proxy} listening at \code{host:port}
-that intercepts and records activity between your web browser and the Shiny
-application at \code{target_app_url}.
+This function creates a \href{https://en.wikipedia.org/wiki/Reverse_proxy}{reverse proxy} at \code{http://host:port}
+(http://127.0.0.1:8600 by default) that intercepts and records activity
+between your web browser and the Shiny application at \code{target_app_url}.
 }
 \details{
 By default, after creating the reverse proxy, a web browser is opened
-automatically. This behavior is controlled by \code{open_browser}. As you interact
-with the application in the web browser, activity is written to the
-\code{output_file}, which defaults to \code{recording.log}.
+automatically. As you interact with the application in the web browser,
+activity is written to the \code{output_file} (\code{recording.log} by default).
 
 To shut down the reverse proxy and complete the recording, close the web
 browser tab or window.
@@ -44,15 +43,15 @@ load-generation tool which can be obtained from the \href{https://rstudio.github
 \section{\code{fileInput}/\code{DT}/\code{HTTP POST} support}{
 
 
-Shiny's \code{\link[shiny:fileInput]{shiny::fileInput()}} input for uploading files, the \code{DT} package, and
-potentially other packages make HTTP POST requests to the target application.
-Because POST requests can be large, they are not stored directly in the
-recording file. Instead, new files adjacent to the recording are created when
-an HTTP POST request is intercepted.
+Shiny's \code{\link[shiny:fileInput]{shiny::fileInput()}} input for uploading files, the \code{DT} package,
+and potentially other packages make HTTP POST requests to the target
+application. Because POST requests can be large, they are not stored
+directly in the recording file. Instead, new files adjacent to the
+recording are created for each HTTP POST request intercepted.
 
 The adjacent files are named after the recording with the pattern
-\code{<output_file>.post.<N>}, where \code{<output_file>} is the chosen recording file
-name and \code{<N>} is the number of the request.
+\code{<output_file>.post.<N>}, where \code{<output_file>} is the chosen recording
+file name and \code{<N>} is the number of the request.
 
 If present, these adjacent files must be kept alongside the recording file
 when the recording is played back with the \code{shinycannon} tool.
