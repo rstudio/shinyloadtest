@@ -455,21 +455,49 @@ RecordingSession <- R6::R6Class("RecordingSession",
 )
 
 #' Record a Session for Load Test
-#' @details This function creates a reverse proxy listening at \code{host:port}
-#'   that stands in front of \code{target_app_url}. As the user interacts with
-#'   the app, the actions and responses are recorded in a file that can be
-#'   replayed later. By default, a web browser is opened automatically so that
-#'   you can begin recording immediately, without manually starting a browser
-#'   and navigating to \code{host:port}.
-#' @param target_app_url The URL of the deployed application
-#' @param host The host where the proxy will run. Usually localhost is used.
-#' @param output_file The name for the generated log file.
-#' @param open_browser Whether to open a browser on the proxy
-#'   (default=\code{TRUE}) or not (\code{FALSE}).
-#' @param port The port for the proxy. Default is 8600. Change this default if
-#'   port 8600 is used by another service.
 #'
-#' @return Creates a recording file that can be used to drive a load test.
+#' This function creates a [reverse
+#' proxy](https://en.wikipedia.org/wiki/Reverse_proxy) at `http://host:port`
+#' (http://127.0.0.1:8600 by default) that intercepts and records activity
+#' between your web browser and the Shiny application at `target_app_url`.
+#'
+#' By default, after creating the reverse proxy, a web browser is opened
+#' automatically. As you interact with the application in the web browser,
+#' activity is written to the `output_file` (`recording.log` by default).
+#'
+#' To shut down the reverse proxy and complete the recording, close the web
+#' browser tab or window.
+#'
+#' Recordings are used as input to the `shinycannon` command-line
+#' load-generation tool which can be obtained from the [shinyloadtest
+#' documentation site](https://rstudio.github.io/shinyloadtest/index.html).
+#'
+#' @section `fileInput`/`DT`/`HTTP POST` support:
+#'
+#'   Shiny's [shiny::fileInput()] input for uploading files, the `DT` package,
+#'   and potentially other packages make HTTP POST requests to the target
+#'   application. Because POST requests can be large, they are not stored
+#'   directly in the recording file. Instead, new files adjacent to the
+#'   recording are created for each HTTP POST request intercepted.
+#'
+#'   The adjacent files are named after the recording with the pattern
+#'   `<output_file>.post.<N>`, where `<output_file>` is the chosen recording
+#'   file name and `<N>` is the number of the request.
+#'
+#'   If present, these adjacent files must be kept alongside the recording file
+#'   when the recording is played back with the `shinycannon` tool.
+#'
+#' @param target_app_url The URL of the deployed application.
+#' @param host The host where the proxy will run. Usually localhost is used.
+#' @param output_file The name of the generated recording file.
+#' @param open_browser Whether to open a browser on the proxy (default=`TRUE`)
+#'   or not (`FALSE`).
+#' @param port The port for the reverse proxy. Default is 8600. Change this
+#'   default if port 8600 is used by another service.
+#'
+#' @return Creates a recording file that can be used as input to the
+#'   `shinycannon` command-line load generation tool.
+#' @seealso `browseVignettes("shinyloadtest")`
 #' @export
 record_session <- function(target_app_url, host = "127.0.0.1", port = 8600,
   output_file = "recording.log", open_browser = TRUE) {

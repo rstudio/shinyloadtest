@@ -14,12 +14,12 @@ value is a path to the test result directory.}
 }
 \value{
 A tidy data frame with the test result data. Each row is an event. Columns include
-   identifiers and timing information for the event.
+identifiers and timing information for the event.
 }
 \description{
 The \code{shinycannon} tool creates a directory of log files for
-  each load test. This function translates one or more test result
-  directories into a tidy data frame.
+each load test. This function translates one or more test result
+directories into a tidy data frame.
 }
 \examples{
 \dontrun{

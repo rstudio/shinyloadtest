@@ -50,6 +50,7 @@ Remotes:
   rstudio/websocket,
   rstudio/httpuv@8492695
 RoxygenNote: 6.1.1
+Roxygen: list(markdown = TRUE)
 Suggests:
     knitr,
     testthat

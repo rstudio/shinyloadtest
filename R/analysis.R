@@ -219,7 +219,7 @@ get_times <- function(df) {
 # Tidying functions -------------------------------------------------------
 
 #' Create Tidy Load Test Results
-#' @description The \code{shinycannon} tool creates a directory of log files for
+#' @description The `shinycannon` tool creates a directory of log files for
 #'   each load test. This function translates one or more test result
 #'   directories into a tidy data frame.
 #' @param ...  Key-value pairs where the key is the desired name for the test and the
