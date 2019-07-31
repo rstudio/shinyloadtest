@@ -97,7 +97,7 @@
 <p>It’s a common misconception that <strong>“Shiny doesn’t scale.”</strong> In actuality, properly-architected Shiny applications can be scaled horizontally, a fact which Sean Lopp was recently able to demonstrate at rstudio::conf 2018. We used <code>shinycannon</code> to simulate 10,000 concurrent users interacting with an application deployed to AWS. You can see a recording of Sean’s talk and the load test demonstration here: <a href="https://www.rstudio.com/resources/videos/scaling-shiny/">Scaling Shiny</a></p>
 <p>To get started with <code>shinyloadtest</code>, read through the quick start guide below.</p>
 <div class="figure">
-<img src="reference/figures/slt_report_screenshot.png" alt="Analysis Example"><p class="caption">Analysis Example</p>
+<img src="reference/figures/slt_report_screenshot.png" alt=""><p class="caption">Analysis Example</p>
 </div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
@@ -213,32 +213,32 @@
 <strong>–output-dir</strong>: Name of the directory to create and store timing information in.</li>
 </ol>
 <p>As an example, to run a load test simulating 5 concurrent users for at least 2 minutes, outputting to the directory <code>run1</code>:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">$ <span class="ex">shinycannon</span> recording.log https://shinyapp.example.com/ --workers 5 --loaded-duration-minutes 2 --output-dir run1</a>
-<a class="sourceLine" id="cb3-2" title="2"><span class="ex">2018-08-29</span> 15:06:14.191 INFO [progress] - Running: 0, Failed: 0, Done: 0</a>
-<a class="sourceLine" id="cb3-3" title="3"><span class="ex">2018-08-29</span> 15:06:14.193 INFO [thread01] - Warming up</a>
-<a class="sourceLine" id="cb3-4" title="4"><span class="ex">2018-08-29</span> 15:06:14.195 INFO [thread00] - Waiting for warmup to complete</a>
-<a class="sourceLine" id="cb3-5" title="5"><span class="ex">2018-08-29</span> 15:06:19.193 INFO [progress] - Running: 1, Failed: 0, Done: 0</a>
-<a class="sourceLine" id="cb3-6" title="6"><span class="ex">2018-08-29</span> 15:06:24.194 INFO [progress] - Running: 1, Failed: 0, Done: 0</a>
-<a class="sourceLine" id="cb3-7" title="7"><span class="ex">2018-08-29</span> 15:06:29.083 INFO [thread02] - Warming up</a>
-<a class="sourceLine" id="cb3-8" title="8"><span class="ex">2018-08-29</span> 15:06:29.195 INFO [progress] - Running: 1, Failed: 0, Done: 0</a>
-<a class="sourceLine" id="cb3-9" title="9"><span class="ex">2018-08-29</span> 15:06:34.195 INFO [progress] - Running: 2, Failed: 0, Done: 0</a>
-<a class="sourceLine" id="cb3-10" title="10"><span class="ex">2018-08-29</span> 15:06:39.196 INFO [progress] - Running: 2, Failed: 0, Done: 0</a>
-<a class="sourceLine" id="cb3-11" title="11"><span class="ex">2018-08-29</span> 15:06:43.973 INFO [thread03] - Warming up</a>
-<a class="sourceLine" id="cb3-12" title="12"><span class="ex">2018-08-29</span> 15:06:44.196 INFO [progress] - Running: 2, Failed: 0, Done: 0</a>
-<a class="sourceLine" id="cb3-13" title="13"><span class="ex">2018-08-29</span> 15:06:49.196 INFO [progress] - Running: 3, Failed: 0, Done: 0</a>
-<a class="sourceLine" id="cb3-14" title="14"><span class="ex">2018-08-29</span> 15:06:54.201 INFO [progress] - Running: 3, Failed: 0, Done: 0</a>
-<a class="sourceLine" id="cb3-15" title="15"><span class="ex">2018-08-29</span> 15:06:58.862 INFO [thread04] - Warming up</a>
-<a class="sourceLine" id="cb3-16" title="16"><span class="ex">2018-08-29</span> 15:06:59.201 INFO [progress] - Running: 3, Failed: 0, Done: 0</a>
-<a class="sourceLine" id="cb3-17" title="17"><span class="ex">2018-08-29</span> 15:07:04.201 INFO [progress] - Running: 4, Failed: 0, Done: 0</a>
-<a class="sourceLine" id="cb3-18" title="18"><span class="ex">2018-08-29</span> 15:07:09.202 INFO [progress] - Running: 4, Failed: 0, Done: 0</a>
-<a class="sourceLine" id="cb3-19" title="19"><span class="ex">2018-08-29</span> 15:07:13.751 INFO [thread05] - Warming up</a>
-<a class="sourceLine" id="cb3-20" title="20"><span class="ex">2018-08-29</span> 15:07:13.752 INFO [thread00] - Maintaining for 2 minutes (120000 ms)</a>
-<a class="sourceLine" id="cb3-21" title="21"><span class="ex">2018-08-29</span> 15:07:14.202 INFO [progress] - Running: 4, Failed: 0, Done: 0</a>
-<a class="sourceLine" id="cb3-22" title="22"><span class="ex">2018-08-29</span> 15:07:19.202 INFO [progress] - Running: 5, Failed: 0, Done: 0</a>
-<a class="sourceLine" id="cb3-23" title="23"><span class="ex">2018-08-29</span> 15:07:24.202 INFO [progress] - Running: 5, Failed: 0, Done: 0</a>
-<a class="sourceLine" id="cb3-24" title="24"><span class="ex">...</span></a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1"></a>$ <span class="ex">shinycannon</span> recording.log https://shinyapp.example.com/ --workers 5 --loaded-duration-minutes 2 --output-dir run1</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="ex">2018-08-29</span> 15:06:14.191 INFO [progress] - Running: 0, Failed: 0, Done: 0</span>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="ex">2018-08-29</span> 15:06:14.193 INFO [thread01] - Warming up</span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="ex">2018-08-29</span> 15:06:14.195 INFO [thread00] - Waiting for warmup to complete</span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="ex">2018-08-29</span> 15:06:19.193 INFO [progress] - Running: 1, Failed: 0, Done: 0</span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="ex">2018-08-29</span> 15:06:24.194 INFO [progress] - Running: 1, Failed: 0, Done: 0</span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="ex">2018-08-29</span> 15:06:29.083 INFO [thread02] - Warming up</span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="ex">2018-08-29</span> 15:06:29.195 INFO [progress] - Running: 1, Failed: 0, Done: 0</span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="ex">2018-08-29</span> 15:06:34.195 INFO [progress] - Running: 2, Failed: 0, Done: 0</span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="ex">2018-08-29</span> 15:06:39.196 INFO [progress] - Running: 2, Failed: 0, Done: 0</span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="ex">2018-08-29</span> 15:06:43.973 INFO [thread03] - Warming up</span>
+<span id="cb3-12"><a href="#cb3-12"></a><span class="ex">2018-08-29</span> 15:06:44.196 INFO [progress] - Running: 2, Failed: 0, Done: 0</span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="ex">2018-08-29</span> 15:06:49.196 INFO [progress] - Running: 3, Failed: 0, Done: 0</span>
+<span id="cb3-14"><a href="#cb3-14"></a><span class="ex">2018-08-29</span> 15:06:54.201 INFO [progress] - Running: 3, Failed: 0, Done: 0</span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="ex">2018-08-29</span> 15:06:58.862 INFO [thread04] - Warming up</span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="ex">2018-08-29</span> 15:06:59.201 INFO [progress] - Running: 3, Failed: 0, Done: 0</span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="ex">2018-08-29</span> 15:07:04.201 INFO [progress] - Running: 4, Failed: 0, Done: 0</span>
+<span id="cb3-18"><a href="#cb3-18"></a><span class="ex">2018-08-29</span> 15:07:09.202 INFO [progress] - Running: 4, Failed: 0, Done: 0</span>
+<span id="cb3-19"><a href="#cb3-19"></a><span class="ex">2018-08-29</span> 15:07:13.751 INFO [thread05] - Warming up</span>
+<span id="cb3-20"><a href="#cb3-20"></a><span class="ex">2018-08-29</span> 15:07:13.752 INFO [thread00] - Maintaining for 2 minutes (120000 ms)</span>
+<span id="cb3-21"><a href="#cb3-21"></a><span class="ex">2018-08-29</span> 15:07:14.202 INFO [progress] - Running: 4, Failed: 0, Done: 0</span>
+<span id="cb3-22"><a href="#cb3-22"></a><span class="ex">2018-08-29</span> 15:07:19.202 INFO [progress] - Running: 5, Failed: 0, Done: 0</span>
+<span id="cb3-23"><a href="#cb3-23"></a><span class="ex">2018-08-29</span> 15:07:24.202 INFO [progress] - Running: 5, Failed: 0, Done: 0</span>
+<span id="cb3-24"><a href="#cb3-24"></a><span class="ex">...</span></span></code></pre></div>
 <p><code>shinycannon</code> includes detailed help documentation explaining the other arguments:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="ex">shinycannon</span> -h</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="ex">shinycannon</span> -h</span></code></pre></div>
 <p>During the test, <code>shinycannon</code> reports the progress and number of simulated users. The result of the test is an output directory (<code>run1</code> in the example above) which includes timing information for each session.</p>
 </div>
 <div id="step-3-analyze-the-results" class="section level3">
@@ -246,7 +246,7 @@
 <a href="#step-3-analyze-the-results" class="anchor"></a>Step 3: Analyze the Results</h3>
 <p>The output directory created in step 2 (<code>run1</code>) is the focus of step 3. The <code>shinyloadtest</code> R package provides functions for analyzing the output files from the test.</p>
 <p>A tidy data frame of run simulation information can be created using <code><a href="reference/load_runs.html">shinyloadtest::load_runs</a></code>.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">df &lt;-<span class="st"> </span>shinyloadtest<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/shinyloadtest/topics/load_runs">load_runs</a></span>(<span class="st">"5 workers"</span> =<span class="st"> "./run1"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>df &lt;-<span class="st"> </span>shinyloadtest<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/shinyloadtest/topics/load_runs">load_runs</a></span>(<span class="st">"5 workers"</span> =<span class="st"> "./run1"</span>)</span></code></pre></div>
 <p>Once the data is loaded into R, a report can be generated using:</p>
 <pre><code><a href="reference/shinyloadtest_report.html">shinyloadtest::shinyloadtest_report(df, "run1.html")</a></code></pre>
 <p>This self contained html report will be opened in your browser for inspection. For further analysis explaination, please visit <a href="articles/analyzing-load-test-logs.html">‘Analysing load test logs’</a>.</p>

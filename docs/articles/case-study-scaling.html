@@ -144,12 +144,12 @@
 <h3 class="hasAnchor">
 <a href="#record-a-session" class="anchor"></a>Record a session</h3>
 <p>First you should install the <code>shinyloadtest</code> R package if you haven’t yet:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">'rstudio/shinyloadtest'</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">'rstudio/shinyloadtest'</span>)</span></code></pre></div>
 <p>Next, obtain the “solo” URL of the deployed app in RStudio Connect. You can do this by navigating to the application from the list of published content, clicking the circular button at the top right of the screen, and then clicking “Open Solo”. This will open a new window. Copy the URL from this new window.</p>
 <p><img src="images/rsc_open_solo.png"></p>
 <p>Back in the R console, run <code>record_session</code> with the solo URL as an argument:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(shinyloadtest)</a>
-<a class="sourceLine" id="cb2-2" title="2"><span class="kw"><a href="../reference/record_session.html">record_session</a></span>(<span class="st">"https://rsc.example.com/content/1234/"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(shinyloadtest)</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="kw"><a href="../reference/record_session.html">record_session</a></span>(<span class="st">"https://rsc.example.com/content/1234/"</span>)</span></code></pre></div>
 <p>This starts a local web server listening on <code>http://127.0.0.1:8600/</code> and should also open a new browser window to this URL. This local web server is a proxy that relays content to and from your RStudio Connect instance, recording interactions so that they can be played back later. It’s in this window that you should model what you imagine would be a typical user interaction. Click around, change things, and observe new outputs.</p>
 <p>Do this for 1-2 minutes. When you’re done, close the browser tab. You should notice the function return in the R console.</p>
 <p>On disk, in the directory where you started R, will be a new file: <code>recording.log</code>. There may also be other files like <code>recording.log.post.0</code>. These complementary files are created when you upload files or if you use an htmlwidget like <a href="https://github.com/rstudio/DT">DT</a> that uses HTTP POST to send data.</p>
@@ -208,10 +208,10 @@
 <h2 class="hasAnchor">
 <a href="#analyze" class="anchor"></a>Analyze</h2>
 <p>At this point we have two runs worth of metrics in our <code>run1</code> and <code>run5</code> output directories. Let’s get back in an R console and process the data into a dataframe:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(shinyloadtest)</a>
-<a class="sourceLine" id="cb6-2" title="2">df &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_runs.html">load_runs</a></span>(<span class="st">"Run 1"</span> =<span class="st"> "run1"</span>, <span class="st">"Run 5"</span> =<span class="st"> "run5"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(shinyloadtest)</span>
+<span id="cb6-2"><a href="#cb6-2"></a>df &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_runs.html">load_runs</a></span>(<span class="st">"Run 1"</span> =<span class="st"> "run1"</span>, <span class="st">"Run 5"</span> =<span class="st"> "run5"</span>)</span></code></pre></div>
 <p>With the data in a tidy data frame, we can generate an HTML report:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw"><a href="../reference/shinyloadtest_report.html">shinyloadtest_report</a></span>(df, <span class="st">"report1.html"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw"><a href="../reference/shinyloadtest_report.html">shinyloadtest_report</a></span>(df, <span class="st">"report1.html"</span>)</span></code></pre></div>
 <p>When you open <code>report1.html</code> in your browser, you’ll see something like this:</p>
 <p><img src="images/report_example.png"></p>
 <blockquote>
@@ -268,9 +268,9 @@
 <h2 class="hasAnchor">
 <a href="#analyze-again" class="anchor"></a>Analyze again</h2>
 <p>Now, back in R, we can generate a new report and compare <code>run5</code> to <code>run5-new-settings</code>:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(shinyloadtest)</a>
-<a class="sourceLine" id="cb9-2" title="2">df &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_runs.html">load_runs</a></span>(<span class="st">"Run 5"</span> =<span class="st"> "run5"</span>, <span class="st">"Run 5 new"</span> =<span class="st"> "run5-new-settings"</span>)</a>
-<a class="sourceLine" id="cb9-3" title="3"><span class="kw"><a href="../reference/shinyloadtest_report.html">shinyloadtest_report</a></span>(df, <span class="st">"report2.html"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(shinyloadtest)</span>
+<span id="cb9-2"><a href="#cb9-2"></a>df &lt;-<span class="st"> </span><span class="kw"><a href="../reference/load_runs.html">load_runs</a></span>(<span class="st">"Run 5"</span> =<span class="st"> "run5"</span>, <span class="st">"Run 5 new"</span> =<span class="st"> "run5-new-settings"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="kw"><a href="../reference/shinyloadtest_report.html">shinyloadtest_report</a></span>(df, <span class="st">"report2.html"</span>)</span></code></pre></div>
 <blockquote>
 <p>If you don’t want to generate the report yourself, you can view an example here: <a href="https://rstudio.github.io/shinyloadtest/articles/case_studies/case_study_report2.html">case_study_report2.html</a></p>
 </blockquote>

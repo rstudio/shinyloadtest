@@ -32,7 +32,9 @@
 
 <meta property="og:title" content="Record a Session for Load Test — record_session" />
 
-<meta property="og:description" content="Record a Session for Load Test" />
+<meta property="og:description" content="This function creates a reverse proxy at http://host:port
+(http://127.0.0.1:8600 by default) that intercepts and records activity
+between your web browser and the Shiny application at target_app_url." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -129,7 +131,9 @@
 
     <div class="ref-description">
     
-    <p>Record a Session for Load Test</p>
+    <p>This function creates a <a href='https://en.wikipedia.org/wiki/Reverse_proxy'>reverse proxy</a> at <code>http://host:port</code>
+(http://127.0.0.1:8600 by default) that intercepts and records activity
+between your web browser and the Shiny application at <code>target_app_url</code>.</p>
     
     </div>
 
@@ -141,7 +145,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>target_app_url</th>
-      <td><p>The URL of the deployed application</p></td>
+      <td><p>The URL of the deployed application.</p></td>
     </tr>
     <tr>
       <th>host</th>
@@ -149,32 +153,52 @@
     </tr>
     <tr>
       <th>port</th>
-      <td><p>The port for the proxy. Default is 8600. Change this default if
-port 8600 is used by another service.</p></td>
+      <td><p>The port for the reverse proxy. Default is 8600. Change this
+default if port 8600 is used by another service.</p></td>
     </tr>
     <tr>
       <th>output_file</th>
-      <td><p>The name for the generated log file.</p></td>
+      <td><p>The name of the generated recording file.</p></td>
     </tr>
     <tr>
       <th>open_browser</th>
-      <td><p>Whether to open a browser on the proxy
-(default=<code>TRUE</code>) or not (<code>FALSE</code>).</p></td>
+      <td><p>Whether to open a browser on the proxy (default=<code>TRUE</code>)
+or not (<code>FALSE</code>).</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>Creates a recording file that can be used to drive a load test.</p>
+    <p>Creates a recording file that can be used as input to the
+<code>shinycannon</code> command-line load generation tool.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>This function creates a reverse proxy listening at <code>host:port</code>
-  that stands in front of <code>target_app_url</code>. As the user interacts with
-  the app, the actions and responses are recorded in a file that can be
-  replayed later. By default, a web browser is opened automatically so that
-  you can begin recording immediately, without manually starting a browser
-  and navigating to <code>host:port</code>.</p>
+    <p>By default, after creating the reverse proxy, a web browser is opened
+automatically. As you interact with the application in the web browser,
+activity is written to the <code>output_file</code> (<code>recording.log</code> by default).</p>
+<p>To shut down the reverse proxy and complete the recording, close the web
+browser tab or window.</p>
+<p>Recordings are used as input to the <code>shinycannon</code> command-line
+load-generation tool which can be obtained from the <a href='https://rstudio.github.io/shinyloadtest/index.html'>shinyloadtest documentation site</a>.</p>
+    
+    <h2 class="hasAnchor" id="fileinput-dt-http-post-support"><a class="anchor" href="#fileinput-dt-http-post-support"></a><code>fileInput</code>/<code>DT</code>/<code>HTTP POST</code> support</h2>
+
+    
+    <p>Shiny's <code><a href='https://www.rdocumentation.org/packages/shiny/topics/fileInput'>shiny::fileInput()</a></code> input for uploading files, the <code>DT</code> package,
+and potentially other packages make HTTP POST requests to the target
+application. Because POST requests can be large, they are not stored
+directly in the recording file. Instead, new files adjacent to the
+recording are created for each HTTP POST request intercepted.</p>
+<p>The adjacent files are named after the recording with the pattern
+<code>&lt;output_file&gt;.post.&lt;N&gt;</code>, where <code>&lt;output_file&gt;</code> is the chosen recording
+file name and <code>&lt;N&gt;</code> is the number of the request.</p>
+<p>If present, these adjacent files must be kept alongside the recording file
+when the recording is played back with the <code>shinycannon</code> tool.</p>
+    
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><code><a href='https://www.rdocumentation.org/packages/utils/topics/browseVignettes'>browseVignettes("shinyloadtest")</a></code></p></div>
     
 
   </div>
@@ -186,6 +210,10 @@ port 8600 is used by another service.</p></td>
       <li><a href="#value">Value</a></li>
 
       <li><a href="#details">Details</a></li>
+
+      <li><a href="#fileinput-dt-http-post-support"><code>fileInput</code>/<code>DT</code>/<code>HTTP POST</code> support</a></li>
+
+      <li><a href="#see-also">See also</a></li>
           </ul>
 
   </div>
