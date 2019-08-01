@@ -215,6 +215,10 @@ RecordingSession <- R6::R6Class("RecordingSession",
         httpuv::interrupt()
         private$localServer <- NULL
         close(private$outputFile)
+        if (length(private$postFiles)) {
+          fileList <- paste(sprintf("\t%s", private$postFiles), collapse = '\n')
+          message("Note: uploaded files to keep with recording file:\n", fileList)
+        }
       }
     },
     # An environment of session-specific identifier strings to their
@@ -231,7 +235,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
     outputFile = NULL,
     sessionCookies = data.frame(),
     clientWsState = CLIENT_WS_STATE$UNOPENED,
-    postFileCounter = 0,
+    postFiles = character(0),
     writeEvent = function(evt) {
       writeLines(format(evt), private$outputFile)
       flush(private$outputFile)
@@ -284,7 +288,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
         # TODO Figure out how to use CURL_INFILESIZE_LARGE to upload files
         # larger than 2GB.
         curl::handle_setopt(h, post = TRUE, infilesize = as.integer(req$HTTP_CONTENT_LENGTH))
-        dataFileName <- sprintf("%s.post.%d", private$outputFileName, private$postFileCounter)
+        dataFileName <- sprintf("%s.post.%d", private$outputFileName, length(private$postFiles))
         writeCon <- file(dataFileName, "wb")
         curl::handle_setopt(h, readfunction = function(n) {
           data <- req$rook.input$read(n)
@@ -294,7 +298,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
         on.exit({
           flush(writeCon)
           close(writeCon)
-          private$postFileCounter <- private$postFileCounter + 1
+          private$postFiles <- c(private$postFiles, dataFileName)
         })
       }
 
