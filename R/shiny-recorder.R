@@ -215,9 +215,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
         httpuv::interrupt()
         private$localServer <- NULL
         close(private$outputFile)
-        if (length(fileList)) {
+        if (length(private$postFiles)) {
           fileList <- paste(sprintf("\t%s", private$postFiles), collapse = '\n')
-          message("Note: the following files containing uploaded data were created. They must be kept with the recording file.\n", fileList)
+          message("Note: uploaded files to keep with recording file:\n", fileList)
         }
       }
     },
