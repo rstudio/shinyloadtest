@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <script type="application/shiny-singletons"></script>
+  <script type="application/html-dependencies">json2[2014.02.04];jquery[1.12.4];shiny[1.3.2];jqueryui[1.12.1];showdown[0.3.1];highlight.js[6.2];ionrangeslider[2.1.6];strftime[0.9.2];bootstrap[3.3.7];font-awesome[5.3.1]</script>
+<script src="shared/json2-min.js"></script>
+<script src="shared/jquery.min.js"></script>
+<link href="shared/shiny.css" rel="stylesheet" />
+<script src="shared/shiny.min.js"></script>
+<script src="shared/jqueryui/jquery-ui.min.js"></script>
+<script src="shared/showdown/compressed/showdown.js"></script>
+<script src="shared/highlight/highlight.pack.js"></script>
+<link href="shared/ionrangeslider/css/ion.rangeSlider.css" rel="stylesheet" />
+<link href="shared/ionrangeslider/css/ion.rangeSlider.skinShiny.css" rel="stylesheet" />
+<script src="shared/ionrangeslider/js/ion.rangeSlider.min.js"></script>
+<script src="shared/strftime/strftime-min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="shared/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<script src="shared/bootstrap/js/bootstrap.min.js"></script>
+<script src="shared/bootstrap/shim/html5shiv.min.js"></script>
+<script src="shared/bootstrap/shim/respond.min.js"></script>
+<link href="font-awesome-5.3.1/css/all.min.css" rel="stylesheet" />
+<link href="font-awesome-5.3.1/css/v4-shims.min.css" rel="stylesheet" />  <script src="shared/shiny-showcase.js"></script>
+  <link rel="stylesheet" type="text/css" href="shared/highlight/rstudio.css"/>
+  <link rel="stylesheet" type="text/css" href="shared/shiny-showcase.css"/>
+  <script type="text/markdown" id="showcase-markdown-content">This small Shiny application demonstrates Shiny's automatic UI updates. 
+
+Move the *Number of bins* slider and notice how the `renderPlot` expression is automatically re-evaluated when its dependant, `input$bins`, changes, causing a histogram with a new number of bins to be rendered.</script>
+  <title>Hello Shiny!</title>
+
+</head>
+
+<body>
+  <table id="showcase-app-code">
+    <tr>
+      <td id="showcase-app-container" class="showcase-app-container-expanded">
+        <div class="container-fluid">
+          <h2>Hello Shiny!</h2>
+          <div class="row">
+            <div class="col-sm-4">
+              <form class="well">
+                <div class="form-group shiny-input-container">
+                  <label class="control-label" for="bins">Number of bins:</label>
+                  <input class="js-range-slider" id="bins" data-min="1" data-max="50" data-from="30" data-step="1" data-grid="true" data-grid-num="9.8" data-grid-snap="false" data-prettify-separator="," data-prettify-enabled="true" data-keyboard="true" data-data-type="number"/>
+                </div>
+              </form>
+            </div>
+            <div class="col-sm-8">
+              <div id="distPlot" class="shiny-plot-output" style="width: 100% ; height: 400px"></div>
+            </div>
+          </div>
+        </div>
+        <td id="showcase-sxs-code" class="showcase-sxs-code-collapsed"></td>
+      </td>
+    </tr>
+  </table>
+  <div class="container-fluid shiny-code-container well" id="showcase-well">
+    <div class="row">
+      <div id="showcase-app-metadata" class="col-sm-4">
+        <h4 class="text-muted shiny-showcase-apptitle">
+          Hello Shiny!
+          <small>
+            <br/>
+            by
+            <a href="http://www.rstudio.com/" class="shiny-showcase-appauthor">RStudio, Inc.</a>
+            
+          </small>
+        </h4>
+        <div id="readme-md"></div>
+      </div>
+      <div id="showcase-code-inline" class="col-sm-8">
+        <div id="showcase-code-tabs">
+          <a id="showcase-code-position-toggle" class="btn btn-default btn-sm" onclick="toggleCodePosition()">
+            <i class="fa fa-level-up"></i>
+            show with app
+          </a>
+          <ul class="nav nav-tabs">
+            <li class="active">
+              <a href="#app_R_code" data-toggle="tab">app.R</a>
+            </li>
+          </ul>
+          <div class="tab-content" id="showcase-code-content">
+            <div class="tab-pane active" id="app_R_code">
+              <pre class="shiny-code"><code class="language-r">library(shiny)
+
+# Define UI for app that draws a histogram ----
+ui &lt;- fluidPage(
+
+  # App title ----
+  titlePanel("Hello Shiny!"),
+
+  # Sidebar layout with input and output definitions ----
+  sidebarLayout(
+
+    # Sidebar panel for inputs ----
+    sidebarPanel(
+
+      # Input: Slider for the number of bins ----
+      sliderInput(inputId = "bins",
+                  label = "Number of bins:",
+                  min = 1,
+                  max = 50,
+                  value = 30)
+
+    ),
+
+    # Main panel for displaying outputs ----
+    mainPanel(
+
+      # Output: Histogram ----
+      plotOutput(outputId = "distPlot")
+
+    )
+  )
+)
+
+# Define server logic required to draw a histogram ----
+server &lt;- function(input, output) {
+
+  # Histogram of the Old Faithful Geyser Data ----
+  # with requested number of bins
+  # This expression that generates a histogram is wrapped in a call
+  # to renderPlot to indicate that:
+  #
+  # 1. It is "reactive" and therefore should be automatically
+  #    re-executed when inputs (input$bins) change
+  # 2. Its output type is a plot
+  output$distPlot &lt;- renderPlot({
+
+    x    &lt;- faithful$waiting
+    bins &lt;- seq(min(x), max(x), length.out = input$bins + 1)
+
+    hist(x, breaks = bins, col = "#75AADB", border = "white",
+         xlab = "Waiting time to next eruption (in mins)",
+         main = "Histogram of waiting times")
+
+    })
+
+}
+
+# Create Shiny app ----
+shinyApp(ui = ui, server = server)</code></pre>
+            </div>
+          </div>
+          <small class="showcase-code-license text-muted">
+            Code license: 
+            <a href="http://www.r-project.org/Licenses/MIT">MIT</a>
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
