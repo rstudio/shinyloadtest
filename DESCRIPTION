@@ -44,10 +44,9 @@ Imports:
     scales,
     stringr,
     tibble,
-    websocket,
+    websocket (>= 1.0.0),
     xml2
 Remotes:
-  rstudio/websocket,
   rstudio/httpuv@8492695
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
