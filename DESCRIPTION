@@ -33,7 +33,7 @@ Imports:
     glue,
     gtable,
     htmltools,
-    httpuv (>= 1.5.1.9000),
+    httpuv (>= 1.5.2),
     jsonlite,
     lubridate,
     magrittr,
@@ -46,8 +46,6 @@ Imports:
     tibble,
     websocket (>= 1.0.0),
     xml2
-Remotes:
-  rstudio/httpuv
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 Suggests:
