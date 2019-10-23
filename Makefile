@@ -16,7 +16,10 @@ urls:
 	rm -f RELEASE_URLS.csv
 	wget https://s3.amazonaws.com/rstudio-shinycannon-build/RELEASE_URLS.csv
 
-site:
+index.md: index.Rmd
+	R -e 'rmarkdown::render("index.Rmd", output_format = rmarkdown::md_document())'
+
+site: index.md
 	R -e 'devtools::document()'
 	R CMD INSTALL --no-multiarch --with-keep.source .
 	HEADLESS=TRUE Rscript scripts/test_sessions.R && rm Rplots.pdf
@@ -30,5 +33,6 @@ devbuild:
 	R -e 'devtools::build(vignettes = FALSE)'
 
 clean:
+	rm -f index.md
 	rm -rf output
 	find vignettes/test_sessions/ -mindepth 1 -type d -exec rm -rf '{}' ';'
