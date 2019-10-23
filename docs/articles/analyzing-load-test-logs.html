@@ -7,8 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Analyzing Load Test Logs • shinyloadtest</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Analyzing Load Test Logs">
 <meta property="og:description" content="">
 <meta name="twitter:card" content="summary">
@@ -83,6 +84,7 @@
 <!--/.navbar -->
 
       
+
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
@@ -132,7 +134,7 @@
 <h1 class="hasAnchor">
 <a href="#tidy-data" class="anchor"></a>Tidy Data</h1>
 <p><code>shinycannon</code> recording sessions can be loaded into R using the <code>load_runs</code> function.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>df &lt;-<span class="st"> </span>shinyloadtest<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/shinyloadtest/topics/load_runs">load_runs</a></span>(</span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>df &lt;-<span class="st"> </span>shinyloadtest<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/shinyloadtest/man/load_runs.html">load_runs</a></span>(</span>
 <span id="cb1-2"><a href="#cb1-2"></a>  <span class="st">`</span><span class="dt">Run 1</span><span class="st">`</span> =<span class="st"> "./PATH/TO/RUN_1"</span>,</span>
 <span id="cb1-3"><a href="#cb1-3"></a>  <span class="st">`</span><span class="dt">Run 2</span><span class="st">`</span> =<span class="st"> "./PATH/TO/RUN_2"</span>,</span>
 <span id="cb1-4"><a href="#cb1-4"></a>  <span class="st">`</span><span class="dt">Run 3</span><span class="st">`</span> =<span class="st"> "./PATH/TO/RUN_3"</span></span>
@@ -264,12 +266,12 @@
 <h1 class="hasAnchor">
 <a href="#report-output" class="anchor"></a>Report Output</h1>
 <p>The data provided by <code><a href="../reference/load_runs.html">shinyloadtest::load_runs</a></code> can be used to directly create a stand alone HTML report. This report contains six major sections of diagnostic information.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>df &lt;-<span class="st"> </span>shinyloadtest<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/shinyloadtest/topics/load_runs">load_runs</a></span>(</span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>df &lt;-<span class="st"> </span>shinyloadtest<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/shinyloadtest/man/load_runs.html">load_runs</a></span>(</span>
 <span id="cb2-2"><a href="#cb2-2"></a>  <span class="st">"1 user"</span> =<span class="st"> "./demo1"</span>,</span>
 <span id="cb2-3"><a href="#cb2-3"></a>  <span class="st">"4 users"</span> =<span class="st"> "./demo4"</span>,</span>
 <span id="cb2-4"><a href="#cb2-4"></a>  <span class="st">"16 users"</span> =<span class="st"> "./demo16"</span></span>
 <span id="cb2-5"><a href="#cb2-5"></a>)</span>
-<span id="cb2-6"><a href="#cb2-6"></a>shinyloadtest<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/shinyloadtest/topics/shinyloadtest_report">shinyloadtest_report</a></span>(df, <span class="st">"report.html"</span>)</span></code></pre></div>
+<span id="cb2-6"><a href="#cb2-6"></a>shinyloadtest<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/shinyloadtest/man/shinyloadtest_report.html">shinyloadtest_report</a></span>(df, <span class="st">"report.html"</span>)</span></code></pre></div>
 <div id="sessions" class="section level2">
 <h2 class="hasAnchor">
 <a href="#sessions" class="anchor"></a>Sessions</h2>
@@ -384,17 +386,20 @@
 </div>
 
 
+
       <footer><div class="copyright">
   <p>Developed by Alan Dipert, Barret Schloerke, Barbara Borges, <a href="https://www.rstudio.com"><img src="https://tidyverse.org/rstudio-logo.svg" height="24"></a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>

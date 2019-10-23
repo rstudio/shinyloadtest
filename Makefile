@@ -9,12 +9,12 @@ help:
 	@echo "make devbuild: runs devtools::build() without building vignettes, since we have a separate/special process for doing that (make site, above)"
 	@echo "make clean: clean the docs and doc site"
 
-# Updates RELEASE_URLS.txt file.
+# Updates RELEASE_URLS.csv file.
 # Should be done manually when a new version of shinycannon is released.
-# RELEASE_URLS.txt is read by index.Rmd
+# RELEASE_URLS.csv is read by index.Rmd
 urls:
-	rm -f RELEASE_URLS.txt
-	wget https://s3.amazonaws.com/rstudio-shinycannon-build/RELEASE_URLS.txt
+	rm -f RELEASE_URLS.csv
+	wget https://s3.amazonaws.com/rstudio-shinycannon-build/RELEASE_URLS.csv
 
 site:
 	R -e 'devtools::document()'

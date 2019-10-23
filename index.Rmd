@@ -1,3 +1,8 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
 # Load Testing Shiny Applications
 
 The `shinyloadtest` package and the accompanying [`shinycannon`](https://github.com/rstudio/shinycannon) software enable load testing
@@ -33,36 +38,32 @@ As opposed to the `shinyloadtest` R package, `shinycannon` is installed and run 
 Depending on your distribution, `shinycannon` can be installed using one of the following packages.
 
 ```{r include=FALSE}
-library(tibble)
-library(dplyr)
+library(readr)
 library(magrittr)
-library(tools)
+library(dplyr)
 library(knitr)
-shinycannon_files <- tibble(url = readLines("RELEASE_URLS.txt")) %>%
-  mutate(
-    name = basename(url),
-    ext = file_ext(name),
-    version = regmatches(name, regexpr("[0-9]+\\.[0-9]+\\.[0-9]+-[0-9a-f]{7}", name)),
-    `Download Link` = sprintf("<a href='%s'>%s</a>", url, name)
-  )
 
-package_types <- tibble(
-  ext = c("deb", "rpm"),
-  Distribution = c("Ubuntu/Debian", "Redhat/Fedora/CentOS"),
-  command_str = c("<code>sudo dpkg -i %s</code>", "<code>sudo yum install -y %s</code>")
+shinycannon_files <- read_csv("RELEASE_URLS.csv") %>%
+  mutate(`Download Link` = sprintf("<a href='%s'>%s</a>", url, file))
+
+package_types <- tribble(
+  ~platform,  ~Distribution,          ~command_str,
+  "deb",      "Ubuntu/Debian",        "<code>sudo dpkg -i %s</code>",
+  "rpm_rh",   "Redhat/Fedora/CentOS", "<code>sudo yum install -y %s</code>",
+  "rpm_suse", "SUSE",                 "<code>sudo zypper install -y --no-gpg-checks %s</code>"
 )
 
 linux_packages <- shinycannon_files %>%
-  inner_join(package_types) %>%
-  mutate(`Install Command` = sprintf(command_str, name)) %>%
+  right_join(package_types, by = "platform") %>%
+  mutate(`Install Command` = sprintf(command_str, file)) %>%
   select(`Distribution`, `Download Link`, `Install Command`)
 
 shinycannon_sh <- shinycannon_files %>%
-  filter(ext == "sh") %>%
+  filter(platform == "sh") %>%
   unlist()
 
 shinycannon_jar <- shinycannon_files %>%
-  filter(ext == "jar") %>%
+  filter(platform == "jar") %>%
   unlist()
 ```
 
@@ -74,14 +75,14 @@ kable(linux_packages, caption = "Linux Packages")
 
 1. Install [Java](https://www.java.com/en/download/)
 1. Download `r shinycannon_sh[["Download Link"]]`
-1. Install with `sudo cp `r shinycannon_sh[["name"]]` /usr/local/bin/shinycannon; sudo chmod +x /usr/local/bin/shinycannon`
+1. Install with `sudo cp `r shinycannon_sh[["file"]]` /usr/local/bin/shinycannon; sudo chmod +x /usr/local/bin/shinycannon`
 1. Run `shinycannon -h` to see help output, or `shinycannon [RECORDING-PATH] [APP-URL]` to generate load.
 
 #### Windows
 
 1. Install [Java](https://www.java.com/en/download/)
 1. Download `r shinycannon_jar[["Download Link"]]` to the directory you wish to run it in
-1. Run `java -jar `r shinycannon_jar[["name"]]` -h` to see help output, or `java -jar `r shinycannon_jar[["name"]]` [RECORDING-PATH] [APP-URL]` to generate load.
+1. Run `java -jar `r shinycannon_jar[["file"]]` -h` to see help output, or `java -jar `r shinycannon_jar[["file"]]` [RECORDING-PATH] [APP-URL]` to generate load.
 
 ## Quick Start
 

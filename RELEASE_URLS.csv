@@ -1,0 +1,6 @@
+version,sha,platform,file,url
+1.0.0,38be139,deb,shinycannon_1.0.0-38be139_amd64.deb,https://s3.amazonaws.com/rstudio-shinycannon-build/2019-10-23-19:28:20_1.0.0-38be139/deb/shinycannon_1.0.0-38be139_amd64.deb
+1.0.0,38be139,rpm_suse,shinycannon-1.0.0-suse-38be139.x86_64.rpm,https://s3.amazonaws.com/rstudio-shinycannon-build/2019-10-23-19:28:20_1.0.0-38be139/rpm/shinycannon-1.0.0-suse-38be139.x86_64.rpm
+1.0.0,38be139,rpm_rh,shinycannon-1.0.0-38be139.x86_64.rpm,https://s3.amazonaws.com/rstudio-shinycannon-build/2019-10-23-19:28:20_1.0.0-38be139/rpm/shinycannon-1.0.0-38be139.x86_64.rpm
+1.0.0,38be139,jar,shinycannon-1.0.0-38be139.jar,https://s3.amazonaws.com/rstudio-shinycannon-build/2019-10-23-19:28:20_1.0.0-38be139/jar/shinycannon-1.0.0-38be139.jar
+1.0.0,38be139,sh,shinycannon-1.0.0-38be139.sh,https://s3.amazonaws.com/rstudio-shinycannon-build/2019-10-23-19:28:20_1.0.0-38be139/bin/shinycannon-1.0.0-38be139.sh
