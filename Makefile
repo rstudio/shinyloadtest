@@ -26,7 +26,7 @@ build_site: prep_vignettes
 	R --quiet --no-restore -e 'unlink("./docs", recursive = TRUE); pkgdown::build_site()'
 
 prep_vignettes: index.md
-	HEADLESS=TRUE Rscript scripts/test_sessions.R && rm Rplots.pdf
+	HEADLESS=TRUE Rscript --verbose scripts/test_sessions.R && rm Rplots.pdf
 
 rcmdcheck:
 	R CMD check --as-cran `Rscript -e 'cat(devtools::build(quiet = TRUE))'`
