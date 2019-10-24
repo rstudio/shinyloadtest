@@ -16,7 +16,7 @@ jobs:
       if: |
         repo = rstudio/reactlog AND \
         type = push AND \
-        branch =~ /^(master|vig_fixes_travis_docs)$/
+        branch = vig_fixes_travis_docs
       before_cache: Rscript -e 'remotes::install_cran("pkgdown")'
       before_deploy:
         - make prep_vignettes
