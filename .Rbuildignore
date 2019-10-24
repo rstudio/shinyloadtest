@@ -3,7 +3,6 @@
 ^\.travis\.yml\.old
 ^docs/
 ^output/
-^test_sessions/
 ^\.travis\.yml$
 ^shinyloadtest_report/
 ^shinyloadtest_report\.html$
@@ -17,3 +16,5 @@
 ^Meta$
 ^RELEASE_URLS\.csv$
 ^vignettes/not-yet-written
+\.Rcheck
+.*\.icloud
