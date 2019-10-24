@@ -66,9 +66,6 @@
     <li>
       <a href="../articles/troubleshooting-ssl.html">Troubleshooting SSL</a>
     </li>
-    <li>
-      <a href="../articles/faq.html">FAQ</a>
-    </li>
   </ul>
 </li>
 <li>
@@ -134,11 +131,11 @@
 <h1 class="hasAnchor">
 <a href="#tidy-data" class="anchor"></a>Tidy Data</h1>
 <p><code>shinycannon</code> recording sessions can be loaded into R using the <code>load_runs</code> function.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>df &lt;-<span class="st"> </span>shinyloadtest<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/shinyloadtest/man/load_runs.html">load_runs</a></span>(</span>
-<span id="cb1-2"><a href="#cb1-2"></a>  <span class="st">`</span><span class="dt">Run 1</span><span class="st">`</span> =<span class="st"> "./PATH/TO/RUN_1"</span>,</span>
-<span id="cb1-3"><a href="#cb1-3"></a>  <span class="st">`</span><span class="dt">Run 2</span><span class="st">`</span> =<span class="st"> "./PATH/TO/RUN_2"</span>,</span>
-<span id="cb1-4"><a href="#cb1-4"></a>  <span class="st">`</span><span class="dt">Run 3</span><span class="st">`</span> =<span class="st"> "./PATH/TO/RUN_3"</span></span>
-<span id="cb1-5"><a href="#cb1-5"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">df &lt;-<span class="st"> </span>shinyloadtest<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/shinyloadtest/man/load_runs.html">load_runs</a></span>(</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">  <span class="st">`</span><span class="dt">Run 1</span><span class="st">`</span> =<span class="st"> "./PATH/TO/RUN_1"</span>,</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3">  <span class="st">`</span><span class="dt">Run 2</span><span class="st">`</span> =<span class="st"> "./PATH/TO/RUN_2"</span>,</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">  <span class="st">`</span><span class="dt">Run 3</span><span class="st">`</span> =<span class="st"> "./PATH/TO/RUN_3"</span></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5">)</a></code></pre></div>
 <p>The <code><a href="../reference/load_runs.html">shinyloadtest::load_runs</a></code> function uses these files to generate a data frame with load test results. The resulting data frame contains the following columns:</p>
 <ul>
 <li>
@@ -266,12 +263,12 @@
 <h1 class="hasAnchor">
 <a href="#report-output" class="anchor"></a>Report Output</h1>
 <p>The data provided by <code><a href="../reference/load_runs.html">shinyloadtest::load_runs</a></code> can be used to directly create a stand alone HTML report. This report contains six major sections of diagnostic information.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>df &lt;-<span class="st"> </span>shinyloadtest<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/shinyloadtest/man/load_runs.html">load_runs</a></span>(</span>
-<span id="cb2-2"><a href="#cb2-2"></a>  <span class="st">"1 user"</span> =<span class="st"> "./demo1"</span>,</span>
-<span id="cb2-3"><a href="#cb2-3"></a>  <span class="st">"4 users"</span> =<span class="st"> "./demo4"</span>,</span>
-<span id="cb2-4"><a href="#cb2-4"></a>  <span class="st">"16 users"</span> =<span class="st"> "./demo16"</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a>)</span>
-<span id="cb2-6"><a href="#cb2-6"></a>shinyloadtest<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/shinyloadtest/man/shinyloadtest_report.html">shinyloadtest_report</a></span>(df, <span class="st">"report.html"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">df &lt;-<span class="st"> </span>shinyloadtest<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/shinyloadtest/man/load_runs.html">load_runs</a></span>(</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">  <span class="st">"1 user"</span> =<span class="st"> "./demo1"</span>,</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">  <span class="st">"4 users"</span> =<span class="st"> "./demo4"</span>,</a>
+<a class="sourceLine" id="cb2-4" data-line-number="4">  <span class="st">"16 users"</span> =<span class="st"> "./demo16"</span></a>
+<a class="sourceLine" id="cb2-5" data-line-number="5">)</a>
+<a class="sourceLine" id="cb2-6" data-line-number="6">shinyloadtest<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/shinyloadtest/man/shinyloadtest_report.html">shinyloadtest_report</a></span>(df, <span class="st">"report.html"</span>)</a></code></pre></div>
 <div id="sessions" class="section level2">
 <h2 class="hasAnchor">
 <a href="#sessions" class="anchor"></a>Sessions</h2>
@@ -362,6 +359,7 @@
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>

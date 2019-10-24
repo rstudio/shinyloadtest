@@ -233,16 +233,16 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <p>Download the certificate to the machine running <code>shinycannon</code> using the following command, substituting <code>example.com</code> for the hostname or address of the target server:</p>
 <p><em>If the target host is an IP address, you should omit the <code>-servername</code> parameter.</em></p>
 <p><strong>Linux</strong>:</p>
-<pre><code>openssl s_client -connect example.com:443 -servername example.com:443 &lt; /dev/null | sed -ne &#39;/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p&#39; &gt; public.crt</code></pre>
+<pre><code>openssl s_client -connect example.com:443 -servername example.com:443 &lt; /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' &gt; public.crt</code></pre>
 <p><strong>Windows</strong>:</p>
 <p><em>If you haven’t, you should install <a href="http://gnuwin32.sourceforge.net/packages/sed.htm">Sed for Windows</a> and <a href="https://www.openssl.org/">OpenSSL</a></em></p>
-<pre><code>openssl s_client -connect google.com:443 -servername google.com:443 &lt; NUL | sed -ne &#39;/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p&#39; &gt; public.crt</code></pre>
+<pre><code>openssl s_client -connect google.com:443 -servername google.com:443 &lt; NUL | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' &gt; public.crt</code></pre>
 </div>
 <div id="find-java_home" class="section level3">
 <h3>Find <code>JAVA_HOME</code></h3>
 <p>Determine your system’s JAVA_HOME location with the following command:</p>
 <p><em>On Linux, the $JAVA_HOME environment variable may already be set. If it is, use it instead.</em></p>
-<pre><code>jrunscript -e &#39;java.lang.System.out.println(java.lang.System.getProperty(&quot;java.home&quot;));&#39;</code></pre>
+<pre><code>jrunscript -e 'java.lang.System.out.println(java.lang.System.getProperty(&quot;java.home&quot;));'</code></pre>
 </div>
 <div id="install-certificate" class="section level3">
 <h3>Install Certificate</h3>

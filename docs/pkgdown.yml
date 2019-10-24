@@ -1,11 +1,11 @@
-pandoc: 2.7.3
+pandoc: 2.2.1
 pkgdown: 1.4.1
 pkgdown_sha: ~
 articles:
   analyzing-load-test-logs: analyzing-load-test-logs.html
   case-study-scaling: case-study-scaling.html
-  faq: faq.html
   limitations-of-shinyloadtest: limitations-of-shinyloadtest.html
   load-testing-authenticated-apps: load-testing-authenticated-apps.html
+  faq: not-yet-written/faq.html
   troubleshooting-ssl: troubleshooting-ssl.html
 

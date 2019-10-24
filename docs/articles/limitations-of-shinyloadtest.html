@@ -66,9 +66,6 @@
     <li>
       <a href="../articles/troubleshooting-ssl.html">Troubleshooting SSL</a>
     </li>
-    <li>
-      <a href="../articles/faq.html">FAQ</a>
-    </li>
   </ul>
 </li>
 <li>
@@ -107,7 +104,7 @@
 <li>
 <strong>WebSockets are required</strong>: On RStudio Connect and Shiny Server Pro, <a href="https://github.com/sockjs/sockjs-client">SockJS</a> is used instead of plain WebSockets in order to support browsers and load balancers that don’t support WebSockets. Even though Shiny works in the absence of WebSocket support, <code>shinyloadtest</code> does not.</li>
 <li>
-<strong>shinyapps.io unsupported</strong>: Applications deployed on <a href="http://www.shinyapps.io/">http://www.shinyapps.io/</a> can’t be recorded or load tested.</li>
+<strong>shinyapps.io unsupported</strong>: Applications deployed on <a href="http://www.shinyapps.io/" class="uri">http://www.shinyapps.io/</a> can’t be recorded or load tested.</li>
 <li>
 <strong>Recordings are server-dependent</strong>: Recordings made with a particular server type — Connect, Shiny Server, local — may only be played back by <code>shinycannon</code> against an application deployed using that same type of server. So, for example, a recording made of an application running on Connect will not work correctly if it’s run with <code>shinycannon</code> on the same target application deployed using a different server like Shiny Server Pro.</li>
 </ol>
@@ -125,6 +122,7 @@
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>

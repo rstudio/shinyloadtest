@@ -8,10 +8,12 @@
 
 <title>Record a Session for Load Test — record_session • shinyloadtest</title>
 
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/cosmo/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
 
@@ -32,12 +34,13 @@
 
 
 
-<meta property="og:title" content="Record a Session for Load Test — record_session" />
 
+<meta property="og:title" content="Record a Session for Load Test — record_session" />
 <meta property="og:description" content="This function creates a reverse proxy at http://host:port
 (http://127.0.0.1:8600 by default) that intercepts and records activity
 between your web browser and the Shiny application at target_app_url." />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -103,16 +106,12 @@ between your web browser and the Shiny application at target_app_url." />
     <li>
       <a href="../articles/troubleshooting-ssl.html">Troubleshooting SSL</a>
     </li>
-    <li>
-      <a href="../articles/faq.html">FAQ</a>
-    </li>
   </ul>
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         
       </ul>
@@ -134,16 +133,14 @@ between your web browser and the Shiny application at target_app_url." />
     </div>
 
     <div class="ref-description">
-    
     <p>This function creates a <a href='https://en.wikipedia.org/wiki/Reverse_proxy'>reverse proxy</a> at <code>http://host:port</code>
 (http://127.0.0.1:8600 by default) that intercepts and records activity
 between your web browser and the Shiny application at <code>target_app_url</code>.</p>
-    
     </div>
 
     <pre class="usage"><span class='fu'>record_session</span>(<span class='no'>target_app_url</span>, <span class='kw'>host</span> <span class='kw'>=</span> <span class='st'>"127.0.0.1"</span>, <span class='kw'>port</span> <span class='kw'>=</span> <span class='fl'>8600</span>,
   <span class='kw'>output_file</span> <span class='kw'>=</span> <span class='st'>"recording.log"</span>, <span class='kw'>open_browser</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
-    
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -170,12 +167,11 @@ default if port 8600 is used by another service.</p></td>
 or not (<code>FALSE</code>).</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>Creates a recording file that can be used as input to the
 <code>shinycannon</code> command-line load generation tool.</p>
-    
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>By default, after creating the reverse proxy, a web browser is opened
@@ -185,7 +181,6 @@ activity is written to the <code>output_file</code> (<code>recording.log</code> 
 browser tab or window.</p>
 <p>Recordings are used as input to the <code>shinycannon</code> command-line
 load-generation tool which can be obtained from the <a href='https://rstudio.github.io/shinyloadtest/index.html'>shinyloadtest documentation site</a>.</p>
-    
     <h2 class="hasAnchor" id="fileinput-dt-http-post-support"><a class="anchor" href="#fileinput-dt-http-post-support"></a><code>fileInput</code>/<code>DT</code>/<code>HTTP POST</code> support</h2>
 
     
@@ -201,26 +196,20 @@ recording are created for each HTTP POST request intercepted.</p>
 file name and <code>&lt;N&gt;</code> is the number of the request.</p>
 <p>If present, these adjacent files must be kept alongside the recording file
 when the recording is played back with the <code>shinycannon</code> tool.</p>
-    
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='https://rdrr.io/r/utils/browseVignettes.html'>browseVignettes("shinyloadtest")</a></code></p></div>
-    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#value">Value</a></li>
-
       <li><a href="#details">Details</a></li>
-
       <li><a href="#fileinput-dt-http-post-support"><code>fileInput</code>/<code>DT</code>/<code>HTTP POST</code> support</a></li>
-
       <li><a href="#see-also">See also</a></li>
-          </ul>
+    </ul>
 
   </div>
 </div>
