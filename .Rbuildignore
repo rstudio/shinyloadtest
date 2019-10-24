@@ -15,3 +15,4 @@
 ^scripts/
 ^doc$
 ^Meta$
+^RELEASE_URLS\.csv$
