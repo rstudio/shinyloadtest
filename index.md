@@ -235,7 +235,7 @@ Helpful Links
 
 -   [RStudio Community](https://community.rstudio.com)
 -   [shinycannon](https://github.com/rstudio/shinycannon)
--   Vignettes:
+-   Articles:
     -   [Analysing load test
         logs](articles/analyzing-load-test-logs.html)
     -   [Load test case study](articles/case-study-scaling.html)
@@ -243,4 +243,4 @@ Helpful Links
         `shinyloadtest`](articles/limitations-of-shinyloadtest.html)
     -   [Load testing authenticated
         apps](articles/load-testing-authenticated-apps.html)
-    -   [FAQ](articles/faq.html)
+        <!--  * [FAQ](articles/faq.html) -->

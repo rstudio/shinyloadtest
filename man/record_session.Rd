@@ -58,5 +58,5 @@ when the recording is played back with the \code{shinycannon} tool.
 }
 
 \seealso{
-\code{browseVignettes("shinyloadtest")}
+\href{https://rstudio.github.io/shinyloadtest/}{shinyloadtest articles}
 }
