@@ -1,7 +1,7 @@
 ---
 title: "Case study: Scaling an app"
 date: "2018-09-05"
-output: rmarkdown::html_vignette
+output: rmarkdown::html_document
 resource_files:
   - case_studies/case_study_report1.html
   - case_studies/case_study_report2.html
