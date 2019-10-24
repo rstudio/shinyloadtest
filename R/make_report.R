@@ -179,7 +179,7 @@ shinyloadtest_report <- function(
       src_gantt = src_gantt,
       src_duration = src_duration,
       src_waterfall = src_waterfall,
-      display_style = if(run_val == levels(df$run)[1]) "block" else "none"
+      idx = which(levels(df$run) %in% run_val)
     )
   })
 
