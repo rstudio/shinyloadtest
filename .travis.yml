@@ -18,6 +18,8 @@ jobs:
         type = push AND \
         branch =~ /^(master|vig_fixes_travis_docs)$/
       before_cache: Rscript -e 'remotes::install_cran("pkgdown")'
+      r_packages:
+        - svglite
       before_deploy:
         - Rscript -e "remotes::install_local()"
         - make prep_vignettes
