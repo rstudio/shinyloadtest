@@ -49,7 +49,4 @@ Imports:
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 Suggests:
-    knitr,
     testthat
-VignetteBuilder: knitr
-BuildVignettes: no
