@@ -56,7 +56,7 @@
             { glue_multi_component("gantt", gantt)}
           </div>
         </section>
-        <section class="sui-layout-flex-vert" id="session-duration">
+        <section class="sui-layout-flex-vert" id="session-duration" style="display: none;">
           <div class="sui-flex-0 slt-view-control">
             <div class="uk-button-group sui-segmented-button" id=session-duration-report-controller>
               { glue_multi_component("gantt_duration_button", gantt) }
@@ -66,7 +66,7 @@
             { glue_multi_component("gantt_duration", gantt)}
           </div>
         </section>
-        <section class="sui-layout-flex-vert" id="waterfall">
+        <section class="sui-layout-flex-vert" id="waterfall" style="display: none;">
           <div class="sui-flex-0 slt-view-control">
             <div class="uk-button-group sui-segmented-button" id=waterfall-report-controller>
               { glue_multi_component("waterfall_button", gantt) }
@@ -76,7 +76,7 @@
             { glue_multi_component("waterfall", gantt)}
           </div>
         </section>
-        <section class="sui-layout-flex-vert" id="latency">
+        <section class="sui-layout-flex-vert" id="latency" style="display: none;">
           <div class="sui-flex-0 slt-view-control">
             <div class="uk-button-group sui-segmented-button" id=latency-report-controller>
               <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=total-http>Total HTTP</button>
@@ -98,7 +98,7 @@
             </div>
           </div>
         </section>
-        <section class="sui-layout-flex-vert" id="duration">
+        <section class="sui-layout-flex-vert" id="duration" style="display: none;">
           <div class="sui-flex-0 slt-view-control">
             <div class="uk-button-group sui-segmented-button" id=duration-report-controller>
               <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=slowest-max>Slowest max time</button>
@@ -138,7 +138,7 @@
             </div>
           </div>
         </section>
-        <section class="sui-layout-flex-vert" id="concurrency">
+        <section class="sui-layout-flex-vert" id="concurrency" style="display: none;">
           <div class="sui-flex-0 slt-view-control">
             <div class="uk-button-group sui-segmented-button" id=concurrency-report-controller>
               <button class="uk-button uk-button-primary sui-segmented-button-button" data-view-option=concurrency-slope>Largest slope</button>
