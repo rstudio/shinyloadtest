@@ -22,10 +22,10 @@ index.md: index.Rmd
 
 site: index.md devinstall build_site
 
-build_site: index.md prep_vignettes
+build_site: prep_vignettes
 	R --quiet --no-restore -e 'unlink("./docs", recursive = TRUE); pkgdown::build_site()'
 
-prep_vignettes:
+prep_vignettes: index.md
 	HEADLESS=TRUE Rscript scripts/test_sessions.R && rm Rplots.pdf
 
 rcmdcheck:
