@@ -14,9 +14,9 @@ jobs:
       name: "pkgdown"
       r: release
       if: |
-        repo = rstudio/reactlog AND \
+        repo = rstudio/shinyloadtest AND \
         type = push AND \
-        branch = vig_fixes_travis_docs
+        branch =~ /^(master|vig_fixes_travis_docs)$/
       before_cache: Rscript -e 'remotes::install_cran("pkgdown")'
       before_deploy:
         - make prep_vignettes
