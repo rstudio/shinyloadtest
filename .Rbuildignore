@@ -16,3 +16,4 @@
 ^doc$
 ^Meta$
 ^RELEASE_URLS\.csv$
+^vignettes/not-yet-written

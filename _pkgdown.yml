@@ -19,8 +19,8 @@ navbar:
         href: articles/limitations-of-shinyloadtest.html
       - text: "Troubleshooting SSL"
         href: articles/troubleshooting-ssl.html
-      - text: FAQ
-        href: articles/faq.html
+      # - text: FAQ
+      #   href: articles/faq.html
     - text: Reference
       href: reference/index.html
 authors:
