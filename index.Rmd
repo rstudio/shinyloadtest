@@ -50,7 +50,7 @@ package_types <- tribble(
   ~platform,  ~Distribution,          ~command_str,
   "deb",      "Ubuntu/Debian",        "<code>sudo dpkg -i %s</code>",
   "rpm_rh",   "Redhat/Fedora/CentOS", "<code>sudo yum install -y %s</code>",
-  "rpm_suse", "SUSE",                 "<code>sudo zypper install -y --no-gpg-checks %s</code>"
+  "rpm_suse", "SUSE",                 "<code>zypper --no-gpg-checks install -y %s</code>"
 )
 
 linux_packages <- shinycannon_files %>%
