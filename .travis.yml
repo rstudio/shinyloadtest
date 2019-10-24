@@ -7,3 +7,22 @@ r:
   - oldrel
   - release
   - devel
+
+jobs:
+  include:
+    - stage: "Deploy"
+      name: "pkgdown"
+      r: release
+      if: |
+        repo = rstudio/reactlog AND \
+        type = push AND \
+        branch =~ /^(master|vig_fixes_travis_docs)$/
+      before_cache: Rscript -e 'remotes::install_cran("pkgdown")'
+      deploy:
+        provider: script
+        script: Rscript -e 'pkgdown::deploy_site_github()'
+        skip_cleanup: true
+        keep-history: false # overwrite all git history
+        on:
+          # deploy on any branch as condition is done above
+          all_branches: true
