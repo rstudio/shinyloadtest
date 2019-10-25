@@ -478,7 +478,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #'
 #' @section `fileInput`/`DT`/`HTTP POST` support:
 #'
-#'   Shiny's [shiny::fileInput()] input for uploading files, the `DT` package,
+#'   Shiny's `shiny::fileInput()` input for uploading files, the `DT` package,
 #'   and potentially other packages make HTTP POST requests to the target
 #'   application. Because POST requests can be large, they are not stored
 #'   directly in the recording file. Instead, new files adjacent to the

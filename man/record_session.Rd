@@ -43,7 +43,7 @@ load-generation tool which can be obtained from the \href{https://rstudio.github
 \section{\code{fileInput}/\code{DT}/\code{HTTP POST} support}{
 
 
-Shiny's \code{\link[shiny:fileInput]{shiny::fileInput()}} input for uploading files, the \code{DT} package,
+Shiny's \code{shiny::fileInput()} input for uploading files, the \code{DT} package,
 and potentially other packages make HTTP POST requests to the target
 application. Because POST requests can be large, they are not stored
 directly in the recording file. Instead, new files adjacent to the
