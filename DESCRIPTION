@@ -12,6 +12,7 @@ Description: Facilities for recording Shiny application sessions and analyzing l
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
+URL: https://rstudio.github.io/shinyloadtest/, https://github.com/rstudio/shinyloadtest
 BugReports: https://github.com/rstudio/shinyloadtest/issues
 Collate:
   'enum.R'
