@@ -1,12 +1,13 @@
 all: help
 
-.PHONY=clean site help urls devcheck devbuild
+.PHONY=clean site help urls rcmdcheck build_site
 
 help:
-	@echo "make RELEASE_URLS.txt: update the shinycannon download links. You should do this after releasing shinycannon."
-	@echo "make site: build docs/vignettes and the doc site, which is hosted on github"
-	@echo "make devcheck: runs devtools::check() without building vignettes, since we have a separate/special process for doing that (make site, above)"
-	@echo "make devbuild: runs devtools::build() without building vignettes, since we have a separate/special process for doing that (make site, above)"
+	@echo "make urls: update the shinycannon download links. You should do this after releasing shinycannon."
+	@echo "make site: installs pkgs and build docs/vignettes and the doc site, which is hosted on github"
+	@echo "make rcmdcheck: builds and checks using R CMD check --as-cran"
+	@echo "make prep_vignettes: prepares vignettes files to produce images in pkgdown articles"
+	@echo "make build_site: builds pkgdown site using scripts/build_docs.R"
 	@echo "make clean: clean the docs and doc site"
 
 # Updates RELEASE_URLS.csv file.
@@ -17,20 +18,18 @@ urls:
 	wget https://s3.amazonaws.com/rstudio-shinycannon-build/RELEASE_URLS.csv
 
 index.md: index.Rmd
-	R -e 'rmarkdown::render("index.Rmd", output_format = rmarkdown::md_document())'
+	R --quiet --no-restore -e 'rmarkdown::render("index.Rmd", output_format = rmarkdown::md_document())'
 
-site: index.md
-	R -e 'devtools::document()'
-	R CMD INSTALL --no-multiarch --with-keep.source .
+site: index.md devinstall build_site
+
+build_site: prep_vignettes
+	R --quiet --no-restore -e 'unlink("./docs", recursive = TRUE); pkgdown::build_site()'
+
+prep_vignettes: index.md
 	HEADLESS=TRUE Rscript scripts/test_sessions.R && rm Rplots.pdf
-	Rscript scripts/build_vignettes.R
-	Rscript scripts/build_docs.R
 
-devcheck:
-	R -e 'devtools::check(vignettes = FALSE)'
-
-devbuild:
-	R -e 'devtools::build(vignettes = FALSE)'
+rcmdcheck:
+	R CMD check --as-cran `Rscript -e 'cat(devtools::build(quiet = TRUE))'`
 
 clean:
 	rm -f index.md

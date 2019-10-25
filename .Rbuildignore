@@ -3,7 +3,6 @@
 ^\.travis\.yml\.old
 ^docs/
 ^output/
-^test_sessions/
 ^\.travis\.yml$
 ^shinyloadtest_report/
 ^shinyloadtest_report\.html$
@@ -14,4 +13,8 @@
 ^_pkgdown.yml$
 ^scripts/
 ^doc$
-^Meta$
+^RELEASE_URLS\.csv$
+\.Rcheck
+.*\.icloud
+^vignettes
+^docs$

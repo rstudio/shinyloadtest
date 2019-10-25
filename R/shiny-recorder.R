@@ -478,7 +478,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #'
 #' @section `fileInput`/`DT`/`HTTP POST` support:
 #'
-#'   Shiny's [shiny::fileInput()] input for uploading files, the `DT` package,
+#'   Shiny's `shiny::fileInput()` input for uploading files, the `DT` package,
 #'   and potentially other packages make HTTP POST requests to the target
 #'   application. Because POST requests can be large, they are not stored
 #'   directly in the recording file. Instead, new files adjacent to the
@@ -501,7 +501,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #'
 #' @return Creates a recording file that can be used as input to the
 #'   `shinycannon` command-line load generation tool.
-#' @seealso `browseVignettes("shinyloadtest")`
+#' @seealso [`shinyloadtest` articles](https://rstudio.github.io/shinyloadtest/)
 #' @export
 record_session <- function(target_app_url, host = "127.0.0.1", port = 8600,
   output_file = "recording.log", open_browser = TRUE) {

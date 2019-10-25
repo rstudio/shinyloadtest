@@ -3,25 +3,41 @@ template:
     bootswatch: cosmo
 navbar:
   type: inverse
-  left:
-    - text: Home
-      icon: fa-home
+  structure: 
+    left: 
+      - home
+      - intro
+      - reference
+      - articles
+      - tutorials
+      - news
+    right: 
+      - github
+  components:
+    home:
+      icon: fas fa-home
       href: index.html
-    - text: Learning
+      text: Home
+    articles:
+      text: Articles
       menu:
-      - text: "Case study: interpreting load test results"
-        href: articles/analyzing-load-test-logs.html
-      - text: "Case study: scaling an app"
-        href: articles/case-study-scaling.html
-      - text: "Load testing authenticated apps"
-        href: articles/load-testing-authenticated-apps.html
-      - text: "Limitations"
-        href: articles/limitations-of-shinyloadtest.html
-      - text: "Troubleshooting SSL"
-        href: articles/troubleshooting-ssl.html
-      - text: FAQ
-        href: articles/faq.html
-    - text: Reference
+        - text: "Case study: interpreting load test results"
+          href: articles/analyzing-load-test-logs.html
+        - text: "Case study: scaling an app"
+          href: articles/case-study-scaling.html
+        - text: "Load testing authenticated apps"
+          href: articles/load-testing-authenticated-apps.html
+        - text: "Limitations"
+          href: articles/limitations-of-shinyloadtest.html
+        - text: "Troubleshooting SSL"
+          href: articles/troubleshooting-ssl.html
+        # - text: FAQ
+        #   href: articles/faq.html
+    news:
+      text: Changelog
+      href: news/index.html
+    reference:
+      text: Reference
       href: reference/index.html
 authors:
   RStudio:

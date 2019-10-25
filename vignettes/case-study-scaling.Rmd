@@ -1,7 +1,7 @@
 ---
 title: "Case study: Scaling an app"
 date: "2018-09-05"
-output: rmarkdown::html_vignette
+output: rmarkdown::html_document
 resource_files:
   - case_studies/case_study_report1.html
   - case_studies/case_study_report2.html
@@ -185,8 +185,8 @@ Dedicating more resources to the app is the easiest way to improve its performan
 Throwing hardware at the problem is an easy fix in our case, but there's usually a strong chance that it's really easy to make your app dramatically faster with only small code changes. For example, you might just need to do some work once when your app starts instead of every time a reactive changes. Here are some resources for learning more about Shiny app performance:
 
 1. `profvis`: In [this webinar](https://www.rstudio.com/resources/webinars/profvis-profiling-tools-for-faster-r-code/), Winston Chang demonstrates using the profvis package to efficiently identify and improve slow paths in code.
-1. In [this rstudio::conf talk](https://www.rstudio.com/resources/videos/make-shiny-fast-by-doing-as-little-work-as-possible/), Alan Dipert describes the Shiny team's efforts to improve the scalability of another demo app, CRAN explorer.
-1. In [this other rstudio::conf talk](https://www.rstudio.com/resources/videos/scaling-shiny-apps-with-async-programming/), Joe Cheng describes how async can be used to improve the scalability of Shiny apps.
+1. In [this rstudio::conf talk](https://resources.rstudio.com/rstudio-conf-2018/make-shiny-fast-by-doing-as-little-work-as-possible-alan-dipert), Alan Dipert describes the Shiny team's efforts to improve the scalability of another demo app, CRAN explorer.
+1. In [this other rstudio::conf talk](https://resources.rstudio.com/rstudio-conf-2018/scaling-shiny-apps-with-async-programming-joe-cheng), Joe Cheng describes how async can be used to improve the scalability of Shiny apps.
 
 For the purposes of this case study, let's say that we're really busy, and it makes sense for us to just crank up the scheduler settings now, and investigate the code later.
 
