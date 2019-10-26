@@ -267,7 +267,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       h <- curl::new_handle()
 
       if (nrow(private$sessionCookies) > 0) {
-        req_curl[["Cookie"]] <- pasteParams(private$sessionCookies, "; ")
+        req_curl[["cookie"]] <- pasteParams(private$sessionCookies, "; ")
       }
 
       curl::handle_setheaders(h, .list = req_curl)
