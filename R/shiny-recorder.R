@@ -259,7 +259,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
     },
     makeUrl = function(req) {
       query <- gsub("\\?", "", req$QUERY_STRING)
-      private$targetURL$appendPaths(req$PATH_INFO)$setQuery(query)$build()
+      private$targetURL$appendPath(req$PATH_INFO)$setQuery(query)$build()
     },
     makeCurlHandle = function(req) {
       port <- private$targetURL$port %OR% if (private$targetURL$scheme == "https") 443 else 80
@@ -352,7 +352,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$writeEvent(makeWSEvent("WS_OPEN", url =  replaceTokens(clientWS$request$PATH_INFO, self$tokens)))
 
       wsScheme <- if (private$targetURL$scheme == "https") "wss" else "ws"
-      wsUrl <- private$targetURL$setScheme(wsScheme)$appendPaths(clientWS$request$PATH_INFO)$build()
+      wsUrl <- private$targetURL$setScheme(wsScheme)$appendPath(clientWS$request$PATH_INFO)$build()
 
       serverWS <- websocket::WebSocket$new(wsUrl,
         headers = if (nrow(private$sessionCookies) > 0) {
@@ -510,7 +510,7 @@ record_session <- function(target_app_url, host = "127.0.0.1", port = 8600,
     message("Listening on ", host, ":", port)
 
     if (open_browser){
-      navUrl <- URLBuilder$new(target_app_url)$setHost(host)$setPort(port)$setScheme("http")$setPaths("")$build()
+      navUrl <- URLBuilder$new(target_app_url)$setHost(host)$setPort(port)$setScheme("http")$setPath("")$build()
       message("Navigating to: ", navUrl)
       utils::browseURL(navUrl)
     }
