@@ -49,6 +49,7 @@ resp_httr_to_rook <- function(resp) {
   headers <- curl::parse_headers_list(resp$headers)
   headers[headers_to_remove(headers$connection)] <- NULL
   headers[["content-encoding"]] <- NULL
+  headers[["content-length"]] <- length(resp$content)
   list(
     status = status,
     headers = headers,
