@@ -36,11 +36,7 @@ req_rook_to_curl <- function(req, domain, port) {
   names(r) <- tolower(names(r))
 
   # Overwrite host field
-  if (port == 80) {
-    r$host <- domain
-  } else {
-    r$host <- paste0(domain, ":", port)
-  }
+  r$host <- domain
 
   r[headers_to_remove(r$connection)] <- NULL
 
