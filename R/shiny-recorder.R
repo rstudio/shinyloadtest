@@ -379,8 +379,29 @@ RecordingSession <- R6::R6Class("RecordingSession",
           return()
         }
 
-        # From here forward, we assumed the message
+        # From here forward, we assume the message can be parsed
         parsed <- parseMessage(msgFromServer)
+        parsed_df <- tree_df(parsed)
+
+        # If the message contains what look like DT URL configuration entries, we store them
+        # as tokens so they are substituted in the recording.
+        if (ncol(parsed_df) >= 7) {
+          dt_urls <- subset(parsed_df, V5 == 'ajax' & V6 == 'url')[['V7']]
+          if (length(dt_urls)) {
+            dt_n <- 0
+            for (url in dt_urls) {
+              m <- stringr::str_match_all(url, 'session/([0-9a-f]+)/dataobj/.*\\?w=&nonce=([0-9a-f]+)')[[1]]
+              if (nrow(m)) {
+                self$tokens[[m[,2]]] <- sprintf("${DT_SESSION_%s}", dt_n)
+                self$tokens[[m[,3]]] <- sprintf("${DT_NONCE_%s}", dt_n)
+                dt_n <- dt_n+1
+              }
+            }
+            private$writeEvent(makeWSEvent("WS_RECV", message = replaceTokens(msgFromServer, self$tokens)))
+            clientWS$send(msgFromServer)
+            return()
+          }
+        }
 
         # If the message from the server is an object with a "config" key, fix
         # up some keys with placeholders and record the message as a
