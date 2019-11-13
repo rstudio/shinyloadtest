@@ -395,7 +395,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
               self$tokens[[nonce]] <- sprintf("${DT_NONCE_%s}", nonce_id)
               nonce_id <- nonce_id + 1
             }
-            private$writeEvent(makeWSEvent("WS_RECV", message = replaceTokens(msgFromServer, self$tokens)))
+            private$writeEvent(makeWSEvent("WS_RECV_INIT_DT", message = replaceTokens(msgFromServer, self$tokens)))
             clientWS$send(msgFromServer)
             return()
           }
