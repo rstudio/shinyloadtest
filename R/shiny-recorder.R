@@ -387,6 +387,8 @@ RecordingSession <- R6::R6Class("RecordingSession",
         # as tokens so they are substituted in the recording.
         if (ncol(parsed_df) >= 7) {
           dt_urls <- subset(parsed_df, V5 == 'ajax' & V6 == 'url')
+          # Order by value name here to ensure nonces are gathered in a stable order that shinycannon also respects
+          dt_urls <- dt_urls[order(as.character(dt_urls$V2)),]
           if (nrow(dt_urls)) {
             urls <- dt_urls[['V7']]
             nonce_id <- 0
