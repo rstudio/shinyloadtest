@@ -36,11 +36,7 @@ req_rook_to_curl <- function(req, domain, port) {
   names(r) <- tolower(names(r))
 
   # Overwrite host field
-  if (port == 80) {
-    r$host <- domain
-  } else {
-    r$host <- paste0(domain, ":", port)
-  }
+  r$host <- domain
 
   r[headers_to_remove(r$connection)] <- NULL
 
@@ -53,6 +49,7 @@ resp_httr_to_rook <- function(resp) {
   headers <- curl::parse_headers_list(resp$headers)
   headers[headers_to_remove(headers$connection)] <- NULL
   headers[["content-encoding"]] <- NULL
+  headers[["content-length"]] <- length(resp$content)
   list(
     status = status,
     headers = headers,
@@ -259,7 +256,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
     },
     makeUrl = function(req) {
       query <- gsub("\\?", "", req$QUERY_STRING)
-      private$targetURL$appendPaths(req$PATH_INFO)$setQuery(query)$build()
+      private$targetURL$appendPath(req$PATH_INFO)$setQuery(query)$build()
     },
     makeCurlHandle = function(req) {
       port <- private$targetURL$port %OR% if (private$targetURL$scheme == "https") 443 else 80
@@ -352,7 +349,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$writeEvent(makeWSEvent("WS_OPEN", url =  replaceTokens(clientWS$request$PATH_INFO, self$tokens)))
 
       wsScheme <- if (private$targetURL$scheme == "https") "wss" else "ws"
-      wsUrl <- private$targetURL$setScheme(wsScheme)$appendPaths(clientWS$request$PATH_INFO)$build()
+      wsUrl <- private$targetURL$setScheme(wsScheme)$appendPath(clientWS$request$PATH_INFO)$build()
 
       serverWS <- websocket::WebSocket$new(wsUrl,
         headers = if (nrow(private$sessionCookies) > 0) {
@@ -531,7 +528,7 @@ record_session <- function(target_app_url, host = "127.0.0.1", port = 8600,
     message("Listening on ", host, ":", port)
 
     if (open_browser){
-      navUrl <- URLBuilder$new(target_app_url)$setHost(host)$setPort(port)$setScheme("http")$setPaths("")$build()
+      navUrl <- URLBuilder$new(target_app_url)$setHost(host)$setPort(port)$setScheme("http")$setPath("")$build()
       message("Navigating to: ", navUrl)
       utils::browseURL(navUrl)
     }

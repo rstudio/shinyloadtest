@@ -1,3 +1,17 @@
+# Join two path components with a slash, ensuring only one slash remains between
+# them.
+joinPaths <- function(p1, p2) {
+  left_slash <- endsWith(p1, "/")
+  right_slash <- startsWith(p2, "/")
+  if ((!left_slash && right_slash) || (left_slash && !right_slash)) {
+    paste0(p1, p2)
+  } else if (left_slash && right_slash) {
+    paste0(p1, substring(p2, 2))
+  } else {
+    paste0(p1, "/", p2)
+  }
+}
+
 URLBuilder <- R6::R6Class("URLBuilder",
   public = list(
     initialize = function(str) {
@@ -9,8 +23,7 @@ URLBuilder <- R6::R6Class("URLBuilder",
         self$scheme <- parsed[,"scheme"]
         self$host <- parsed[,"server"]
         self$port <- strtoi(parsed[,"port"])
-        self$paths <- stringr::str_split(parsed[,"path"], "/")[[1]]
-        self$paths <- self$paths[self$paths != "" & !is.na(self$paths)]
+        self$path <- parsed[,"path"]
         self$query <- parsed[,"query"]
       }
     },
@@ -20,45 +33,40 @@ URLBuilder <- R6::R6Class("URLBuilder",
       copy
     },
     setHost = function(host) {
-      copy <-  self$clone()
+      copy <- self$clone()
       copy$host <- host
       copy
     },
     setPort = function(port) {
-      copy <-  self$clone()
+      copy <- self$clone()
       copy$port <- port
       copy
     },
     setQuery = function(query = "") {
-      copy <-  self$clone()
+      copy <- self$clone()
       copy$query <- query
       copy
     },
-    # TODO Complexity with slashes only belongs in place where appending/joining to existing path
-    setPaths = function(paths, raw = TRUE, append = FALSE) {
-      stopifnot(is.character(paths))
-      paths <- if (raw) paths else URLencode(paths)
-      paths <- unlist(stringr::str_split(paths, "/"))
-      paths <- paths[paths != "" & !is.na(paths)]
+    setPath = function(path) {
+      stopifnot(is.character(path))
       copy <- self$clone()
-      copy$paths <- if (append) c(self$paths, paths) else paths
+      copy$path <- path
       copy
     },
-    appendPaths = function(paths, raw = FALSE) {
-      self$setPaths(paths, raw = raw, append = TRUE)
+    appendPath = function(path) {
+      self$setPath(joinPaths(self$path, path))
     },
     build = function() {
       scheme <- paste0(ifelse(self$scheme == "", "http", self$scheme), "://")
       host_port <- paste0(self$host, ifelse(is.na(self$port), "", paste0(":", self$port)))
-      paths <- paste(collapse = "/", self$paths)
       query <- ifelse(self$query == "", "", paste0("?", self$query))
-      paste0(scheme, host_port, "/", paths, query)
+      paste0(scheme, joinPaths(host_port, self$path), query)
     },
     length = NA,
     scheme = NA,
     host = NA,
     port = NA,
-    paths = character(0),
+    path = "",
     query = NA
   )
 )

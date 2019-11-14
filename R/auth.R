@@ -29,7 +29,7 @@ isProtected <- function(appUrl) {
 
 loginUrlFor <- function(appUrl, appServer) {
   if (appServer %in% c(SERVER_TYPE$RSC, SERVER_TYPE$SSP)) {
-    appUrl$appendPaths("__login__")
+    appUrl$appendPath("__login__")
   } else {
     stop(paste0("Unknown appServer:", appServer))
   }
