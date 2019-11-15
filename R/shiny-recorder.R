@@ -233,6 +233,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
     sessionCookies = data.frame(),
     clientWsState = CLIENT_WS_STATE$UNOPENED,
     postFiles = character(0),
+    dataObjectCounter = 0,
     writeEvent = function(evt) {
       writeLines(format(evt), private$outputFile)
       flush(private$outputFile)
@@ -376,29 +377,19 @@ RecordingSession <- R6::R6Class("RecordingSession",
           return()
         }
 
+        nonces <- findNonces(msgFromServer)
+        if (length(nonces)) {
+          for (nonce in nonces) {
+            self$tokens[[nonce]] <- sprintf("${SHINY_DATAOBJ_NONCE_%s}", self$dataObjectCounter)
+            self$dataObjectCounter <- self$dataObjectCounter + 1
+          }
+          private$writeEvent(makeWSEvent("WS_RECV_DATAOBJ", message = replaceTokens(msgFromServer, self$tokens)))
+          clientWS$send(msgFromServer)
+          return()
+        }
+
         # From here forward, we assume the message can be parsed
         parsed <- parseMessage(msgFromServer)
-        parsed_df <- tree_df(parsed)
-
-        # If the message contains what look like DT URL configuration entries, we store them
-        # as tokens so they are substituted in the recording.
-        if (ncol(parsed_df) >= 7) {
-          dt_urls <- subset(parsed_df, V5 == 'ajax' & V6 == 'url')
-          # Order by value name here to ensure nonces are gathered in a stable order that shinycannon also respects
-          dt_urls <- dt_urls[order(as.character(dt_urls$V2)),]
-          if (nrow(dt_urls)) {
-            urls <- dt_urls[['V7']]
-            nonce_id <- 0
-            for (url in urls) {
-              nonce <- stringr::str_match_all(url, '/dataobj/.*\\?w=&nonce=([0-9a-f]+)')[[1]][,2]
-              self$tokens[[nonce]] <- sprintf("${DT_NONCE_%s}", nonce_id)
-              nonce_id <- nonce_id + 1
-            }
-            private$writeEvent(makeWSEvent("WS_RECV_INIT_DT", message = replaceTokens(msgFromServer, self$tokens)))
-            clientWS$send(msgFromServer)
-            return()
-          }
-        }
 
         # If the message from the server is an object with a "config" key, fix
         # up some keys with placeholders and record the message as a
