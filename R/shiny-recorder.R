@@ -233,7 +233,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
     sessionCookies = data.frame(),
     clientWsState = CLIENT_WS_STATE$UNOPENED,
     postFiles = character(0),
-    dataObjectCounter = 0,
+    dataObjCounter = 0,
     writeEvent = function(evt) {
       writeLines(format(evt), private$outputFile)
       flush(private$outputFile)
@@ -380,8 +380,8 @@ RecordingSession <- R6::R6Class("RecordingSession",
         nonces <- findNonces(msgFromServer)
         if (length(nonces)) {
           for (nonce in nonces) {
-            self$tokens[[nonce]] <- sprintf("${SHINY_DATAOBJ_NONCE_%s}", self$dataObjectCounter)
-            self$dataObjectCounter <- self$dataObjectCounter + 1
+            self$tokens[[nonce]] <- sprintf("${SHINY_DATAOBJ_NONCE_%s}", self$dataObjCounter)
+            self$dataObjCounter <- self$dataObjCounter + 1
           }
           private$writeEvent(makeWSEvent("WS_RECV_DATAOBJ", message = replaceTokens(msgFromServer, self$tokens)))
           clientWS$send(msgFromServer)
