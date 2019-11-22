@@ -22,7 +22,7 @@ index.md: index.Rmd
 
 devinstall:
 	R -e 'devtools::document()'
-	R -e 'devtools::install()'
+	R CMD INSTALL --no-multiarch --with-keep.source .
 
 site: index.md devinstall build_site
 
