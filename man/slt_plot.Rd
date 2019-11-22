@@ -45,7 +45,7 @@ slt_websocket_latency(df, cutoff = 10)
 \item{max_load_time}{The amount of time users will wait for the page to load
 when first requesting the app.}
 
-\item{cutoff}{Where to draw a horizontal or vertical line to display a resonable cutoff line for requests.}
+\item{cutoff}{Where to draw a horizontal or vertical line to display a reasonable cutoff line for requests.}
 }
 \description{
 Many different plotting routines to display different loadtest information.

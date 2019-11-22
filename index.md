@@ -70,18 +70,18 @@ of the following packages.
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">Ubuntu/Debian</td>
-<td style="text-align: left;"><a href='https://s3.amazonaws.com/rstudio-shinycannon-build/2019-10-23-19:28:20_1.0.0-38be139/deb/shinycannon_1.0.0-38be139_amd64.deb'>shinycannon_1.0.0-38be139_amd64.deb</a></td>
-<td style="text-align: left;"><code>sudo dpkg -i shinycannon_1.0.0-38be139_amd64.deb</code></td>
+<td style="text-align: left;"><a href='https://s3.amazonaws.com/rstudio-shinycannon-build/2019-11-22-20:24:21_1.0.0-9b22a92/deb/shinycannon_1.0.0-9b22a92_amd64.deb'>shinycannon_1.0.0-9b22a92_amd64.deb</a></td>
+<td style="text-align: left;"><code>sudo dpkg -i shinycannon_1.0.0-9b22a92_amd64.deb</code></td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Redhat/Fedora/CentOS</td>
-<td style="text-align: left;"><a href='https://s3.amazonaws.com/rstudio-shinycannon-build/2019-10-23-19:28:20_1.0.0-38be139/rpm/shinycannon-1.0.0-38be139.x86_64.rpm'>shinycannon-1.0.0-38be139.x86_64.rpm</a></td>
-<td style="text-align: left;"><code>sudo yum install -y shinycannon-1.0.0-38be139.x86_64.rpm</code></td>
+<td style="text-align: left;"><a href='https://s3.amazonaws.com/rstudio-shinycannon-build/2019-11-22-20:24:21_1.0.0-9b22a92/rpm/shinycannon-1.0.0-9b22a92.x86_64.rpm'>shinycannon-1.0.0-9b22a92.x86_64.rpm</a></td>
+<td style="text-align: left;"><code>sudo yum install -y shinycannon-1.0.0-9b22a92.x86_64.rpm</code></td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">SUSE</td>
-<td style="text-align: left;"><a href='https://s3.amazonaws.com/rstudio-shinycannon-build/2019-10-23-19:28:20_1.0.0-38be139/rpm/shinycannon-1.0.0-suse-38be139.x86_64.rpm'>shinycannon-1.0.0-suse-38be139.x86_64.rpm</a></td>
-<td style="text-align: left;"><code>zypper —-no-gpg-checks install -y shinycannon-1.0.0-suse-38be139.x86_64.rpm</code></td>
+<td style="text-align: left;"><a href='https://s3.amazonaws.com/rstudio-shinycannon-build/2019-11-22-20:24:21_1.0.0-9b22a92/rpm/shinycannon-1.0.0-suse-9b22a92.x86_64.rpm'>shinycannon-1.0.0-suse-9b22a92.x86_64.rpm</a></td>
+<td style="text-align: left;"><code>zypper —-no-gpg-checks install -y shinycannon-1.0.0-suse-9b22a92.x86_64.rpm</code></td>
 </tr>
 </tbody>
 </table>
@@ -90,9 +90,9 @@ of the following packages.
 
 1.  Install [Java](https://www.java.com/en/download/)
 2.  Download
-    <a href='https://s3.amazonaws.com/rstudio-shinycannon-build/2019-10-23-19:28:20_1.0.0-38be139/bin/shinycannon-1.0.0-38be139.sh'>shinycannon-1.0.0-38be139.sh</a>
+    <a href='https://s3.amazonaws.com/rstudio-shinycannon-build/2019-11-22-20:24:21_1.0.0-9b22a92/bin/shinycannon-1.0.0-9b22a92.sh'>shinycannon-1.0.0-9b22a92.sh</a>
 3.  Install with
-    `sudo cp shinycannon-1.0.0-38be139.sh /usr/local/bin/shinycannon; sudo chmod +x /usr/local/bin/shinycannon`
+    `sudo cp shinycannon-1.0.0-9b22a92.sh /usr/local/bin/shinycannon; sudo chmod +x /usr/local/bin/shinycannon`
 4.  Run `shinycannon -h` to see help output, or
     `shinycannon [RECORDING-PATH] [APP-URL]` to generate load.
 
@@ -100,11 +100,11 @@ of the following packages.
 
 1.  Install [Java](https://www.java.com/en/download/)
 2.  Download
-    <a href='https://s3.amazonaws.com/rstudio-shinycannon-build/2019-10-23-19:28:20_1.0.0-38be139/jar/shinycannon-1.0.0-38be139.jar'>shinycannon-1.0.0-38be139.jar</a>
+    <a href='https://s3.amazonaws.com/rstudio-shinycannon-build/2019-11-22-20:24:21_1.0.0-9b22a92/jar/shinycannon-1.0.0-9b22a92.jar'>shinycannon-1.0.0-9b22a92.jar</a>
     to the directory you wish to run it in
-3.  Run `java -jar shinycannon-1.0.0-38be139.jar -h` to see help output,
+3.  Run `java -jar shinycannon-1.0.0-9b22a92.jar -h` to see help output,
     or
-    `java -jar shinycannon-1.0.0-38be139.jar [RECORDING-PATH] [APP-URL]`
+    `java -jar shinycannon-1.0.0-9b22a92.jar [RECORDING-PATH] [APP-URL]`
     to generate load.
 
 Quick Start
@@ -227,7 +227,7 @@ Once the data is loaded into R, a report can be generated using:
     shinyloadtest::shinyloadtest_report(df, "run1.html")
 
 This self contained html report will be opened in your browser for
-inspection. For further analysis explaination, please visit [‘Analysing
+inspection. For further analysis explanation, please visit [‘Analysing
 load test logs’](articles/analyzing-load-test-logs.html).
 
 Helpful Links
