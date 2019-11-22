@@ -18,3 +18,5 @@
 .*\.icloud
 ^vignettes
 ^docs$
+^CRAN-RELEASE$
+^cran-comments\.md$
