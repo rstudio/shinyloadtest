@@ -1,5 +1,7 @@
-shinyloadtest 1.0.0.9000
+shinyloadtest 1.0.0
 =======
+
+This is the initial release of shinyloadtest to CRAN.
 
 ### Bug fixes
 
