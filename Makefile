@@ -1,6 +1,6 @@
 all: help
 
-.PHONY=clean site help urls rcmdcheck build_site
+.PHONY=clean site help urls rcmdcheck build_site devinstall
 
 help:
 	@echo "make urls: update the shinycannon download links. You should do this after releasing shinycannon."
@@ -19,6 +19,10 @@ urls:
 
 index.md: index.Rmd
 	R --quiet --no-restore -e 'rmarkdown::render("index.Rmd", output_format = rmarkdown::md_document())'
+
+devinstall:
+	R -e 'devtools::document()'
+	R -e 'devtools::install()'
 
 site: index.md devinstall build_site
 
