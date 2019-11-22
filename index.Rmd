@@ -176,7 +176,7 @@ Once the data is loaded into R, a report can be generated using:
 shinyloadtest::shinyloadtest_report(df, "run1.html")
 ```
 
-This self contained html report will be opened in your browser for inspection.  For further analysis explaination, please visit ['Analysing load test logs'](articles/analyzing-load-test-logs.html).
+This self contained html report will be opened in your browser for inspection.  For further analysis explanation, please visit ['Analysing load test logs'](articles/analyzing-load-test-logs.html).
 
 
 # Helpful Links
