@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">shinyloadtest</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
       </span>
     </div>
 
@@ -124,7 +124,14 @@
 <a href="#application-limitations" class="anchor"></a>Application limitations</h2>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Apps must be deterministic</strong>: The recording file made by <code>record_session</code> contains messages from the server in the order they were received. If messages are received in a different order by <code>shinycannon</code> when it’s playing the recording back, that session will be considered a failure. If the same change in inputs does not always lead to outputs being updated in the same order, shinyloadtest will not work.</li>
+<strong>Apps must be deterministic</strong>: The recording file made by <code>record_session</code> contains messages from the server in the order they were received. If messages are received in a different order by <code>shinycannon</code> when it’s playing the recording back, that session will be considered a failure. If the same change in inputs does not always lead to outputs being updated in the same order, shinyloadtest will not work.
+<ul>
+<li>Apps with high latency — either because they are geographically distant from you, or because they perform long-running computations — are likelier to exhibit non-determinism. High latency can cause messages sent from the browser and received from the server to be likelier to interleave in different ways, which can cause <code>shinycannon</code> to fail. The telltale sign of such a problem is a message like <code>WS_RECV line 66: Haven't received message after 30 seconds</code> in <code>shinycannon</code> output.</li>
+<li>One way to mitigate the effect of high latency is to take more time between interacting with inputs when you’re making your recording. The longer the amount of time between messages your browser sends, the less likely it is that messages received from the server will interleave with them in a different way in the future, when <code>shinycannon</code> is replaying them.</li>
+<li>In testing, we’ve observed intermittent problems with the <code>selectize()</code> input, particularly when <code>server = TRUE</code>. More information can be found at <a href="https://github.com/rstudio/shinyloadtest/issues/121" class="uri">https://github.com/rstudio/shinyloadtest/issues/121</a>
+</li>
+</ul>
+</li>
 <li>
 <strong>R Markdown documents with <code>runtime: shiny</code> unsupported</strong>: R Markdown documents that <a href="https://bookdown.org/yihui/rmarkdown/shiny-start.html">embed Shiny applications</a> are currently unsupported.</li>
 </ol>
