@@ -22,6 +22,8 @@ This is a re-submission addressing the following reviewer feedback e-mail:
 
 1. The Description field in DESCRIPTION has been expanded.
 
+TODO: address plot documentation feedback
+
 ## Test environments
 
 * Ubuntu 18.04, R 3.6.1
