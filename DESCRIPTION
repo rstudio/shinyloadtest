@@ -55,5 +55,5 @@ Imports:
 RoxygenNote: 7.0.1
 Roxygen: list(markdown = TRUE)
 Suggests:
-    testthat
+    testthat,
     usethis
