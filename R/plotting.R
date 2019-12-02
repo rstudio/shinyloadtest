@@ -3,7 +3,8 @@ if (getRversion() >= "2.15.1") {
   utils::globalVariables(c("start", "end", "ready", "begin", "label", "time", "maintenance", "quantile", "spread", "HTTP", "WebSocket", "val", "name", "max_latency", "colorCol", "xmin", "xmax", "ymin", "ymax", "fill"))
 }
 
-#' @import ggplot2 dplyr
+#' @rawNamespace import(ggplot2, except = vars)
+#' @import dplyr
 NULL
 
 # Plotting functions ------------------------------------------------------
@@ -19,6 +20,18 @@ NULL
 #' @param max_load_time The amount of time users will wait for the page to load
 #'   when first requesting the app.
 #' @rdname slt_plot
+#' @return A \code{\link[ggplot2]{ggplot}} plot object
+#' @examples
+#' slt_time_boxplot(slt_demo_data)
+#' slt_time_concurrency(slt_demo_data)
+#' slt_waterfall(slt_demo_data)
+#' slt_hist_loadtimes(slt_demo_data)
+#' slt_user(slt_demo_data)
+#' slt_session(slt_demo_data)
+#' slt_session_duration(slt_demo_data)
+#' slt_session_latency(slt_demo_data)
+#' slt_http_latency(slt_demo_data)
+#' slt_websocket_latency(slt_demo_data)
 NULL
 
 

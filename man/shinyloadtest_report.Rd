@@ -4,10 +4,16 @@
 \alias{shinyloadtest_report}
 \title{Make shinyloadtest Report}
 \usage{
-shinyloadtest_report(df, output = "shinyloadtest_report.html",
+shinyloadtest_report(
+  df,
+  output = "shinyloadtest_report.html",
   duration_cutoff = c(attr(df, "recording_duration"), 60)[1],
-  http_latency_cutoff = 5, max_websocket_cutoff = 20,
-  open_browser = TRUE, self_contained = TRUE, verbose = TRUE)
+  http_latency_cutoff = 5,
+  max_websocket_cutoff = 20,
+  open_browser = TRUE,
+  self_contained = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{df}{data.frame returned from \code{\link[=load_runs]{load_runs()}}}

@@ -21,8 +21,9 @@ This is a re-submission addressing the following reviewer feedback e-mail:
 > Jelena Saf
 
 1. The Description field in DESCRIPTION has been expanded.
+2. Added \value to all the slt_* function documentation
 
-TODO: address plot documentation feedback
+TODO: add examples and value to load_runs, record_session, shinyloadtest_report
 
 ## Test environments
 

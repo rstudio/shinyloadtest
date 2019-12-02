@@ -4,8 +4,13 @@
 \alias{record_session}
 \title{Record a Session for Load Test}
 \usage{
-record_session(target_app_url, host = "127.0.0.1", port = 8600,
-  output_file = "recording.log", open_browser = TRUE)
+record_session(
+  target_app_url,
+  host = "127.0.0.1",
+  port = 8600,
+  output_file = "recording.log",
+  open_browser = TRUE
+)
 }
 \arguments{
 \item{target_app_url}{The URL of the deployed application.}
@@ -25,7 +30,7 @@ Creates a recording file that can be used as input to the
 \code{shinycannon} command-line load generation tool.
 }
 \description{
-This function creates a \href{https://en.wikipedia.org/wiki/Reverse_proxy}{reverse proxy} at \code{http://host:port}
+This function creates a \href{https://en.wikipedia.org/wiki/Reverse_proxy}{reverse proxy} at \verb{http://host:port}
 (http://127.0.0.1:8600 by default) that intercepts and records activity
 between your web browser and the Shiny application at \code{target_app_url}.
 }
@@ -40,7 +45,7 @@ browser tab or window.
 Recordings are used as input to the \code{shinycannon} command-line
 load-generation tool which can be obtained from the \href{https://rstudio.github.io/shinyloadtest/index.html}{shinyloadtest documentation site}.
 }
-\section{\code{fileInput}/\code{DT}/\code{HTTP POST} support}{
+\section{\code{fileInput}/\code{DT}/\verb{HTTP POST} support}{
 
 
 Shiny's \code{shiny::fileInput()} input for uploading files, the \code{DT} package,
@@ -50,13 +55,13 @@ directly in the recording file. Instead, new files adjacent to the
 recording are created for each HTTP POST request intercepted.
 
 The adjacent files are named after the recording with the pattern
-\code{<output_file>.post.<N>}, where \code{<output_file>} is the chosen recording
-file name and \code{<N>} is the number of the request.
+\verb{<output_file>.post.<N>}, where \verb{<output_file>} is the chosen recording
+file name and \verb{<N>} is the number of the request.
 
 If present, these adjacent files must be kept alongside the recording file
 when the recording is played back with the \code{shinycannon} tool.
 }
 
 \seealso{
-\href{https://rstudio.github.io/shinyloadtest/}{shinyloadtest articles}
+\href{https://rstudio.github.io/shinyloadtest/}{\code{shinyloadtest} articles}
 }
