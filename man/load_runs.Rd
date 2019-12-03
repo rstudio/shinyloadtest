@@ -13,8 +13,22 @@ value is a path to the test result directory.}
 \item{verbose}{Whether or not to print progress for reading loadtest directories}
 }
 \value{
-A tidy data frame with the test result data. Each row is an event. Columns include
-identifiers and timing information for the event.
+A tidy data frame with the test result data. Each row is an event. Columns include identifiers and timing information for the event. The variables are as follows
+\describe{
+\item{run}{Name of the run}
+\item{session_id}{simulated session identifier, 0-based}
+\item{user_id}{simulated user identifier, 0-based}
+\item{iteration}{user session identifier, 0-based}
+\item{input_line_number}{recording line number associated with event}
+\item{event}{type of the event}
+\item{start}{time the event started, in seconds, relative to the time at which all simulated users were running.}
+\item{end}{time the event ended, in seconds, relative to the time at which all simulated users were running}
+\item{time}{event duration, in seconds}
+\item{concurrency}{number of events that happened at the same time as this one}
+\item{maintenance}{whether this event occurred before or after all simulated users were running}
+\item{label}{event-specific text label}
+\item{json}{raw message JSON and parsed JSON of the event}
+}
 }
 \description{
 The \code{shinycannon} tool creates a directory of log files for
