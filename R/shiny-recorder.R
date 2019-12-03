@@ -499,6 +499,10 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #' @return Creates a recording file that can be used as input to the
 #'   `shinycannon` command-line load generation tool.
 #' @seealso [`shinyloadtest` articles](https://rstudio.github.io/shinyloadtest/)
+#' @examples
+#' \dontrun{
+#'   record_session("https://example.com/your-shiny-app/")
+#' }
 #' @export
 record_session <- function(target_app_url, host = "127.0.0.1", port = 8600,
   output_file = "recording.log", open_browser = TRUE) {
