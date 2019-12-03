@@ -164,8 +164,23 @@ value is a path to the test result directory.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A tidy data frame with the test result data. Each row is an event. Columns include
-identifiers and timing information for the event.</p>
+    <p>A tidy data frame with the test result data. Each row is an event. Columns include identifiers and timing information for the event. The variables are as follows</p><dl class='dl-horizontal'>
+<dt>run</dt><dd><p>Name of the run</p></dd>
+<dt>session_id</dt><dd><p>simulated session identifier, 0-based</p></dd>
+<dt>user_id</dt><dd><p>simulated user identifier, 0-based</p></dd>
+<dt>iteration</dt><dd><p>user session identifier, 0-based</p></dd>
+<dt>input_line_number</dt><dd><p>recording line number associated with event</p></dd>
+<dt>event</dt><dd><p>type of the event</p></dd>
+<dt>start</dt><dd><p>time the event started, in seconds, relative to the time at which all simulated users were running.</p></dd>
+<dt>end</dt><dd><p>time the event ended, in seconds, relative to the time at which all simulated users were running</p></dd>
+<dt>time</dt><dd><p>event duration, in seconds</p></dd>
+<dt>concurrency</dt><dd><p>number of events that happened at the same time as this one</p></dd>
+<dt>maintenance</dt><dd><p>whether this event occurred before or after all simulated users were running</p></dd>
+<dt>label</dt><dd><p>event-specific text label</p></dd>
+<dt>json</dt><dd><p>raw message JSON and parsed JSON of the event</p></dd>
+
+</dl>
+
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {

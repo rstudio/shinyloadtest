@@ -154,8 +154,7 @@
 
 <span class='fu'>slt_session</span>(<span class='no'>df</span>)
 
-<span class='fu'>slt_session_duration</span>(<span class='no'>df</span>, <span class='kw'>cutoff</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/attr.html'>attr</a></span>(<span class='no'>df</span>, <span class='st'>"recording_duration"</span>),
-  <span class='fl'>60</span>)[<span class='fl'>1</span>])
+<span class='fu'>slt_session_duration</span>(<span class='no'>df</span>, <span class='kw'>cutoff</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/attr.html'>attr</a></span>(<span class='no'>df</span>, <span class='st'>"recording_duration"</span>), <span class='fl'>60</span>)[<span class='fl'>1</span>])
 
 <span class='fu'>slt_session_latency</span>(<span class='no'>df</span>)
 
@@ -189,6 +188,9 @@ when first requesting the app.</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A <code><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></code> plot object</p>
     <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
 
     
@@ -205,12 +207,16 @@ when first requesting the app.</p></td>
 <li><p><code>slt_websocket_latency</code>: Bar chart of maximum calculation (websocket) latency for each session within each run</p></li>
 </ul>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='fu'>slt_time_boxplot</span>(<span class='no'>slt_demo_data_16</span>)</div><div class='img'><img src='slt_plot-1.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>slt_time_concurrency</span>(<span class='no'>slt_demo_data_16</span>)</div><div class='img'><img src='slt_plot-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>slt_waterfall</span>(<span class='no'>slt_demo_data_16</span>)</div><div class='img'><img src='slt_plot-3.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>slt_hist_loadtimes</span>(<span class='no'>slt_demo_data_16</span>)</div><div class='output co'>#&gt; <span class='message'>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></div><div class='img'><img src='slt_plot-4.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>slt_user</span>(<span class='no'>slt_demo_data_16</span>)</div><div class='img'><img src='slt_plot-5.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>slt_session</span>(<span class='no'>slt_demo_data_16</span>)</div><div class='img'><img src='slt_plot-6.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>slt_session_duration</span>(<span class='no'>slt_demo_data_16</span>)</div><div class='img'><img src='slt_plot-7.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>slt_session_latency</span>(<span class='no'>slt_demo_data_16</span>)</div><div class='img'><img src='slt_plot-8.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>slt_http_latency</span>(<span class='no'>slt_demo_data_16</span>)</div><div class='img'><img src='slt_plot-9.png' alt='' width='700' height='433' /></div><div class='input'><span class='fu'>slt_websocket_latency</span>(<span class='no'>slt_demo_data_16</span>)</div><div class='img'><img src='slt_plot-10.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#value">Value</a></li>
       <li><a href="#functions">Functions</a></li>
+      <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>

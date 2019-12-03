@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Make shinyloadtest Report — shinyloadtest_report • shinyloadtest</title>
+<title>Example metrics for a 16-user load test — slt_demo_data_16 • shinyloadtest</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,8 @@
 
 
 
-<meta property="og:title" content="Make shinyloadtest Report — shinyloadtest_report" />
-<meta property="og:description" content="Make shinyloadtest Report" />
+<meta property="og:title" content="Example metrics for a 16-user load test — slt_demo_data_16" />
+<meta property="og:description" content="An example dataset like that returned by load_runs, but without the json variable for portability. Contains latency data for 3942 shinycannon events suitable for passing to shinyloadtest_report." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -133,74 +133,41 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Make shinyloadtest Report</h1>
-    <small class="dont-index">Source: <a href='https://github.com/rstudio/shinyloadtest/blob/master/R/make_report.R'><code>R/make_report.R</code></a></small>
-    <div class="hidden name"><code>shinyloadtest_report.Rd</code></div>
+    <h1>Example metrics for a 16-user load test</h1>
+    <small class="dont-index">Source: <a href='https://github.com/rstudio/shinyloadtest/blob/master/R/data.R'><code>R/data.R</code></a></small>
+    <div class="hidden name"><code>slt_demo_data_16.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Make shinyloadtest Report</p>
+    <p>An example dataset like that returned by <code><a href='load_runs.html'>load_runs</a></code>, but without the <code>json</code> variable for portability. Contains latency data for 3942 <code>shinycannon</code> events suitable for passing to <code><a href='shinyloadtest_report.html'>shinyloadtest_report</a></code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>shinyloadtest_report</span>(
-  <span class='no'>df</span>,
-  <span class='kw'>output</span> <span class='kw'>=</span> <span class='st'>"shinyloadtest_report.html"</span>,
-  <span class='kw'>duration_cutoff</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/attr.html'>attr</a></span>(<span class='no'>df</span>, <span class='st'>"recording_duration"</span>), <span class='fl'>60</span>)[<span class='fl'>1</span>],
-  <span class='kw'>http_latency_cutoff</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>max_websocket_cutoff</span> <span class='kw'>=</span> <span class='fl'>20</span>,
-  <span class='kw'>open_browser</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>self_contained</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)</pre>
-
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>df</th>
-      <td><p>data.frame returned from <code><a href='load_runs.html'>load_runs()</a></code></p></td>
-    </tr>
-    <tr>
-      <th>output</th>
-      <td><p>File where HTML output should be saved</p></td>
-    </tr>
-    <tr>
-      <th>duration_cutoff</th>
-      <td><p>Cutoff value for session duration plot. Defaults to the recording duration used to simulate <code>df</code> or 60 seconds.</p></td>
-    </tr>
-    <tr>
-      <th>http_latency_cutoff</th>
-      <td><p>Cutoff value for total http latency plot</p></td>
-    </tr>
-    <tr>
-      <th>max_websocket_cutoff</th>
-      <td><p>Cutoff value for max websocket latency plot</p></td>
-    </tr>
-    <tr>
-      <th>open_browser</th>
-      <td><p>Whether to open the created output in the browser</p></td>
-    </tr>
-    <tr>
-      <th>self_contained</th>
-      <td><p>Boolean that determines if the final output should be a self contained html file</p></td>
-    </tr>
-    <tr>
-      <th>verbose</th>
-      <td><p>Boolean that determines if progress output is displayed</p></td>
-    </tr>
-    </table>
+    <pre class="usage"><span class='no'>slt_demo_data_16</span></pre>
 
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>  <span class='co'># Run best with example(shinyloadtest_report, ask = FALSE)</span>
-  <span class='no'>html_file</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sprintf.html'>sprintf</a></span>(<span class='st'>"%s.html"</span>, <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempfile</a></span>(<span class='st'>"report"</span>))
-  <span class='fu'><a href='https://rdrr.io/r/base/message.html'>message</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/sprintf.html'>sprintf</a></span>(<span class='st'>"Generating report: %s"</span>, <span class='no'>html_file</span>))</div><div class='output co'>#&gt; <span class='message'>Generating report: /tmp/RtmpWsRTgn/report34e35b21b2bd.html</span></div><div class='input'>  <span class='fu'>shinyloadtest_report</span>(<span class='no'>slt_demo_data_1</span>, <span class='kw'>output</span> <span class='kw'>=</span> <span class='no'>html_file</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Removed 1 rows containing missing values (geom_vline).</span></div></pre>
+    <h2 class="hasAnchor" id="format"><a class="anchor" href="#format"></a>Format</h2>
+
+    <p>A data frame with 3942 rows and 12 variables:</p><dl class='dl-horizontal'>
+<dt>run</dt><dd><p>Name of the run</p></dd>
+<dt>session_id</dt><dd><p>simulated session identifier, 0-based</p></dd>
+<dt>user_id</dt><dd><p>simulated user identifier, 0-based</p></dd>
+<dt>iteration</dt><dd><p>user session identifier, 0-based</p></dd>
+<dt>input_line_number</dt><dd><p>recording line number associated with event</p></dd>
+<dt>event</dt><dd><p>type of the event</p></dd>
+<dt>start</dt><dd><p>time the event started, in seconds, relative to the time at which all simulated users were running.</p></dd>
+<dt>end</dt><dd><p>time the event ended, in seconds, relative to the time at which all simulated users were running</p></dd>
+<dt>time</dt><dd><p>event duration, in seconds</p></dd>
+<dt>concurrency</dt><dd><p>number of events that happened at the same time as this one</p></dd>
+<dt>maintenance</dt><dd><p>whether this event occurred before or after all simulated users were running</p></dd>
+<dt>label</dt><dd><p>event-specific text label</p></dd>
+
+</dl>
+
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#examples">Examples</a></li>
+      <li><a href="#format">Format</a></li>
     </ul>
 
   </div>

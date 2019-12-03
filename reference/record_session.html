@@ -146,8 +146,13 @@ between your web browser and the Shiny application at target_app_url." />
 between your web browser and the Shiny application at <code>target_app_url</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>record_session</span>(<span class='no'>target_app_url</span>, <span class='kw'>host</span> <span class='kw'>=</span> <span class='st'>"127.0.0.1"</span>, <span class='kw'>port</span> <span class='kw'>=</span> <span class='fl'>8600</span>,
-  <span class='kw'>output_file</span> <span class='kw'>=</span> <span class='st'>"recording.log"</span>, <span class='kw'>open_browser</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
+    <pre class="usage"><span class='fu'>record_session</span>(
+  <span class='no'>target_app_url</span>,
+  <span class='kw'>host</span> <span class='kw'>=</span> <span class='st'>"127.0.0.1"</span>,
+  <span class='kw'>port</span> <span class='kw'>=</span> <span class='fl'>8600</span>,
+  <span class='kw'>output_file</span> <span class='kw'>=</span> <span class='st'>"recording.log"</span>,
+  <span class='kw'>open_browser</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -206,8 +211,12 @@ file name and <code>&lt;N&gt;</code> is the number of the request.</p>
 when the recording is played back with the <code>shinycannon</code> tool.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><a href='https://rstudio.github.io/shinyloadtest/'>shinyloadtest articles</a></p></div>
+    <div class='dont-index'><p><a href='https://rstudio.github.io/shinyloadtest/'><code>shinyloadtest</code> articles</a></p></div>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+  <span class='fu'>record_session</span>(<span class='st'>"https://example.com/your-shiny-app/"</span>)
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -217,6 +226,7 @@ when the recording is played back with the <code>shinycannon</code> tool.</p>
       <li><a href="#details">Details</a></li>
       <li><a href="#fileinput-dt-http-post-support"><code>fileInput</code>/<code>DT</code>/<code>HTTP POST</code> support</a></li>
       <li><a href="#see-also">See also</a></li>
+      <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>
