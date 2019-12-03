@@ -60,3 +60,5 @@ Roxygen: list(markdown = TRUE)
 Suggests:
     testthat,
     usethis
+SystemRequirements:
+    pandoc (>= 2.2) - http://pandoc.org
