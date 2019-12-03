@@ -22,16 +22,16 @@ NULL
 #' @rdname slt_plot
 #' @return A \code{\link[ggplot2]{ggplot}} plot object
 #' @examples
-#' slt_time_boxplot(slt_demo_data)
-#' slt_time_concurrency(slt_demo_data)
-#' slt_waterfall(slt_demo_data)
-#' slt_hist_loadtimes(slt_demo_data)
-#' slt_user(slt_demo_data)
-#' slt_session(slt_demo_data)
-#' slt_session_duration(slt_demo_data)
-#' slt_session_latency(slt_demo_data)
-#' slt_http_latency(slt_demo_data)
-#' slt_websocket_latency(slt_demo_data)
+#' slt_time_boxplot(slt_demo_data_16)
+#' slt_time_concurrency(slt_demo_data_16)
+#' slt_waterfall(slt_demo_data_16)
+#' slt_hist_loadtimes(slt_demo_data_16)
+#' slt_user(slt_demo_data_16)
+#' slt_session(slt_demo_data_16)
+#' slt_session_duration(slt_demo_data_16)
+#' slt_session_latency(slt_demo_data_16)
+#' slt_http_latency(slt_demo_data_16)
+#' slt_websocket_latency(slt_demo_data_16)
 NULL
 
 

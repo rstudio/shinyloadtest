@@ -225,8 +225,7 @@ get_times <- function(df) {
 #' @param ...  Key-value pairs where the key is the desired name for the test and the
 #'   value is a path to the test result directory.
 #' @param verbose Whether or not to print progress for reading loadtest directories
-#' @return A tidy data frame with the test result data. Each row is an event. Columns include
-#'    identifiers and timing information for the event.
+#' @eval roxygen_gen_df_desc("@return A tidy data frame with the test result data. Each row is an event. Columns include identifiers and timing information for the event. The variables are as follows", TRUE)
 #' @export
 #' @examples
 #' \dontrun{

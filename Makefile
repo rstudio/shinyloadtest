@@ -21,6 +21,7 @@ index.md: index.Rmd
 	R --quiet --no-restore -e 'rmarkdown::render("index.Rmd", output_format = rmarkdown::md_document())'
 
 devinstall:
+	Rscript data-raw/slt_demo_data.R
 	R -e 'devtools::document()'
 	R CMD INSTALL --no-multiarch --with-keep.source .
 

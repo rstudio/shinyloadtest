@@ -62,6 +62,11 @@ If present, these adjacent files must be kept alongside the recording file
 when the recording is played back with the \code{shinycannon} tool.
 }
 
+\examples{
+\dontrun{
+  record_session("https://example.com/your-shiny-app/")
+}
+}
 \seealso{
 \href{https://rstudio.github.io/shinyloadtest/}{\code{shinyloadtest} articles}
 }

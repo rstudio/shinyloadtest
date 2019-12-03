@@ -1,4 +1,4 @@
-# 2019-12-01 1.0.0
+# 2019-12-03 1.0.0
 
 This is a re-submission addressing the following reviewer feedback e-mail:
 
@@ -20,10 +20,15 @@ This is a re-submission addressing the following reviewer feedback e-mail:
 > Best,
 > Jelena Saf
 
-1. The Description field in DESCRIPTION has been expanded.
-2. Added \value to all the slt_* function documentation
+The following changes addressing reviewer feedback were made:
 
-TODO: add examples and value to load_runs, record_session, shinyloadtest_report
+1. The Description field in DESCRIPTION has been expanded.
+2. \value was added to all slt_* function documentation
+3. Running \examples were added to the slt_plot topic
+4. \value was added to load_runs()
+5. A \dontrun \example was added to record_session(). \dontrun used because record_session() starts a server.
+6. Example datasets suitable for passing to shinyloadtest_report() were added: slt_demo_data_1, slt_demo_data_4, and slt_demo_data_16
+7. A running example using a provided example dataset was added to shinyloadtest_report()
 
 ## Test environments
 
