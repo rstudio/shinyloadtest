@@ -36,7 +36,7 @@ The following changes addressing reviewer feedback were made:
 * Ubuntu 18.04: R 3.6.1
 * Travis Ubuntu 16.04: oldrelease, release, devel
 * win-builder: oldrelease, release, devel
-* rhub: windows-x86_64-devel, ubuntu-gcc-release, fedora-clang-devel
+* rhub: windows-x86_64-devel, ubuntu-gcc-release
 
 ## R CMD check results
 
