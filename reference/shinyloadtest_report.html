@@ -192,9 +192,9 @@
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>  <span class='co'># Run best with example(shinyloadtest_report, ask = FALSE)</span>
-  <span class='no'>html_file</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sprintf.html'>sprintf</a></span>(<span class='st'>"%s.html"</span>, <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempfile</a></span>(<span class='st'>"report"</span>))
-  <span class='fu'><a href='https://rdrr.io/r/base/message.html'>message</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/sprintf.html'>sprintf</a></span>(<span class='st'>"Generating report: %s"</span>, <span class='no'>html_file</span>))</div><div class='output co'>#&gt; <span class='message'>Generating report: /tmp/RtmpziyHzw/report348462f54fd9.html</span></div><div class='input'>  <span class='fu'>shinyloadtest_report</span>(<span class='no'>slt_demo_data_1</span>, <span class='kw'>output</span> <span class='kw'>=</span> <span class='no'>html_file</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: Removed 1 rows containing missing values (geom_vline).</span></div></pre>
+    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+  <span class='fu'>shinyloadtest_report</span>(<span class='no'>slt_demo_data_1</span>)
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
