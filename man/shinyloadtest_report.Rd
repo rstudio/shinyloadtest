@@ -36,8 +36,7 @@ shinyloadtest_report(
 Make shinyloadtest Report
 }
 \examples{
-  # Run best with example(shinyloadtest_report, ask = FALSE)
-  html_file <- sprintf("\%s.html", tempfile("report"))
-  message(sprintf("Generating report: \%s", html_file))
-  shinyloadtest_report(slt_demo_data_1, output = html_file)
+\dontrun{
+  shinyloadtest_report(slt_demo_data_1)
+}
 }
