@@ -15,10 +15,9 @@ if (getRversion() >= "2.15.1") {
 #' @param self_contained Boolean that determines if the final output should be a self contained html file
 #' @param open_browser Whether to open the created output in the browser
 #' @examples
-#'   # Run best with example(shinyloadtest_report, ask = FALSE)
-#'   html_file <- sprintf("%s.html", tempfile("report"))
-#'   message(sprintf("Generating report: %s", html_file))
-#'   shinyloadtest_report(slt_demo_data_1, output = html_file)
+#' \dontrun{
+#'   shinyloadtest_report(slt_demo_data_1)
+#' }
 #' @export
 shinyloadtest_report <- function(
   df,
@@ -131,7 +130,7 @@ shinyloadtest_report <- function(
   # gantt chart plots
   min_gantt_time <- min(df$start)
   max_gantt_time <- max(df$end)
-  max_duration <- max(gantt_duration_data(df)$end)
+  max_duration <- max(c(gantt_duration_data(df)$end, duration_cutoff))
   gantt <- lapply(levels(df$run), function(run_val) {
     run_val_clean <-
       run_val %>%
