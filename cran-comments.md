@@ -1,4 +1,4 @@
-# 2019-12-04 1.0.0
+# 2019-12-06 1.0.0
 
 This is a re-submission addressing the following reviewer feedback e-mail:
 
@@ -27,8 +27,8 @@ The following changes addressing reviewer feedback were made:
 3. Running \examples were added to the slt_plot topic
 4. \value was added to load_runs()
 5. A \dontrun \example was added to record_session(). \dontrun used because record_session() starts a server.
-6. Example datasets suitable for passing to shinyloadtest_report() were added: slt_demo_data_1, slt_demo_data_4, and slt_demo_data_16
-7. A running example using a provided example dataset was added to shinyloadtest_report()
+6. A \dontrun \example was added to shinyloadtest_report(). \dontrun used because CRAN servers don't have a recent enough pandoc for it to work.
+7. Example datasets suitable for passing to shinyloadtest_report() were added: slt_demo_data_1, slt_demo_data_4, and slt_demo_data_16
 
 ## Test environments
 
