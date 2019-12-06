@@ -40,7 +40,7 @@ The following changes addressing reviewer feedback were made:
 
 There were no ERRORs or WARNINGs.
 
-Sometimes a NOTE about example running time is produced; it is caused by the slt_* examples suggested by CRAN review.
+Sometimes a NOTE about example running time > 5 seconds is produced; it is caused by the new slt_* examples.
 
 ## Downstream dependencies
 
