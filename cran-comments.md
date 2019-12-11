@@ -1,3 +1,8 @@
+# 2019-12-11 1.0.0
+
+This is a resubmission because an incorrect version of the package was 
+previously submitted.
+
 # 2019-12-06 1.0.0
 
 This is a re-submission addressing the following reviewer feedback e-mail:
