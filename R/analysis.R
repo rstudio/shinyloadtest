@@ -135,6 +135,22 @@ read_recording <- function(file_name) {
     )
 }
 
+# A WS message with this payload is only ever sent when SockJS is used
+# (SSP/RSC). The message may begin with the following strings:
+#
+# 1. "[\"0|o|": This type of message is sent when an older version of SSP is
+# used that doesn't support subapps. The 0 here is the SockJS message id.
+#
+# 2. "[\"0#<subapp-id>|o|": This type of message is sent with more recent
+# versions of SSP, and with RSC. It indicates that the server supports subapps.
+# <subapp-id> is an integer identifying the subapp. For single applications, it
+# is 0. It is the same for the duration of the session. We have not tested with
+# subapps and so it is unknown as of this writing whether or not shinyloadtest
+# works with them.
+isSockjsInitMessage <- function(msg) {
+  grepl("^\\[\"0(#\\d+)?\\|o\\|", msg)
+}
+
 WS_CLOSE_LABEL <- "Stop Session"
 recording_item_labels <- function(x_list) {
   shorten_url <- function(u) {
@@ -164,8 +180,8 @@ recording_item_labels <- function(x_list) {
         if (i > 1 && identical(x_list[[i - 1]]$type, "WS_RECV_INIT")) {
           "Initialize Inputs"
         } else {
-          if (grepl("\\|o\\|\"]$", x$message)) {
-            "Initialize Connection"
+          if (isSockjsInitMessage(x$message)) {
+            "SockJS Initialize Connection"
           } else {
             message <- x$message_parsed
             if (identical(message$method, "uploadInit")) {
