@@ -1,4 +1,4 @@
-shinyloadtest 1.0.0
+shinyloadtest 1.0.1
 =======
 
 This is the initial release of shinyloadtest to CRAN.
@@ -9,6 +9,7 @@ This is the initial release of shinyloadtest to CRAN.
   the target application
   ([#115](https://github.com/rstudio/shinyloadtest/pull/115),
   [rstudio/shinycannon#38](https://github.com/rstudio/shinycannon/issues/38))
+* Fixed a bug that prevented runs from being loaded ([#124](https://github.com/rstudio/shinyloadtest/issues/124), [#125](https://github.com/rstudio/shinyloadtest/pull/125))
 
 ### Improvements
 
