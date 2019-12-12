@@ -1,7 +1,7 @@
 # 2019-12-12 1.0.1
 
 This is a re-submission because an incorrect version of the package was 
-previously submitted. It also includes a bug fix.
+previously submitted as version 1.0.0. It also includes a bug fix.
 
 # 2019-12-06 1.0.0
 
