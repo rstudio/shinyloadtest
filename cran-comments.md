@@ -1,3 +1,28 @@
+# 2019-12-17 1.0.1
+
+This is a re-submission addressing the following reviewer feedback e-mail:
+
+> Please omit the redundant 'Tools for' from your description.
+> 
+> Please add more small executable examples in your Rd-files to illustrate
+> the use of the exported function but also enable automatic testing.
+> 
+> Please add \value to .Rd files that are not data files and explain the
+> functions results in the documentation.
+> f.i.: shinyloadtest_report.Rd
+> If a function does not return a value, please document that too, e.g.
+> \value{None}.
+> 
+> Please fix and resubmit, and document what was changed in the submission
+> comments.
+> 
+> Best,
+> Jelena Saf
+
+The following changes addressing reviewer feedback were made:
+
+1. Redundant working in DESCRIPTION was removed.
+
 # 2019-12-12 1.0.1
 
 This is a re-submission because an incorrect version of the package was 

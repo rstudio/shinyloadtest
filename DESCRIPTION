@@ -8,7 +8,7 @@ Authors@R: c(
             person("Barbara", "Borges", role = c("aut")),
             person("RStudio", role = c("cph", "fnd"))
             )
-Description: Tools for assessing the number of concurrent users 'shiny'
+Description: Assesses the number of concurrent users 'shiny'
   applications are capable of supporting, and for directing application changes
   in order to support a higher number of users. Provides facilities for recording
   'shiny' application sessions, playing recorded sessions against a target
