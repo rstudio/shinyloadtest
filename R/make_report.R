@@ -16,9 +16,7 @@ if (getRversion() >= "2.15.1") {
 #' @param open_browser Whether to open the created output in the browser
 #' @return The path to the report, invisibly
 #' @examples
-#' \dontrun{
 #'   shinyloadtest_report(slt_demo_data_1)
-#' }
 #' @export
 shinyloadtest_report <- function(
   df,

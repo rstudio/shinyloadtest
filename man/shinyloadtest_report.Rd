@@ -39,7 +39,5 @@ The path to the report, invisibly
 Make shinyloadtest Report
 }
 \examples{
-\dontrun{
   shinyloadtest_report(slt_demo_data_1)
-}
 }
