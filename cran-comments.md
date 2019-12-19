@@ -23,7 +23,8 @@ The following changes addressing reviewer feedback were made:
 
 1. Redundant working in DESCRIPTION was removed.
 2. Added return value documentation to shinyloadtest_report()
-3. Removed \dontrun from shinyloadtest_report() example
+3. Removed \dontrun from shinyloadtest_report() example in order to be automatically tested
+    - This example exercises every function in the package except load_runs()
 
 # 2019-12-12 1.0.1
 
