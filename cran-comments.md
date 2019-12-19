@@ -1,4 +1,4 @@
-# 2019-12-17 1.0.1
+# 2019-12-19 1.0.1
 
 This is a re-submission addressing the following reviewer feedback e-mail:
 
@@ -22,6 +22,7 @@ This is a re-submission addressing the following reviewer feedback e-mail:
 The following changes addressing reviewer feedback were made:
 
 1. Redundant working in DESCRIPTION was removed.
+2. Added return value documentation to shinyloadtest_report()
 
 # 2019-12-12 1.0.1
 
