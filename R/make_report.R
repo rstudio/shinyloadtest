@@ -14,6 +14,7 @@ if (getRversion() >= "2.15.1") {
 #' @param verbose Boolean that determines if progress output is displayed
 #' @param self_contained Boolean that determines if the final output should be a self contained html file
 #' @param open_browser Whether to open the created output in the browser
+#' @return The path to the report, invisibly
 #' @examples
 #' \dontrun{
 #'   shinyloadtest_report(slt_demo_data_1)

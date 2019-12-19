@@ -32,6 +32,9 @@ shinyloadtest_report(
 
 \item{verbose}{Boolean that determines if progress output is displayed}
 }
+\value{
+The path to the report, invisibly
+}
 \description{
 Make shinyloadtest Report
 }
