@@ -19,12 +19,16 @@ This is a re-submission addressing the following reviewer feedback e-mail:
 > Best,
 > Jelena Saf
 
-The following changes addressing reviewer feedback were made:
+The following work was performed in response to reviewer feedback:
 
 1. Redundant wording in DESCRIPTION was removed.
 2. Return value was added to the shinyloadtest_report() documentation.
-3. \dontrun was removed from shinyloadtest_report() examples in order to be automatically tested
-    - This example exercises every function in the package except load_runs()
+3. In an effort to add more runnable examples, I removed \dontrun from 
+   the shinyloadtest_report() examples, but this fails on CRAN test 
+   servers because the version of pandoc is not recent enough (< 2.2). 
+   This is unfortunate, because shinyloadtest_report() exercises nearly 
+   every other function in the package. Instead, we added a unit test 
+   involving shinyloadtest_report() that runs on Travis CI.
 
 # 2019-12-12 1.0.1
 
