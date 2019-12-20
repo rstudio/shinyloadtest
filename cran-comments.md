@@ -1,4 +1,4 @@
-# 2019-12-19 1.0.1
+# 2019-12-20 1.0.1
 
 This is a re-submission addressing the following reviewer feedback e-mail:
 
