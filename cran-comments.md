@@ -26,9 +26,8 @@ The following work was performed in response to reviewer feedback:
 3. In an effort to add more runnable examples, I removed \dontrun from 
    the shinyloadtest_report() examples, but this fails on CRAN test 
    servers because the version of pandoc is not recent enough (< 2.2). 
-   This is unfortunate, because shinyloadtest_report() exercises nearly 
-   every other function in the package. Instead, we added a unit test 
-   involving shinyloadtest_report() that runs on Travis CI.
+   So, in order to ensure shinyloadtest_report() is tested, we added
+   a unit test involving shinyloadtest_report() that runs in Travis CI.
 
 # 2019-12-12 1.0.1
 
