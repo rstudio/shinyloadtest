@@ -1,7 +1,7 @@
 Package: shinyloadtest
 Type: Package
 Title: Load Test Shiny Applications
-Version: 1.0.1
+Version: 1.0.2.9000
 Authors@R: c(
             person("Alan", "Dipert", role = c("aut", "cre"), email = "alan@rstudio.com"),
             person("Barret", "Schloerke", role = c("aut"), email = "barret@rstudio.com"),
