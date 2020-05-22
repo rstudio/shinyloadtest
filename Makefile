@@ -15,7 +15,7 @@ help:
 # RELEASE_URLS.csv is read by index.Rmd
 urls:
 	rm -f RELEASE_URLS.csv
-	wget https://s3.amazonaws.com/rstudio-shinycannon-build/RELEASE_URLS.csv
+	./scripts/fetch_releases.R > RELEASE_URLS.csv
 
 index.md: index.Rmd
 	R --quiet --no-restore -e 'rmarkdown::render("index.Rmd", output_format = rmarkdown::md_document())'
