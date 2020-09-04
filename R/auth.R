@@ -53,8 +53,8 @@ handlePost <- function(handle, loginUrl, postfields, cookies, cookieName) {
 }
 
 # Returns the cookies that should be attached to all subsequent HTTP requests,
-# including the initial websocket request. Currently implemented for RSC and
-# SSP.
+# including the initial websocket request. Currently implemented for SSP and RSC
+# with LDAP/AD, PAM, or password auth.
 postLogin <- function(appUrl, appServer, username, password) {
 
   loginUrl <- loginUrlFor(appUrl, appServer)
@@ -94,11 +94,30 @@ postLogin <- function(appUrl, appServer, username, password) {
   )
 }
 
-getApp <- function(appUrl, cookie) {
+# Get cookies for RSC with API key provided.
+getConnectCookies <- function(appUrl, appServer, connectApiKey) {
+  stopifnot(appServer == SERVER_TYPE$RSC)
+
+  h <- curl::new_handle()
+  curl::handle_setopt(h,
+    ssl_verifyhost = 0, ssl_verifypeer = 0
+  )
+  curl::handle_setheaders(h,
+    Authorization = paste0("Key ", connectApiKey)
+  )
+
+  resp <- curl::curl_fetch_memory(appUrl$build(), handle = h)
+
+  if (!(resp$status_code %in% c(200, 302))) stop("Authentication failed")
+  curl::handle_cookies(h)[,c("name", "value")]
+}
+
+getApp <- function(appUrl, cookie = NULL, api_key = NULL) {
   h <- curl::new_handle()
   curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0,
     cookie = pasteParams(cookie, "; ")
   )
+
   curl::curl_fetch_memory(appUrl, handle = h)
 }
 
