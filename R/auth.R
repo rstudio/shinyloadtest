@@ -94,7 +94,7 @@ postLogin <- function(appUrl, appServer, username, password) {
   )
 }
 
-getApp <- function(appUrl) {
+getApp <- function(appUrl, cookie) {
   h <- curl::new_handle()
   curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0,
     cookie = pasteParams(cookie, "; ")
