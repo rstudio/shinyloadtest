@@ -54,7 +54,7 @@ handlePost <- function(handle, loginUrl, postfields, cookies, cookieName) {
 
 # Returns the cookies that should be attached to all subsequent HTTP requests,
 # including the initial websocket request. Currently implemented for SSP and RSC
-# with LDAP/AD, PAM, or password auth.
+# with LDAP/AD, PAM, or password auth. Don't need for RSC if using API key.
 postLogin <- function(appUrl, appServer, username, password) {
 
   loginUrl <- loginUrlFor(appUrl, appServer)
@@ -92,24 +92,6 @@ postLogin <- function(appUrl, appServer, username, password) {
     SAI = stop("Logging in to shinyapps.io is unsupported"),
     SHN = stop("Plain Shiny apps don't support authentication")
   )
-}
-
-# Get cookies for RSC with API key provided.
-getConnectCookies <- function(appUrl, appServer, connectApiKey) {
-  stopifnot(appServer == SERVER_TYPE$RSC)
-
-  h <- curl::new_handle()
-  curl::handle_setopt(h,
-    ssl_verifyhost = 0, ssl_verifypeer = 0
-  )
-  curl::handle_setheaders(h,
-    Authorization = paste0("Key ", connectApiKey)
-  )
-
-  resp <- curl::curl_fetch_memory(appUrl$build(), handle = h)
-
-  if (!(resp$status_code %in% c(200, 302))) stop("Authentication failed")
-  curl::handle_cookies(h)[,c("name", "value")]
 }
 
 getApp <- function(appUrl, cookie = NULL, api_key = NULL) {

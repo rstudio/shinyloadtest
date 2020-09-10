@@ -243,17 +243,12 @@ RecordingSession <- R6::R6Class("RecordingSession",
     },
     initializeSessionCookies = function() {
       cookies <- data.frame()
-      if (isProtected(private$targetURL)) {
-        if (!is.null(private$connectApiKey) &&
-            private$targetType == SERVER_TYPE$RSC) {
-          cookies <- getConnectCookies(private$targetURL, private$targetType, private$connectApiKey)
-        } else {
+      if (isProtected(private$targetURL) && is.null(private$connectApiKey)) {
           username <- getPass::getPass("Enter your username: ")
           if (is.null(username)) stop("Login aborted (username not provided)")
           password <- getPass::getPass("Enter your password: ")
           if (is.null(password)) stop("Login aborted (password not provided)")
           cookies <- postLogin(private$targetURL, private$targetType, username, password)
-        }
       }
       private$sessionCookies <- cookies
     },
