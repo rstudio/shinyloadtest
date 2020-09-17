@@ -192,6 +192,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$localHost <- host
       private$localPort <- port
       if (private$targetType == SERVER_TYPE$RSC) {
+        message("Authenticating using provided connect_api_key.")
         private$connectApiKey <- connectApiKey
       }
 
@@ -508,8 +509,8 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #'   or not (`FALSE`).
 #' @param port The port for the reverse proxy. Default is 8600. Change this
 #'   default if port 8600 is used by another service.
-#' @param connect_api_key an RStudio Connect api key, defaults to
-#'   Sys.getenv("CONNECT_API_KEY")
+#' @param connect_api_key An RStudio Connect api key. It may be useful to use
+#'  `Sys.getenv("CONNECT_API_KEY")`.
 #'
 #' @return Creates a recording file that can be used as input to the
 #'   `shinycannon` command-line load generation tool.
@@ -521,8 +522,12 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #' @export
 record_session <- function(target_app_url, host = "127.0.0.1", port = 8600,
   output_file = "recording.log", open_browser = TRUE,
-  connect_api_key = Sys.getenv("CONNECT_API_KEY")) {
-    if (identical(connect_api_key, "")) connect_api_key <- NULL
+  connect_api_key = NULL) {
+    if (!is.null(connect_api_key)) {
+      stopifnot(length(connect_api_key) == 1)
+      stopifnot(is.character(connect_api_key))
+      stopifnot(nchar(connect_api_key) > 0)
+    }
 
     session <- RecordingSession$new(target_app_url, host, port, output_file, connect_api_key)
     on.exit(session$stop())
