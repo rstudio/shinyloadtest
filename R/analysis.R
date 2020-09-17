@@ -227,7 +227,7 @@ get_times <- function(df) {
               concurrency = mean(concurrency)) %>%
     ungroup() %>%
     arrange(input_line_number, run) %>%
-    tibble::as.tibble()
+    tibble::as_tibble()
 }
 
 
