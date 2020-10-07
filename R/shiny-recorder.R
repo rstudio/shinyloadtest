@@ -191,7 +191,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       }
       private$localHost <- host
       private$localPort <- port
-      if (private$targetType == SERVER_TYPE$RSC) {
+      if (private$targetType == SERVER_TYPE$RSC && !is.null(connectApiKey)) {
         message("Authenticating using provided connect_api_key.")
         private$connectApiKey <- connectApiKey
       }
