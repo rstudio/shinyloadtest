@@ -4,7 +4,8 @@
 \name{slt_demo_data_1}
 \alias{slt_demo_data_1}
 \title{Example metrics for a 1-user load test}
-\format{A data frame with 1323 rows and 12 variables:
+\format{
+A data frame with 1323 rows and 12 variables:
 \describe{
 \item{run}{Name of the run}
 \item{session_id}{simulated session identifier, 0-based}
@@ -18,7 +19,8 @@
 \item{concurrency}{number of events that happened at the same time as this one}
 \item{maintenance}{whether this event occurred before or after all simulated users were running}
 \item{label}{event-specific text label}
-}}
+}
+}
 \usage{
 slt_demo_data_1
 }

@@ -35,7 +35,7 @@ Collate:
 Imports:
     R6,
     curl,
-    dplyr (>= 0.8.0.1),
+    dplyr (>= 1.0.0),
     getPass,
     ggplot2,
     glue,
@@ -55,7 +55,7 @@ Imports:
     svglite,
     websocket (>= 1.0.0),
     xml2
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 Suggests:
     testthat,
