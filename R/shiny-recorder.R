@@ -191,9 +191,16 @@ RecordingSession <- R6::R6Class("RecordingSession",
       }
       private$localHost <- host
       private$localPort <- port
-      if (private$targetType == SERVER_TYPE$RSC && !is.null(connectApiKey)) {
-        message("Authenticating using provided connect_api_key.")
-        private$connectApiKey <- connectApiKey
+      if (private$targetType == SERVER_TYPE$RSC) {
+        # notify if the apikey is being used
+        if (!is.null(connectApiKey)) {
+          message("Authenticating using provided connect_api_key.")
+          private$connectApiKey <- connectApiKey
+        }
+        # check if the solo url was not provided
+        if (grepl("#", targetAppUrl, fixed = TRUE)) {
+          stop("Please provide the content URL (solo mode) of this RStudio Connect Shiny app")
+        }
       }
 
       private$initializeSessionCookies()
