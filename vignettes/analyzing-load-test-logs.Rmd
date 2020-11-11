@@ -12,9 +12,8 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  out.width = "80%",
-  fig.align = "center",
-  fig.width = 8, 
+  out.width = "100%",
+  fig.width = 8,
   fig.height = 6
 )
 
@@ -24,6 +23,8 @@ folders_exist <- dir.exists(sub("\\.zip$", "", zips))
 if (any(!folders_exist)) {
   lapply(zips[!folders_exist], unzip, exdir = "./test_sessions")
 }
+
+ggplot2::theme_set(ggplot2::theme_grey(12))
 ```
 
 ```{r setup, message = FALSE}
@@ -158,7 +159,7 @@ In this plot you're primarily looking for uniform shape. In particular you want 
 
 If we look at another run where a file was uploaded and many POST requests were made for a DT table, we can see many line crossings. This happens when execution for that step took **much** more time than the other sessions.  
 
-```{r, echo = FALSE, fig.height = 16}
+```{r, echo = FALSE, fig.height = 10}
 upload <- load_runs("./test_sessions/upload-dt/", verbose = FALSE)
 upload %>% slt_waterfall()
 ```
@@ -167,7 +168,7 @@ upload %>% slt_waterfall()
 
 The **Latency** page displays two plots. The first plot displays the total HTTP (homepage + js/css) time for each session:
 
-```{r, echo = FALSE, fig.height=7}
+```{r, echo = FALSE}
 df %>% 
   filter(run == "4 users") %>% 
   slt_http_latency()
@@ -177,7 +178,7 @@ This plot helps diagnose how long a user has to wait before they see _something_
 
 The second plot displays the maximum calculation time:
 
-```{r, echo = FALSE, fig.height=7}
+```{r, echo = FALSE}
 df %>% 
   filter(run == "4 users") %>% 
   slt_websocket_latency()
