@@ -49,7 +49,7 @@ slt_time_boxplot <- function(df, labels = NULL) {
   df %>%
     ggplot(aes(run, time)) +
     geom_boxplot(aes(fill = run), show.legend = FALSE) +
-    scale_fill_manual(values = run_fill_colors) +
+    scale_fill_manual(NULL, values = run_fill_colors) +
     labs(
       y = "Time (sec)",
       x = NULL
@@ -78,7 +78,7 @@ slt_time_concurrency <- function(df, labels = NULL) {
       colour = "grey70"
     ) +
     geom_point(aes(colour = run)) +
-    scale_colour_manual(values = run_fill_colors) +
+    scale_colour_manual(NULL, values = run_fill_colors) +
     labs(
       x = "Concurrency",
       y = "Time (sec)"
@@ -146,11 +146,10 @@ slt_user <- function(df) {
   ggplot(df1, aes(center, user_id)) +
     geom_tile(aes(fill = eventLabel, width = duration), height = 1) +
     maintenance_vline(df1, "time") +
-    scale_fill_manual(values = event_colours) +
+    scale_fill_manual(NULL, values = event_colours) +
     labs(
       x = "Elapsed time (sec)",
-      y = "Simulated user #",
-      fill = NULL
+      y = "Simulated user #"
     ) +
     theme(legend.position = "bottom") +
     facet_on_run_free(df1)
@@ -302,8 +301,7 @@ manip_event_label <- function(df) {
     "Homepage" = "REQ_HOME",
     "JS/CSS" = "REQ_GET",
     "Start session" = "WS_OPEN",
-    "Calculate" = "WS_RECV",
-    "WS_SEND" = "WS_SEND"
+    "Calculate" = "WS_RECV"
   )
 
   df %>%
