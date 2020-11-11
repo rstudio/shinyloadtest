@@ -10,70 +10,38 @@ strip_suffix <- function(str) {
 }
 
 
-# Read a single .log file
-read_log_file <- function(file) {
-  suppressWarnings({
-    df <- readr::read_csv(
-      file,
-      col_types = readr::cols(
-        session_id = readr::col_integer(),
-        worker_id = readr::col_integer(),
-        iteration = readr::col_integer(),
-        event = readr::col_character(),
-        timestamp = readr::col_double(),
-        input_line_number = readr::col_integer(),
-        comment = readr::col_character()
-      ),
-      comment = "#"
-    )
-  })
-  df %>%
-    mutate(user_id = worker_id) %>%
-    select(- worker_id)
-}
-
 # Read a "sessions/" directory full of .log files
 read_log_dir <- function(dir, name = basename(dirname(dir)), verbose = TRUE) {
-  verbose <- isTRUE(verbose)
   files <- list.files(dir, pattern = "*.csv", full.names = TRUE)
   if (length(files) == 0) {
     stop("No files found for run dir: ", dir, call. = FALSE)
   }
-  if (verbose) {
-    pr <- progress::progress_bar$new(
-      format = ":evt [:bar] :current/:total eta::eta",
-      total = length(files) + 2,
-      show_after = 0,
-      clear = FALSE
-    )
-    tick <- function(evt) {
-      pr$tick(tokens = list(evt = evt))
-    }
-  } else {
-    tick <- identity
-  }
 
-  df <- lapply(files, function(file) {
-      tick(name)
-      read_log_file(file)
-    }) %>%
-    bind_rows() %>%
-    arrange(timestamp) %>%
-    mutate(timestamp = (.$timestamp - min(.$timestamp)) / 1000)
+  df <- vroom::vroom(files,
+    col_types = vroom::cols(
+      session_id = vroom::col_integer(),
+      worker_id = vroom::col_integer(),
+      iteration = vroom::col_integer(),
+      event = vroom::col_character(),
+      timestamp = vroom::col_double(),
+      input_line_number = vroom::col_integer(),
+      comment = vroom::col_character()
+    ),
+    comment = "#",
+  )
 
-  tick(paste0(name, " - Cleanup"))
-  relative_concurrency <- with(df, {
-    ifelse(event == "WS_OPEN_START", 1,
-           ifelse(event == "WS_CLOSE_END", -1,
-                  0))
-  })
   df <- df %>%
+    arrange(timestamp) %>%
     mutate(
-      concurrency = cumsum(relative_concurrency),
+      timestamp = (timestamp - min(timestamp)) / 1000,
+      concurrency = cumsum(case_when(
+        event == "WS_OPEN_START" ~ 1,
+        event == "WS_CLOSE_END" ~ -1,
+        TRUE ~ 0
+      )),
       run = name
-    )
-  tick(name)
-
+    ) %>%
+    rename(user_id = worker_id)
   df
 }
 
@@ -218,16 +186,23 @@ recording_item_labels <- function(x_list) {
 
 get_times <- function(df) {
   df %>%
-    filter(!is.na(input_line_number)) %>%
-    group_by(run, session_id, user_id, iteration, input_line_number) %>%
-    summarise(event = strip_suffix(event[1]),
-              start = min(timestamp),
-              end = max(timestamp),
-              time = diff(range(timestamp)),
-              concurrency = mean(concurrency)) %>%
-    ungroup() %>%
-    arrange(input_line_number, run) %>%
-    tibble::as_tibble()
+    filter(
+      !is.na(input_line_number),
+      !event %in% c(
+        "PLAYER_SESSION_CREATE",
+        "PLAYBACK_SLEEPBEFORE_START",
+        "PLAYBACK_SLEEPBEFORE_END"
+      )
+    ) %>%
+    group_by(run, user_id, session_id, iteration, input_line_number) %>%
+    summarise(
+      event = strip_suffix(event[[1]]),
+      start = min(timestamp),
+      end = max(timestamp),
+      time = diff(range(timestamp)),
+      concurrency = mean(concurrency),
+      .groups = "drop"
+    )
 }
 
 
@@ -309,11 +284,8 @@ load_runs <- function(..., verbose = TRUE) {
         ., names(.),
         USE.NAMES = FALSE, SIMPLIFY = FALSE,
         FUN = function(recording_path, run) {
-          df_run <- read_log_dir(file.path(recording_path, "sessions"), run, verbose = verbose) %>%
-            get_times() %>%
-            filter(event != "PLAYBACK_SLEEPBEFORE", event != "PLAYER_SESSION") %>%
-            arrange(run, user_id, session_id, input_line_number) %>%
-            select(run, everything())
+          raw <- read_log_dir(file.path(recording_path, "sessions"), run)
+          df_run <- get_times(raw)
 
           recording_path <- file.path(recording_path, "recording.log")
           if (is.null(first_recording$name)) {
@@ -337,10 +309,7 @@ load_runs <- function(..., verbose = TRUE) {
           df_maintenance_ids <- maintenance_df_ids(df_run)
 
           df_run <- df_run %>%
-            ungroup() %>%
-            mutate(
-              maintenance = id %in% df_maintenance_ids
-            ) %>%
+            mutate(maintenance = id %in% df_maintenance_ids) %>%
             select(-id)
 
           min_maintenance_time <- df_run %>%
