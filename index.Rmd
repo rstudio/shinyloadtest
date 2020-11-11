@@ -157,7 +157,11 @@ $ shinycannon recording.log https://shinyapp.example.com/ --workers 5 --loaded-d
 shinycannon -h
 ```
 
-During the test, `shinycannon` reports the progress and number of simulated users. The result of the test is an output directory (`run1` in the example above) which includes timing information for each session.
+During the test, `shinycannon` reports the progress and number of simulated users. The result of the test is an output directory (`run1` in the example above) which includes timing information for each session. Inside that directory you'll find:
+
+* `recording.log`: a copy of the original recording used.
+* `detail.log`: log output, to help debug errors.
+* `./sessions/*.csv`: one file for each simulated user session. 
 
 ### Step 3: Analyze the Results
 

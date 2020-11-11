@@ -75,7 +75,7 @@ This report contains six major sections of diagnostic information: sessions, ses
 
 ## Sessions
 
-The **Sessions** tab of displays the sessions performed by each shinycannon worker. Each row represent one worker and each rectangle represents the time taken to perform an action. The following plot shows the actions performed by workers over 5 minutes (600s).
+The **Sessions** page of displays the sessions performed by each shinycannon worker. Each row represent one worker and each rectangle represents the time taken to perform an action. The following plot shows the actions performed by workers over 5 minutes (600s).
 
 ```{r, echo=FALSE, fig.height=2.5}
 df %>%
@@ -122,7 +122,7 @@ Also note the dotted vertical lines which show the major phases of the load test
 
 ## Session duration
 
-The main focus of the **Sessions** tab is how the experimental design: how the sessions were divided across workers. Generally, you'll want to spend more time with the **Session duration** tab which better summarises the experience of a simulated user. The session duration plot has one row per session:
+The main focus of the **Sessions** page is how the experimental design: how the sessions were divided across workers. Generally, you'll want to spend more time with the **Session duration** page which better summarises the experience of a simulated user. The session duration plot has one row per session:
 
 ```{r, echo = FALSE}
 df %>% 
@@ -146,7 +146,7 @@ Note that the fastest session now takes ~4 times longer than the original record
 
 ## Event Waterfall
 
-The **Event Waterfall** gives a more precise view into the individual events within a recording. Each line represents a session, with events running in row from top to bottom, and elapsed time on the x-axis.
+The **Event Waterfall** gives a more precise view into the individual events within a recording. Each line represents a session, with events running from top to bottom, and elapsed time on the x-axis.
 
 ```{r, echo = FALSE, fig.height=7}
 df %>% 
@@ -165,13 +165,15 @@ upload %>% slt_waterfall()
 
 ## Latency
 
-The **Latency** tab displays two plots. The first plot displays the total HTTP (homepage + js/css) time for each session:
+The **Latency** page displays two plots. The first plot displays the total HTTP (homepage + js/css) time for each session:
 
 ```{r, echo = FALSE, fig.height=7}
 df %>% 
   filter(run == "4 users") %>% 
   slt_http_latency()
 ```
+
+This plot helps diagnose how long a user has to wait before they see _something_ in their browser. Ideally, this will be very short since the server is just providing static files.
 
 The second plot displays the maximum calculation time:
 
@@ -181,82 +183,36 @@ df %>%
   slt_websocket_latency()
 ```
 
-Both plots display a cutoff value, that defaults to 5s but can be overriden with the `cutoff` parameters to `shinyloadtest_report()`.
-
-The total HTTP latency plot helps to diagnose how long a user has to wait before a website has appeared on their browser.  Ideally, this should be no time at all, as the server is just providing static files.
-
-The maximum SockJS latency plot helps to diagnose the maximum amount of time a user has to wait before an input is updated or output is recalculated.  Ideally, this should be shorter than our attention spans.
-
-
-In the example above, the `16 users` run has a very strong pattern in it's maximum calculation time.  Knowing that the `16 users` run has the same recording as the `1 user` and `4 users` runs, it would appear that the `16 users` server is under too much load as the same calculations should be computed within 1 second (as in the `1 user` run).
-
+This plot helps to diagnose how much time a user spends waiting for outputs to be updated. 
 
 ## Event Duration
 
-The `Event Duration` tab has three to four tabs available to choose from:
-
-* Slowest max time - Event plots are arranged by the slowest maximum time within each plot
-* Slowest min time - Event plots are arranged by the slowest minimum time within each plot
-* Largest mean difference - Event plots are arranged by the largest difference in the run's mean event time. This option is available if more than one run is being displayed.
-* Data table - A tabular display of the slowest max time, slowest min time, and (possibly) largest mean difference
+The **Event Duration** page helps understand the variability of individual events. Each event is summarised with a boxplot, with run on the x-axis and time on the y-axis:
 
 ```{r, echo = FALSE}
 df %>% filter(input_line_number == 1) %>% slt_time_boxplot()
 ```
 
-Ideally, the boxplots should not differ for any event and are close to 0 seconds elapsed.  As resource contention goes up, event time might go up.  Hopefully, there are no extreme outliers above the center mass of the boxplot as shown below.
+Since there are typically many events, and most are uninteresting, the report gives you three ways of sorting to find interesting events:
 
-```{r, echo = FALSE}
-df %>% filter(input_line_number == 4) %>% slt_time_boxplot()
-```
+* Slowest maximum time
+* Slowest minimum time
+* Largest mean difference (only shown if more than one run being processed).
+
+These plots can help you narrow in on particularly slow events, but you should also be interested in events with high variability.
 
 ## Event Concurrency
 
-The `Event Concurrency` tab has four tabs available to choose from:
-
-* Largest slope - Event plots are arranged by the largest slope magnitude found when fitting a line to each run
-* Largest intercept - Event plots are arranged by the largest intercept magnitude found when fitting a line to each run
-* Largest error - Event plots are arranged by the largest error magnitude found when fitting a line to each run
-* Data table - A tabular display of the raw slope, raw intercept, and raw error values
-
-Ideally, we want a flat linear model with no slope.  This means that the calculations of our shiny application will scale as user concurrency goes up.
+The **Event Concurrency** page helps you understand how events responded to varying levels of concurrency. Each simulated session is represented by a point with number of concurrent processes on the x-axis and event time on the y-axis. The points are coloured by run. Each run also gets a line of best fit, which gives a sense for how the event respond to increasing concurrency. 
 
 ```{r, echo = FALSE}
 df %>% filter(input_line_number == 16) %>% slt_time_concurrency()
 ```
 
-However, if a strong linear trend exists as concurrency is increased, users will be waiting longer as more users are accessing the shiny application.
+Like **Event Duration**, most events are uninteresting, so the report gives you three ways of sorting to find interesting events:
 
-```{r, echo = FALSE}
-df %>% filter(input_line_number == 34) %>% slt_time_concurrency()
-```
+* Largest slope, which emphasises events that appear to respond particularly poorly to increasing concurrency.
+* Largest intercept
+* Largest error
 
-
-<!-- # Tips -->
-
-<!-- * It is always good to establish a baseline or an __approved__ run when comparing against potential server configuration runs.  This will give you a baseline to compare against.   -->
-
-<!-- * Try to only alter one server configuration component at a time when deviating from your baseline run.  This helps pinpoint exactly what caused a speedup or slowdown in the application response time.   -->
-
-
-## Underlying data
-
-There are a few types of log files generated by a `shinycannon` recording session.
-
-* `./recording.log`
-  * Copy of the original recording used
-  * The file is comprised of JSON lines that capture all of the HTTP(s) and SockJS traffic that occurred during the recording
-* `./detail.log`
-  * Log output to help debug errors
-* `./sessions/*.csv`
-  * Collection of files for each session number, simulated user id, and user session
-  * One file is generated for each simulated session
-  * The file name format displays `SESSION_USER_USERSESSION.csv`
-  * Lines starting with `#` should be ignored when processing
-
-These are processed `load_runs()` to generate a tidy data frame with the following columns:
-
-
-
-They key idea is that each row of the tidy results data frame represents an event. Events include the initial page load, user inputs and their associated outputs, and user wait times. You'll want to compare the duration of event times across different load tests.
-
+If you want your app to handle as many user as possible, look for events where the time increases steeply with concurrency - these are places where optimisation will have the greatest impact.
