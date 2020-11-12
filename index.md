@@ -74,8 +74,7 @@ tool. You can run it using your system’s terminal or console program, or
 you can run it from the RStudio terminal tab. A typical run looks like
 this:
 
-``` shinycannon
-```
+    shinycannon recording.log https://shinyapp.example.com/ --workers 5 --loaded-duration-minutes 2 --output-dir run1
 
 See [the shinycannon article](articles/shinycannon.html#recording) for
 details.
