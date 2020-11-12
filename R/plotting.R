@@ -197,7 +197,7 @@ slt_session_duration <- function(df, cutoff = NULL) {
     scale_fill_manual(NULL, values = event_colours) +
     labs(
       x = "Time since session start (sec)",
-      y = "Sessions ordered by total duration"
+      y = "Sessions (ordered by total duration)"
     ) +
     theme(legend.position = "bottom") +
     facet_on_run_free(df1)
