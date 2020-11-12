@@ -131,7 +131,11 @@ shinyloadtest_report <- function(
   # gantt chart plots
   min_gantt_time <- min(df$start)
   max_gantt_time <- max(df$end)
-  max_duration <- max(df$end - df$start, duration_cutoff)
+
+  session_rel <- df %>%
+    filter(maintenance) %>%
+    manip_session_relative()
+  max_duration <- max(session_rel$end, duration_cutoff)
   gantt <- lapply(levels(df$run), function(run_val) {
     run_val_clean <-
       run_val %>%
