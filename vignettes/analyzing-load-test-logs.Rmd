@@ -1,5 +1,5 @@
 ---
-title: "Analyzing load test logs"
+title: "Analyzing results"
 date: "2018-09-05"
 output: rmarkdown::html_vignette
 vignette: >
