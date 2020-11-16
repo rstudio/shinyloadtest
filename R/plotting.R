@@ -94,7 +94,9 @@ slt_waterfall <- function(df, limits = NULL) {
   limits <- limits %||% c(0, NA)
 
   df1 <- df %>%
+    filter(maintenance) %>%
     manip_event_label() %>%
+    manip_session_relative() %>%
     mutate(label = fct_rev(str_trunc(label, 50)))
 
   ggplot(df1, aes(end, label, group = session_id, color = concurrency)) +
@@ -159,6 +161,7 @@ slt_user <- function(df) {
 #' @export
 slt_session <- function(df) {
   df_session <- df %>%
+    filter(maintenance) %>%
     manip_event_label() %>%
     manip_tile_position() %>%
     mutate(
@@ -205,6 +208,7 @@ slt_session_duration <- function(df, cutoff = NULL) {
 
 latency_df <- function(df) {
   df %>%
+    filter(maintenance) %>%
     manip_event_label() %>%
     mutate(user_id = paste0("w:", user_id)) %>%
     group_by(run, session_id, eventLabel, user_id, maintenance) %>%
