@@ -1,0 +1,70 @@
+on:
+  push:
+    paths:
+      - README.Rmd
+      - DESCRIPTION
+      - .github/workflows/readme-rmd.yml
+
+name: Render README
+
+jobs:
+  render:
+    name: Render README
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - { os: ubuntu-18.04, r: 'release', rspm: "https://packagemanager.rstudio.com/all/__linux__/bionic/latest"}
+    env:
+      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+      RSPM: ${{ matrix.config.rspm }}
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-r@v1
+        id: install-r
+        with:
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+
+      - uses: r-lib/actions/setup-pandoc@v1
+
+      - name: Install pak and query dependencies
+        run: |
+          install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
+          saveRDS(pak::pkg_deps_tree("local::.", dependencies = TRUE), ".github/r-depends.rds")
+        shell: Rscript {0}
+
+      - name: Cache R packages
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ matrix.config.os }}-${{ steps.install-r.outputs.installed-r-version }}-2-${{ hashFiles('.github/r-depends.rds') }}
+          restore-keys: ${{ matrix.config.os }}-${{ steps.install-r.outputs.installed-r-version }}-2-
+
+      - name: Install linux system dependencies
+        if: runner.os == 'Linux'
+        shell: Rscript {0}
+        run: |
+          pak::local_system_requirements(execute = TRUE)
+          pak::pkg_system_requirements("devtools", execute = TRUE)
+
+      - name: Install dependencies
+        shell: Rscript {0}
+        run: |
+          pak::local_install_dev_deps(upgrade = TRUE)
+          pak::pkg_install(c("devtools", "rmarkdown"))
+
+      - name: Render README
+        run: >
+          Rscript
+          -e 'devtools::build_readme(quiet = FALSE)'
+      - name: Commit results
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git commit README.md -m 'Re-build README.Rmd (GitHub Action)' || echo "No changes to commit"
+          git push https://schloerke:${{secrets.GH_PAT}}@github.com/${{github.repository}}.git HEAD:${{ github.ref }} || echo "No changes to push"
