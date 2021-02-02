@@ -3,7 +3,7 @@ title: "Analyzing results"
 date: "2018-09-05"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Analyzing Load Test Logs}
+  %\VignetteIndexEntry{Analyzing results}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -139,9 +139,9 @@ The **Session duration** page uses similar graphical conventions to the **Sessio
 A red line shows the running time of the original script.
 
 ```{r, echo = FALSE}
-df %>% 
-  filter(run == "4 users") %>% 
-  slt_session_duration(cutoff = 16.72) + 
+df %>%
+  filter(run == "4 users") %>%
+  slt_session_duration(cutoff = 16.72) +
   ggplot2::labs(title = "4 simulatenous users")
 ```
 
@@ -149,9 +149,9 @@ This plot shows us that most sessions are completed in about the same amount of 
 We get a very different picture if we look at the performance of the app with 16 simultaneous users:
 
 ```{r, echo = FALSE}
-df %>% 
-  filter(run == "16 users") %>% 
-  slt_session_duration(cutoff = 16.72) + 
+df %>%
+  filter(run == "16 users") %>%
+  slt_session_duration(cutoff = 16.72) +
   ggplot2::labs(title = "16 simultaneous users")
 ```
 
@@ -164,8 +164,8 @@ The **Event Waterfall** gives a more precise view into the individual events wit
 Each line represents a session, with events running from top to bottom, and elapsed time on the x-axis.
 
 ```{r, echo = FALSE, fig.height=7}
-df %>% 
-  filter(run == "4 users") %>% 
+df %>%
+  filter(run == "4 users") %>%
   slt_waterfall()
 ```
 
@@ -185,8 +185,8 @@ The **Total HTTP** latency plot shows how long a user has to wait before they se
 Ideally, this will be very short since the server is just providing static files.
 
 ```{r, echo = FALSE}
-df %>% 
-  filter(run == "4 users") %>% 
+df %>%
+  filter(run == "4 users") %>%
   slt_http_latency()
 ```
 
@@ -197,8 +197,8 @@ This basically represents how much time R spends computing.
 To make this faster, you'll need to make your R code faster.
 
 ```{r, echo = FALSE}
-df %>% 
-  filter(run == "4 users") %>% 
+df %>%
+  filter(run == "4 users") %>%
   slt_websocket_latency()
 ```
 

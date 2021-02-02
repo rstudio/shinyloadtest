@@ -2,7 +2,7 @@
 title: "Installing and running shinycannon"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{record}
+  %\VignetteIndexEntry{Installing and running shinycannon}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
