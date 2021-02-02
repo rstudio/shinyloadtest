@@ -1,5 +1,10 @@
 #!/usr/bin/Rscript
 
+# Updates RELEASE_URLS.csv file.
+# Should be done manually when a new version of shinycannon is released.
+# RELEASE_URLS.csv is read by README.Rmd
+
+
 library(httr)
 library(jsonlite)
 library(readr)
@@ -46,4 +51,6 @@ json <- jsonlite::parse_json(httr::GET(url))
 latest <- json[[1]]
 df <- asset_df(latest)
 
-cat(readr::format_csv(df))
+save_file <- rprojroot::find_package_root_file("RELEASE_URLS.csv")
+cat(readr::format_csv(df), file = rprojroot::find_package_root_file("RELEASE_URLS.csv"))
+message("Updated: ", save_file)
