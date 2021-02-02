@@ -189,11 +189,8 @@ get_times <- function(df) {
   df %>%
     filter(
       !is.na(input_line_number),
-      !event %in% c(
-        "PLAYER_SESSION_CREATE",
-        "PLAYBACK_SLEEPBEFORE_START",
-        "PLAYBACK_SLEEPBEFORE_END"
-      )
+      event != "PLAYER_SESSION_CREATE",
+      !grepl("^PLAYBACK", event) # remove all playback_** events
     ) %>%
     group_by(run, user_id, session_id, iteration, input_line_number) %>%
     summarise(
