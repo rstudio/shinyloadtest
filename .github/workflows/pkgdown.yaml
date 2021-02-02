@@ -71,6 +71,9 @@ jobs:
       - name: Install package
         run: R CMD INSTALL .
 
+      - name: Prep vignettes
+        run: HEADLESS=TRUE Rscript scripts/test_sessions.R && rm Rplots.pdf
+
       - name: Build Site (PR)
         if: github.event_name != 'push'
         shell: Rscript {0}
