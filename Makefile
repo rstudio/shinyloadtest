@@ -22,7 +22,7 @@ index.md: devinstall index.Rmd
 
 devinstall:
 	Rscript data-raw/slt_demo_data.R
-	R -e 'devtools::document()'
+	R --quiet --no-restore -e 'devtools::document()'
 	R CMD INSTALL --no-multiarch --with-keep.source .
 
 site: devinstall index.md build_site
@@ -39,4 +39,4 @@ rcmdcheck:
 clean:
 	rm -f index.md
 	rm -rf output
-	find vignettes/test_sessions/ -mindepth 1 -type d -exec rm -rf '{}' ';'
+	find vignettes/test_sessions -mindepth 1 -maxdepth 1 -type d -exec rm '-rf' '{}' ';'
