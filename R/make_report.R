@@ -34,11 +34,16 @@ shinyloadtest_report <- function(
     stop("'output' should end in '.html'", call. = FALSE)
   }
 
+  assert_is_available("gtable")
+  assert_is_available("htmltools")
+  assert_is_available("progress")
+
   verbose <- isTRUE(verbose)
   self_contained <- isTRUE(self_contained)
   missing_duration_cutoff <- missing(duration_cutoff)
 
   if (self_contained) {
+    assert_is_available("rmarkdown")
     if (rmarkdown::pandoc_version() < "2.2") {
       stop("Please upgrade your pandoc version to be at least v2.2", call. = FALSE)
     }

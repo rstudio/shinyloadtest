@@ -36,29 +36,27 @@ Imports:
     R6,
     curl,
     dplyr (>= 1.0.0),
-    getPass,
     ggplot2,
-    glue,
-    gtable,
-    htmltools,
     httpuv (>= 1.5.2),
     jsonlite,
-    lubridate,
     magrittr,
-    progress,
     rlang (>= 0.1.2),
-    rmarkdown,
     scales,
     stringr,
-    tibble,
     svglite,
     vroom,
     websocket (>= 1.0.0),
     xml2
+Suggests:
+    getPass,
+    glue,
+    gtable,
+    htmltools,
+    lubridate,
+    progress,
+    rmarkdown,
+    testthat
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
-Suggests:
-    testthat,
-    usethis
 SystemRequirements:
     pandoc (>= 2.2) - http://pandoc.org

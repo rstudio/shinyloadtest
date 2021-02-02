@@ -240,6 +240,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
     initializeSessionCookies = function() {
       cookies <- data.frame()
       if (isProtected(private$targetURL)) {
+        assert_is_available("getPass")
         username <- getPass::getPass("Enter your username: ")
         if (is.null(username)) stop("Login aborted (username not provided)")
         password <- getPass::getPass("Enter your password: ")

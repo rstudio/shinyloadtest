@@ -48,6 +48,8 @@ read_log_dir <- function(dir, name = basename(dirname(dir)), verbose = vroom::vr
 
 # Read a recording file
 read_recording <- function(file_name) {
+  assert_is_available("lubridate")
+
   file_lines <- readLines(file_name)
   input_line_number <- seq_along(file_lines)
   not_comments <- (!grepl("^#", file_lines))
@@ -63,7 +65,7 @@ read_recording <- function(file_name) {
   startTime <- baselineInfo[[1]]$begin
   baselineData <- baselineInfo %>%
     lapply(function(info) {
-      tibble::tibble(
+      tibble(
         event = info$type,
         start = as.numeric(difftime(info$begin, startTime, units = "secs")),
         end = if (!is.null(info$end))
