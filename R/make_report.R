@@ -131,7 +131,11 @@ shinyloadtest_report <- function(
   # gantt chart plots
   min_gantt_time <- min(df$start)
   max_gantt_time <- max(df$end)
-  max_duration <- max(c(gantt_duration_data(df)$end, duration_cutoff))
+
+  session_rel <- df %>%
+    filter(maintenance) %>%
+    manip_session_relative()
+  max_duration <- max(session_rel$end, duration_cutoff)
   gantt <- lapply(levels(df$run), function(run_val) {
     run_val_clean <-
       run_val %>%
@@ -370,4 +374,25 @@ save_svg <- function(p, output, width = 15, height = 10, units = "in", ...) {
   # to_svgz(output_tmp, output)
   file.copy(output_tmp, output)
   output
+}
+
+
+extract_legend <- function(p) {
+  first_grob <- function(x) {
+    x$grobs[[1]]
+  }
+  legend_grob <- ggplot2::ggplot_build(p) %>%
+    ggplot2::ggplot_gtable() %>%
+    gtable::gtable_filter("guide-box") %>%
+    first_grob() %>%
+    gtable::gtable_filter("guides") %>%
+    first_grob()
+    # %>%
+    # gtable::gtable_filter("key|label")
+
+  list(
+    legend_grob = legend_grob,
+    height_inches = legend_grob$heights %>% grid::convertUnit("inches") %>% as.numeric() %>% sum(),
+    width_inches = legend_grob$widths %>% grid::convertUnit("inches") %>% as.numeric() %>% sum()
+  )
 }

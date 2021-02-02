@@ -17,20 +17,20 @@ urls:
 	rm -f RELEASE_URLS.csv
 	Rscript scripts/fetch_release_urls.R > RELEASE_URLS.csv
 
-index.md: index.Rmd
+index.md: devinstall index.Rmd
 	R --quiet --no-restore -e 'rmarkdown::render("index.Rmd", output_format = rmarkdown::md_document())'
 
 devinstall:
 	Rscript data-raw/slt_demo_data.R
-	R -e 'devtools::document()'
+	R --quiet --no-restore -e 'devtools::document()'
 	R CMD INSTALL --no-multiarch --with-keep.source .
 
-site: index.md devinstall build_site
+site: devinstall index.md build_site
 
-build_site: prep_vignettes
+build_site: devinstall prep_vignettes
 	R --quiet --no-restore -e 'unlink("./docs", recursive = TRUE); pkgdown::build_site()'
 
-prep_vignettes: index.md
+prep_vignettes: devinstall index.md
 	HEADLESS=TRUE Rscript scripts/test_sessions.R && rm Rplots.pdf
 
 rcmdcheck:
@@ -39,4 +39,4 @@ rcmdcheck:
 clean:
 	rm -f index.md
 	rm -rf output
-	find vignettes/test_sessions/ -mindepth 1 -type d -exec rm -rf '{}' ';'
+	find vignettes/test_sessions -mindepth 1 -maxdepth 1 -type d -exec rm '-rf' '{}' ';'

@@ -30,3 +30,17 @@ glue_multi_component <- function(file, datas, ..., collapse = "") {
 glue_index <- function(data, ...) {
   glue_component("index", data, ...)
 }
+
+fct_rev <- function(x) {
+  factor(x, levels = rev(unique(x)))
+}
+
+str_trunc <- function(x, width = 100) {
+  x <- as.character(x)
+
+  too_long <- nchar(x) > width
+  x[too_long] <- paste0(substr(x[too_long], 1, width - 3), "...")
+  x
+}
+
+`%||%` <- function(a, b) if (is.null(a)) b else a

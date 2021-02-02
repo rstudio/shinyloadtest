@@ -1,0 +1,6 @@
+version,sha,platform,file,url
+1.0.0,a581ed7,jar,shinycannon-1.0.0-a581ed7.jar,https://github.com/rstudio/shinycannon/releases/download/v1.0.0/shinycannon-1.0.0-a581ed7.jar
+1.0.0,a581ed7,sh,shinycannon-1.0.0-a581ed7.sh,https://github.com/rstudio/shinycannon/releases/download/v1.0.0/shinycannon-1.0.0-a581ed7.sh
+1.0.0,a581ed7,rpm_rh,shinycannon-1.0.0-a581ed7.x86_64.rpm,https://github.com/rstudio/shinycannon/releases/download/v1.0.0/shinycannon-1.0.0-a581ed7.x86_64.rpm
+1.0.0,a581ed7,rpm_suse,shinycannon-1.0.0-suse-a581ed7.x86_64.rpm,https://github.com/rstudio/shinycannon/releases/download/v1.0.0/shinycannon-1.0.0-suse-a581ed7.x86_64.rpm
+1.0.0,a581ed7,deb,shinycannon_1.0.0-a581ed7_amd64.deb,https://github.com/rstudio/shinycannon/releases/download/v1.0.0/shinycannon_1.0.0-a581ed7_amd64.deb
