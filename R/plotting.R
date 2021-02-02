@@ -118,6 +118,7 @@ slt_waterfall <- function(df, limits = NULL) {
 #' @export
 slt_hist_loadtimes <- function(df, max_load_time = 5) {
   df1 <- df %>%
+    filter(maintenance) %>%
     group_by(run, session_id) %>%
     summarise(
       begin = min(start),
@@ -141,6 +142,8 @@ slt_hist_loadtimes <- function(df, max_load_time = 5) {
 #' @export
 slt_user <- function(df) {
   df1 <- df %>%
+    # Not filtering to maintenance as it is odd to see longer delay times near the startup for what appears to be no reason
+    # filter(maintenance) %>%
     manip_event_label() %>%
     manip_tile_position() %>%
     mutate(user_id = fct_rev(user_id))
