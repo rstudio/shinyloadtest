@@ -1,0 +1,97 @@
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+name: pkgdown
+
+jobs:
+  pkgdown:
+    runs-on: ${{ matrix.config.os }}
+
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: ubuntu-16.04,   r: 'release', rspm: "https://packagemanager.rstudio.com/cran/__linux__/xenial/latest"}
+
+    env:
+      RSPM: ${{ matrix.config.rspm }}
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-r@v1
+        id: install-r
+        with:
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+
+      - uses: r-lib/actions/setup-pandoc@v1
+
+      - name: Install pak and query dependencies
+        shell: Rscript {0}
+        run: |
+          install.packages("pak", repos = "https://r-lib.github.io/p/pak/dev/")
+          saveRDS(pak::pkg_deps_tree("local::.", dependencies = TRUE), ".github/r-depends.rds")
+
+      - name: Cache R packages
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ matrix.config.os }}-${{ steps.install-r.outputs.installed-r-version }}-2-${{ hashFiles('.github/r-depends.rds') }}
+          restore-keys: ${{ matrix.config.os }}-${{ steps.install-r.outputs.installed-r-version }}-2-
+
+      - name: Install linux system dependencies
+        if: runner.os == 'Linux'
+        shell: Rscript {0}
+        run: |
+          pak::local_system_requirements(execute = TRUE)
+          pak::pkg_system_requirements("pkgdown", execute = TRUE)
+      - name: Install macOS system dependencies
+        if: runner.os == 'macOS'
+        run: |
+          brew install libgit2
+          brew install imagemagick@6
+
+      - name: Install dependencies
+        shell: Rscript {0}
+        run: |
+          pak::local_install_dev_deps(upgrade = TRUE)
+          pak::pkg_install(c("pkgdown"))
+
+      - name: Install package
+        run: R CMD INSTALL .
+
+      - name: Build Site (PR)
+        if: github.event_name != 'push'
+        shell: Rscript {0}
+        run: |
+          pkgdown::build_site(new_process = FALSE)
+
+      - name: Validate all topics exist (PR)
+        if: github.event_name != 'push'
+        shell: Rscript {0}
+        run: |
+          pkgdown::build_reference_index()
+          stopifnot(length(warnings()) == 0)
+
+      - name: git setup
+        if: github.event_name == 'push'
+        run: |
+          git config --local user.email "${GITHUB_ACTOR}@users.noreply.github.com" && \
+            git config --local user.name "${GITHUB_ACTOR}"
+
+      - name: Build and Deploy Site
+        if: github.event_name == 'push'
+        shell: Rscript {0}
+        run: |
+          pkgdown::deploy_to_branch(new_process = FALSE)
