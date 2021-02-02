@@ -1,5 +1,5 @@
-
-# Load testing Shiny apps
+Load testing Shiny apps
+=======================
 
 The `shinyloadtest` package and the accompanying
 [`shinycannon`](https://github.com/rstudio/shinycannon) command line
@@ -17,7 +17,8 @@ Shiny](https://rstudio.com/resources/rstudioconf-2018/scaling-shiny/)
 which shows how to to horizontally scale an app to handle tens of
 thousands of users.
 
-## Installation
+Installation
+------------
 
 To perform a load test you’ll need two pieces of software:
 
@@ -32,7 +33,8 @@ To perform a load test you’ll need two pieces of software:
     instructions](articles/shinycannon.html#installation) for operating
     specific install instructions..
 
-## Quick Start
+Quick Start
+-----------
 
 The process for load testing a Shiny application consists of three
 steps:
@@ -50,9 +52,7 @@ Rinse and repeat as necessary. Each step is described below.
 Record a session using `shinyloadtest::record_session()`, which takes
 the URL of the **deployed** application as an argument:
 
-``` r
-shinyloadtest::record_session('https://shinyapp.example.com/')
-```
+    shinyloadtest::record_session('https://shinyapp.example.com/')
 
 Running the function will open a browser displaying the app. Once open,
 interact with the application as a typical user might then close the
@@ -85,10 +85,8 @@ Now we can analyse our results by reading the data into
 `shinyloadtest::load_runs()` and create a report with
 `shinyloadtest_report()`:
 
-``` r
-df <- shinyloadtest::load_runs("run1")
-shinyloadtest::shinyloadtest_report(df, "run1.html")
-```
+    df <- shinyloadtest::load_runs("run1")
+    shinyloadtest::shinyloadtest_report(df, "run1.html")
 
 This self contained html report will be opened in your browser for
 inspection. For further analysis explanation, please visit [Analysing
