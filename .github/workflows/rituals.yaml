@@ -1,15 +1,18 @@
 on:
   push:
-    paths:
-      - README.Rmd
-      - DESCRIPTION
-      - .github/workflows/readme-rmd.yml
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
 
-name: Render README
+name: Rituals
 
 jobs:
   render:
-    name: Render README
+    name: Rituals
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
@@ -58,13 +61,39 @@ jobs:
           pak::local_install_dev_deps(upgrade = TRUE)
           pak::pkg_install(c("devtools", "rmarkdown"))
 
-      - name: Render README
-        run: >
-          Rscript
-          -e 'devtools::build_readme(quiet = FALSE)'
-      - name: Commit results
+      - name: Git config
         run: |
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+
+      - name: Render README
+        run: |
+          Rscript -e 'devtools::build_readme(quiet = FALSE)'
           git commit README.md -m 'Re-build README.Rmd (GitHub Action)' || echo "No changes to commit"
-          git push https://schloerke:${{secrets.GH_PAT}}@github.com/${{github.repository}}.git HEAD:${{ github.ref }} || echo "No changes to push"
+
+      - name: Update ./data
+          Rscript data-raw/slt_demo_data.R
+          git add man data || echo "No data updates to add"
+          git commit -m 'Resave data (GitHub Action)' || echo "No changes to commit"
+
+      - name: Document
+        run: |
+          Rscript -e 'pak::pkg_install("roxygen2")'
+          Rscript -e 'roxygen2::roxygenise()'
+          git add man/\* NAMESPACE
+          git commit -m 'Document (GitHub Actions)' || echo "No documentation changes to commit"
+
+      - name: Commit results
+        run: |
+          git add man data || echo "No data updates to add"
+          git commit -m 'Resave data (GitHub Action)' || echo "No changes to commit"
+
+      - name: Git Push (PR)
+        uses: r-lib/actions/pr-push@master
+        if: github.event_name == 'pull_request'
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Git Push (MASTER)
+        if: github.event_name == 'push'
+        run: |
+          git push https://${{github.actor}}:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git HEAD:${{ github.ref }} || echo "No changes to push"
