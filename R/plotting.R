@@ -27,14 +27,14 @@ NULL
 #' slt_session(slt_demo_data_4)
 #' slt_session_duration(slt_demo_data_4)
 #'
-#' slt_waterfall(slt_demo_data_4)
+#' \donttest{slt_waterfall(slt_demo_data_4)
 #' slt_time_boxplot(slt_demo_data_4)
 #' slt_time_concurrency(slt_demo_data_4)
 #'
 #' slt_session_latency(slt_demo_data_4)
 #' slt_http_latency(slt_demo_data_4)
 #' slt_websocket_latency(slt_demo_data_4)
-#' slt_hist_loadtimes(slt_demo_data_4)
+#' slt_hist_loadtimes(slt_demo_data_4)}
 NULL
 
 #' @describeIn slt_plot Box plot of load times for each event in each run
