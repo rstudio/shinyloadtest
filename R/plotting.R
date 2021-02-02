@@ -185,7 +185,7 @@ slt_session <- function(df) {
 #' @describeIn slt_plot Event gantt chart of fastest to slowest session times within each run
 #' @export
 slt_session_duration <- function(df, cutoff = NULL) {
-  cuttoff <- cutoff %||% attr(df, "recording_duration") %||% 60
+  cutoff <- cutoff %||% attr(df, "recording_duration") %||% 60
 
   df1 <- df %>%
     filter(maintenance) %>%
