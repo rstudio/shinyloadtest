@@ -5,7 +5,7 @@
 \alias{slt_demo_data_4}
 \title{Example metrics for a 4-user load test}
 \format{
-A data frame with 4636 rows and 12 variables:
+A data frame with 4514 rows and 12 variables:
 \describe{
 \item{run}{Name of the run}
 \item{session_id}{simulated session identifier, 0-based}
@@ -25,6 +25,6 @@ A data frame with 4636 rows and 12 variables:
 slt_demo_data_4
 }
 \description{
-An example dataset like that returned by \code{\link{load_runs}}, but without the \code{json} variable for portability. Contains latency data for 4636 \code{shinycannon} events suitable for passing to \code{\link{shinyloadtest_report}}.
+An example dataset like that returned by \code{\link{load_runs}}, but without the \code{json} variable for portability. Contains latency data for 4514 \code{shinycannon} events suitable for passing to \code{\link{shinyloadtest_report}}.
 }
 \keyword{datasets}
