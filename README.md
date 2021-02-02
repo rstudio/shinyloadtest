@@ -1,6 +1,8 @@
 # shinyloadtest
 
-[![Build Status](https://travis-ci.org/rstudio/shinyloadtest.svg?branch=master)](https://travis-ci.org/rstudio/shinyloadtest)
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/rstudio/shinyloadtest/workflows/R-CMD-check/badge.svg)](https://github.com/rstudio/shinyloadtest/actions)
+<!-- badges: end -->
 
 A load testing tool for [Shiny](https://shiny.rstudio.com/) applications. https://rstudio.github.io/shinyloadtest
 
