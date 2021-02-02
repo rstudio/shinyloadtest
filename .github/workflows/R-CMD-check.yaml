@@ -90,11 +90,18 @@ jobs:
           sessioninfo::session_info(pkgs, include_base = TRUE)
         shell: Rscript {0}
 
-      - name: Check
+      - name: "Check (with `--run-donttest`)"
         env:
           _R_CHECK_CRAN_INCOMING_: false
           _R_CHECK_FORCE_SUGGESTS_: ${{ matrix.config.r != '3.3' }}
-        run: rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
+        run: rcmdcheck::rcmdcheck(args = c("--run-donttest", "--no-manual", "--as-cran"), error_on = "warning", check_dir = "check")
+        shell: Rscript {0}
+
+      - name: Check (for CRAN)
+        env:
+          _R_CHECK_CRAN_INCOMING_: false
+          _R_CHECK_FORCE_SUGGESTS_: ${{ matrix.config.r != '3.3' }}
+        run: rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), error_on = "note", check_dir = "check")
         shell: Rscript {0}
 
       - name: Show testthat output
