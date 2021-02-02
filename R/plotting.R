@@ -23,11 +23,11 @@ NULL
 #' @rdname slt_plot
 #' @return A \code{\link[ggplot2]{ggplot}} plot object
 #' @examples
-#' slt_user(slt_demo_data_4)
+#' \donttest{slt_user(slt_demo_data_4)
 #' slt_session(slt_demo_data_4)
 #' slt_session_duration(slt_demo_data_4)
 #'
-#' \donttest{slt_waterfall(slt_demo_data_4)
+#' slt_waterfall(slt_demo_data_4)
 #' slt_time_boxplot(slt_demo_data_4)
 #' slt_time_concurrency(slt_demo_data_4)
 #'
