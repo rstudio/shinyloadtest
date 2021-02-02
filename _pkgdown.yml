@@ -1,5 +1,8 @@
 url: https://rstudio.github.io/shinyloadtest/
 
+development:
+  mode: auto
+
 template:
   params:
     bootswatch: cosmo
