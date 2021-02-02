@@ -4,7 +4,7 @@
 \alias{load_runs}
 \title{Create Tidy Load Test Results}
 \usage{
-load_runs(..., verbose = TRUE)
+load_runs(..., verbose = vroom::vroom_progress())
 }
 \arguments{
 \item{...}{Key-value pairs where the key is the desired name for the test and the

@@ -11,7 +11,7 @@ strip_suffix <- function(str) {
 
 
 # Read a "sessions/" directory full of .log files
-read_log_dir <- function(dir, name = basename(dirname(dir)), verbose = TRUE) {
+read_log_dir <- function(dir, name = basename(dirname(dir)), verbose = vroom::vroom_progress()) {
   files <- list.files(dir, pattern = "*.csv", full.names = TRUE)
   if (length(files) == 0) {
     stop("No files found for run dir: ", dir, call. = FALSE)
@@ -28,6 +28,7 @@ read_log_dir <- function(dir, name = basename(dirname(dir)), verbose = TRUE) {
       comment = vroom::col_character()
     ),
     comment = "#",
+    progress = vroom::vroom_progress()
   )
 
   df <- df %>%
@@ -261,7 +262,7 @@ get_times <- function(df) {
 #'      `2 cores` = 'results/run-2/'
 #'   )
 #' }
-load_runs <- function(..., verbose = TRUE) {
+load_runs <- function(..., verbose = vroom::vroom_progress()) {
 
   # TODO: Validate input directories and fail intelligently!
   verbose <- isTRUE(verbose)
@@ -284,7 +285,7 @@ load_runs <- function(..., verbose = TRUE) {
         ., names(.),
         USE.NAMES = FALSE, SIMPLIFY = FALSE,
         FUN = function(recording_path, run) {
-          raw <- read_log_dir(file.path(recording_path, "sessions"), run)
+          raw <- read_log_dir(file.path(recording_path, "sessions"), run, verbose = verbose)
           df_run <- get_times(raw)
 
           recording_path <- file.path(recording_path, "recording.log")
