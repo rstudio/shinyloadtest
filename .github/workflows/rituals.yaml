@@ -72,6 +72,7 @@ jobs:
           git commit README.md -m 'Re-build README.Rmd (GitHub Action)' || echo "No changes to commit"
 
       - name: Update ./data
+        run: |
           Rscript data-raw/slt_demo_data.R
           git add man data || echo "No data updates to add"
           git commit -m 'Resave data (GitHub Action)' || echo "No changes to commit"
