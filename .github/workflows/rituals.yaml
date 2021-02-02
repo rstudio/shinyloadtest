@@ -45,8 +45,10 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.R_LIBS_USER }}
-          key: ${{ matrix.config.os }}-${{ steps.install-r.outputs.installed-r-version }}-2-${{ hashFiles('.github/r-depends.rds') }}
-          restore-keys: ${{ matrix.config.os }}-${{ steps.install-r.outputs.installed-r-version }}-2-
+          key: ${{ matrix.config.os }}-${{ steps.install-r.outputs.installed-r-version }}-rituals-2-${{ hashFiles('.github/r-depends.rds') }}
+          restore-keys: |
+            ${{ matrix.config.os }}-${{ steps.install-r.outputs.installed-r-version }}-rituals-2-
+            ${{ matrix.config.os }}-${{ steps.install-r.outputs.installed-r-version }}-2-
 
       - name: Install linux system dependencies
         if: runner.os == 'Linux'
