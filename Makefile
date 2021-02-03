@@ -24,6 +24,7 @@ readme: README.Rmd
 	R --quiet --no-restore -e 'devtools::build_readme(quiet = FALSE)'
 
 devinstall:
+	R CMD INSTALL --no-multiarch --with-keep.source .
 	Rscript data-raw/slt_demo_data.R
 	R --quiet --no-restore -e 'devtools::document()'
 	R CMD INSTALL --no-multiarch --with-keep.source .
