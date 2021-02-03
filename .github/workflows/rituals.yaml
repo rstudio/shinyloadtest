@@ -96,6 +96,12 @@ jobs:
           git add man NAMESPACE
           git commit -m 'Document (GitHub Actions)' || echo "No documentation changes to commit"
 
+      - name: Update vignettes/RELEASE_URLS.csv
+        run: |
+          Rscript scripts/fetch_release_urls.R
+          git add vignettes/RELEASE_URLS.csv
+          git commit -m 'Update shinycannon RELEASE_URLS.csv (GitHub Actions)' || echo "No release url changes to commit"
+
       - name: Git Push (PR)
         uses: r-lib/actions/pr-push@master
         if: github.event_name == 'pull_request'
