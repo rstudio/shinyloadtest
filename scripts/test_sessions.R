@@ -1,3 +1,6 @@
+## File used in GHA: .github/workflows/pkgdown.yaml
+# source("scripts/test_sessions.R")
+
 library(shinyloadtest)
 library(magrittr)
 

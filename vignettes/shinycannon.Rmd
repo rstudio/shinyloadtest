@@ -32,7 +32,13 @@ library(magrittr)
 library(dplyr)
 library(knitr)
 
-shinycannon_files <- read_csv("RELEASE_URLS.csv") %>%
+# Release urls are updated in Rituals GHA
+shinycannon_files <-
+  read_csv(
+    "RELEASE_URLS.csv",
+    comment = "#",
+    col_types = list(.default = col_character())
+  ) %>%
   mutate(`Download Link` = sprintf("<a href='%s'>%s</a>", url, file))
 
 package_types <- tribble(

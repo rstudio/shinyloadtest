@@ -1,9 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^\.travis\.yml\.old
 ^docs/
 ^output/
-^\.travis\.yml$
 ^shinyloadtest_report/
 ^shinyloadtest_report\.html$
 ^index\.Rmd$
@@ -21,3 +19,5 @@
 ^CRAN-RELEASE$
 ^cran-comments\.md$
 ^data-raw$
+^\.github$
+README.Rmd
