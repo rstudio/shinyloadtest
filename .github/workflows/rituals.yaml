@@ -26,6 +26,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        name: Git Pull (master)
+        if: github.event_name != 'pull_request'
+
+      - uses: actions/checkout@v2
+        name: Git Pull (PR)
+        if: github.event_name == 'pull_request'
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Git config
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
       - uses: r-lib/actions/setup-r@v1
         id: install-r
