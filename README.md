@@ -1,5 +1,5 @@
 
-# Load Testing Shiny Applications
+# Load Testing Shiny
 
 <!-- badges: start -->
 
