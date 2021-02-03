@@ -1,15 +1,13 @@
 all: help
 
-.PHONY=clean urls site readme demo_data devinstall build_site prep_vignettes document rcmdcheck
+.PHONY=clean urls site readme devinstall build_site prep_vignettes rcmdcheck
 
 help:
 	@echo "make urls: update the shinycannon download links. You should do this after releasing shinycannon."
 	@echo "make site: installs pkgs and build docs/vignettes and the doc site, which is hosted on github"
 	@echo "make readme: builds README.Rmd"
-	@echo "make demo_data: builds all data from data-raw"
 	@echo "make devinstall: install shinyloadtest"
 	@echo "make prep_vignettes: prepares vignettes files to produce images in pkgdown articles"
-	@echo "make document: builds the pkg documentation"
 	@echo "make rcmdcheck: builds and checks using R CMD check --as-cran"
 	@echo "make clean: clean the docs and doc site"
 
@@ -25,17 +23,13 @@ site: devinstall readme prep_vignettes urls
 readme: README.Rmd
 	R --quiet --no-restore -e 'devtools::build_readme(quiet = FALSE)'
 
-demo_data:
+devinstall:
 	Rscript data-raw/slt_demo_data.R
-
-devinstall: document demo_data
+	R --quiet --no-restore -e 'devtools::document()'
 	R CMD INSTALL --no-multiarch --with-keep.source .
 
 prep_vignettes: devinstall
 	HEADLESS=TRUE Rscript scripts/test_sessions.R && rm Rplots.pdf
-
-document:
-	R --quiet --no-restore -e 'devtools::document()'
 
 rcmdcheck:
 	R CMD check --as-cran `Rscript -e 'cat(devtools::build(quiet = TRUE))'`
