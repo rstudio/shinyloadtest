@@ -1,0 +1,16 @@
+pandoc: 2.7.3
+pkgdown: 1.6.1
+pkgdown_sha: ~
+articles:
+  analyzing-load-test-logs: analyzing-load-test-logs.html
+  case-study-scaling: case-study-scaling.html
+  limitations-of-shinyloadtest: limitations-of-shinyloadtest.html
+  load-testing-authenticated-apps: load-testing-authenticated-apps.html
+  not-yet-written/faq: faq.html
+  shinycannon: shinycannon.html
+  troubleshooting-ssl: troubleshooting-ssl.html
+last_built: 2021-02-03T23:57Z
+urls:
+  reference: https://rstudio.github.io/shinyloadtest//reference
+  article: https://rstudio.github.io/shinyloadtest//articles
+
