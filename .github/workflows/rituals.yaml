@@ -77,24 +77,19 @@ jobs:
           pak::local_install(upgrade = TRUE)
           pak::pkg_install(c("devtools", "rmarkdown"))
 
-      - name: Git config
-        run: |
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-
-      - name: Render README
+      - name: Update ./README.md
         run: |
           Rscript -e 'devtools::build_readme(quiet = FALSE)'
           git add README.md || echo "README.md not updated"
-          git commit -m 'Re-build README.Rmd (GitHub Action)' || echo "No changes to commit"
+          git commit -m 'Re-build README.Rmd (GitHub Action)' || echo "No README changes to commit"
 
       - name: Update ./data
         run: |
           Rscript data-raw/slt_demo_data.R
           git add man data || echo "No data updates to add"
-          git commit -m 'Resave data (GitHub Action)' || echo "No changes to commit"
+          git commit -m 'Resave data (GitHub Action)' || echo "No data changes to commit"
 
-      - name: Document
+      - name: Update documentation
         run: |
           Rscript -e 'pak::pkg_install("roxygen2")'
           Rscript -e 'roxygen2::roxygenise()'
