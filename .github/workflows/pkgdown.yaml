@@ -66,19 +66,13 @@ jobs:
         shell: Rscript {0}
         run: |
           pak::local_install_dev_deps(upgrade = TRUE)
-          pak::pkg_install(c("pkgdown", "readr"))
+          pak::pkg_install(c("devtools", "pkgdown", "readr"))
 
-      - name: Install package
-        run: R CMD INSTALL .
-
-      - name: Prep vignettes
-        run: HEADLESS=TRUE Rscript scripts/test_sessions.R && rm Rplots.pdf
-
-      - name: Build Site (PR)
-        if: github.event_name != 'push'
-        shell: Rscript {0}
+      # Requires some extra work to be done before site is built
+      # Use consistent `make` command
+      - name: Build and prep pkgdown site
         run: |
-          pkgdown::build_site(new_process = FALSE)
+          make site
 
       - name: Validate all topics exist (PR)
         if: github.event_name != 'push'
