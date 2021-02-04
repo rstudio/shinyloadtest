@@ -1,6 +1,6 @@
 # shinyloadtest (development version)
 
-* `load_runs()` now uses vroom instead of `read_csv()`; this substantially 
+* `load_runs()` now uses vroom instead of `read_csv()`; this substantially
   improves its performance.
 
 * The homepage has been rewritten to get to the big picture more quickly.
@@ -11,13 +11,13 @@
 
 * Plots have be thoroughly overhauled:
 
-    * Waterfall plot now only shows plots in maintenance period, and 
+    * Waterfall plot now only shows plots in maintenance period, and
       times are session relative.
-      
+
     * Sessions in warmup and cooldown are no longer shown in muted colours,
-      because that unfortunately relied on a ggplot2 bug. Instead they're 
+      because that unfortunately relied on a ggplot2 bug. Instead they're
       simply omitted from the plot.
-      
+
     * The line of best fit in the latency plots has been made less visually
       prominent, and no longer shows standard errors.
 
