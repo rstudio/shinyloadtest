@@ -49,3 +49,19 @@ test_that("URLs with query strings can be modified", {
   url <- URLBuilder$new(url_string_before)$appendPath("foo")
   expect_equal(url_string_after, url$build())
 })
+
+
+test_that("Shinyapps.io url throws an error", {
+  skip_on_cran()
+  expect_error(
+    record_session("https://testing-apps.shinyapps.io/300-bs-themer/"),
+    "not supported"
+  )
+})
+test_that("RSC url with a hash throws an error", {
+  skip_on_cran()
+  expect_error(
+    record_session("https://beta.rstudioconnect.com/connect/#/apps/15967/access"),
+    "Open Solo"
+  )
+})
