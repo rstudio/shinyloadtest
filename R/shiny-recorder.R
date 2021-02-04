@@ -189,6 +189,11 @@ RecordingSession <- R6::R6Class("RecordingSession",
       if (private$targetType == SERVER_TYPE$SAI) {
         stop("Recording shinyapps.io apps is not supported")
       }
+      if (private$targetType == SERVER_TYPE$RSC) {
+        if (grepl("#", targetAppUrl)) {
+          stop("Hash (`#`) found in RStudio Connect URL. Please provide your direct (`Open Solo`) Shiny app `target_app_url`")
+        }
+      }
       private$localHost <- host
       private$localPort <- port
 
