@@ -21,6 +21,8 @@
     * The line of best fit in the latency plots has been made less visually
       prominent, and no longer shows standard errors.
 
+* Assert that RStudio Connect urls do not contain a `#` (#140)
+
 shinyloadtest 1.0.1
 =======
 
