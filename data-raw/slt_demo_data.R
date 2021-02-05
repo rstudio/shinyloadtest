@@ -21,6 +21,6 @@ load_demo_data <- function() {
 
 load_demo_data()
 
-use_data(slt_demo_data_1, overwrite = TRUE)
-use_data(slt_demo_data_4, overwrite = TRUE)
-use_data(slt_demo_data_16, overwrite = TRUE)
+use_data(slt_demo_data_1, overwrite = TRUE, version = 2)
+use_data(slt_demo_data_4, overwrite = TRUE, version = 2)
+use_data(slt_demo_data_16, overwrite = TRUE, version = 2)

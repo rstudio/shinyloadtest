@@ -4,7 +4,7 @@
 \alias{load_runs}
 \title{Create Tidy Load Test Results}
 \usage{
-load_runs(..., verbose = TRUE)
+load_runs(..., verbose = vroom::vroom_progress())
 }
 \arguments{
 \item{...}{Key-value pairs where the key is the desired name for the test and the
@@ -35,6 +35,47 @@ The \code{shinycannon} tool creates a directory of log files for
 each load test. This function translates one or more test result
 directories into a tidy data frame.
 }
+\section{Output variables}{
+
+\itemize{
+\item \code{run}: The name of the recording session.
+\item \code{session_id}: An incrementing integer value for every session within
+a \code{run}. Starts at 0.
+\item \code{user_id}: Which simulated user is performing the work within a \code{run}.
+Starts at 0.
+\item \code{iteration}: an incrementing integer value of the session iteration
+for the #' matching \code{user_id}. Starts at 0.
+\item \code{input_line_number}: The line number corresponding to the event in the
+\code{recording.log} file.
+\item \code{event}: the web event being performed. One of the following values:
+\itemize{
+\item \code{REQ_HOME}: initial request for to load the homepage
+\item \code{REQ_GET}: Request a supporting file (JavaScript / CSS)
+\item \code{REQ_TOK}: Request a Shiny token
+\item \code{REQ_SINF}: Request SockJS information
+\item \code{REQ_POST}: Perform a POST query, such as uploading part of a file
+\item \code{WS_RECV_BEGIN_UPLOAD}: A file upload is being requested
+\item \code{WS_OPEN}: Open a new SockJS connection
+\item \code{WS_RECV_INIT}: Initialize a new SockJS
+\item \code{WS_SEND}: Send information from the Shiny server to the browser
+\item \code{WS_RECV}: Send information from the browser to the Shiny server
+\item \code{WS_CLOSE}: Close the SockJS connection
+}
+\item \code{start}: Start time of the event relative to the beginning of the \code{run}'s
+maintenance period
+\item \code{end}: End time of the event relative to the beginning of the \code{run}'s
+maintenance period
+\item \code{time}: Total elapsed time of the event
+\item \code{concurrency}: A number of events that are being processed concurrently
+\item \code{maintenance}: A boolean determining whether or not all simulated users
+are executing a session
+\item \code{label}: A human readable event name
+\item \code{json}: The parsed JSON provided in the \code{recording.log} file. If the field
+\code{message} exists, a \code{message_parsed} field is added containing a parsed
+form of the SockJS's JSON message content.
+}
+}
+
 \examples{
 \dontrun{
   load_runs(

@@ -1,6 +1,6 @@
 if (getRversion() >= "2.15.1") {
   # TODO remove and upgrade the dplyr fns to FN_()
-  utils::globalVariables(c("input_line_number", "run", "session_id", "user_id", "iteration", "event", "timestamp", "concurrency", "center", "event_class", "total_latency", ".", "type", "min_start", "max_end", "worker_id", "json"))
+  utils::globalVariables(c("input_line_number", "run", "session_id", "user_id", "iteration", "event", "timestamp", "concurrency", "center", "event_class", "total_latency", ".", "type", "min_start", "max_end", "worker_id", "json", "eventLabel", "duration"))
 }
 
 # Utility functions -------------------------------------------------------
@@ -10,75 +10,46 @@ strip_suffix <- function(str) {
 }
 
 
-# Read a single .log file
-read_log_file <- function(file) {
-  suppressWarnings({
-    df <- readr::read_csv(
-      file,
-      col_types = readr::cols(
-        session_id = readr::col_integer(),
-        worker_id = readr::col_integer(),
-        iteration = readr::col_integer(),
-        event = readr::col_character(),
-        timestamp = readr::col_double(),
-        input_line_number = readr::col_integer(),
-        comment = readr::col_character()
-      ),
-      comment = "#"
-    )
-  })
-  df %>%
-    mutate(user_id = worker_id) %>%
-    select(- worker_id)
-}
-
 # Read a "sessions/" directory full of .log files
-read_log_dir <- function(dir, name = basename(dirname(dir)), verbose = TRUE) {
-  verbose <- isTRUE(verbose)
+read_log_dir <- function(dir, name = basename(dirname(dir)), verbose = vroom::vroom_progress()) {
   files <- list.files(dir, pattern = "*.csv", full.names = TRUE)
   if (length(files) == 0) {
     stop("No files found for run dir: ", dir, call. = FALSE)
   }
-  if (verbose) {
-    pr <- progress::progress_bar$new(
-      format = ":evt [:bar] :current/:total eta::eta",
-      total = length(files) + 2,
-      show_after = 0,
-      clear = FALSE
-    )
-    tick <- function(evt) {
-      pr$tick(tokens = list(evt = evt))
-    }
-  } else {
-    tick <- identity
-  }
 
-  df <- lapply(files, function(file) {
-      tick(name)
-      read_log_file(file)
-    }) %>%
-    bind_rows() %>%
-    arrange(timestamp) %>%
-    mutate(timestamp = (.$timestamp - min(.$timestamp)) / 1000)
+  df <- vroom::vroom(files,
+    col_types = vroom::cols(
+      session_id = vroom::col_integer(),
+      worker_id = vroom::col_integer(),
+      iteration = vroom::col_integer(),
+      event = vroom::col_character(),
+      timestamp = vroom::col_double(),
+      input_line_number = vroom::col_integer(),
+      comment = vroom::col_character()
+    ),
+    comment = "#",
+    progress = vroom::vroom_progress()
+  )
 
-  tick(paste0(name, " - Cleanup"))
-  relative_concurrency <- with(df, {
-    ifelse(event == "WS_OPEN_START", 1,
-           ifelse(event == "WS_CLOSE_END", -1,
-                  0))
-  })
   df <- df %>%
+    arrange(timestamp) %>%
     mutate(
-      concurrency = cumsum(relative_concurrency),
+      timestamp = (timestamp - min(timestamp)) / 1000,
+      concurrency = cumsum(case_when(
+        event == "WS_OPEN_START" ~ 1,
+        event == "WS_CLOSE_END" ~ -1,
+        TRUE ~ 0
+      )),
       run = name
-    )
-  tick(name)
-
+    ) %>%
+    rename(user_id = worker_id)
   df
 }
 
 # Read a recording file
 read_recording <- function(file_name) {
+  assert_is_available("lubridate")
+
   file_lines <- readLines(file_name)
   input_line_number <- seq_along(file_lines)
   not_comments <- (!grepl("^#", file_lines))
@@ -94,7 +65,7 @@ read_recording <- function(file_name) {
   startTime <- baselineInfo[[1]]$begin
   baselineData <- baselineInfo %>%
     lapply(function(info) {
-      tibble::tibble(
+      tibble(
         event = info$type,
         start = as.numeric(difftime(info$begin, startTime, units = "secs")),
         end = if (!is.null(info$end))
@@ -218,16 +189,20 @@ recording_item_labels <- function(x_list) {
 
 get_times <- function(df) {
   df %>%
-    filter(!is.na(input_line_number)) %>%
-    group_by(run, session_id, user_id, iteration, input_line_number) %>%
-    summarise(event = strip_suffix(event[1]),
-              start = min(timestamp),
-              end = max(timestamp),
-              time = diff(range(timestamp)),
-              concurrency = mean(concurrency)) %>%
-    ungroup() %>%
-    arrange(input_line_number, run) %>%
-    tibble::as.tibble()
+    filter(
+      !is.na(input_line_number),
+      event != "PLAYER_SESSION_CREATE",
+      !grepl("^PLAYBACK", event) # remove all playback_** events
+    ) %>%
+    group_by(run, user_id, session_id, iteration, input_line_number) %>%
+    summarise(
+      event = strip_suffix(event[[1]]),
+      start = min(timestamp),
+      end = max(timestamp),
+      time = diff(range(timestamp)),
+      concurrency = mean(concurrency),
+      .groups = "drop"
+    )
 }
 
 
@@ -238,6 +213,42 @@ get_times <- function(df) {
 #' @description The `shinycannon` tool creates a directory of log files for
 #'   each load test. This function translates one or more test result
 #'   directories into a tidy data frame.
+#' @section Output variables:
+#'
+#' * `run`: The name of the recording session.
+#' * `session_id`: An incrementing integer value for every session within
+#'    a `run`. Starts at 0.
+#' * `user_id`: Which simulated user is performing the work within a `run`.
+#'    Starts at 0.
+#' * `iteration`: an incrementing integer value of the session iteration
+#'    for the #' matching `user_id`. Starts at 0.
+#' * `input_line_number`: The line number corresponding to the event in the
+#'   `recording.log` file.
+#' * `event`: the web event being performed. One of the following values:
+#'     * `REQ_HOME`: initial request for to load the homepage
+#'     * `REQ_GET`: Request a supporting file (JavaScript / CSS)
+#'     * `REQ_TOK`: Request a Shiny token
+#'     * `REQ_SINF`: Request SockJS information
+#'     * `REQ_POST`: Perform a POST query, such as uploading part of a file
+#'     * `WS_RECV_BEGIN_UPLOAD`: A file upload is being requested
+#'     * `WS_OPEN`: Open a new SockJS connection
+#'     * `WS_RECV_INIT`: Initialize a new SockJS
+#'     * `WS_SEND`: Send information from the Shiny server to the browser
+#'     * `WS_RECV`: Send information from the browser to the Shiny server
+#'     * `WS_CLOSE`: Close the SockJS connection
+#' * `start`: Start time of the event relative to the beginning of the `run`'s
+#'    maintenance period
+#' * `end`: End time of the event relative to the beginning of the `run`'s
+#'    maintenance period
+#' * `time`: Total elapsed time of the event
+#' * `concurrency`: A number of events that are being processed concurrently
+#' * `maintenance`: A boolean determining whether or not all simulated users
+#'    are executing a session
+#' * `label`: A human readable event name
+#' * `json`: The parsed JSON provided in the `recording.log` file. If the field
+#'    `message` exists, a `message_parsed` field is added containing a parsed
+#'    form of the SockJS's JSON message content.
+#'
 #' @param ...  Key-value pairs where the key is the desired name for the test and the
 #'   value is a path to the test result directory.
 #' @param verbose Whether or not to print progress for reading loadtest directories
@@ -250,7 +261,7 @@ get_times <- function(df) {
 #'      `2 cores` = 'results/run-2/'
 #'   )
 #' }
-load_runs <- function(..., verbose = TRUE) {
+load_runs <- function(..., verbose = vroom::vroom_progress()) {
 
   # TODO: Validate input directories and fail intelligently!
   verbose <- isTRUE(verbose)
@@ -273,11 +284,8 @@ load_runs <- function(..., verbose = TRUE) {
         ., names(.),
         USE.NAMES = FALSE, SIMPLIFY = FALSE,
         FUN = function(recording_path, run) {
-          df_run <- read_log_dir(file.path(recording_path, "sessions"), run, verbose = verbose) %>%
-            get_times() %>%
-            filter(event != "PLAYBACK_SLEEPBEFORE", event != "PLAYER_SESSION") %>%
-            arrange(run, user_id, session_id, input_line_number) %>%
-            select(run, everything())
+          raw <- read_log_dir(file.path(recording_path, "sessions"), run, verbose = verbose)
+          df_run <- get_times(raw)
 
           recording_path <- file.path(recording_path, "recording.log")
           if (is.null(first_recording$name)) {
@@ -301,10 +309,7 @@ load_runs <- function(..., verbose = TRUE) {
           df_maintenance_ids <- maintenance_df_ids(df_run)
 
           df_run <- df_run %>%
-            ungroup() %>%
-            mutate(
-              maintenance = id %in% df_maintenance_ids
-            ) %>%
+            mutate(maintenance = id %in% df_maintenance_ids) %>%
             select(-id)
 
           min_maintenance_time <- df_run %>%

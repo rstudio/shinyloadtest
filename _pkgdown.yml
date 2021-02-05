@@ -1,45 +1,28 @@
+url: https://rstudio.github.io/shinyloadtest/
+
+development:
+  mode: auto
+
 template:
   params:
     bootswatch: cosmo
+    docsearch:
+      api_key: '993bbaa8141e65ce07013c0f54fc3277'
+      index_name: 'shinyloadtest'
 navbar:
   type: inverse
-  structure: 
-    left: 
-      - home
-      - intro
-      - reference
-      - articles
-      - tutorials
-      - news
-    right: 
-      - github
-  components:
-    home:
-      icon: fas fa-home
-      href: index.html
-      text: Home
-    articles:
-      text: Articles
-      menu:
-        - text: "Case study: interpreting load test results"
-          href: articles/analyzing-load-test-logs.html
-        - text: "Case study: scaling an app"
-          href: articles/case-study-scaling.html
-        - text: "Load testing authenticated apps"
-          href: articles/load-testing-authenticated-apps.html
-        - text: "Limitations"
-          href: articles/limitations-of-shinyloadtest.html
-        - text: "Troubleshooting SSL"
-          href: articles/troubleshooting-ssl.html
-        # - text: FAQ
-        #   href: articles/faq.html
-    news:
-      text: Changelog
-      href: news/index.html
-    reference:
-      text: Reference
-      href: reference/index.html
-authors:
-  RStudio:
-    href: https://www.rstudio.com
-    html: <img src="https://tidyverse.org/rstudio-logo.svg" height="24" />
+
+articles:
+- title: Getting started
+  navbar: ~
+  contents:
+  - shinycannon
+  - analyzing-load-test-logs
+  - case-study-scaling
+
+- title: Advanced
+  navbar: Advanced
+  contents:
+  - limitations-of-shinyloadtest
+  - load-testing-authenticated-apps
+  - troubleshooting-ssl

@@ -4,6 +4,7 @@ if (getRversion() >= "2.15.1") {
 }
 
 #' @rawNamespace import(ggplot2, except = vars)
+#' @importFrom stats reorder
 #' @import dplyr
 NULL
 
@@ -22,517 +23,203 @@ NULL
 #' @rdname slt_plot
 #' @return A \code{\link[ggplot2]{ggplot}} plot object
 #' @examples
+#' \donttest{slt_user(slt_demo_data_4)
+#' slt_session(slt_demo_data_4)
 #' slt_session_duration(slt_demo_data_4)
 #'
-#' \donttest{slt_time_boxplot(slt_demo_data_16)
-#' slt_time_concurrency(slt_demo_data_16)
-#' slt_waterfall(slt_demo_data_16)
-#' slt_hist_loadtimes(slt_demo_data_16)
-#' slt_user(slt_demo_data_16)
-#' slt_session(slt_demo_data_16)
-#' slt_session_duration(slt_demo_data_16)
-#' slt_session_latency(slt_demo_data_16)
-#' slt_http_latency(slt_demo_data_16)
-#' slt_websocket_latency(slt_demo_data_16)}
+#' slt_waterfall(slt_demo_data_4)
+#' slt_time_boxplot(slt_demo_data_4)
+#' slt_time_concurrency(slt_demo_data_4)
+#'
+#' slt_session_latency(slt_demo_data_4)
+#' slt_http_latency(slt_demo_data_4)
+#' slt_websocket_latency(slt_demo_data_4)
+#' slt_hist_loadtimes(slt_demo_data_4)}
 NULL
-
-
-
-cutoff_color <- "red"
-
-# Run colors
-run_fill_colors <- c(
-  "#7fc97f", # medium green
-  "#beaed4", # medium purple
-  "#fdc086", # medium orange
-  "#f28983", # medium red
-  "#7ddbb6", # medium teal
-  "#75aadb", # medium blue
-  "#5d945d", # dark green
-  "#9084a1", # dark purple
-  "#c9996b", # dark orange
-  "#bd5c57", # dark red
-  "#5fa68a", # dark teal
-  "#5981a6", # dark blue
-  "#9efa9e", # bright green
-  "#e5d1ff", # bright purple
-  "#8df5cc", # bright teal
-  "#88c6ff", # bright blue
-  "#3d613d", # very dark green
-  "#625a6e", # very dark purple
-  "#967250", # very dark orange
-  "#8a433f", # very dark red
-  "#467362", # very dark teal
-  "#3d5973"  # very dark blue
-)
-run_accent_color_map <- c(
-  # Accent colors only to be used as accents
-  # e.g. I'm currently using these colors for the lines and dots in the box plots
-
-  # for use with data colors: 01, 07, 13, 17
-  green = "#144714",
-
-  # for use with data colors: 02, 08, 14, 18
-  purple =  "#413554",
-
-  # for use with data colors: 03, 09, 19
-  orange = "#7a4920",
-
-  # for use with data colors: 04, 10, 20
-  red = "#5c1815",
-
-  # for use with data colors: 05, 11, 15, 21
-  teal = "#14593e",
-
-  # for use with data colors: 06, 12, 16, 22
-  blue = "#103659"
-)
-
-run_accent_colors <- run_accent_color_map[c(1:6, 1:6, 1:2, 5:6, 1:6)]
-
-
-make_run_fill <- function(run_names) {
-  if (length(run_names) > length(run_fill_colors)) {
-    stop("Too many runs provided.  Do not have enough colors.")
-  }
-  ret <- run_fill_colors[seq_along(run_names)]
-  names(ret) <- run_names
-  ret
-}
-make_run_color <- function(run_names) {
-  if (length(run_names) > length(run_accent_colors)) {
-    stop("Too many runs provided.  Do not have enough colors.")
-  }
-  ret <- run_accent_colors[seq_along(run_names)]
-  names(ret) <- run_names
-  ret
-}
-
-
-facet_on_labels <- function(p, df, labels) {
-  label_length <- length(unique(df$label))
-
-  if(
-    (is.null(labels) || length(labels) > 1) &&
-    (label_length > 1)
-  ) {
-    p <- p + facet_wrap(~label)
-  } else if (label_length == 1) {
-    p <- p + labs(title = df$label[1])
-  }
-
-  p
-}
-
-
 
 #' @describeIn slt_plot Box plot of load times for each event in each run
 #' @export
 slt_time_boxplot <- function(df, labels = NULL) {
-  df <- df %>% filter(maintenance == TRUE)
+  df <- df %>% filter(maintenance)
 
   if (!is.null(labels)) {
-    labels <- enexpr(labels)
-    df <- df %>% filter(label %in% rlang::UQ(labels))
+    df <- df %>% filter(label %in% !!labels)
   }
 
-  p <- df %>%
-    ggplot(aes(run, time, fill = run, color = run)) +
-    geom_boxplot(show.legend = FALSE) +
-    scale_fill_manual(values = make_run_fill(levels(df$run))) +
-    scale_color_manual(values = make_run_color(levels(df$run))) +
-    # labs(subtitle = "lower is faster") +
-    labs(y = "Time (sec)", x = NULL) +
-    theme(
-      panel.grid.major.x = element_blank(),
-      legend.position = "bottom"
-    )
-
-  p <- facet_on_labels(p, df, labels)
-  p
+  df %>%
+    ggplot(aes(run, time)) +
+    geom_boxplot(aes(fill = run), show.legend = FALSE) +
+    scale_fill_manual(NULL, values = run_fill_colors) +
+    labs(
+      y = "Time (sec)",
+      x = NULL
+    ) +
+    theme(legend.position = "bottom") +
+    facet_on_labels(df)
 }
 
 
 #' @describeIn slt_plot Time on concurrency for each event for each run
 #' @export
 slt_time_concurrency <- function(df, labels = NULL) {
-  df <- df %>% filter(maintenance == TRUE)
+  df <- df %>% filter(maintenance)
 
   if (!is.null(labels)) {
-    labels <- enexpr(labels)
-    df <- df %>% filter(label %in% rlang::UQ(labels))
+    df <- df %>% filter(label %in% !!labels)
   }
 
-  p <- df %>%
-    ggplot(aes(concurrency, time, fill = run, color = run)) +
-    geom_point() +
-    geom_smooth(method = "lm") +
-    scale_fill_manual(values = make_run_color(levels(df$run))) +
-    scale_color_manual(values = make_run_fill(levels(df$run))) +
-    coord_cartesian(ylim = range(df$time)) +
-    labs(x = "Concurrency", y = "Time (sec)") +
-    # labs(subtitle = "lower is faster") +
-    theme(legend.position = "bottom")
-
-  p <- facet_on_labels(p, df, labels)
-  p
+  df %>%
+    ggplot(aes(concurrency, time)) +
+    geom_smooth(
+      aes(group = run),
+      method = "lm",
+      formula = y ~ x,
+      se = FALSE,
+      colour = "grey70"
+    ) +
+    geom_point(aes(colour = run)) +
+    scale_colour_manual(NULL, values = run_fill_colors) +
+    labs(
+      x = "Concurrency",
+      y = "Time (sec)"
+    ) +
+    theme(legend.position = "bottom") +
+    facet_on_labels(df)
 }
-
-
-# #' @export
-# # slt_timestamp_time <- function(df) {
-#   df %>%
-#     ggplot(aes(end, time, color = run)) +
-#     geom_point() +
-#     geom_smooth() +
-#     facet_wrap(~label)
-# }
 
 #' @describeIn slt_plot Event waterfall for each session within each run
 #' @param limits passed into \code{\link[ggplot2]{scale_colour_gradientn}}
 #' @export
-slt_waterfall <- function(df, limits = c(0, max(df$concurrency, na.rm = TRUE))) {
-  non_maintenance <- df %>% filter(maintenance == FALSE) %>% as.data.frame()
-  maintenance <- df %>% filter(maintenance == TRUE) %>% as.data.frame()
-  rect_df <- data.frame(xmin = 0, xmax = 0, ymin = maintenance[1,"label"], ymax = maintenance[2, "label"], fill = "fill")
+slt_waterfall <- function(df, limits = NULL) {
+  limits <- limits %||% c(0, NA)
 
-  # shorten labels longer than 100 characters
-  labels <- levels(df$label)
-  long_label_len <- 100
-  are_long_labels <- nchar(labels) > long_label_len
-  if (any(are_long_labels)) {
-    labels[are_long_labels] <- paste0(substr(labels[are_long_labels], 1, long_label_len - 2), "...")
-  }
-  levels(df$label) <- labels
+  df1 <- df %>%
+    filter(maintenance) %>%
+    manip_event_label() %>%
+    manip_session_relative() %>%
+    mutate(label = fct_rev(str_trunc(label, 50)))
 
-  y_limits <- rev(levels(df$label))
-  y_limits <- y_limits[!grepl(WS_CLOSE_LABEL, y_limits, fixed = TRUE)]
-
-  p <- maintenance %>%
-    ggplot(
-      aes(
-        end, label,
-        group = session_id,
-        color = concurrency
-      )
-    ) +
-    geom_line(data = non_maintenance, color = request_colors()[["Warmup / Cooldown"]], size = 0.5) +
-    maintenance_vline_only(data = df, mapping = aes(xintercept = start), show.legend = FALSE) +
-    maintenance_vline_only(data = df, mapping = aes(xintercept = end), show.legend = FALSE) +
-    geom_rect(data = rect_df, inherit.aes = FALSE, mapping = aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax, fill = fill)) +
-    scale_fill_manual(request_scales_title, values = request_colors()[["Warmup / Cooldown"]], limits = "Warmup / Cooldown") +
-    ## can not add due to competing color scales
-    # request_scale_color(includeWarmup = TRUE) +
-    # request_scale_guides() +
-    scale_y_discrete(limits = y_limits) +
+  ggplot(df1, aes(end, label, group = session_id, color = concurrency)) +
     geom_line(size = 0.5) +
-    scale_colour_gradientn(colours = rev(c(run_fill_colors[c(3, 13, 6)], run_accent_colors[2])), limits = limits) +
-    guides(
-      color = guide_colorbar(order = 1),
-      fill = guide_legend(order = 2)
+    maintenance_vline(df1, "time") +
+    scale_colour_gradientn(
+      colours = c("#413554", "#75aadb", "#9efa9e", "#fdc086"),
+      limits = limits
     ) +
     labs(
-      x = "Total elapsed time (sec)", y = NULL
-      # subtitle = "more vertical is faster"
+      x = "Time since session start (sec)",
+      y = NULL
     ) +
-    theme(legend.position = "bottom")
-
-  facet_on_run(p, maintenance)
+    theme(legend.position = "bottom") +
+    facet_on_run(df1)
 }
-
 
 #' @describeIn slt_plot Histogram of page load times
 #' @export
 slt_hist_loadtimes <- function(df, max_load_time = 5) {
-  p <- df %>%
+  df1 <- df %>%
+    filter(maintenance) %>%
     group_by(run, session_id) %>%
-    summarise(begin = min(start), ready = start[event == "WS_OPEN"], finish = max(end)) %>%
+    summarise(
+      begin = min(start),
+      ready = start[event == "WS_OPEN"],
+      finish = max(end)
+    )
+
+  df1 %>%
     ggplot(aes(ready - begin)) +
     geom_histogram() +
     geom_vline(xintercept = max_load_time, color = "red") +
-    xlab("Initial Page Load Time (sec)") +
-    ylab("Sessions") +
-    theme(legend.position = "bottom")
-
-  facet_on_run(p, df)
-}
-
-
-
-
-request_color_column <- function(maintenance, event) {
-  paste0(maintenance, "_", event)
-}
-request_border <- "transparent"
-request_colors <- function() {
-  # cols <- scales::hue_pal()(4)
-  # request_colors <-
-  # cols <- c("#872f29", "#1c9165", "#00ffe5", "#75aadb")
-  cols <- c("#f28983", "#fdc086", "#9cffd9", "#75aadb")
-
-  colors <- c("Homepage" = cols[1], "JS/CSS" = cols[2], "Start session" = cols[3], "Calculate" = cols[4])
-  colorsMuted <- scales::muted(colors, 87, 20)
-  colorsAll <- c(
-    "Warmup / Cooldown" = "lightgrey",
-    "Homepage" = colors[["Homepage"]],
-    "JS/CSS" = colors[["JS/CSS"]],
-    "Start session" = colors[["Start session"]],
-    "Calculate" = colors[["Calculate"]],
-    "TRUE_Homepage" = colors[["Homepage"]],
-    "TRUE_JS/CSS" = colors[["JS/CSS"]],
-    "TRUE_Start session" = colors[["Start session"]],
-    "TRUE_Calculate" = colors[["Calculate"]],
-    "FALSE_Homepage" = colorsMuted[["Homepage"]],
-    "FALSE_JS/CSS" = colorsMuted[["JS/CSS"]],
-    "FALSE_Start session" = colorsMuted[["Start session"]],
-    "FALSE_Calculate" = colorsMuted[["Calculate"]]
-  )
-  colorsAll
-}
-
-maintenance_color <- "#2e2e2e"
-maintenance_vline <- function(data, mapping, ...) {
-  data <- data %>%
-    group_by(run) %>%
-    filter(maintenance == TRUE) %>%
-    summarise(start = min(start), end = max(end), maintenance = "Warmup / Cooldown")
-
-  data$maintenance = "Warmup / Cooldown"
-  mapping$colour <- aes(color = maintenance)$colour
-  geom_vline(data = data, mapping = mapping, size = 1, linetype = "dotted", ...)
-}
-maintenance_vline_only <- function(data, mapping, ...) {
-  data <- data %>%
-    group_by(run) %>%
-    filter(maintenance == TRUE) %>%
-    summarise(start = min(start), end = max(end), maintenance = "Warmup / Cooldown")
-
-  geom_vline(data = data, mapping = mapping, size = 1, linetype = "dotted", color = maintenance_color, ...)
-}
-maintenance_session_vline <- function(data, mapping, ...) {
-  data <- data %>%
-    group_by(run) %>%
-    filter(maintenance == TRUE) %>%
-    summarise(start = min(as.numeric(session_id)) - 0.5, end = max(as.numeric(session_id)) + 0.5, maintenance = "Warmup / Cooldown")
-
-  data$maintenance = "Warmup / Cooldown"
-  mapping$colour <- aes(color = maintenance)$colour
-  geom_vline(data = data, mapping = mapping, size = 1, linetype = "dotted", ...)
-}
-
-request_scales_title <- ""
-request_scale_fill <- function(
-  includeWarmup = FALSE,
-  # includeCutoff = FALSE,
-  limits = c("Homepage", "JS/CSS", "Start session", "Calculate", if (includeWarmup) "Warmup / Cooldown"
-    # , if (includeCutoff) "Cutoff"
-  ),
-  ...
-) {
-  clear <- "transparent"
-  values <- request_colors()
-  # values[["Cutoff"]] <- clear
-
-  scale_fill_manual(request_scales_title, values = values, limits = limits)
-}
-
-request_scale_color <- function(
-  includeWarmup = TRUE,
-  # includeCutoff = FALSE,
-  limits = c("Homepage", "JS/CSS", "Start session", "Calculate", if (includeWarmup) "Warmup / Cooldown"
-    # , if (includeCutoff) "Cutoff"
-  ),
-  ...
-) {
-  clear <- "transparent"
-  values <- request_colors()
-  for (key in names(values)) {
-    values[[key]] <- clear
-  }
-  if (includeWarmup) {
-    values[["Warmup / Cooldown"]] <- maintenance_color
-  }
-  # if (includeCutoff) {
-  #   values[["Cutoff"]] <- cutoff_color
-  # }
-
-  scale_color_manual(request_scales_title, limits = limits, values = values)
-}
-request_scale_guides <- function(
-  ...
-  # includeLineType = FALSE
-) {
-  g <- guide_legend(request_scales_title)
-  # if (includeLineType) {
-  #   guides(fill = g, color = g, linetype = g)
-  # } else {
-    guides(fill = g, color = g)
-  # }
-}
-
-
-facet_on_run <- function(p, df, col = "run", rows = vars(run), ...) {
-  if (length(unique(df[[col]])) > 1) {
-    p <- p + facet_grid(rows = rows, ...)
-  }
-  p
-}
-facet_on_run_free <- function(p, df, col = "run", rows = vars(run), ...) {
-  facet_on_run(p, df, col, rows, scales = "free_y", space = "free_y", ...)
+    labs(
+      x = "Initial Page Load Time (sec)",
+      y = "Number of sessions"
+    ) +
+    theme(legend.position = "bottom") +
+    facet_on_run(df)
 }
 
 #' @describeIn slt_plot Gantt chart of event duration for each user within each run
 #' @export
 slt_user <- function(df) {
-  df_gantt <- df %>%
-    filter(event %in% c("REQ_HOME", "REQ_GET", "WS_OPEN", "WS_RECV", "WS_SEND")) %>%
-    mutate(user_id = factor(user_id, levels = rev(unique(user_id)))) %>%
-    mutate(center = (end + start) / 2) %>%
-    mutate(event = factor(event,
-      levels = c("REQ_HOME", "REQ_GET", "WS_OPEN", "WS_RECV", "WS_SEND"),
-      labels = c("Homepage", "JS/CSS", "Start session", "Calculate", "WS_SEND"))) %>%
-    mutate(colorCol = request_color_column(maintenance, event))
+  df1 <- df %>%
+    # Not filtering to maintenance as it is odd to see longer delay times near the startup for what appears to be no reason
+    # filter(maintenance) %>%
+    manip_event_label() %>%
+    manip_tile_position() %>%
+    mutate(user_id = fct_rev(user_id))
 
-  p <- ggplot(df_gantt, aes(x = center, y = user_id, width = (end - start), fill = colorCol)) +
-    geom_tile(height = 1, color = request_border) + #, size = 0.3) +
-    maintenance_vline(data = df_gantt, mapping = aes(xintercept = start)) +
-    maintenance_vline(data = df_gantt, mapping = aes(xintercept = end)) +
-    request_scale_fill(includeWarmup = TRUE) +
-    request_scale_color(includeWarmup = TRUE) +
-    request_scale_guides() +
-    scale_y_discrete(labels = {
-      rev(unique(df$user_id))
-    }, breaks = {
-      rev(unique(df$user_id))
-    }) +
+  ggplot(df1, aes(center, user_id)) +
+    geom_tile(aes(fill = eventLabel, width = duration), height = 1) +
+    maintenance_vline(df1, "time") +
+    scale_fill_manual(NULL, values = event_colours) +
     labs(
       x = "Elapsed time (sec)",
-      y = "Simulated User #"
-      # subtitle = "smaller bar width is faster"
+      y = "Simulated user #"
     ) +
-    theme(legend.position = "bottom")
-
-  facet_on_run_free(p, df_gantt)
+    theme(legend.position = "bottom") +
+    facet_on_run_free(df1)
 }
 
 #' @describeIn slt_plot Event gantt chart of each user session within each run
 #' @export
 slt_session <- function(df) {
   df_session <- df %>%
-    ungroup() %>%
-    filter(event %in% c("REQ_HOME", "REQ_GET", "WS_OPEN", "WS_RECV", "WS_SEND")) %>%
-    mutate(user_id = factor(user_id, levels = sort(unique(user_id)))) %>%
-    mutate(session_id = factor(session_id, levels = rev(sort(unique(session_id))))) %>%
-    mutate(center = (end + start) / 2) %>%
-    mutate(event = factor(event,
-      levels = c("REQ_HOME", "REQ_GET", "WS_OPEN", "WS_RECV", "WS_SEND"),
-      labels = c("Homepage", "JS/CSS", "Start session", "Calculate", "WS_SEND"))) %>%
-    mutate(colorCol = request_color_column(maintenance, event))
+    filter(maintenance) %>%
+    manip_event_label() %>%
+    manip_tile_position() %>%
+    mutate(
+      user_id = factor(user_id, levels = sort(unique(user_id))),
+      session_id = factor(session_id, levels = rev(sort(unique(session_id)))),
+    )
 
-
-  session_breaks <- breaks_from_session_levels(df_session)
-
-  p <- df_session %>%
-    ggplot(aes(x = center, y = session_id, width = (end - start), fill = colorCol)) +
-      geom_tile(height = 1, color = request_border) + #, size = 0.3) +
-      maintenance_vline(data = df_session, mapping = aes(xintercept = start)) +
-      maintenance_vline(data = df_session, mapping = aes(xintercept = end)) +
-      request_scale_fill(includeWarmup = TRUE) +
-      request_scale_color(includeWarmup = TRUE) +
-      request_scale_guides() +
-      scale_y_discrete(labels = session_breaks, breaks = session_breaks) +
-      ylab("Session #") +
-      xlab("Elapsed time (sec)") +
-      theme(legend.position = "bottom")
-
-  facet_on_run_free(p, df_session)
+  ggplot(df_session, aes(center, session_id, width = duration)) +
+    geom_tile(aes(fill = eventLabel), height = 1) +
+    maintenance_vline(df_session, "time") +
+    scale_y_discrete(breaks = session_breaks(df$session_id)) +
+    scale_fill_manual(NULL, values = event_colours) +
+    labs(
+      x = "Elapsed time (sec)",
+      y = "Session #"
+    ) +
+    theme(legend.position = "bottom") +
+    facet_on_run_free(df_session)
 }
 
-
-
-gantt_duration_data <- function(df) {
-  df %>%
-    filter(maintenance == TRUE) %>%
-    filter(event %in% c("REQ_HOME", "REQ_GET", "WS_OPEN", "WS_RECV", "WS_SEND")) %>%
-    group_by(run, session_id, user_id, iteration) %>%
-    mutate(end = end - min(start), start = start - min(start)) %>%
-    ungroup()
-}
 #' @describeIn slt_plot Event gantt chart of fastest to slowest session times within each run
 #' @export
-slt_session_duration <- function(df, cutoff = c(attr(df, "recording_duration"), 60)[1]) {
-  df1 <- gantt_duration_data(df)
+slt_session_duration <- function(df, cutoff = NULL) {
+  cutoff <- cutoff %||% attr(df, "recording_duration") %||% 60
 
-  sessions <- df1 %>%
-    group_by(run, session_id, user_id, iteration) %>%
-    summarise(max = max(end)) %>%
-    arrange(run, desc(max)) %>%
-    group_by(run) %>%
-    mutate(order = 1:length(session_id)) %>%
-    ungroup()
+  df1 <- df %>%
+    filter(maintenance) %>%
+    manip_session_relative() %>%
+    manip_event_label() %>%
+    manip_tile_position()
 
-  df1 <- df1 %>%
-    inner_join(sessions, by = c("run", "session_id", "user_id", "iteration"))
-  p <- df1 %>%
-    mutate(center = (end + start) / 2) %>%
-    mutate(event = factor(event,
-      levels = c("REQ_HOME", "REQ_GET", "WS_OPEN", "WS_RECV", "WS_SEND"),
-      labels = c("Homepage", "JS/CSS", "Start session", "Calculate", "WS_SEND"))) %>%
-    ggplot(aes(x = center, y = order, width = (end - start), fill = event)) +
-      geom_tile(height = 1, color = request_border) + #, size = 0.3) +
-      # scale_fill_brewer(palette = "RdBu") +
-      # geom_vline(data = data.frame(x = cutoff, col = cutoff_color), mapping = aes(xintercept = x, color = I("transparent")), show.legend = TRUE) +
-      geom_vline(xintercept = cutoff, color = cutoff_color) +
-      # scale_fill_manual(
-      #   "",
-      #   values = request_colors(),
-      #   limits = c("Homepage", "JS/CSS", "Start session", "Calculate")
-      # ) +
-      request_scale_fill(includeWarmup = FALSE, includeCutoff = TRUE) +
-      request_scale_color(includeCutoff = TRUE, includeWarmup = FALSE) +
-      theme(
-        panel.grid.minor.y=element_blank(),
-        panel.grid.major.y=element_blank(),
-        axis.text.y=element_blank(),
-        axis.ticks.y=element_blank()) +
-      labs(
-        x = "Time since session start (sec)",
-        y = "Sessions ordered by total duration"
-        # subtitle = "smaller bar width is faster"
-      ) +
-      theme(legend.position = "bottom")
-
-  facet_on_run_free(p, df1)
+  ggplot(df1, aes(center, as.integer(reorder(session_id, end, max)))) +
+    geom_tile(aes(width = duration, fill = eventLabel), height = 1) +
+    geom_vline(xintercept = cutoff, color = cutoff_color) +
+    scale_y_continuous(labels = NULL) +
+    scale_fill_manual(NULL, values = event_colours) +
+    labs(
+      x = "Time since session start (sec)",
+      y = "Sessions (ordered by total duration)"
+    ) +
+    theme(legend.position = "bottom") +
+    facet_on_run_free(df1)
 }
 
-
-
 latency_df <- function(df) {
-  session_levels <- df$session_id %>% unique() %>% sort()
-
-  rename_event <- function(event) {
-    switch(event,
-      REQ_HOME = "Homepage",
-      REQ_GET = "JS/CSS",
-      WS_OPEN = "Start session",
-      WS_RECV = "Calculate",
-      WS_SEND = "Calculate",
-      event
-    )
-  }
-
-  df_sum <- df %>%
-    filter(event %in% c("REQ_HOME", "REQ_GET", "WS_OPEN", "WS_RECV", "WS_SEND")) %>%
-    # mutate(session_id = factor(session_id, levels = rev(unique(session_id)))) %>%
+  df %>%
+    filter(maintenance) %>%
+    manip_event_label() %>%
     mutate(user_id = paste0("w:", user_id)) %>%
-    mutate(session_id = factor(session_id, levels = session_levels)) %>%
-    mutate(event = vapply(event, rename_event, character(1))) %>%
-    mutate(event = factor(event,
-      levels = c("Homepage", "JS/CSS", "Start session", "Calculate"))) %>%
-    group_by(run, session_id, event, user_id, maintenance) %>%
-    summarise(total_latency = sum(time), max_latency = max(time)) %>%
-    mutate(colorCol = request_color_column(maintenance, event))
-  df_sum
+    group_by(run, session_id, eventLabel, user_id, maintenance) %>%
+    summarise(
+      total_latency = sum(time),
+      max_latency = max(time),
+      .groups = "drop"
+    )
 }
 
 gantt_latency <- function(df) {
@@ -578,110 +265,134 @@ gantt_latency <- function(df) {
 #' @describeIn slt_plot Stacked bar chart of event duration for each session within each run
 #' @export
 slt_session_latency <- function(df) {
-  df_sum <- latency_df(df)
-
-  session_breaks <- breaks_from_session_levels(df_sum)
-
-  p <- ggplot(
-    df_sum,
-    aes(session_id, max_latency, fill = colorCol, group = event)
-  ) +
-    geom_col(position = position_stack(reverse = TRUE)) +
-    maintenance_session_vline(data = df_sum, mapping = aes(xintercept = start)) +
-    maintenance_session_vline(data = df_sum, mapping = aes(xintercept = end)) +
-    request_scale_fill(includeWarmup = TRUE) +
-    request_scale_color(includeWarmup = TRUE) +
-    request_scale_guides() +
-    scale_x_discrete(labels = session_breaks, breaks = session_breaks) +
-    labs(
-      x = "Session",
-      y = "Total Latency (sec)"
-      # subtitle = "shorter bar is faster"
-    ) +
-    theme(legend.position = "bottom")
-
-  facet_on_run(p, df_sum)
+  slt_latency(df, NULL, 10)
 }
 
 #' @describeIn slt_plot Bar chart of total HTTP latency for each session within each run
 #' @export
-slt_http_latency <- function(df, cutoff = 10) {
-  df_sum <- latency_df(df) %>%
-    ungroup() %>%
-    filter(event == "Homepage" | event == "JS/CSS") %>%
-    mutate(event = factor(event, levels = c("Homepage", "JS/CSS"), ordered = TRUE))
-
-  session_breaks <- breaks_from_session_levels(df_sum)
-
-  p <- ggplot(
-    df_sum,
-    aes(session_id, total_latency, fill = colorCol, group = event)
-  ) +
-    geom_col(position = position_stack(reverse = TRUE)) +
-    maintenance_session_vline(data = df_sum, mapping = aes(xintercept = start)) +
-    maintenance_session_vline(data = df_sum, mapping = aes(xintercept = end)) +
-    # geom_hline(data = data.frame(y = cutoff, col = cutoff_color), mapping = aes(yintercept = y, color = I("transparent")), show.legend = TRUE) +
-    geom_hline(yintercept = cutoff, color = cutoff_color) +
-    request_scale_fill(
-      includeWarmup = TRUE, includeCutoff = FALSE,
-      limits = c("Homepage", "JS/CSS", "Warmup / Cooldown")) +
-    request_scale_color(
-      includeWarmup = TRUE,
-      includeCutoff = FALSE,
-      limits = c("Homepage", "JS/CSS", "Warmup / Cooldown")) +
-    # scale_linetype_manual("asdf", values = c("Homepage" = "blank", "JS/CSS" = "blank", "Warmup / Cooldown" = "dotted", "Cutoff" = "solid"), limits = c("Homepage", "JS/CSS", "Warmup / Cooldown", "Cutoff")) +
-    request_scale_guides(includeLineType = FALSE) +
-    # geom_step(position = position_stack(reverse = TRUE)) +
-    scale_x_discrete(labels = session_breaks, breaks = session_breaks) +
-    labs(
-      x = "Session",
-      y = "Total HTTP Latency (sec)"
-      # subtitle = "shorter bar is faster"
-    ) +
-    theme(legend.position = "bottom")
-
-  facet_on_run(p, df_sum)
+slt_http_latency <- function(df, cutoff = 5) {
+  slt_latency(df, c("Homepage", "JS/CSS"), cutoff = cutoff)
 }
 #' @describeIn slt_plot Bar chart of maximum calculation (websocket) latency for each session within each run
 #' @export
-slt_websocket_latency <- function(df, cutoff = 10) {
-  df_sum <- latency_df(df) %>% filter(event == "Calculate")
+slt_websocket_latency <- function(df, cutoff = 5) {
+  slt_latency(df, "Calculate", cutoff = cutoff)
+}
 
-  session_breaks <- breaks_from_session_levels(df_sum)
+slt_latency <- function(df, events, cutoff = 5) {
+  df_sum <- latency_df(df)
+  if (!is.null(events)) {
+    df_sum <- df_sum %>% filter(eventLabel %in% events)
+  }
+  df_sum <- df_sum %>%
+    mutate(eventLabel = fct_rev(eventLabel))
 
-  p <- ggplot(
-    df_sum,
-    aes(session_id, max_latency, fill = colorCol, group = event)
-  ) +
-    geom_col(position = position_stack(reverse = TRUE)) +
-    maintenance_session_vline(data = df_sum, mapping = aes(xintercept = start)) +
-    maintenance_session_vline(data = df_sum, mapping = aes(xintercept = end)) +
-    request_scale_fill(includeWarmup = TRUE, limits = c("Calculate", "Warmup / Cooldown")) +
-    request_scale_color(includeWarmup = TRUE, limits = c("Calculate", "Warmup / Cooldown")) +
-    request_scale_guides() +
-    scale_x_discrete(labels = session_breaks, breaks = session_breaks) +
+  ggplot(df_sum, aes(session_id, total_latency)) +
+    geom_col(aes(fill = eventLabel), width = 0.95) +
     geom_hline(yintercept = cutoff, color = cutoff_color) +
+    maintenance_vline(df_sum, "session") +
+    scale_fill_manual(NULL, values = event_colours) +
+    scale_x_continuous(labels = NULL) +
     labs(
       x = "Session",
-      y = "Maximum WebSocket Latency (sec)"
-      # subtitle = "shorter bar is faster"
+      y = "Total latency (sec)"
     ) +
-    theme(legend.position = "bottom")
+    theme(legend.position = "bottom", legend.justification = "left") +
+    facet_on_run_free(df_sum)
+}
 
-  # if (length(unique(df$run)) > 1) {
-  #   p <- p + theme(legend.position = "bottom")
-  # }
+# Data manipulation helpers -----------------------------------------------
 
-  facet_on_run(p, df_sum)
+manip_event_label <- function(df) {
+  labels <- c(
+    "Homepage" = "REQ_HOME",
+    "JS/CSS" = "REQ_GET",
+    "Start session" = "WS_OPEN",
+    "Calculate" = "WS_RECV"
+  )
+
+  df %>%
+    filter(event %in% labels) %>%
+    mutate(
+      eventLabel = factor(event, levels = labels, labels = names(labels))
+    )
+}
+
+manip_tile_position <- function(df) {
+  df %>%
+    mutate(
+      center = (end + start) / 2,
+      duration = end - start,
+    )
+}
+
+manip_session_relative <- function(df) {
+  df %>%
+    group_by(run, session_id, user_id, iteration) %>%
+    mutate(
+      end = end - min(start),
+      start = start - min(start),
+    )
 }
 
 
+# Facetting helpers -------------------------------------------------------
 
-breaks_from_session_levels <- function(df) {
-  session_levels <- levels(df$session_id)
-  len <- length(session_levels)
+facet_on_labels <- function(df) {
+  n_labels <- length(unique(df[["labels"]]))
+
+  if (n_labels == 1) {
+    labs(title = df$label[[1]])
+  } else {
+    facet_wrap(~label)
+  }
+}
+
+facet_on_run <- function(df, ...) {
+  if (length(unique(df$run)) > 1) {
+    facet_grid(rows = vars(run), ...)
+  } else {
+    facet_null()
+  }
+}
+
+facet_on_run_free <- function(df, ...) {
+  facet_on_run(df, ..., scales = "free_y", space = "free_y")
+}
+
+
+# Annotations -------------------------------------------------------------
+
+maintenance_vline <- function(data, type = c("time", "session")) {
+  type <- match.arg(type)
+
+  summary <- data %>%
+    group_by(run) %>%
+    filter(maintenance) %>%
+    summarise(
+      event = "Warm up / Cooldown",
+      time = if (type == "time") {
+        c(min(start), max(end))
+      } else {
+        range(as.numeric(session_id)) + c(-0.5, 0.5)
+      }
+    )
+
+  geom_vline(
+    aes(xintercept = time),
+    data = summary,
+    size = 0.5,
+    linetype = "dashed",
+    colour = alpha("black", 0.70)
+  )
+}
+
+session_breaks <- function(x) {
+  x <- sort(unique(x))
+
+  len <- length(x)
   if (len <= 20) {
-    return(session_levels)
+    return(x)
   }
 
   divisor <- 5
@@ -689,26 +400,67 @@ breaks_from_session_levels <- function(df) {
     divisor <- divisor + 5
   }
 
-  session_breaks <- session_levels[seq_along(session_levels) %% divisor == 1]
+  x[seq_along(x) %% divisor == 1]
 }
 
+# Colours -----------------------------------------------------------------
 
-extract_legend <- function(p) {
-  first_grob <- function(x) {
-    x$grobs[[1]]
-  }
-  legend_grob <- ggplot2::ggplot_build(p) %>%
-    ggplot2::ggplot_gtable() %>%
-    gtable::gtable_filter("guide-box") %>%
-    first_grob() %>%
-    gtable::gtable_filter("guides") %>%
-    first_grob()
-    # %>%
-    # gtable::gtable_filter("key|label")
+cutoff_color <- "red"
 
-  list(
-    legend_grob = legend_grob,
-    height_inches = legend_grob$heights %>% grid::convertUnit("inches") %>% as.numeric() %>% sum(),
-    width_inches = legend_grob$widths %>% grid::convertUnit("inches") %>% as.numeric() %>% sum()
-  )
-}
+# Run colors
+run_fill_colors <- c(
+  "#7fc97f", # medium green
+  "#beaed4", # medium purple
+  "#fdc086", # medium orange
+  "#f28983", # medium red
+  "#7ddbb6", # medium teal
+  "#75aadb", # medium blue
+  "#5d945d", # dark green
+  "#9084a1", # dark purple
+  "#c9996b", # dark orange
+  "#bd5c57", # dark red
+  "#5fa68a", # dark teal
+  "#5981a6", # dark blue
+  "#9efa9e", # bright green
+  "#e5d1ff", # bright purple
+  "#8df5cc", # bright teal
+  "#88c6ff", # bright blue
+  "#3d613d", # very dark green
+  "#625a6e", # very dark purple
+  "#967250", # very dark orange
+  "#8a433f", # very dark red
+  "#467362", # very dark teal
+  "#3d5973"  # very dark blue
+)
+run_accent_color_map <- c(
+  # Accent colors only to be used as accents
+  # e.g. I'm currently using these colors for the lines and dots in the box plots
+  # for use with data colors: 01, 07, 13, 17
+  green = "#144714",
+
+  # for use with data colors: 02, 08, 14, 18
+  purple =  "#413554",
+
+  # for use with data colors: 03, 09, 19
+  orange = "#7a4920",
+
+  # for use with data colors: 04, 10, 20
+  red = "#5c1815",
+
+  # for use with data colors: 05, 11, 15, 21
+  teal = "#14593e",
+
+  # for use with data colors: 06, 12, 16, 22
+  blue = "#103659"
+)
+
+run_accent_colors <- run_accent_color_map[c(1:6, 1:6, 1:2, 5:6, 1:6)]
+
+event_colours <- c(
+  "Homepage" = "#f28983",
+  "JS/CSS" = "#fdc086",
+  "Start session" = "#9cffd9",
+  "Calculate" = "#75aadb"
+)
+
+maintenance_color <- "#2e2e2e"

@@ -18,7 +18,7 @@ slt_time_boxplot(df, labels = NULL)
 
 slt_time_concurrency(df, labels = NULL)
 
-slt_waterfall(df, limits = c(0, max(df$concurrency, na.rm = TRUE)))
+slt_waterfall(df, limits = NULL)
 
 slt_hist_loadtimes(df, max_load_time = 5)
 
@@ -26,13 +26,13 @@ slt_user(df)
 
 slt_session(df)
 
-slt_session_duration(df, cutoff = c(attr(df, "recording_duration"), 60)[1])
+slt_session_duration(df, cutoff = NULL)
 
 slt_session_latency(df)
 
-slt_http_latency(df, cutoff = 10)
+slt_http_latency(df, cutoff = 5)
 
-slt_websocket_latency(df, cutoff = 10)
+slt_websocket_latency(df, cutoff = 5)
 }
 \arguments{
 \item{df}{data frame returned from \code{\link{load_runs}}}
@@ -76,16 +76,16 @@ Many different plotting routines to display different loadtest information.
 }}
 
 \examples{
+\donttest{slt_user(slt_demo_data_4)
+slt_session(slt_demo_data_4)
 slt_session_duration(slt_demo_data_4)
 
-\donttest{slt_time_boxplot(slt_demo_data_16)
-slt_time_concurrency(slt_demo_data_16)
-slt_waterfall(slt_demo_data_16)
-slt_hist_loadtimes(slt_demo_data_16)
-slt_user(slt_demo_data_16)
-slt_session(slt_demo_data_16)
-slt_session_duration(slt_demo_data_16)
-slt_session_latency(slt_demo_data_16)
-slt_http_latency(slt_demo_data_16)
-slt_websocket_latency(slt_demo_data_16)}
+slt_waterfall(slt_demo_data_4)
+slt_time_boxplot(slt_demo_data_4)
+slt_time_concurrency(slt_demo_data_4)
+
+slt_session_latency(slt_demo_data_4)
+slt_http_latency(slt_demo_data_4)
+slt_websocket_latency(slt_demo_data_4)
+slt_hist_loadtimes(slt_demo_data_4)}
 }

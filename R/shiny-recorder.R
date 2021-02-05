@@ -253,6 +253,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       cookies <- data.frame()
       # if auth is required and are not using the connectApiKey...
       if (isProtected(private$targetURL) && is.null(private$connectApiKey)) {
+        assert_is_available("getPass")
         username <- getPass::getPass("Enter your username: ")
         if (is.null(username)) stop("Login aborted (username not provided)")
         password <- getPass::getPass("Enter your password: ")
