@@ -255,6 +255,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
       cookies <- data.frame()
       # if auth is required and are not using the connectApiKey...
       if (isProtected(private$targetURL) && is.null(private$connectApiKey)) {
+        if (private$targetType == SERVER_TYPE$RSC) {
+          message("An RStudio Connect API key was not provided to `record_session(connect_api_key=)`. Asking for login information...")
+        }
         assert_is_available("getPass")
         username <- getPass::getPass("Enter your username: ")
         if (is.null(username)) stop("Login aborted (username not provided)")
