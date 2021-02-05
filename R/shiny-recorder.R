@@ -210,7 +210,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
       header <- c(
         paste0("# version: 1"),
         paste0("# target_url: ", targetAppUrl),
-        paste0("# target_type: ", format_server_type(private$targetType))
+        paste0("# target_type: ", format_server_type(private$targetType)),
+        if (!is.null(private$connectApiKey))
+          "# rscApiKeyRequired: true"
       )
       writeLines(header, private$outputFile)
       flush(private$outputFile)
