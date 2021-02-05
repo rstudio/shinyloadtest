@@ -1,5 +1,5 @@
 <div id="largest-mean-diff">
-  { glue_component("picker_duration", list(id="largest-mean-diff-picker", len = length(boxplot$mean_diff),  comment = "largest mean differences", info = "Event plots are arranged by the <b>largest difference in the run’s mean</b> event time.")) }
+  { glue_component("picker_duration", list(id="largest-mean-diff-picker", len = length(boxplot$mean_diff),  comment = "largest mean differences", info = "Event plots are arranged by the <b>largest difference in the run's mean</b> event time.")) }
   <div class="uk-flex uk-grid-match uk-grid-small uk-child-width-1-4@m slt-chart-grid" uk-grid id="largest-mean-diff-grid">
     { glue_multi_component("boxplot_thumbnail", boxplot$mean_diff)}
   </div>
