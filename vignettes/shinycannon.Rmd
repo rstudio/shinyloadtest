@@ -70,14 +70,14 @@ kable(linux_packages)
 
 1.  Install [Java](https://www.java.com/en/download/)
 2.  Download `r shinycannon_sh[["Download Link"]]`
-3.  Install with `sudo cp`r shinycannon_sh[["file"]]`/usr/local/bin/shinycannon; sudo chmod +x /usr/local/bin/shinycannon`
+3.  Install with `sudo cp `r shinycannon_sh[["file"]]` /usr/local/bin/shinycannon; sudo chmod +x /usr/local/bin/shinycannon`
 4.  Run `shinycannon -h` to see help output, or `shinycannon [RECORDING-PATH] [APP-URL]` to generate load.
 
 ### Windows
 
 1.  Install [Java](https://www.java.com/en/download/)
 2.  Download `r shinycannon_jar[["Download Link"]]` to the directory you wish to run it in
-3.  Run `java -jar`r shinycannon_jar[["file"]]`-h` to see help output, or `java -jar`r shinycannon_jar[["file"]]`[RECORDING-PATH] [APP-URL]` to generate load.
+3.  Run `java -jar `r shinycannon_jar[["file"]]` -h` to see help output, or `java -jar `r shinycannon_jar[["file"]]` [RECORDING-PATH] [APP-URL]` to generate load.
 
 ## Recording
 
