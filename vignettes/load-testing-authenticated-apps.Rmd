@@ -36,9 +36,9 @@ The supplied username and password are used for the duration of the recording to
 
 ## Load testing
 
-Because credentials are not stored in recordings, a username and password must be supplied to `shinycannon` in order to load test authenticated applications.
+Because credentials are not stored in recordings, a username and password or RStudio Connect API Key must be supplied to `shinycannon` in order to load test authenticated applications.
 
-`shinycannon` does not have `--user`, `--password`, or `--connect-api-key` arguments for security reasons, so that these strings will not appear in a process list. Instead, the `SHINYCANNON_USER`, `SHINYCANNON_PASS`, and `SHINYCANNON_CONNECT_API_KEY` environment variables must be set.
+`shinycannon` does not have `--user`, `--password`, or `--connect-api-key` arguments for security reasons, so that these strings will not appear in a process list. Instead, the `SHINYCANNON_USER`, `SHINYCANNON_PASS`, and `SHINYCANNON_CONNECT_API_KEY` environment variables must be set. `SHINYCANNON_CONNECT_API_KEY` will take preference over `SHINYCANNON_USER` and `SHINYCANNON_PASS`.
 
 On Linux and macOS, you can disable history for any command that starts with a space. If using a `bash`:
 
