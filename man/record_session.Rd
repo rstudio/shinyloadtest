@@ -9,7 +9,8 @@ record_session(
   host = "127.0.0.1",
   port = 8600,
   output_file = "recording.log",
-  open_browser = TRUE
+  open_browser = TRUE,
+  connect_api_key = NULL
 )
 }
 \arguments{
@@ -24,6 +25,9 @@ default if port 8600 is used by another service.}
 
 \item{open_browser}{Whether to open a browser on the proxy (default=\code{TRUE})
 or not (\code{FALSE}).}
+
+\item{connect_api_key}{An RStudio Connect api key. It may be useful to use
+\code{Sys.getenv("CONNECT_API_KEY")}.}
 }
 \value{
 Creates a recording file that can be used as input to the

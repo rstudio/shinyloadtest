@@ -183,7 +183,7 @@ CLIENT_WS_STATE <- enum(UNOPENED, OPEN, CLOSED)
 
 RecordingSession <- R6::R6Class("RecordingSession",
   public = list(
-    initialize = function(targetAppUrl, host, port, outputFileName) {
+    initialize = function(targetAppUrl, host, port, outputFileName, connectApiKey) {
       private$targetURL <- URLBuilder$new(targetAppUrl)
       private$targetType <- servedBy(private$targetURL)
       if (private$targetType == SERVER_TYPE$SAI) {
@@ -191,6 +191,17 @@ RecordingSession <- R6::R6Class("RecordingSession",
       }
       private$localHost <- host
       private$localPort <- port
+      if (private$targetType == SERVER_TYPE$RSC) {
+        # notify if the apikey is being used
+        if (!is.null(connectApiKey)) {
+          message("Authenticating using provided connect_api_key.")
+          private$connectApiKey <- connectApiKey
+        }
+        # check if the solo url was not provided
+        if (grepl("#", targetAppUrl, fixed = TRUE)) {
+          stop("Please provide the content URL (solo mode) of this RStudio Connect Shiny app")
+        }
+      }
 
       private$initializeSessionCookies()
 
@@ -199,7 +210,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
       header <- c(
         paste0("# version: 1"),
         paste0("# target_url: ", targetAppUrl),
-        paste0("# target_type: ", format_server_type(private$targetType))
+        paste0("# target_type: ", format_server_type(private$targetType)),
+        if (!is.null(private$connectApiKey))
+          "# rscApiKeyRequired: true"
       )
       writeLines(header, private$outputFile)
       flush(private$outputFile)
@@ -230,6 +243,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
     localServer = NULL,
     outputFileName = NULL,
     outputFile = NULL,
+    connectApiKey = NULL,
     sessionCookies = data.frame(),
     clientWsState = CLIENT_WS_STATE$UNOPENED,
     postFiles = character(0),
@@ -239,7 +253,11 @@ RecordingSession <- R6::R6Class("RecordingSession",
     },
     initializeSessionCookies = function() {
       cookies <- data.frame()
-      if (isProtected(private$targetURL)) {
+      # if auth is required and are not using the connectApiKey...
+      if (isProtected(private$targetURL) && is.null(private$connectApiKey)) {
+        if (private$targetType == SERVER_TYPE$RSC) {
+          message("An RStudio Connect API key was not provided to `record_session(connect_api_key=)`. Asking for login information...")
+        }
         assert_is_available("getPass")
         username <- getPass::getPass("Enter your username: ")
         if (is.null(username)) stop("Login aborted (username not provided)")
@@ -266,6 +284,10 @@ RecordingSession <- R6::R6Class("RecordingSession",
 
       if (nrow(private$sessionCookies) > 0) {
         req_curl[["cookie"]] <- pasteParams(private$sessionCookies, "; ")
+      }
+
+      if (!is.null(private$connectApiKey)) {
+        req_curl[["Authorization"]] <- paste0("Key ", private$connectApiKey)
       }
 
       curl::handle_setheaders(h, .list = req_curl)
@@ -352,10 +374,15 @@ RecordingSession <- R6::R6Class("RecordingSession",
       wsScheme <- if (private$targetURL$scheme == "https") "wss" else "ws"
       wsUrl <- private$targetURL$setScheme(wsScheme)$appendPath(clientWS$request$PATH_INFO)$build()
 
-      serverWS <- websocket::WebSocket$new(wsUrl,
-        headers = if (nrow(private$sessionCookies) > 0) {
-          c(Cookie = pasteParams(private$sessionCookies, "; "))
-        } else c())
+      headers <- list()
+      if (nrow(private$sessionCookies) > 0) {
+        headers[["Cookie"]] <-  pasteParams(private$sessionCookies, "; ")
+      }
+      if (!is.null(private$connectApiKey)) {
+        headers[["Authorization"]] <- paste0("Key ", private$connectApiKey)
+      }
+
+      serverWS <- websocket::WebSocket$new(wsUrl, headers = headers)
       serverWS$onMessage(function(event) {
         msgFromServer <- event$data
 
@@ -496,6 +523,8 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #'   or not (`FALSE`).
 #' @param port The port for the reverse proxy. Default is 8600. Change this
 #'   default if port 8600 is used by another service.
+#' @param connect_api_key An RStudio Connect api key. It may be useful to use
+#'  `Sys.getenv("CONNECT_API_KEY")`.
 #'
 #' @return Creates a recording file that can be used as input to the
 #'   `shinycannon` command-line load generation tool.
@@ -506,8 +535,15 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #' }
 #' @export
 record_session <- function(target_app_url, host = "127.0.0.1", port = 8600,
-  output_file = "recording.log", open_browser = TRUE) {
-    session <- RecordingSession$new(target_app_url, host, port, output_file)
+  output_file = "recording.log", open_browser = TRUE,
+  connect_api_key = NULL) {
+    if (!is.null(connect_api_key)) {
+      stopifnot(length(connect_api_key) == 1)
+      stopifnot(is.character(connect_api_key))
+      stopifnot(nchar(connect_api_key) > 0)
+    }
+
+    session <- RecordingSession$new(target_app_url, host, port, output_file, connect_api_key)
     on.exit(session$stop())
     message("Listening on ", host, ":", port)
 
