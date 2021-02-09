@@ -80,7 +80,7 @@ between your web browser and the Shiny application at target_app_url." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">shinyloadtest</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.0.2.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.0.2.9001</span>
       </span>
     </div>
 
@@ -170,7 +170,8 @@ between your web browser and the Shiny application at <code>target_app_url</code
   host <span class='op'>=</span> <span class='st'>"127.0.0.1"</span>,
   port <span class='op'>=</span> <span class='fl'>8600</span>,
   output_file <span class='op'>=</span> <span class='st'>"recording.log"</span>,
-  open_browser <span class='op'>=</span> <span class='cn'>TRUE</span>
+  open_browser <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  connect_api_key <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -197,6 +198,11 @@ default if port 8600 is used by another service.</p></td>
       <th>open_browser</th>
       <td><p>Whether to open a browser on the proxy (default=<code>TRUE</code>)
 or not (<code>FALSE</code>).</p></td>
+    </tr>
+    <tr>
+      <th>connect_api_key</th>
+      <td><p>An RStudio Connect api key. It may be useful to use
+<code><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv("CONNECT_API_KEY")</a></code>.</p></td>
     </tr>
     </table>
 

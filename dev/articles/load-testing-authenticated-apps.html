@@ -34,7 +34,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">shinyloadtest</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.0.2.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.0.2.9001</span>
       </span>
     </div>
 
@@ -146,12 +146,21 @@
 <div id="load-testing" class="section level2">
 <h2 class="hasAnchor">
 <a href="#load-testing" class="anchor"></a>Load testing</h2>
-<p>Because credentials are not stored in recordings, a username and password must be supplied to <code>shinycannon</code> in order to load test authenticated applications.</p>
-<p><code>shinycannon</code> does not have <code>--user</code> and <code>--password</code> arguments for security reasons, so that these strings will not appear in a process list. Instead, <code>SHINYCANNON_USER</code> and <code>SHINYCANNON_PASS</code> environment variables must be set.</p>
-<p>On Linux and macOS, <code>shinycannon</code> can be run with these variables set like this:</p>
-<pre><code>$ export SHINYCANNON_USER=myUser
-$ export SHINYCANNON_PASS=myPass
+<p>Because credentials are not stored in recordings, a username and password or RStudio Connect API Key must be supplied to <code>shinycannon</code> in order to load test authenticated applications.</p>
+<p><code>shinycannon</code> does not have <code>--user</code>, <code>--password</code>, or <code>--connect-api-key</code> arguments for security reasons, so that these strings will not appear in a process list. Instead, the <code>SHINYCANNON_USER</code>, <code>SHINYCANNON_PASS</code>, and <code>SHINYCANNON_CONNECT_API_KEY</code> environment variables must be set. <code>SHINYCANNON_CONNECT_API_KEY</code> will take preference over <code>SHINYCANNON_USER</code> and <code>SHINYCANNON_PASS</code>.</p>
+<p>On Linux and macOS, you can disable history for any command that starts with a space. If using a <code>bash</code>:</p>
+<pre><code>$ # Disable history for any command that starts with a space
+$ HISTCONTROL=ignoreboth
+$  export SHINYCANNON_USER=myUser
+$  export SHINYCANNON_PASS=myPass
+$
 $ shinycannon recording.log https://shinyapp.example.com/ --workers 5 --loaded-duration-minutes 2 --output-dir run1</code></pre>
+<p>And if using <code>zsh</code>:</p>
+<pre><code>$ # Disable history for any command that starts with a space
+$ setopt HIST_IGNORE_SPACE
+$  export SHINYCANNON_CONNECT_API_KEY=$CONNECT_API_KEY
+$
+$ shinycannon connect_recording.log https://connect.example.com/content/545/ --workers 5 --loaded-duration-minutes 2 --output-dir run2</code></pre>
 </div>
   </div>
 
