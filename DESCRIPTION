@@ -55,8 +55,10 @@ Suggests:
     lubridate,
     progress,
     rmarkdown,
-    testthat
+    testthat,
+    spelling
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 SystemRequirements:
     pandoc (>= 2.2) - http://pandoc.org
+Language: en-US
