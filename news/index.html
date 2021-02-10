@@ -37,6 +37,12 @@
 <script src="../pkgdown.js"></script>
 
 
+<!-- docsearch -->
+<script src="../docsearch.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.3/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
+<link href="../docsearch.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+
 
 
 <meta property="og:title" content="Changelog" />
@@ -71,7 +77,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">shinyloadtest</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
       </span>
     </div>
 
@@ -79,9 +85,8 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home"></span>
+    <span class="fas fa-home fa-lg"></span>
      
-    Home
   </a>
 </li>
 <li>
@@ -95,16 +100,21 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/analyzing-load-test-logs.html">Case study: interpreting load test results</a>
+      <a href="../articles/shinycannon.html">Installing and running shinycannon</a>
     </li>
     <li>
-      <a href="../articles/case-study-scaling.html">Case study: scaling an app</a>
+      <a href="../articles/analyzing-load-test-logs.html">Analyzing results</a>
     </li>
     <li>
-      <a href="../articles/load-testing-authenticated-apps.html">Load testing authenticated apps</a>
+      <a href="../articles/case-study-scaling.html">Case study: Scaling an app</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Advanced</li>
+    <li>
+      <a href="../articles/limitations-of-shinyloadtest.html">Limitations of shinyloadtest</a>
     </li>
     <li>
-      <a href="../articles/limitations-of-shinyloadtest.html">Limitations</a>
+      <a href="../articles/load-testing-authenticated-apps.html">Load Testing Authenticated Apps</a>
     </li>
     <li>
       <a href="../articles/troubleshooting-ssl.html">Troubleshooting SSL</a>
@@ -118,11 +128,17 @@
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/rstudio/shinyloadtest/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
       </ul>
+      
+      <form class="navbar-form navbar-right hidden-xs hidden-sm" role="search">
+        <div class="form-group">
+          <input type="search" class="form-control" name="search-input" id="search-input" placeholder="Search..." aria-label="Search for..." autocomplete="off">
+        </div>
+      </form>
       
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
@@ -139,25 +155,44 @@
       <small>Source: <a href='https://github.com/rstudio/shinyloadtest/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="shinyloadtest-1-0-1" class="section level1">
+    <div id="shinyloadtest-110" class="section level1">
+<h1 class="page-header" data-toc-text="1.1.0">
+<a href="#shinyloadtest-110" class="anchor"></a>shinyloadtest 1.1.0<small> Unreleased </small>
+</h1>
+<ul>
+<li><p><code><a href="../reference/record_session.html">record_session()</a></code> gained a new variable <code>connect_api_key</code> to be able to record a session against RStudio Connect using a Connect API key. Please see <a href="https://rstudio.github.io/shinyloadtest/dev/articles/load-testing-authenticated-apps.html">Load Testing Authenticated Apps</a> for more details. Using a Connect API key also requires <code>shinycannon</code> &gt;= 1.1.0 (<a href='https://github.com/rstudio/shinyloadtest/issues/133'>#133</a>)</p></li>
+<li><p><code><a href="../reference/load_runs.html">load_runs()</a></code> now uses vroom instead of <code>read_csv()</code>; this substantially improves its performance.</p></li>
+<li><p>The homepage has been rewritten to get to the big picture more quickly. Most of the details about shinycannon have moved to a new article.</p></li>
+<li><p>The analysis vignette has been overhauled to get into the plots more quickly, and provide more advice about interpretation.</p></li>
+<li>
+<p>Plots have be thoroughly overhauled:</p>
+<ul>
+<li><p>Waterfall plot now only shows plots in maintenance period, and times are session relative.</p></li>
+<li><p>Sessions in warmup and cooldown are no longer shown in muted colours, because that unfortunately relied on a ggplot2 bug. Instead they’re simply omitted from the plot.</p></li>
+<li><p>The line of best fit in the latency plots has been made less visually prominent, and no longer shows standard errors.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+    <div id="shinyloadtest-101" class="section level1">
 <h1 class="page-header" data-toc-text="1.0.1">
-<a href="#shinyloadtest-1-0-1" class="anchor"></a>shinyloadtest 1.0.1<small> 2020-01-09 </small>
+<a href="#shinyloadtest-101" class="anchor"></a>shinyloadtest 1.0.1<small> 2020-01-09 </small>
 </h1>
 <p>This is the initial release of shinyloadtest to CRAN.</p>
 <div id="bug-fixes" class="section level3">
 <h3 class="hasAnchor">
 <a href="#bug-fixes" class="anchor"></a>Bug fixes</h3>
 <ul>
-<li>Server type detection is now tolerant of invalid HTML/XML markup produced by the target application (<a href="https://github.com/rstudio/shinyloadtest/pull/115"><a href='https://github.com/rstudio/shinyloadtest/issues/115'>#115</a></a>, <a href="https://github.com/rstudio/shinycannon/issues/38">rstudio/shinycannon<a href='https://github.com/rstudio/shinyloadtest/issues/38'>#38</a></a>)</li>
-<li>Fixed a bug that prevented runs from being loaded (<a href="https://github.com/rstudio/shinyloadtest/issues/124"><a href='https://github.com/rstudio/shinyloadtest/issues/124'>#124</a></a>, <a href="https://github.com/rstudio/shinyloadtest/pull/125"><a href='https://github.com/rstudio/shinyloadtest/issues/125'>#125</a></a>)</li>
+<li>Server type detection is now tolerant of invalid HTML/XML markup produced by the target application (<a href='https://github.com/rstudio/shinyloadtest/issues/115'>#115</a>, <a href="https://github.com/rstudio/shinycannon/issues/38">rstudio/shinycannon<a href='https://github.com/rstudio/shinyloadtest/issues/38'>#38</a></a>)</li>
+<li>Fixed a bug that prevented runs from being loaded (<a href='https://github.com/rstudio/shinyloadtest/issues/124'>#124</a>, <a href='https://github.com/rstudio/shinyloadtest/issues/125'>#125</a>)</li>
 </ul>
 </div>
 <div id="improvements" class="section level3">
 <h3 class="hasAnchor">
 <a href="#improvements" class="anchor"></a>Improvements</h3>
 <ul>
-<li>The application server type is now captured in recording files. A corresponding enhancement was made to <code>shinycannon</code> that will produce a warning if the recording server type differs from the target (<a href="https://github.com/rstudio/shinyloadtest/pull/107"><a href='https://github.com/rstudio/shinyloadtest/issues/107'>#107</a></a>, <a href="https://github.com/rstudio/shinycannon/pull/36">rstudio/shinycannon<a href='https://github.com/rstudio/shinyloadtest/issues/36'>#36</a></a>)</li>
-<li>The way URLs are dealt with internally is now more robust, and should be tolerant of a wider variety of Shiny app deployment scenarios (<a href="https://github.com/rstudio/shinyloadtest/pull/119"><a href='https://github.com/rstudio/shinyloadtest/issues/119'>#119</a></a>.</li>
+<li>The application server type is now captured in recording files. A corresponding enhancement was made to <code>shinycannon</code> that will produce a warning if the recording server type differs from the target (<a href='https://github.com/rstudio/shinyloadtest/issues/107'>#107</a>), <a href="https://github.com/rstudio/shinycannon/pull/36">rstudio/shinycannon<a href='https://github.com/rstudio/shinyloadtest/issues/36'>#36</a></a>)</li>
+<li>The way URLs are dealt with internally is now more robust, and should be tolerant of a wider variety of Shiny app deployment scenarios (<a href='https://github.com/rstudio/shinyloadtest/issues/119'>#119</a>).</li>
 </ul>
 </div>
 </div>
@@ -174,7 +209,7 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by Alan Dipert, Barret Schloerke, Barbara Borges, <a href='https://www.rstudio.com'><img src="https://tidyverse.org/rstudio-logo.svg" height="24" /></a>.</p>
+  <p>Developed by Barret Schloerke, Alan Dipert, Barbara Borges, <a href='https://www.rstudio.com'><img src='https://www.tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.</p>
 </div>
 
 <div class="pkgdown">
@@ -185,6 +220,23 @@
    </div>
 
   
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.js" integrity="sha256-GKvGqXDznoRYHCwKXGnuchvKSwmx9SRMrZOTh2g4Sb0=" crossorigin="anonymous"></script>
+<script>
+  docsearch({
+    
+    
+    apiKey: '993bbaa8141e65ce07013c0f54fc3277',
+    indexName: 'shinyloadtest',
+    inputSelector: 'input#search-input.form-control',
+    transformData: function(hits) {
+      return hits.map(function (hit) {
+        hit.url = updateHitURL(hit);
+        return hit;
+      });
+    }
+  });
+</script>
+
 
 
   </body>

@@ -37,6 +37,12 @@
 <script src="../pkgdown.js"></script>
 
 
+<!-- docsearch -->
+<script src="../docsearch.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.3/docsearch.min.css" integrity="sha256-QOSRU/ra9ActyXkIBbiIB144aDBdtvXBcNc3OTNuX/Q=" crossorigin="anonymous" />
+<link href="../docsearch.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js" integrity="sha256-4HLtjeVgH0eIB3aZ9mLYF6E8oU5chNdjU6p6rrXpl9U=" crossorigin="anonymous"></script>
+
 
 
 <meta property="og:title" content="Record a Session for Load Test — record_session" />
@@ -74,7 +80,7 @@ between your web browser and the Shiny application at target_app_url." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">shinyloadtest</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.2.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
       </span>
     </div>
 
@@ -82,9 +88,8 @@ between your web browser and the Shiny application at target_app_url." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home"></span>
+    <span class="fas fa-home fa-lg"></span>
      
-    Home
   </a>
 </li>
 <li>
@@ -98,16 +103,21 @@ between your web browser and the Shiny application at target_app_url." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/analyzing-load-test-logs.html">Case study: interpreting load test results</a>
+      <a href="../articles/shinycannon.html">Installing and running shinycannon</a>
     </li>
     <li>
-      <a href="../articles/case-study-scaling.html">Case study: scaling an app</a>
+      <a href="../articles/analyzing-load-test-logs.html">Analyzing results</a>
     </li>
     <li>
-      <a href="../articles/load-testing-authenticated-apps.html">Load testing authenticated apps</a>
+      <a href="../articles/case-study-scaling.html">Case study: Scaling an app</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Advanced</li>
+    <li>
+      <a href="../articles/limitations-of-shinyloadtest.html">Limitations of shinyloadtest</a>
     </li>
     <li>
-      <a href="../articles/limitations-of-shinyloadtest.html">Limitations</a>
+      <a href="../articles/load-testing-authenticated-apps.html">Load Testing Authenticated Apps</a>
     </li>
     <li>
       <a href="../articles/troubleshooting-ssl.html">Troubleshooting SSL</a>
@@ -121,11 +131,17 @@ between your web browser and the Shiny application at target_app_url." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/rstudio/shinyloadtest/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
       </ul>
+      
+      <form class="navbar-form navbar-right hidden-xs hidden-sm" role="search">
+        <div class="form-group">
+          <input type="search" class="form-control" name="search-input" id="search-input" placeholder="Search..." aria-label="Search for..." autocomplete="off">
+        </div>
+      </form>
       
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
@@ -149,13 +165,14 @@ between your web browser and the Shiny application at target_app_url." />
 between your web browser and the Shiny application at <code>target_app_url</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>record_session</span>(
-  <span class='kw'>target_app_url</span>,
-  host = <span class='st'>"127.0.0.1"</span>,
-  port = <span class='fl'>8600</span>,
-  output_file = <span class='st'>"recording.log"</span>,
-  open_browser = <span class='fl'>TRUE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>record_session</span><span class='op'>(</span>
+  <span class='va'>target_app_url</span>,
+  host <span class='op'>=</span> <span class='st'>"127.0.0.1"</span>,
+  port <span class='op'>=</span> <span class='fl'>8600</span>,
+  output_file <span class='op'>=</span> <span class='st'>"recording.log"</span>,
+  open_browser <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  connect_api_key <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -181,6 +198,11 @@ default if port 8600 is used by another service.</p></td>
       <th>open_browser</th>
       <td><p>Whether to open a browser on the proxy (default=<code>TRUE</code>)
 or not (<code>FALSE</code>).</p></td>
+    </tr>
+    <tr>
+      <th>connect_api_key</th>
+      <td><p>An RStudio Connect api key. It may be useful to use
+<code><a href='https://rdrr.io/r/base/Sys.getenv.html'>Sys.getenv("CONNECT_API_KEY")</a></code>.</p></td>
     </tr>
     </table>
 
@@ -217,9 +239,9 @@ when the recording is played back with the <code>shinycannon</code> tool.</p>
     <div class='dont-index'><p><a href='https://rstudio.github.io/shinyloadtest/'><code>shinyloadtest</code> articles</a></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
-  <span class='fu'>record_session</span>(<span class='st'>"https://example.com/your-shiny-app/"</span>)
-}
+    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+  <span class='fu'>record_session</span><span class='op'>(</span><span class='st'>"https://example.com/your-shiny-app/"</span><span class='op'>)</span>
+<span class='op'>}</span>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -232,7 +254,7 @@ when the recording is played back with the <code>shinycannon</code> tool.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Alan Dipert, Barret Schloerke, Barbara Borges, <a href='https://www.rstudio.com'><img src="https://tidyverse.org/rstudio-logo.svg" height="24" /></a>.</p>
+  <p>Developed by Barret Schloerke, Alan Dipert, Barbara Borges, <a href='https://www.rstudio.com'><img src='https://www.tidyverse.org/rstudio-logo.svg' alt='RStudio' height='24' /></a>.</p>
 </div>
 
 <div class="pkgdown">
@@ -243,6 +265,23 @@ when the recording is played back with the <code>shinycannon</code> tool.</p>
    </div>
 
   
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docsearch.js/2.6.1/docsearch.min.js" integrity="sha256-GKvGqXDznoRYHCwKXGnuchvKSwmx9SRMrZOTh2g4Sb0=" crossorigin="anonymous"></script>
+<script>
+  docsearch({
+    
+    
+    apiKey: '993bbaa8141e65ce07013c0f54fc3277',
+    indexName: 'shinyloadtest',
+    inputSelector: 'input#search-input.form-control',
+    transformData: function(hits) {
+      return hits.map(function (hit) {
+        hit.url = updateHitURL(hit);
+        return hit;
+      });
+    }
+  });
+</script>
+
 
 
   </body>
