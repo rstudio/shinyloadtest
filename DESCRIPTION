@@ -4,7 +4,7 @@ Title: Load Test Shiny Applications
 Version: 1.1.0
 Authors@R: c(
             person("Barret", "Schloerke", role = c("aut", "cre"), email = "barret@rstudio.com", comment = c(ORCID = "0000-0001-9986-114X")),
-            person("Alan", "Dipert", role = c("aut"), email = "alan@rstudio.com"),
+            person("Alan", "Dipert", role = c("aut")),
             person("Barbara", "Borges", role = c("aut")),
             person("RStudio", role = c("cph", "fnd"))
             )
