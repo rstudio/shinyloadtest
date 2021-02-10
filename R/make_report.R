@@ -401,3 +401,10 @@ extract_legend <- function(p) {
     width_inches = legend_grob$widths %>% grid::convertUnit("inches") %>% as.numeric() %>% sum()
   )
 }
+
+
+# Use imports so they are believed to be used
+ignore <- function() {
+  # Used within ggsave when saving an svg
+  svglite::svglite
+}
