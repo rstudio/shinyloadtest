@@ -34,6 +34,9 @@ Barret
    Old maintainer(s):
      Alan Dipert <alan@rstudio.com>
 
+The previous maintainer, Alan Dipert (alan@rstudio.com), no longer works at RStudio, and his email address has been deactivated.
+I’d like to be the maintainer of this package from now on. If you need further information to confirm, please let me know.
+
 ## revdepcheck results
 
 There are 0 reverse dependencies
