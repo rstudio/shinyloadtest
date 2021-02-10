@@ -1,4 +1,4 @@
-# shinyloadtest (development version)
+# shinyloadtest 1.1.0
 
 * `load_runs()` now uses vroom instead of `read_csv()`; this substantially 
   improves its performance.
