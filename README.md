@@ -6,7 +6,7 @@
 [![R-CMD-check](https://github.com/rstudio/shinyloadtest/workflows/R-CMD-check/badge.svg)](https://github.com/rstudio/shinyloadtest/actions)
 <!-- badges: end -->
 
-The [`shinyloadtest` package](https://rstudio.github.io/shinyloadtest)
+The [`shinyloadtest` package](https://rstudio.github.io/shinyloadtest/)
 and the accompanying
 [`shinycannon`](https://github.com/rstudio/shinycannon) command line
 tool make it possible to **load test** deployed Shiny apps. Load testing
@@ -35,8 +35,8 @@ To perform a load test you’ll need two pieces of software:
     testing, but for best results we recommend installing it on a
     server, and preferably not the one the application under test is
     also on. See [installation
-    instructions](articles/shinycannon.html#installation) for operating
-    specific install instructions..
+    instructions](https://rstudio.github.io/shinyloadtest/articles/shinycannon.html#installation)
+    for operating specific install instructions..
 
 ## Quick Start
 
@@ -67,10 +67,10 @@ be created that contains a recording of the session. This recording will
 serve as the basis for the load test.
 
 If your application requires authentication, consult the [authentication
-article](articles/load-testing-authenticated-apps.html). Also be aware
-that [certain Shiny
-features](articles/limitations-of-shinyloadtest.html) are not compatible
-with shinyloadtest.
+article](https://rstudio.github.io/shinyloadtest/articles/load-testing-authenticated-apps.html).
+Also be aware that [certain Shiny
+features](https://rstudio.github.io/shinyloadtest/articles/limitations-of-shinyloadtest.html)
+are not compatible with shinyloadtest.
 
 ### Step 2: Run the Load Test
 
@@ -82,8 +82,9 @@ this:
 
     shinycannon recording.log https://shinyapp.example.com/ --workers 5 --loaded-duration-minutes 2 --output-dir run1
 
-See [the shinycannon article](articles/shinycannon.html#recording) for
-details.
+See [the shinycannon
+article](https://rstudio.github.io/shinyloadtest/articles/shinycannon.html#recording)
+for details.
 
 ### Step 3: Analyze the Results
 
@@ -98,6 +99,7 @@ shinyloadtest::shinyloadtest_report(df, "run1.html")
 
 This self contained html report will be opened in your browser for
 inspection. For further analysis explanation, please visit [Analysing
-load test logs](articles/analyzing-load-test-logs.html).
+load test
+logs](https://rstudio.github.io/shinyloadtest/articles/analyzing-load-test-logs.html).
 
 ![Analysis Example](man/figures/slt_report_screenshot.png)

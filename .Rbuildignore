@@ -21,3 +21,4 @@
 ^data-raw$
 ^\.github$
 README.Rmd
+^revdep$

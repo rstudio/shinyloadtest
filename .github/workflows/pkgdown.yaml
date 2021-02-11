@@ -3,6 +3,7 @@ on:
     branches:
       - main
       - master
+      - rc-v**
   pull_request:
     branches:
       - main

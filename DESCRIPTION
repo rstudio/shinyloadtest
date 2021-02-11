@@ -1,10 +1,10 @@
 Package: shinyloadtest
 Type: Package
 Title: Load Test Shiny Applications
-Version: 1.0.2.9001
+Version: 1.1.0
 Authors@R: c(
             person("Barret", "Schloerke", role = c("aut", "cre"), email = "barret@rstudio.com", comment = c(ORCID = "0000-0001-9986-114X")),
-            person("Alan", "Dipert", role = c("aut"), email = "alan@rstudio.com"),
+            person("Alan", "Dipert", role = c("aut")),
             person("Barbara", "Borges", role = c("aut")),
             person("RStudio", role = c("cph", "fnd"))
             )
@@ -55,8 +55,10 @@ Suggests:
     lubridate,
     progress,
     rmarkdown,
-    testthat
+    testthat,
+    spelling
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 SystemRequirements:
     pandoc (>= 2.2) - http://pandoc.org
+Language: en-US
