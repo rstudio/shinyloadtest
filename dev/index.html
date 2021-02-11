@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">shinyloadtest</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.0.2.9001</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">1.1.0.9000</span>
       </span>
     </div>
 
@@ -116,7 +116,7 @@
 <a href="#load-testing-shiny-applications" class="anchor"></a>Load Testing Shiny Applications</h1></div>
 <!-- badges: start -->
 
-<p>The <a href="https://rstudio.github.io/shinyloadtest"><code>shinyloadtest</code> package</a> and the accompanying <a href="https://github.com/rstudio/shinycannon"><code>shinycannon</code></a> command line tool make it possible to <strong>load test</strong> deployed Shiny apps. Load testing helps developers and administrators estimate how many users their application can support. If an application requires tuning, load testing and load test result analysis can be used to identify performance bottlenecks and to guide changes to infrastructure, configuration, or code.</p>
+<p>The <a href="https://rstudio.github.io/shinyloadtest/"><code>shinyloadtest</code> package</a> and the accompanying <a href="https://github.com/rstudio/shinycannon"><code>shinycannon</code></a> command line tool make it possible to <strong>load test</strong> deployed Shiny apps. Load testing helps developers and administrators estimate how many users their application can support. If an application requires tuning, load testing and load test result analysis can be used to identify performance bottlenecks and to guide changes to infrastructure, configuration, or code.</p>
 <p>Scientific load testing helps put to rest the common misconception that <strong>"</strong>Shiny doesn’t scale". As rstudio::conf(2018) Sean Lopp presented on <a href="https://rstudio.com/resources/rstudioconf-2018/scaling-shiny/">Scaling Shiny</a> which shows how to to horizontally scale an app to handle tens of thousands of users.</p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
@@ -126,7 +126,7 @@
 <li>
 <code>shinyloadtest</code> is an R package used to generate recordings and analyze results. You should install it on your development machine with <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("shinyloadtest")</a></code>.</li>
 <li>
-<code>shinycannon</code> is a command-line used to replay recordings in parallel. You can install it on your development machine for testing, but for best results we recommend installing it on a server, and preferably not the one the application under test is also on. See <a href="articles/shinycannon.html#installation">installation instructions</a> for operating specific install instructions..</li>
+<code>shinycannon</code> is a command-line used to replay recordings in parallel. You can install it on your development machine for testing, but for best results we recommend installing it on a server, and preferably not the one the application under test is also on. See <a href="https://rstudio.github.io/shinyloadtest/articles/shinycannon.html#installation">installation instructions</a> for operating specific install instructions..</li>
 </ul>
 </div>
 <div id="quick-start" class="section level2">
@@ -149,14 +149,14 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">shinyloadtest</span><span class="fu">::</span><span class="fu"><a href="reference/record_session.html">record_session</a></span><span class="op">(</span><span class="st">'https://shinyapp.example.com/'</span><span class="op">)</span></code></pre></div>
 <p>Running the function will open a browser displaying the app. Once open, interact with the application as a typical user might then close the browser. After closing the app, a file (<code>recording.log</code> by default) will be created that contains a recording of the session. This recording will serve as the basis for the load test.</p>
-<p>If your application requires authentication, consult the <a href="articles/load-testing-authenticated-apps.html">authentication article</a>. Also be aware that <a href="articles/limitations-of-shinyloadtest.html">certain Shiny features</a> are not compatible with shinyloadtest.</p>
+<p>If your application requires authentication, consult the <a href="https://rstudio.github.io/shinyloadtest/articles/load-testing-authenticated-apps.html">authentication article</a>. Also be aware that <a href="https://rstudio.github.io/shinyloadtest/articles/limitations-of-shinyloadtest.html">certain Shiny features</a> are not compatible with shinyloadtest.</p>
 </div>
 <div id="step-2-run-the-load-test" class="section level3">
 <h3 class="hasAnchor">
 <a href="#step-2-run-the-load-test" class="anchor"></a>Step 2: Run the Load Test</h3>
 <p>With the recording in hand, we’re ready to run the load test. The actual test is conducted outside of R using the <code>shinycannon</code> command-line tool. You can run it using your system’s terminal or console program, or you can run it from the RStudio terminal tab. A typical run looks like this:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>shinycannon recording.log https<span class="op">:</span><span class="er">//</span>shinyapp.example.com<span class="op">/</span><span class="st"> </span><span class="op">--</span>workers <span class="dv">5</span> <span class="op">--</span>loaded<span class="op">-</span>duration<span class="op">-</span>minutes <span class="dv">2</span> <span class="op">--</span>output<span class="op">-</span>dir run1</span></code></pre></div>
-<p>See <a href="articles/shinycannon.html#recording">the shinycannon article</a> for details.</p>
+<p>See <a href="https://rstudio.github.io/shinyloadtest/articles/shinycannon.html#recording">the shinycannon article</a> for details.</p>
 </div>
 <div id="step-3-analyze-the-results" class="section level3">
 <h3 class="hasAnchor">
@@ -165,7 +165,7 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">shinyloadtest</span><span class="fu">::</span><span class="fu"><a href="reference/load_runs.html">load_runs</a></span><span class="op">(</span><span class="st">"run1"</span><span class="op">)</span>
 <span class="fu">shinyloadtest</span><span class="fu">::</span><span class="fu"><a href="reference/shinyloadtest_report.html">shinyloadtest_report</a></span><span class="op">(</span><span class="va">df</span>, <span class="st">"run1.html"</span><span class="op">)</span></code></pre></div>
-<p>This self contained html report will be opened in your browser for inspection. For further analysis explanation, please visit <a href="articles/analyzing-load-test-logs.html">Analysing load test logs</a>.</p>
+<p>This self contained html report will be opened in your browser for inspection. For further analysis explanation, please visit <a href="https://rstudio.github.io/shinyloadtest/articles/analyzing-load-test-logs.html">Analysing load test logs</a>.</p>
 <p><img src="reference/figures/slt_report_screenshot.png" alt="Analysis Example"></p>
 </div>
 </div>
