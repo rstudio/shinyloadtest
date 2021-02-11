@@ -2,7 +2,7 @@
 
 * `record_session()` gained a new variable `connect_api_key` to be able to
   record a session against RStudio Connect using a Connect API key. Please see
-  [Load Testing Authenticated Apps](https://rstudio.github.io/shinyloadtest/dev/articles/load-testing-authenticated-apps.html)
+  [Load Testing Authenticated Apps](https://rstudio.github.io/shinyloadtest/articles/load-testing-authenticated-apps.html)
   for more details. Using a Connect API key also requires `shinycannon` >= 1.1.0
   (#133)
 
