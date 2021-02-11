@@ -1,3 +1,10 @@
+# shinyloadtest (development version)
+
+### Bug Fixes
+
+### Improvements
+
+
 # shinyloadtest 1.1.0
 
 * `record_session()` gained a new variable `connect_api_key` to be able to
