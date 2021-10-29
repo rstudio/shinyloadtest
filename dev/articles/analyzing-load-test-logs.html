@@ -139,19 +139,19 @@
 <p><code><a href="../reference/load_runs.html">load_runs()</a></code> returns a tidy tibble:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span>
-<span class="co">#&gt; # A tibble: 11,729 x 13</span>
-<span class="co">#&gt;    run   user_id session_id iteration input_line_numb… event start   end   time</span>
-<span class="co">#&gt;    &lt;ord&gt;   &lt;int&gt;      &lt;int&gt;     &lt;int&gt;            &lt;int&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;</span>
-<span class="co">#&gt;  1 1 us…       0          0         0                1 REQ_… 0     0.308 0.308 </span>
-<span class="co">#&gt;  2 1 us…       0          0         0                2 REQ_… 0.309 0.316 0.007 </span>
-<span class="co">#&gt;  3 1 us…       0          0         0                3 REQ_… 0.316 0.323 0.007 </span>
-<span class="co">#&gt;  4 1 us…       0          0         0                4 REQ_… 0.323 0.33  0.007 </span>
-<span class="co">#&gt;  5 1 us…       0          0         0                5 REQ_… 0.33  0.339 0.009 </span>
-<span class="co">#&gt;  6 1 us…       0          0         0                6 REQ_… 0.339 0.351 0.0120</span>
-<span class="co">#&gt;  7 1 us…       0          0         0                7 REQ_… 0.351 0.361 0.01  </span>
-<span class="co">#&gt;  8 1 us…       0          0         0                8 REQ_… 0.361 0.365 0.004 </span>
-<span class="co">#&gt;  9 1 us…       0          0         0                9 REQ_… 0.366 0.373 0.007 </span>
-<span class="co">#&gt; 10 1 us…       0          0         0               10 REQ_… 0.373 0.382 0.009 </span>
+<span class="co">#&gt; # A tibble: 11,729 × 13</span>
+<span class="co">#&gt;    run   user_id session_id iteration input_line_numb… event start   end    time</span>
+<span class="co">#&gt;    &lt;ord&gt;   &lt;int&gt;      &lt;int&gt;     &lt;int&gt;            &lt;int&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt;  1 1 us…       0          0         0                1 REQ_… 0     0.308 0.308  </span>
+<span class="co">#&gt;  2 1 us…       0          0         0                2 REQ_… 0.309 0.316 0.00700</span>
+<span class="co">#&gt;  3 1 us…       0          0         0                3 REQ_… 0.316 0.323 0.00700</span>
+<span class="co">#&gt;  4 1 us…       0          0         0                4 REQ_… 0.323 0.33  0.00700</span>
+<span class="co">#&gt;  5 1 us…       0          0         0                5 REQ_… 0.33  0.339 0.00900</span>
+<span class="co">#&gt;  6 1 us…       0          0         0                6 REQ_… 0.339 0.351 0.0120 </span>
+<span class="co">#&gt;  7 1 us…       0          0         0                7 REQ_… 0.351 0.361 0.0100 </span>
+<span class="co">#&gt;  8 1 us…       0          0         0                8 REQ_… 0.361 0.365 0.00400</span>
+<span class="co">#&gt;  9 1 us…       0          0         0                9 REQ_… 0.366 0.373 0.00700</span>
+<span class="co">#&gt; 10 1 us…       0          0         0               10 REQ_… 0.373 0.382 0.00900</span>
 <span class="co">#&gt; # … with 11,719 more rows, and 4 more variables: concurrency &lt;dbl&gt;,</span>
 <span class="co">#&gt; #   maintenance &lt;lgl&gt;, label &lt;ord&gt;, json &lt;list&gt;</span></code></pre></div>
 <p>The first three variables identify each simulated session:</p>
