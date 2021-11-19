@@ -3,7 +3,7 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/rstudio/shinyloadtest/workflows/R-CMD-check/badge.svg)](https://github.com/rstudio/shinyloadtest/actions)
+[![R-CMD-check](https://github.com/rstudio/shinyloadtest/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rstudio/shinyloadtest/actions)
 <!-- badges: end -->
 
 The [`shinyloadtest` package](https://rstudio.github.io/shinyloadtest/)
