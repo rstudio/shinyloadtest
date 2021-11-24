@@ -36,7 +36,7 @@ devinstall: demo_data document
 	R CMD INSTALL --no-multiarch --with-keep.source .
 
 prep_vignettes: devinstall
-	HEADLESS=TRUE Rscript scripts/test_sessions.R && rm Rplots.pdf
+	HEADLESS=TRUE Rscript -e 'source("scripts/test_sessions.R", echo = TRUE, local = TRUE)' && rm Rplots.pdf
 
 rcmdcheck:
 	R CMD check --as-cran `Rscript -e 'cat(devtools::build(quiet = TRUE))'`
