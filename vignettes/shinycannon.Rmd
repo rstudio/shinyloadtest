@@ -89,9 +89,9 @@ kable(linux_packages)
 In addition to these two required arguments, `shinycannon` accepts a number of optional arguments that can be specified with flags.
 Of these, the most interesting are:
 
-1.  **--workers**: The number of concurrent users to simulate. `shinycannon` uses threads to represent each user. It defaults to 1.
-2.  **--loaded-duration-minutes**: The duration of the load test, in minutes. This does not include "warmup time", which is the time shinycannon spends gradually increasing the number of workers, or "cooldown time", which is the time spent decreasing the number of workers. It defaults to 0, meaning that after all workers have "warmed up", they will immediately begin to "cool down". Generally, you'll want to set this to a duration greater than 0. `shinycannon` will re-run the recording as necessary to fill the time.
-3.  **--output-dir**: Name of the directory to create and store timing information in.
+1.  `--workers`: The number of concurrent users to simulate. `shinycannon` uses threads to represent each user. It defaults to 1.
+2.  `--loaded-duration-minutes`: The duration of the load test, in minutes. This does not include "warmup time", which is the time shinycannon spends gradually increasing the number of workers, or "cooldown time", which is the time spent decreasing the number of workers. It defaults to 0, meaning that after all workers have "warmed up", they will immediately begin to "cool down". Generally, you'll want to set this to a duration greater than 0. `shinycannon` will re-run the recording as necessary to fill the time.
+3.  `--output-dir`: Name of the directory to create and store timing information in.
 
 As an example, to run a load test simulating 5 concurrent users for at least 2 minutes, outputting to the directory `run1`:
 
