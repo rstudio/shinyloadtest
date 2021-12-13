@@ -2,21 +2,21 @@
   "index_name": "shinyloadtest",
   "start_urls": [
     {
-      "url": "https://rstudio.github.io/shinyloadtest//index.html",
+      "url": "https://rstudio.github.io/shinyloadtest/index.html",
       "selectors_key": "homepage",
       "tags": [
         "homepage"
       ]
     },
     {
-      "url": "https://rstudio.github.io/shinyloadtest//reference",
+      "url": "https://rstudio.github.io/shinyloadtest/reference",
       "selectors_key": "reference",
       "tags": [
         "reference"
       ]
     },
     {
-      "url": "https://rstudio.github.io/shinyloadtest//articles",
+      "url": "https://rstudio.github.io/shinyloadtest/articles",
       "selectors_key": "articles",
       "tags": [
         "articles"
@@ -30,7 +30,7 @@
     "/articles/index.html"
   ],
   "sitemap_urls": [
-    "https://rstudio.github.io/shinyloadtest//sitemap.xml"
+    "https://rstudio.github.io/shinyloadtest/sitemap.xml"
   ],
   "selectors": {
     "homepage": {

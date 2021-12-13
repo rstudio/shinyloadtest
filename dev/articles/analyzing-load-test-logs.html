@@ -22,6 +22,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
@@ -40,12 +42,6 @@
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -66,7 +62,8 @@
       <a href="../articles/case-study-scaling.html">Case study: Scaling an app</a>
     </li>
     <li class="divider">
-    <li class="dropdown-header">Advanced</li>
+    </li>
+<li class="dropdown-header">Advanced</li>
     <li>
       <a href="../articles/limitations-of-shinyloadtest.html">Limitations of shinyloadtest</a>
     </li>
@@ -84,7 +81,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/rstudio/shinyloadtest/">
+  <a href="https://github.com/rstudio/shinyloadtest/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -110,9 +107,9 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Analyzing results</h1>
             
-            <h4 class="date">2018-09-05</h4>
+            <h4 data-toc-skip class="date">2018-09-05</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/rstudio/shinyloadtest/blob/master/vignettes/analyzing-load-test-logs.Rmd"><code>vignettes/analyzing-load-test-logs.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/rstudio/shinyloadtest/blob/HEAD/vignettes/analyzing-load-test-logs.Rmd" class="external-link"><code>vignettes/analyzing-load-test-logs.Rmd</code></a></small>
       <div class="hidden name"><code>analyzing-load-test-logs.Rmd</code></div>
 
     </div>
@@ -121,11 +118,11 @@
     
 <p>This vignette shows you how to analyse the results of your load tests, explaining the plots produced in the report, and giving a few tips on interpretation.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/shinyloadtest/">shinyloadtest</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></code></pre></div>
-<div id="loading-data" class="section level2">
-<h2 class="hasAnchor">
-<a href="#loading-data" class="anchor"></a>Loading data</h2>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/shinyloadtest/">shinyloadtest</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></code></pre></div>
+<div class="section level2">
+<h2 id="loading-data">Loading data<a class="anchor" aria-label="anchor" href="#loading-data"></a>
+</h2>
 <p>Start by loading the <code>shinycannon</code> results into R with <code><a href="../reference/load_runs.html">load_runs()</a></code>. If you have a single run, just give it the directory of the results:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_runs.html">load_runs</a></span><span class="op">(</span><span class="st">"test_sessions/demo1"</span><span class="op">)</span></code></pre></div>
@@ -139,21 +136,21 @@
 <p><code><a href="../reference/load_runs.html">load_runs()</a></code> returns a tidy tibble:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span>
-<span class="co">#&gt; # A tibble: 11,729 × 13</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 11,729 × 13</span></span>
 <span class="co">#&gt;    run   user_id session_id iteration input_line_numb… event start   end    time</span>
-<span class="co">#&gt;    &lt;ord&gt;   &lt;int&gt;      &lt;int&gt;     &lt;int&gt;            &lt;int&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;</span>
-<span class="co">#&gt;  1 1 us…       0          0         0                1 REQ_… 0     0.308 0.308  </span>
-<span class="co">#&gt;  2 1 us…       0          0         0                2 REQ_… 0.309 0.316 0.00700</span>
-<span class="co">#&gt;  3 1 us…       0          0         0                3 REQ_… 0.316 0.323 0.00700</span>
-<span class="co">#&gt;  4 1 us…       0          0         0                4 REQ_… 0.323 0.33  0.00700</span>
-<span class="co">#&gt;  5 1 us…       0          0         0                5 REQ_… 0.33  0.339 0.00900</span>
-<span class="co">#&gt;  6 1 us…       0          0         0                6 REQ_… 0.339 0.351 0.0120 </span>
-<span class="co">#&gt;  7 1 us…       0          0         0                7 REQ_… 0.351 0.361 0.0100 </span>
-<span class="co">#&gt;  8 1 us…       0          0         0                8 REQ_… 0.361 0.365 0.00400</span>
-<span class="co">#&gt;  9 1 us…       0          0         0                9 REQ_… 0.366 0.373 0.00700</span>
-<span class="co">#&gt; 10 1 us…       0          0         0               10 REQ_… 0.373 0.382 0.00900</span>
-<span class="co">#&gt; # … with 11,719 more rows, and 4 more variables: concurrency &lt;dbl&gt;,</span>
-<span class="co">#&gt; #   maintenance &lt;lgl&gt;, label &lt;ord&gt;, json &lt;list&gt;</span></code></pre></div>
+<span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;ord&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 1 us…       0          0         0                1 REQ_… 0     0.308 0.308  </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 1 us…       0          0         0                2 REQ_… 0.309 0.316 0.007<span style="text-decoration: underline;">00</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 1 us…       0          0         0                3 REQ_… 0.316 0.323 0.007<span style="text-decoration: underline;">00</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 1 us…       0          0         0                4 REQ_… 0.323 0.33  0.007<span style="text-decoration: underline;">00</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 1 us…       0          0         0                5 REQ_… 0.33  0.339 0.009<span style="text-decoration: underline;">00</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 1 us…       0          0         0                6 REQ_… 0.339 0.351 0.012<span style="text-decoration: underline;">0</span> </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 1 us…       0          0         0                7 REQ_… 0.351 0.361 0.010<span style="text-decoration: underline;">0</span> </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 1 us…       0          0         0                8 REQ_… 0.361 0.365 0.004<span style="text-decoration: underline;">00</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 1 us…       0          0         0                9 REQ_… 0.366 0.373 0.007<span style="text-decoration: underline;">00</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 1 us…       0          0         0               10 REQ_… 0.373 0.382 0.009<span style="text-decoration: underline;">00</span></span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 11,719 more rows, and 4 more variables: concurrency &lt;dbl&gt;,</span></span>
+<span class="co">#&gt; <span style="color: #949494;">#   maintenance &lt;lgl&gt;, label &lt;ord&gt;, json &lt;list&gt;</span></span></code></pre></div>
 <p>The first three variables identify each simulated session:</p>
 <ul>
 <li>
@@ -165,17 +162,17 @@
 </ul>
 <p><code><a href="../reference/load_runs.html">?load_runs</a></code> provides a full description of all the variables.</p>
 </div>
-<div id="report-output" class="section level2">
-<h2 class="hasAnchor">
-<a href="#report-output" class="anchor"></a>Report output</h2>
+<div class="section level2">
+<h2 id="report-output">Report output<a class="anchor" aria-label="anchor" href="#report-output"></a>
+</h2>
 <p>You won’t generally work with this data directly — instead, you’ll usually start by creating a standalone HTML report:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/shinyloadtest_report.html">shinyloadtest_report</a></span><span class="op">(</span><span class="va">df</span>, <span class="st">"report.html"</span><span class="op">)</span></code></pre></div>
 <p>This report contains six pages of diagnostic information: sessions, session duration, event waterfall, latency, event duration, and event concurrency. I describe each page below.</p>
 </div>
-<div id="sessions" class="section level2">
-<h2 class="hasAnchor">
-<a href="#sessions" class="anchor"></a>Sessions</h2>
+<div class="section level2">
+<h2 id="sessions">Sessions<a class="anchor" aria-label="anchor" href="#sessions"></a>
+</h2>
 <p>The <strong>Sessions</strong> page displays the summarises the simulated sessions performed by each shinycannon worker. Each row represent one worker and each rectangle represents one event. The width of the rectangle gives the duration of the event, and the colour gives the event type. For example, the following plot shows the actions performed by 4 workers over 5 minutes (600s):</p>
 <p><img src="analyzing-load-test-logs_files/figure-html/unnamed-chunk-6-1.png" width="100%"></p>
 <p>If you use more workers, you’ll see more rows. The following plot shows the results from 16 simultaneous workers:</p>
@@ -184,7 +181,7 @@
 <ul>
 <li><p>Homepage (red): the browser first loads the HTML homepage generated by your <code>ui</code>, representing the start of a new simulated session. If the first session takes a long time to load, you’re probably doing too much work on start up (but you’ll have also noticed this when starting the app yourself). If subsequent sessions take a long time, you probably have a <code>ui()</code> function that is doing too much work.</p></li>
 <li><p>JS/CSS (orange): once the browser has read the homepage, it next requests the <code>.css</code> and <code>.js</code> files needed to render the page. It is very rare for these to take a long time, and typically if they do it’s because the server is “blocked” waiting for computation requested by another worker.</p></li>
-<li><p>Start session (green): now the browser creates a bi-direction line of communication to the Shiny session using <a href="http://sockjs.org">SockJS</a>. The browser uses this to notify Shiny when the user interacts with an input, and Shiny uses it to tell the browser how to update the outputs.</p></li>
+<li><p>Start session (green): now the browser creates a bi-direction line of communication to the Shiny session using <a href="http://sockjs.org" class="external-link">SockJS</a>. The browser uses this to notify Shiny when the user interacts with an input, and Shiny uses it to tell the browser how to update the outputs.</p></li>
 <li><p>Calculate (blue): the user has changed an input and Shiny has performed computation to update an output or execute an observer.</p></li>
 <li><p>Waiting (uncoloured): the app is waiting for input; i.e. the user is thinking about what to do next.</p></li>
 </ul>
@@ -197,35 +194,35 @@
 <p>The rest of the report will focus on sessions in the maintenance phase since these represent an app under the full load of simultaneous users. If the maintenance period is a only a small proportion of the full app, you’ll need to re-run the simulation with a greater <code>--loaded-duration-minutes</code> value.</p>
 <p>The sessions tab gives you an overview of the experimental design (how sessions were assigned to workers), so you’ll generally only spend a small amount of time on this page before moving on to the <strong>session duration</strong>.</p>
 </div>
-<div id="session-duration" class="section level2">
-<h2 class="hasAnchor">
-<a href="#session-duration" class="anchor"></a>Session duration</h2>
+<div class="section level2">
+<h2 id="session-duration">Session duration<a class="anchor" aria-label="anchor" href="#session-duration"></a>
+</h2>
 <p>The <strong>Session duration</strong> page uses similar graphical conventions to the <strong>Session</strong> page but instead of one worker per row, we now have one session per row, and the time on the x-axis is relative to session start. A red line shows the running time of the original script.</p>
 <p><img src="analyzing-load-test-logs_files/figure-html/unnamed-chunk-8-1.png" width="100%"></p>
 <p>This plot shows us that most sessions are completed in about the same amount of time as the original script, which suggests that the app can comfortably handle four simultaneous users. We get a very different picture if we look at the performance of the app with 16 simultaneous users:</p>
 <p><img src="analyzing-load-test-logs_files/figure-html/unnamed-chunk-9-1.png" width="100%"></p>
 <p>The fastest session now takes ~4 times longer than the original recording, and there’s one session that takes twice again as long again. This suggests that we’ve overloaded the server and we either need to increase server resources or optimise the app.</p>
 </div>
-<div id="event-waterfall" class="section level2">
-<h2 class="hasAnchor">
-<a href="#event-waterfall" class="anchor"></a>Event waterfall</h2>
+<div class="section level2">
+<h2 id="event-waterfall">Event waterfall<a class="anchor" aria-label="anchor" href="#event-waterfall"></a>
+</h2>
 <p>The <strong>Event Waterfall</strong> gives a more precise view into the individual events within a recording. Each line represents a session, with events running from top to bottom, and elapsed time on the x-axis.</p>
 <p><img src="analyzing-load-test-logs_files/figure-html/unnamed-chunk-10-1.png" width="100%"></p>
 <p>In this plot you’re primarily looking for uniform shape. In particular, you want the lines to be parallel, because a crossing line indicates that user A started before user B, but finished afterwards (this is like seeing the table that ordered after you get their food first). We can see this problem in different run, where a file was uploaded and many POST requests were made.</p>
 <p><img src="analyzing-load-test-logs_files/figure-html/unnamed-chunk-11-1.png" width="100%"></p>
 </div>
-<div id="latency" class="section level2">
-<h2 class="hasAnchor">
-<a href="#latency" class="anchor"></a>Latency</h2>
+<div class="section level2">
+<h2 id="latency">Latency<a class="anchor" aria-label="anchor" href="#latency"></a>
+</h2>
 <p>The <strong>Latency</strong> page summarises the amount of time spent waiting, broken down in to total HTTP (homepage + js/css) and websockets (representing calculation). The <strong>Total HTTP</strong> latency plot shows how long a user has to wait before they see <em>something</em> in their browser. Ideally, this will be very short since the server is just providing static files.</p>
 <p><img src="analyzing-load-test-logs_files/figure-html/unnamed-chunk-12-1.png" width="100%"></p>
 <p>The variability is because R is single threaded; if Shiny is performing a computation for another worker, it can’t launch the transmission of static files.</p>
 <p>The <strong>Maximum WebSocket</strong> latency shows how much time time a user spends waiting for outputs to be updated. This basically represents how much time R spends computing. To make this faster, you’ll need to make your R code faster.</p>
 <p><img src="analyzing-load-test-logs_files/figure-html/unnamed-chunk-13-1.png" width="100%"></p>
 </div>
-<div id="event-duration" class="section level2">
-<h2 class="hasAnchor">
-<a href="#event-duration" class="anchor"></a>Event duration</h2>
+<div class="section level2">
+<h2 id="event-duration">Event duration<a class="anchor" aria-label="anchor" href="#event-duration"></a>
+</h2>
 <p>The <strong>Event Duration</strong> page helps understand the variability of individual events. Each event is summarised with a boxplot, with run on the x-axis and time on the y-axis:</p>
 <p><img src="analyzing-load-test-logs_files/figure-html/unnamed-chunk-14-1.png" width="100%"></p>
 <p>Since there are typically many events, and most are uninteresting, the report gives you three ways to find interesting events:</p>
@@ -236,9 +233,9 @@
 </ul>
 <p>These plots can help you find events that are either slow, or have high variability. You’ll then need to backtrack to the underlying Shiny code and think about how to improve performance.</p>
 </div>
-<div id="event-concurrency" class="section level2">
-<h2 class="hasAnchor">
-<a href="#event-concurrency" class="anchor"></a>Event concurrency</h2>
+<div class="section level2">
+<h2 id="event-concurrency">Event concurrency<a class="anchor" aria-label="anchor" href="#event-concurrency"></a>
+</h2>
 <p>The <strong>Event Concurrency</strong> page helps you understand how events responded to varying degrees of concurrent load. Each simulated session is represented by a point with number of concurrent processes on the x-axis and time taken on the y-axis. The points are coloured by run. Each run also gets a line of best fit, which gives a sense for how the event respond to increasing concurrency.</p>
 <p><img src="analyzing-load-test-logs_files/figure-html/unnamed-chunk-15-1.png" width="100%"></p>
 <p>Like <strong>Event Duration</strong>, most events are uninteresting, so the report gives you three ways of sorting to find interesting events:</p>
@@ -262,11 +259,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Barret Schloerke, Alan Dipert, Barbara Borges, <a href="https://www.rstudio.com"><img src="https://www.tidyverse.org/rstudio-logo.svg" alt="RStudio" height="24"></a>.</p>
+  <p></p>
+<p>Developed by Barret Schloerke, Alan Dipert, Barbara Borges, <a href="https://www.rstudio.com" class="external-link"><img src="https://www.tidyverse.org/rstudio-logo.svg" alt="RStudio" width="72"></a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>

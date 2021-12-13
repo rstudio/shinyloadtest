@@ -22,6 +22,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
@@ -40,12 +42,6 @@
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -66,7 +62,8 @@
       <a href="../articles/case-study-scaling.html">Case study: Scaling an app</a>
     </li>
     <li class="divider">
-    <li class="dropdown-header">Advanced</li>
+    </li>
+<li class="dropdown-header">Advanced</li>
     <li>
       <a href="../articles/limitations-of-shinyloadtest.html">Limitations of shinyloadtest</a>
     </li>
@@ -84,7 +81,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/rstudio/shinyloadtest/">
+  <a href="https://github.com/rstudio/shinyloadtest/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -110,9 +107,9 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Case study: Scaling an app</h1>
             
-            <h4 class="date">2018-09-05</h4>
+            <h4 data-toc-skip class="date">2018-09-05</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/rstudio/shinyloadtest/blob/master/vignettes/case-study-scaling.Rmd"><code>vignettes/case-study-scaling.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/rstudio/shinyloadtest/blob/HEAD/vignettes/case-study-scaling.Rmd" class="external-link"><code>vignettes/case-study-scaling.Rmd</code></a></small>
       <div class="hidden name"><code>case-study-scaling.Rmd</code></div>
 
     </div>
@@ -120,11 +117,11 @@
     
     
 <p><code>shinyloadtest</code> and <code>shinycannon</code> are tools to help you assess your application’s performance. Since they are only tools to measure performance and not to improve it, they must be used as part of a larger workflow.</p>
-<p>In this case study, we’ll introduce a workflow — <em>the optimization loop</em> — and apply the workflow to the process of optimizing the <a href="https://github.com/rstudio/cranwhales">cranwhales</a> demo application.</p>
+<p>In this case study, we’ll introduce a workflow — <em>the optimization loop</em> — and apply the workflow to the process of optimizing the <a href="https://github.com/rstudio/cranwhales" class="external-link">cranwhales</a> demo application.</p>
 <p>For a lighter treatment of <code>shinyloadtest</code> that will get you using it faster, you may consider starting with <a href="..">the introductory tutorial</a> instead.</p>
-<div id="the-optimization-loop" class="section level2">
-<h2 class="hasAnchor">
-<a href="#the-optimization-loop" class="anchor"></a>The Optimization Loop</h2>
+<div class="section level2">
+<h2 id="the-optimization-loop">The Optimization Loop<a class="anchor" aria-label="anchor" href="#the-optimization-loop"></a>
+</h2>
 <p><img src="images/loop.svg"></p>
 <p>The optimization loop is a general methodology for approaching optimization work. Applied to the problem of capacity optimization, which is the area <code>shinyloadtest</code> is helpful in, the steps are defined as:</p>
 <ol style="list-style-type: decimal">
@@ -133,27 +130,27 @@
 <li>
 <strong>Analyze</strong>: Visualize and interpret the metrics. <code><a href="../reference/load_runs.html">shinyloadtest::load_runs</a></code> is used for this part. If it looks like <em>n</em> users can be supported, stop here. Otherwise, go to the next step.</li>
 <li>
-<strong>Recommend</strong>: Based on analysis, propose a way for the capacity of the application to be increased. Patterns in the metrics can help you identify what change in the application or its configuration would be most beneficial. It could be a code change, like <a href="https://rstudio.github.io/promises/articles/casestudy.html">converting the app to async</a>, or a configuration change, like increasing the number of R processes allocated to the application in RStudio Connect or Shiny Server Pro.</li>
+<strong>Recommend</strong>: Based on analysis, propose a way for the capacity of the application to be increased. Patterns in the metrics can help you identify what change in the application or its configuration would be most beneficial. It could be a code change, like <a href="https://rstudio.github.io/promises/articles/casestudy.html" class="external-link">converting the app to async</a>, or a configuration change, like increasing the number of R processes allocated to the application in RStudio Connect or Shiny Server Pro.</li>
 <li>
 <strong>Optimize</strong>: Implement one or more of the recommendations and benchmark again. Repeat the process until the application supports <em>n</em> users to your satisfaction.</li>
 </ol>
 </div>
-<div id="the-cranwhales-demo-app" class="section level2">
-<h2 class="hasAnchor">
-<a href="#the-cranwhales-demo-app" class="anchor"></a>The cranwhales demo app</h2>
-<p>For the purposes of this case study, we’ll pretend that <a href="https://github.com/rstudio/cranwhales">cranwhales</a> is an app we wrote and that we’re interested in ensuring it can support a minimum number of concurrent users. In a nutshell, cranwhales is a way to visualize anonymized download statistics from RStudio’s <code>0-Cloud</code> CRAN mirror. For more on the app’s features, see <a href="https://rstudio.github.io/promises/articles/casestudy.html#a-tour-of-the-app">the tour</a>.</p>
+<div class="section level2">
+<h2 id="the-cranwhales-demo-app">The cranwhales demo app<a class="anchor" aria-label="anchor" href="#the-cranwhales-demo-app"></a>
+</h2>
+<p>For the purposes of this case study, we’ll pretend that <a href="https://github.com/rstudio/cranwhales" class="external-link">cranwhales</a> is an app we wrote and that we’re interested in ensuring it can support a minimum number of concurrent users. In a nutshell, cranwhales is a way to visualize anonymized download statistics from RStudio’s <code>0-Cloud</code> CRAN mirror. For more on the app’s features, see <a href="https://rstudio.github.io/promises/articles/casestudy.html#a-tour-of-the-app" class="external-link">the tour</a>.</p>
 <p><img src="images/cranwhales.png"></p>
-<p>cranwhales was written by <a href="https://twitter.com/jcheng">Joe Cheng</a> to demonstrate Shiny’s <a href="https://blog.rstudio.com/2018/06/26/shiny-1-1-0/">async capabilities</a>. We use it here because it’s close to a typical Shiny app in size and scope, and because it’s already given an optimization treatment in <a href="https://rstudio.github.io/promises/articles/casestudy.html">Joe’s async case study</a>.</p>
+<p>cranwhales was written by <a href="https://twitter.com/jcheng" class="external-link">Joe Cheng</a> to demonstrate Shiny’s <a href="https://blog.rstudio.com/2018/06/26/shiny-1-1-0/" class="external-link">async capabilities</a>. We use it here because it’s close to a typical Shiny app in size and scope, and because it’s already given an optimization treatment in <a href="https://rstudio.github.io/promises/articles/casestudy.html" class="external-link">Joe’s async case study</a>.</p>
 <p>Joe’s case study focuses on the <strong>optimize</strong> step and the mechanics of improving performance with an emphasis on using async to do so. Here, we’ll instead focus on the <strong>benchmark</strong> and <strong>analyze</strong> steps as enabled by <code>shinyloadtest</code> and <code>shinycannon</code>.</p>
 </div>
-<div id="deployment" class="section level2">
-<h2 class="hasAnchor">
-<a href="#deployment" class="anchor"></a>Deployment</h2>
-<p>cranwhales is currently <a href="https://gallery.shinyapps.io/cranwhales/">deployed on shinyapps.io</a>, but we’ll assume for this case study that you’ve deployed cranwhales to your own <a href="https://www.rstudio.com/products/connect/">RStudio Connect</a> instance with default runtime/scheduler settings. <code>shinyloadtest</code> is capable of benchmarking and generating load against apps that <a href="load-testing-authenticated-apps.Rmd">require authentication</a> but we’ll assume your deployment of cranwhales is accessible without authentication.</p>
+<div class="section level2">
+<h2 id="deployment">Deployment<a class="anchor" aria-label="anchor" href="#deployment"></a>
+</h2>
+<p>cranwhales is currently <a href="https://gallery.shinyapps.io/cranwhales/" class="external-link">deployed on shinyapps.io</a>, but we’ll assume for this case study that you’ve deployed cranwhales to your own <a href="https://www.rstudio.com/products/connect/" class="external-link">RStudio Connect</a> instance with default runtime/scheduler settings. <code>shinyloadtest</code> is capable of benchmarking and generating load against apps that <a href="load-testing-authenticated-apps.Rmd">require authentication</a> but we’ll assume your deployment of cranwhales is accessible without authentication.</p>
 </div>
-<div id="benchmark" class="section level2">
-<h2 class="hasAnchor">
-<a href="#benchmark" class="anchor"></a>Benchmark</h2>
+<div class="section level2">
+<h2 id="benchmark">Benchmark<a class="anchor" aria-label="anchor" href="#benchmark"></a>
+</h2>
 <p>The first step is benchmarking, and we’ll do it in several sub-steps:</p>
 <ol style="list-style-type: decimal">
 <li>Record a realistic session using <code><a href="../reference/record_session.html">shinyloadtest::record_session</a></code>
@@ -162,26 +159,26 @@
 <li>Pick a number <strong>n</strong>, the number of users we want to be able to use the app at the same time</li>
 <li>Run <code>shinycannon</code> with <strong>n</strong> users, producing another directory of metric data</li>
 </ol>
-<div id="record-a-session" class="section level3">
-<h3 class="hasAnchor">
-<a href="#record-a-session" class="anchor"></a>Record a session</h3>
+<div class="section level3">
+<h3 id="record-a-session">Record a session<a class="anchor" aria-label="anchor" href="#record-a-session"></a>
+</h3>
 <p>First you should install the <code>shinyloadtest</code> R package if you haven’t yet:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span><span class="op">(</span><span class="st">'rstudio/shinyloadtest'</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">'rstudio/shinyloadtest'</span><span class="op">)</span></code></pre></div>
 <p>Next, obtain the “solo” URL of the deployed app in RStudio Connect. You can do this by navigating to the application from the list of published content, clicking the circular button at the top right of the screen, and then clicking “Open Solo”. This will open a new window. Copy the URL from this new window.</p>
 <p><img src="images/rsc_open_solo.png"></p>
 <p>Back in the R console, run <code>record_session</code> with the solo URL as an argument:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/shinyloadtest/">shinyloadtest</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/shinyloadtest/">shinyloadtest</a></span><span class="op">)</span>
 <span class="fu"><a href="../reference/record_session.html">record_session</a></span><span class="op">(</span><span class="st">"https://rsc.example.com/content/1234/"</span><span class="op">)</span></code></pre></div>
 <p>This starts a local web server listening on <code>http://127.0.0.1:8600/</code> and should also open a new browser window to this URL. This local web server is a proxy that relays content to and from your RStudio Connect instance, recording interactions so that they can be played back later. It’s in this window that you should model what you imagine would be a typical user interaction. Click around, change things, and observe new outputs.</p>
 <p>Do this for 1-2 minutes. When you’re done, close the browser tab. You should notice the function return in the R console.</p>
-<p>On disk, in the directory where you started R, will be a new file: <code>recording.log</code>. There may also be other files like <code>recording.log.post.0</code>. These complementary files are created when you upload files or if you use an htmlwidget like <a href="https://github.com/rstudio/DT">DT</a> that uses HTTP POST to send data.</p>
+<p>On disk, in the directory where you started R, will be a new file: <code>recording.log</code>. There may also be other files like <code>recording.log.post.0</code>. These complementary files are created when you upload files or if you use an htmlwidget like <a href="https://github.com/rstudio/DT" class="external-link">DT</a> that uses HTTP POST to send data.</p>
 <p>Together, these files constitute a <strong>recording</strong>. They are the input to <code>shinycannon</code>.</p>
 </div>
-<div id="baseline-run" class="section level3">
-<h3 class="hasAnchor">
-<a href="#baseline-run" class="anchor"></a>Baseline run</h3>
+<div class="section level3">
+<h3 id="baseline-run">Baseline run<a class="anchor" aria-label="anchor" href="#baseline-run"></a>
+</h3>
 <p>Now that you’ve made a recording, you’re ready for your first <code>shinycannon</code> run. For the first run, you should just test with 1 user. This will generate metrics analogous to those you experienced when you made your recording, and will serve as a baseline for subsequent runs.</p>
 <blockquote>
 <p>Note: It’s best to run shinycannon on a machine close to the target machine on the network. We don’t want RStudio Connect and shinycannon to contend for resources on the same machine.</p>
@@ -218,9 +215,9 @@
 <p>Note: If you see any messages of severity ERROR, the run hasn’t necessarily failed, but the metrics it produces may not be usable. You should investigate the error and re-run. The <code>--debug</code> flag will result in the creation of a <code>debug.log</code> file in the output directory, which may be useful for debugging but can become large quickly.</p>
 </blockquote>
 </div>
-<div id="comparison-run" class="section level3">
-<h3 class="hasAnchor">
-<a href="#comparison-run" class="anchor"></a>Comparison run</h3>
+<div class="section level3">
+<h3 id="comparison-run">Comparison run<a class="anchor" aria-label="anchor" href="#comparison-run"></a>
+</h3>
 <p>Now that we have baseline metrics, we should conduct a more ambitious run for contrast. Perhaps in our organization we can expect up to 5 people to use cranwhales at the same time, so to simulate that possibility we’ll run <code>shinycannon</code> again with <code>--workers 5</code>:</p>
 <blockquote>
 <p>Load testing can be useful even if your target number is small, like 5.</p>
@@ -228,12 +225,12 @@
 <pre><code>shinycannon recording.log https://rsc.example.com/content/1234/ --workers 5 --loaded-duration-minutes 5 --output-dir run5</code></pre>
 </div>
 </div>
-<div id="analyze" class="section level2">
-<h2 class="hasAnchor">
-<a href="#analyze" class="anchor"></a>Analyze</h2>
+<div class="section level2">
+<h2 id="analyze">Analyze<a class="anchor" aria-label="anchor" href="#analyze"></a>
+</h2>
 <p>At this point we have two runs worth of metrics in our <code>run1</code> and <code>run5</code> output directories. Let’s get back in an R console and process the data into a dataframe:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/shinyloadtest/">shinyloadtest</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/shinyloadtest/">shinyloadtest</a></span><span class="op">)</span>
 <span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_runs.html">load_runs</a></span><span class="op">(</span><span class="st">"Run 1"</span> <span class="op">=</span> <span class="st">"run1"</span>, <span class="st">"Run 5"</span> <span class="op">=</span> <span class="st">"run5"</span><span class="op">)</span></code></pre></div>
 <p>With the data in a tidy data frame, we can generate an HTML report:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -254,27 +251,27 @@
 </blockquote>
 <p>If your target number <strong>n</strong> is very large, you may find it easier to start by looking at the Latency tab which shows histograms of latency for the page load time and the latency of user interactions with the app.</p>
 </div>
-<div id="recommend" class="section level2">
-<h2 class="hasAnchor">
-<a href="#recommend" class="anchor"></a>Recommend</h2>
+<div class="section level2">
+<h2 id="recommend">Recommend<a class="anchor" aria-label="anchor" href="#recommend"></a>
+</h2>
 <p>The application doesn’t seem to have performed well with 5 concurrent users, but it’s important to keep in mind that performance is relative to the kind of application you’re optimizing and to the needs of your users. If we do decide the app is too slow and we want to try to improve it, there are two courses of action we can consider:</p>
 <ol style="list-style-type: decimal">
-<li>We could <a href="https://support.rstudio.com/hc/en-us/articles/231874748-Scaling-and-Performance-Tuning-in-RStudio-Connect">tune the app’s RStudio Connect configuration</a>. In this case, the easiest way to improve the performance in the 5-user case is to modify the app’s scheduler settings, dedicating 1 process per user and limiting the number of processes to 5.</li>
+<li>We could <a href="https://support.rstudio.com/hc/en-us/articles/231874748-Scaling-and-Performance-Tuning-in-RStudio-Connect" class="external-link">tune the app’s RStudio Connect configuration</a>. In this case, the easiest way to improve the performance in the 5-user case is to modify the app’s scheduler settings, dedicating 1 process per user and limiting the number of processes to 5.</li>
 <li>We could improve the performance of the application at the code level.</li>
 </ol>
 <p>Dedicating more resources to the app is the easiest way to improve its performance, but it’s also the most costly resource-wise, and depending on what’s slow, might not even help. Dedicating your developer time is potentially costly in terms of your time, but improves the scalability of your app in the long run.</p>
 <p>Throwing hardware at the problem is an easy fix in our case, but there’s usually a strong chance that it’s really easy to make your app dramatically faster with only small code changes. For example, you might just need to do some work once when your app starts instead of every time a reactive changes. Here are some resources for learning more about Shiny app performance:</p>
 <ol style="list-style-type: decimal">
 <li>
-<code>profvis</code>: In <a href="https://www.rstudio.com/resources/webinars/profvis-profiling-tools-for-faster-r-code/">this webinar</a>, Winston Chang demonstrates using the profvis package to efficiently identify and improve slow paths in code.</li>
-<li>In <a href="https://resources.rstudio.com/rstudio-conf-2018/make-shiny-fast-by-doing-as-little-work-as-possible-alan-dipert">this rstudio::conf talk</a>, Alan Dipert describes the Shiny team’s efforts to improve the scalability of another demo app, CRAN explorer.</li>
-<li>In <a href="https://resources.rstudio.com/rstudio-conf-2018/scaling-shiny-apps-with-async-programming-joe-cheng">this other rstudio::conf talk</a>, Joe Cheng describes how async can be used to improve the scalability of Shiny apps.</li>
+<code>profvis</code>: In <a href="https://www.rstudio.com/resources/webinars/profvis-profiling-tools-for-faster-r-code/" class="external-link">this webinar</a>, Winston Chang demonstrates using the profvis package to efficiently identify and improve slow paths in code.</li>
+<li>In <a href="https://resources.rstudio.com/rstudio-conf-2018/make-shiny-fast-by-doing-as-little-work-as-possible-alan-dipert" class="external-link">this rstudio::conf talk</a>, Alan Dipert describes the Shiny team’s efforts to improve the scalability of another demo app, CRAN explorer.</li>
+<li>In <a href="https://resources.rstudio.com/rstudio-conf-2018/scaling-shiny-apps-with-async-programming-joe-cheng" class="external-link">this other rstudio::conf talk</a>, Joe Cheng describes how async can be used to improve the scalability of Shiny apps.</li>
 </ol>
 <p>For the purposes of this case study, let’s say that we’re really busy, and it makes sense for us to just crank up the scheduler settings now, and investigate the code later.</p>
 </div>
-<div id="optimize" class="section level2">
-<h2 class="hasAnchor">
-<a href="#optimize" class="anchor"></a>Optimize</h2>
+<div class="section level2">
+<h2 id="optimize">Optimize<a class="anchor" aria-label="anchor" href="#optimize"></a>
+</h2>
 <p>In the “Runtime” tab of the application’s settings in RStudio Connect, let’s “Specify custom settings”:</p>
 <ul>
 <li>Max processes: 5</li>
@@ -284,18 +281,18 @@
 </ul>
 <p>With these settings, our hypothesis is that each user will be assigned their own R process, and the metrics should look closer to the baseline than our previous <code>run5</code></p>
 </div>
-<div id="benchmark-again" class="section level2">
-<h2 class="hasAnchor">
-<a href="#benchmark-again" class="anchor"></a>Benchmark again</h2>
+<div class="section level2">
+<h2 id="benchmark-again">Benchmark again<a class="anchor" aria-label="anchor" href="#benchmark-again"></a>
+</h2>
 <p>Let’s run <code>shinycannon</code> again, and output results to a different directory, <code>run5-new-settings</code>:</p>
 <pre><code>shinycannon recording.log https://rsc.example.com/content/1234/ --workers 5 --loaded-duration-minutes 5 --output-dir run5-new-settings</code></pre>
 </div>
-<div id="analyze-again" class="section level2">
-<h2 class="hasAnchor">
-<a href="#analyze-again" class="anchor"></a>Analyze again</h2>
+<div class="section level2">
+<h2 id="analyze-again">Analyze again<a class="anchor" aria-label="anchor" href="#analyze-again"></a>
+</h2>
 <p>Now, back in R, we can generate a new report and compare <code>run5</code> to <code>run5-new-settings</code>:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/shinyloadtest/">shinyloadtest</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/shinyloadtest/">shinyloadtest</a></span><span class="op">)</span>
 <span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_runs.html">load_runs</a></span><span class="op">(</span><span class="st">"Run 5"</span> <span class="op">=</span> <span class="st">"run5"</span>, <span class="st">"Run 5 new"</span> <span class="op">=</span> <span class="st">"run5-new-settings"</span><span class="op">)</span>
 <span class="fu"><a href="../reference/shinyloadtest_report.html">shinyloadtest_report</a></span><span class="op">(</span><span class="va">df</span>, <span class="st">"report2.html"</span><span class="op">)</span></code></pre></div>
 <blockquote>
@@ -303,9 +300,9 @@
 </blockquote>
 <p><img src="images/run2_duration.svg" alt="run2-duration"><img src="images/run2_new_duration.svg" alt="run2-duration"> Just as we hoped, performance is much improved. After adding processes, sessions didn’t take as long to run. Because they didn’t take as long to run, more of them were able to complete in our 5-minute maintenance period.</p>
 </div>
-<div id="conclusion" class="section level1">
-<h1 class="hasAnchor">
-<a href="#conclusion" class="anchor"></a>Conclusion</h1>
+<div class="section level1">
+<h1 id="conclusion">Conclusion<a class="anchor" aria-label="anchor" href="#conclusion"></a>
+</h1>
 <p>In this case study we introduced <em>the optimization loop</em> workflow and demonstrated how <code>shinyloadtest</code> and <code>shinycannon</code> can be used together to assess an application’s performance and guide its optimization.</p>
 <p>We ran a baseline test to establish the performance of our application in the single-user case, and then ran a subsequent test to see how it did with multiple concurrent users.</p>
 <p>We were dissatisfied with its multi-user performance, and considered whether to improve the application’s performance or simply allocate it more resources. We chose to allocate more resources. Then we benchmarked and analyzed again and observed a satisfactory improvement.</p>
@@ -324,11 +321,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Barret Schloerke, Alan Dipert, Barbara Borges, <a href="https://www.rstudio.com"><img src="https://www.tidyverse.org/rstudio-logo.svg" alt="RStudio" height="24"></a>.</p>
+  <p></p>
+<p>Developed by Barret Schloerke, Alan Dipert, Barbara Borges, <a href="https://www.rstudio.com" class="external-link"><img src="https://www.tidyverse.org/rstudio-logo.svg" alt="RStudio" width="72"></a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
