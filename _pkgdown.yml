@@ -1,7 +1,9 @@
 url: https://rstudio.github.io/shinyloadtest/
 
+# shinycannon urls are auto updated and should not be written to `/dev`
+# Instead, always post website to `/` (even using dev version)
 development:
-  mode: auto
+  mode: release
 
 template:
   params:
