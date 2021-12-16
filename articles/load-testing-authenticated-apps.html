@@ -21,6 +21,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
@@ -33,18 +35,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">shinyloadtest</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.9000</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -65,7 +61,8 @@
       <a href="../articles/case-study-scaling.html">Case study: Scaling an app</a>
     </li>
     <li class="divider">
-    <li class="dropdown-header">Advanced</li>
+    </li>
+<li class="dropdown-header">Advanced</li>
     <li>
       <a href="../articles/limitations-of-shinyloadtest.html">Limitations of shinyloadtest</a>
     </li>
@@ -83,7 +80,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/rstudio/shinyloadtest/">
+  <a href="https://github.com/rstudio/shinyloadtest/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -109,16 +106,16 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Load Testing Authenticated Apps</h1>
             
-            <h4 class="date">2018-09-05</h4>
+            <h4 data-toc-skip class="date">2018-09-05</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/rstudio/shinyloadtest/blob/master/vignettes/load-testing-authenticated-apps.Rmd"><code>vignettes/load-testing-authenticated-apps.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/rstudio/shinyloadtest/blob/HEAD/vignettes/load-testing-authenticated-apps.Rmd" class="external-link"><code>vignettes/load-testing-authenticated-apps.Rmd</code></a></small>
       <div class="hidden name"><code>load-testing-authenticated-apps.Rmd</code></div>
 
     </div>
 
     
     
-<p><code>shinyloadtest</code> supports load testing applications served by <a href="https://www.rstudio.com/products/connect/">RStudio Connect</a> or <a href="https://www.rstudio.com/products/shiny-server-pro/">Shiny Server Pro</a> with the following authentication configurations:</p>
+<p><code>shinyloadtest</code> supports load testing applications served by <a href="https://www.rstudio.com/products/connect/" class="external-link">RStudio Connect</a> or <a href="https://www.rstudio.com/products/shiny-server-pro/" class="external-link">Shiny Server Pro</a> with the following authentication configurations:</p>
 <ul>
 <li>Connect
 <ul>
@@ -135,16 +132,16 @@
 </ul>
 </li>
 </ul>
-<div id="recording" class="section level2">
-<h2 class="hasAnchor">
-<a href="#recording" class="anchor"></a>Recording</h2>
+<div class="section level2">
+<h2 id="recording">Recording<a class="anchor" aria-label="anchor" href="#recording"></a>
+</h2>
 <p><code><a href="../reference/record_session.html">shinyloadtest::record_session</a></code> will automatically detect when an application is protected using a supported authentication scheme and will prompt for a username and password.</p>
 <p>If <code>record_session</code> is called from within an RStudio IDE session, two UI dialogs will appear. If it’s called from an R session in a command-line setting, prompts will appear on standard output.</p>
 <p>The supplied username and password are used for the duration of the recording to interact with the application, but these credentials are not stored in the recording file.</p>
 </div>
-<div id="load-testing" class="section level2">
-<h2 class="hasAnchor">
-<a href="#load-testing" class="anchor"></a>Load testing</h2>
+<div class="section level2">
+<h2 id="load-testing">Load testing<a class="anchor" aria-label="anchor" href="#load-testing"></a>
+</h2>
 <p>Because credentials are not stored in recordings, a username and password or RStudio Connect API Key must be supplied to <code>shinycannon</code> in order to load test authenticated applications.</p>
 <p><code>shinycannon</code> does not have <code>--user</code>, <code>--password</code>, or <code>--connect-api-key</code> arguments for security reasons, so that these strings will not appear in a process list. Instead, the <code>SHINYCANNON_USER</code>, <code>SHINYCANNON_PASS</code>, and <code>SHINYCANNON_CONNECT_API_KEY</code> environment variables must be set. <code>SHINYCANNON_CONNECT_API_KEY</code> will take preference over <code>SHINYCANNON_USER</code> and <code>SHINYCANNON_PASS</code>.</p>
 <p>On Linux and macOS, you can disable history for any command that starts with a space. If using a <code>bash</code>:</p>
@@ -174,11 +171,13 @@ $ shinycannon connect_recording.log https://connect.example.com/content/545/ --w
 
 
       <footer><div class="copyright">
-  <p>Developed by Barret Schloerke, Alan Dipert, Barbara Borges, <a href="https://www.rstudio.com"><img src="https://www.tidyverse.org/rstudio-logo.svg" alt="RStudio" height="24"></a>.</p>
+  <p></p>
+<p>Developed by Barret Schloerke, Alan Dipert, Barbara Borges, <a href="https://www.rstudio.com" class="external-link"><img src="https://www.tidyverse.org/rstudio-logo.svg" alt="RStudio" width="72"></a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>

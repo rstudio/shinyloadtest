@@ -21,6 +21,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
@@ -33,18 +35,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">shinyloadtest</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.9000</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -65,7 +61,8 @@
       <a href="../articles/case-study-scaling.html">Case study: Scaling an app</a>
     </li>
     <li class="divider">
-    <li class="dropdown-header">Advanced</li>
+    </li>
+<li class="dropdown-header">Advanced</li>
     <li>
       <a href="../articles/limitations-of-shinyloadtest.html">Limitations of shinyloadtest</a>
     </li>
@@ -83,7 +80,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/rstudio/shinyloadtest/">
+  <a href="https://github.com/rstudio/shinyloadtest/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -110,7 +107,7 @@
       <h1 data-toc-skip>Installing and running shinycannon</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/rstudio/shinyloadtest/blob/master/vignettes/shinycannon.Rmd"><code>vignettes/shinycannon.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/rstudio/shinyloadtest/blob/HEAD/vignettes/shinycannon.Rmd" class="external-link"><code>vignettes/shinycannon.Rmd</code></a></small>
       <div class="hidden name"><code>shinycannon.Rmd</code></div>
 
     </div>
@@ -118,14 +115,14 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/shinyloadtest/">shinyloadtest</a></span><span class="op">)</span></code></pre></div>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/shinyloadtest/">shinyloadtest</a></span><span class="op">)</span></code></pre></div>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <p><code>shinycannon</code> requires custom installation that differs from platform to platform.</p>
-<div id="linux" class="section level3">
-<h3 class="hasAnchor">
-<a href="#linux" class="anchor"></a>Linux</h3>
+<div class="section level3">
+<h3 id="linux">Linux<a class="anchor" aria-label="anchor" href="#linux"></a>
+</h3>
 <p>Depending on your distribution, <code>shinycannon</code> can be installed using one of the following packages.</p>
 <table class="table">
 <colgroup>
@@ -141,49 +138,49 @@
 <tbody>
 <tr class="odd">
 <td align="left">Redhat/Fedora/CentOS</td>
-<td align="left"><a href="https://github.com/rstudio/shinycannon/releases/download/v1.1.0/shinycannon-1.1.0-45731f0.x86_64.rpm">shinycannon-1.1.0-45731f0.x86_64.rpm</a></td>
-<td align="left"><code>sudo yum install -y shinycannon-1.1.0-45731f0.x86_64.rpm</code></td>
+<td align="left"><a href="https://github.com/rstudio/shinycannon/releases/download/v1.1.2/shinycannon-1.1.2-ef2b74c.x86_64.rpm" class="external-link">shinycannon-1.1.2-ef2b74c.x86_64.rpm</a></td>
+<td align="left"><code>sudo yum install -y shinycannon-1.1.2-ef2b74c.x86_64.rpm</code></td>
 </tr>
 <tr class="even">
 <td align="left">SUSE</td>
-<td align="left"><a href="https://github.com/rstudio/shinycannon/releases/download/v1.1.0/shinycannon-1.1.0-suse-45731f0.x86_64.rpm">shinycannon-1.1.0-suse-45731f0.x86_64.rpm</a></td>
-<td align="left"><code>zypper —-no-gpg-checks install -y shinycannon-1.1.0-suse-45731f0.x86_64.rpm</code></td>
+<td align="left"><a href="https://github.com/rstudio/shinycannon/releases/download/v1.1.2/shinycannon-1.1.2-suse-ef2b74c.x86_64.rpm" class="external-link">shinycannon-1.1.2-suse-ef2b74c.x86_64.rpm</a></td>
+<td align="left"><code>zypper —-no-gpg-checks install -y shinycannon-1.1.2-suse-ef2b74c.x86_64.rpm</code></td>
 </tr>
 <tr class="odd">
 <td align="left">Ubuntu/Debian</td>
-<td align="left"><a href="https://github.com/rstudio/shinycannon/releases/download/v1.1.0/shinycannon_1.1.0-45731f0_amd64.deb">shinycannon_1.1.0-45731f0_amd64.deb</a></td>
-<td align="left"><code>sudo dpkg -i shinycannon_1.1.0-45731f0_amd64.deb</code></td>
+<td align="left"><a href="https://github.com/rstudio/shinycannon/releases/download/v1.1.2/shinycannon_1.1.2-ef2b74c_amd64.deb" class="external-link">shinycannon_1.1.2-ef2b74c_amd64.deb</a></td>
+<td align="left"><code>sudo dpkg -i shinycannon_1.1.2-ef2b74c_amd64.deb</code></td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="macos" class="section level3">
-<h3 class="hasAnchor">
-<a href="#macos" class="anchor"></a>macOS</h3>
+<div class="section level3">
+<h3 id="macos">macOS<a class="anchor" aria-label="anchor" href="#macos"></a>
+</h3>
 <ol style="list-style-type: decimal">
-<li>Install <a href="https://www.java.com/en/download/">Java</a>
+<li>Install <a href="https://www.java.com/en/download/" class="external-link">Java</a>
 </li>
-<li>Download <a href="https://github.com/rstudio/shinycannon/releases/download/v1.1.0/shinycannon-1.1.0-45731f0.sh">shinycannon-1.1.0-45731f0.sh</a>
+<li>Download <a href="https://github.com/rstudio/shinycannon/releases/download/v1.1.2/shinycannon-1.1.2-ef2b74c.sh" class="external-link">shinycannon-1.1.2-ef2b74c.sh</a>
 </li>
-<li>Install with <code>sudo cp shinycannon-1.1.0-45731f0.sh /usr/local/bin/shinycannon; sudo chmod +x /usr/local/bin/shinycannon</code>
+<li>Install with <code>sudo cp shinycannon-1.1.2-ef2b74c.sh /usr/local/bin/shinycannon; sudo chmod +x /usr/local/bin/shinycannon</code>
 </li>
 <li>Run <code>shinycannon -h</code> to see help output, or <code>shinycannon [RECORDING-PATH] [APP-URL]</code> to generate load.</li>
 </ol>
 </div>
-<div id="windows" class="section level3">
-<h3 class="hasAnchor">
-<a href="#windows" class="anchor"></a>Windows</h3>
+<div class="section level3">
+<h3 id="windows">Windows<a class="anchor" aria-label="anchor" href="#windows"></a>
+</h3>
 <ol style="list-style-type: decimal">
-<li>Install <a href="https://www.java.com/en/download/">Java</a>
+<li>Install <a href="https://www.java.com/en/download/" class="external-link">Java</a>
 </li>
-<li>Download <a href="https://github.com/rstudio/shinycannon/releases/download/v1.1.0/shinycannon-1.1.0-45731f0.jar">shinycannon-1.1.0-45731f0.jar</a> to the directory you wish to run it in</li>
-<li>Run <code>java -jar shinycannon-1.1.0-45731f0.jar -h</code> to see help output, or <code>java -jar shinycannon-1.1.0-45731f0.jar [RECORDING-PATH] [APP-URL]</code> to generate load.</li>
+<li>Download <a href="https://github.com/rstudio/shinycannon/releases/download/v1.1.2/shinycannon-1.1.2-ef2b74c.jar" class="external-link">shinycannon-1.1.2-ef2b74c.jar</a> to the directory you wish to run it in</li>
+<li>Run <code>java -jar shinycannon-1.1.2-ef2b74c.jar -h</code> to see help output, or <code>java -jar shinycannon-1.1.2-ef2b74c.jar [RECORDING-PATH] [APP-URL]</code> to generate load.</li>
 </ol>
 </div>
 </div>
-<div id="recording" class="section level2">
-<h2 class="hasAnchor">
-<a href="#recording" class="anchor"></a>Recording</h2>
+<div class="section level2">
+<h2 id="recording">Recording<a class="anchor" aria-label="anchor" href="#recording"></a>
+</h2>
 <p><code>shinycannon</code> accepts two required positional arguments:</p>
 <ol style="list-style-type: decimal">
 <li>
@@ -195,11 +192,11 @@
 <p>In addition to these two required arguments, <code>shinycannon</code> accepts a number of optional arguments that can be specified with flags. Of these, the most interesting are:</p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>–workers</strong>: The number of concurrent users to simulate. <code>shinycannon</code> uses threads to represent each user. It defaults to 1.</li>
+<code>--workers</code>: The number of concurrent users to simulate. <code>shinycannon</code> uses threads to represent each user. It defaults to 1.</li>
 <li>
-<strong>–loaded-duration-minutes</strong>: The duration of the load test, in minutes. This does not include “warmup time”, which is the time shinycannon spends gradually increasing the number of workers, or “cooldown time”, which is the time spent decreasing the number of workers. It defaults to 0, meaning that after all workers have “warmed up”, they will immediately begin to “cool down”. Generally, you’ll want to set this to a duration greater than 0. <code>shinycannon</code> will re-run the recording as necessary to fill the time.</li>
+<code>--loaded-duration-minutes</code>: The duration of the load test, in minutes. This does not include “warmup time”, which is the time shinycannon spends gradually increasing the number of workers, or “cooldown time”, which is the time spent decreasing the number of workers. It defaults to 0, meaning that after all workers have “warmed up”, they will immediately begin to “cool down”. Generally, you’ll want to set this to a duration greater than 0. <code>shinycannon</code> will re-run the recording as necessary to fill the time.</li>
 <li>
-<strong>–output-dir</strong>: Name of the directory to create and store timing information in.</li>
+<code>--output-dir</code>: Name of the directory to create and store timing information in.</li>
 </ol>
 <p>As an example, to run a load test simulating 5 concurrent users for at least 2 minutes, outputting to the directory <code>run1</code>:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a>$ <span class="ex">shinycannon</span> recording.log https://shinyapp.example.com/ --workers 5 --loaded-duration-minutes 2 --output-dir run1</span>
@@ -251,11 +248,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Barret Schloerke, Alan Dipert, Barbara Borges, <a href="https://www.rstudio.com"><img src="https://www.tidyverse.org/rstudio-logo.svg" alt="RStudio" height="24"></a>.</p>
+  <p></p>
+<p>Developed by Barret Schloerke, Alan Dipert, Barbara Borges, <a href="https://www.rstudio.com" class="external-link"><img src="https://www.tidyverse.org/rstudio-logo.svg" alt="RStudio" width="72"></a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>

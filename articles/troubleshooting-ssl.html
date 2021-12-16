@@ -21,6 +21,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
@@ -33,18 +35,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">shinyloadtest</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.9000</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
@@ -65,7 +61,8 @@
       <a href="../articles/case-study-scaling.html">Case study: Scaling an app</a>
     </li>
     <li class="divider">
-    <li class="dropdown-header">Advanced</li>
+    </li>
+<li class="dropdown-header">Advanced</li>
     <li>
       <a href="../articles/limitations-of-shinyloadtest.html">Limitations of shinyloadtest</a>
     </li>
@@ -83,7 +80,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/rstudio/shinyloadtest/">
+  <a href="https://github.com/rstudio/shinyloadtest/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -109,9 +106,9 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Troubleshooting SSL</h1>
             
-            <h4 class="date">2019-06-19</h4>
+            <h4 data-toc-skip class="date">2019-06-19</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/rstudio/shinyloadtest/blob/master/vignettes/troubleshooting-ssl.Rmd"><code>vignettes/troubleshooting-ssl.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/rstudio/shinyloadtest/blob/HEAD/vignettes/troubleshooting-ssl.Rmd" class="external-link"><code>vignettes/troubleshooting-ssl.Rmd</code></a></small>
       <div class="hidden name"><code>troubleshooting-ssl.Rmd</code></div>
 
     </div>
@@ -124,42 +121,41 @@
 <p>The first thing you should try is upgrading Java on your machine. Newer versions of Java come with updated certificate stores.</p>
 <p>If that doesn’t work, and if you are confident the target server is legitimate (for example, it’s run from within your organization) you can rectify the problem by adding the target server’s certificate to Java’s certificate store using the steps below.</p>
 <p>Otherwise, you should consider contacting the target server’s administrator because <strong>the machine may have been compromised</strong>.</p>
-<div id="add-certificate" class="section level2">
-<h2 class="hasAnchor">
-<a href="#add-certificate" class="anchor"></a>Add Certificate</h2>
-<div id="download" class="section level3">
-<h3 class="hasAnchor">
-<a href="#download" class="anchor"></a>Download</h3>
+<div class="section level2">
+<h2 id="add-certificate">Add Certificate<a class="anchor" aria-label="anchor" href="#add-certificate"></a>
+</h2>
+<div class="section level3">
+<h3 id="download">Download<a class="anchor" aria-label="anchor" href="#download"></a>
+</h3>
 <p>Download the certificate to the machine running <code>shinycannon</code> using the following command, substituting <code>example.com</code> for the hostname or address of the target server:</p>
 <p><em>If the target host is an IP address, you should omit the <code>-servername</code> parameter.</em></p>
 <p><strong>Linux</strong>:</p>
 <pre><code>openssl s_client -connect example.com:443 -servername example.com:443 &lt; /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' &gt; public.crt</code></pre>
 <p><strong>Windows</strong>:</p>
-<p><em>If you haven’t, you should install <a href="http://gnuwin32.sourceforge.net/packages/sed.htm">Sed for Windows</a> and <a href="https://www.openssl.org/">OpenSSL</a></em></p>
+<p><em>If you haven’t, you should install <a href="http://gnuwin32.sourceforge.net/packages/sed.htm" class="external-link">Sed for Windows</a> and <a href="https://www.openssl.org/" class="external-link">OpenSSL</a></em></p>
 <pre><code>openssl s_client -connect google.com:443 -servername google.com:443 &lt; NUL | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' &gt; public.crt</code></pre>
 </div>
-<div id="find-java_home" class="section level3">
-<h3 class="hasAnchor">
-<a href="#find-java_home" class="anchor"></a>Find <code>JAVA_HOME</code>
+<div class="section level3">
+<h3 id="find-java_home">Find <code>JAVA_HOME</code><a class="anchor" aria-label="anchor" href="#find-java_home"></a>
 </h3>
 <p>Determine your system’s JAVA_HOME location with the following command:</p>
 <p><em>On Linux, the $JAVA_HOME environment variable may already be set. If it is, use it instead.</em></p>
 <pre><code>jrunscript -e 'java.lang.System.out.println(java.lang.System.getProperty("java.home"));'</code></pre>
 </div>
-<div id="install-certificate" class="section level3">
-<h3 class="hasAnchor">
-<a href="#install-certificate" class="anchor"></a>Install Certificate</h3>
+<div class="section level3">
+<h3 id="install-certificate">Install Certificate<a class="anchor" aria-label="anchor" href="#install-certificate"></a>
+</h3>
 <p>Install the certificate with the following command, substituting <code>&lt;JAVA_HOME&gt;</code> for your system’s <code>JAVA_HOME</code> value, and <code>&lt;server_name&gt;</code> for some name of your choosing:</p>
 <p><em>On Linux, you must be root or use <code>sudo</code>.</em></p>
 <pre><code>&lt;JAVA_HOME&gt;/bin/keytool -import -alias &lt;server_name&gt; -keystore &lt;JAVA_HOME&gt;/jre/lib/security/cacerts -file public.crt</code></pre>
 <p>You may be prompted for a password. By default it is <code>changeit</code>.</p>
 <p>You may be prompted about whether to trust the certificate. Type <code>yes</code> and hit enter.</p>
 </div>
-<div id="try-again" class="section level3">
-<h3 class="hasAnchor">
-<a href="#try-again" class="anchor"></a>Try again</h3>
+<div class="section level3">
+<h3 id="try-again">Try again<a class="anchor" aria-label="anchor" href="#try-again"></a>
+</h3>
 <p>Try <code>shinycannon</code> again, ensuring <code>SHINYCANNON_USER</code> and <code>SHINYCANNON_PASS</code> are set if your target application requires authentication.</p>
-<p><em>These instructions were adapted from the following document: <a href="https://confluence.atlassian.com/kb/how-to-import-a-public-ssl-certificate-into-a-jvm-867025849.html" class="uri">https://confluence.atlassian.com/kb/how-to-import-a-public-ssl-certificate-into-a-jvm-867025849.html</a></em></p>
+<p><em>These instructions were adapted from the following document: <a href="https://confluence.atlassian.com/kb/how-to-import-a-public-ssl-certificate-into-a-jvm-867025849.html" class="external-link uri">https://confluence.atlassian.com/kb/how-to-import-a-public-ssl-certificate-into-a-jvm-867025849.html</a></em></p>
 </div>
 </div>
   </div>
@@ -175,11 +171,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Barret Schloerke, Alan Dipert, Barbara Borges, <a href="https://www.rstudio.com"><img src="https://www.tidyverse.org/rstudio-logo.svg" alt="RStudio" height="24"></a>.</p>
+  <p></p>
+<p>Developed by Barret Schloerke, Alan Dipert, Barbara Borges, <a href="https://www.rstudio.com" class="external-link"><img src="https://www.tidyverse.org/rstudio-logo.svg" alt="RStudio" width="72"></a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>

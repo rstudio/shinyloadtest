@@ -25,6 +25,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
   <div class="container">
@@ -37,18 +39,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">shinyloadtest</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.1.0.9000</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="reference/index.html">Reference</a>
 </li>
@@ -69,7 +65,8 @@
       <a href="articles/case-study-scaling.html">Case study: Scaling an app</a>
     </li>
     <li class="divider">
-    <li class="dropdown-header">Advanced</li>
+    </li>
+<li class="dropdown-header">Advanced</li>
     <li>
       <a href="articles/limitations-of-shinyloadtest.html">Limitations of shinyloadtest</a>
     </li>
@@ -87,7 +84,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/rstudio/shinyloadtest/">
+  <a href="https://github.com/rstudio/shinyloadtest/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -110,29 +107,29 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="load-testing-shiny-applications" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#load-testing-shiny-applications" class="anchor"></a>Load Testing Shiny Applications</h1></div>
+<div class="section level1">
+<div class="page-header"><h1 id="load-testing-shiny-applications">Load Testing Shiny Applications<a class="anchor" aria-label="anchor" href="#load-testing-shiny-applications"></a>
+</h1></div>
 <!-- badges: start -->
 
-<p>The <a href="https://rstudio.github.io/shinyloadtest/"><code>shinyloadtest</code> package</a> and the accompanying <a href="https://github.com/rstudio/shinycannon"><code>shinycannon</code></a> command line tool make it possible to <strong>load test</strong> deployed Shiny apps. Load testing helps developers and administrators estimate how many users their application can support. If an application requires tuning, load testing and load test result analysis can be used to identify performance bottlenecks and to guide changes to infrastructure, configuration, or code.</p>
-<p>Scientific load testing helps put to rest the common misconception that <strong>"</strong>Shiny doesn’t scale". As rstudio::conf(2018) Sean Lopp presented on <a href="https://rstudio.com/resources/rstudioconf-2018/scaling-shiny/">Scaling Shiny</a> which shows how to to horizontally scale an app to handle tens of thousands of users.</p>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
+<p>The <a href="https://rstudio.github.io/shinyloadtest/"><code>shinyloadtest</code> package</a> and the accompanying <a href="https://github.com/rstudio/shinycannon" class="external-link"><code>shinycannon</code></a> command line tool make it possible to <strong>load test</strong> deployed Shiny apps. Load testing helps developers and administrators estimate how many users their application can support. If an application requires tuning, load testing and load test result analysis can be used to identify performance bottlenecks and to guide changes to infrastructure, configuration, or code.</p>
+<p>Scientific load testing helps put to rest the common misconception that <strong>"</strong>Shiny doesn’t scale". As rstudio::conf(2018) Sean Lopp presented on <a href="https://rstudio.com/resources/rstudioconf-2018/scaling-shiny/" class="external-link">Scaling Shiny</a> which shows how to to horizontally scale an app to handle tens of thousands of users.</p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <p>To perform a load test you’ll need two pieces of software:</p>
 <ul>
 <li>
-<code>shinyloadtest</code> is an R package used to generate recordings and analyze results. You should install it on your development machine with <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("shinyloadtest")</a></code>.</li>
+<code>shinyloadtest</code> is an R package used to generate recordings and analyze results. You should install it on your development machine with <code>install.packages("shinyloadtest")</code>.</li>
 <li>
 <code>shinycannon</code> is a command-line used to replay recordings in parallel. You can install it on your development machine for testing, but for best results we recommend installing it on a server, and preferably not the one the application under test is also on. See <a href="https://rstudio.github.io/shinyloadtest/articles/shinycannon.html#installation">installation instructions</a> for operating specific install instructions..</li>
 </ul>
 </div>
-<div id="quick-start" class="section level2">
-<h2 class="hasAnchor">
-<a href="#quick-start" class="anchor"></a>Quick Start</h2>
+<div class="section level2">
+<h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
+</h2>
 <p>The process for load testing a Shiny application consists of three steps:</p>
-<ol>
+<ol style="list-style-type: decimal">
 <li>
 <strong>Record</strong> a typical user session for the app.</li>
 <li>
@@ -141,31 +138,33 @@
 <strong>Analyze</strong> the results of the load test and determine if the app performed well enough.</li>
 </ol>
 <p>Rinse and repeat as necessary. Each step is described below.</p>
-<div id="step-1-recording" class="section level3">
-<h3 class="hasAnchor">
-<a href="#step-1-recording" class="anchor"></a>Step 1: Recording</h3>
+<div class="section level3">
+<h3 id="step-1-recording">Step 1: Recording<a class="anchor" aria-label="anchor" href="#step-1-recording"></a>
+</h3>
 <p>Record a session using <code><a href="reference/record_session.html">shinyloadtest::record_session()</a></code>, which takes the URL of the <strong>deployed</strong> application as an argument:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">shinyloadtest</span><span class="fu">::</span><span class="fu"><a href="reference/record_session.html">record_session</a></span><span class="op">(</span><span class="st">'https://shinyapp.example.com/'</span><span class="op">)</span></code></pre></div>
 <p>Running the function will open a browser displaying the app. Once open, interact with the application as a typical user might then close the browser. After closing the app, a file (<code>recording.log</code> by default) will be created that contains a recording of the session. This recording will serve as the basis for the load test.</p>
 <p>If your application requires authentication, consult the <a href="https://rstudio.github.io/shinyloadtest/articles/load-testing-authenticated-apps.html">authentication article</a>. Also be aware that <a href="https://rstudio.github.io/shinyloadtest/articles/limitations-of-shinyloadtest.html">certain Shiny features</a> are not compatible with shinyloadtest.</p>
 </div>
-<div id="step-2-run-the-load-test" class="section level3">
-<h3 class="hasAnchor">
-<a href="#step-2-run-the-load-test" class="anchor"></a>Step 2: Run the Load Test</h3>
+<div class="section level3">
+<h3 id="step-2-run-the-load-test">Step 2: Run the Load Test<a class="anchor" aria-label="anchor" href="#step-2-run-the-load-test"></a>
+</h3>
 <p>With the recording in hand, we’re ready to run the load test. The actual test is conducted outside of R using the <code>shinycannon</code> command-line tool. You can run it using your system’s terminal or console program, or you can run it from the RStudio terminal tab. A typical run looks like this:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>shinycannon recording.log https<span class="op">:</span><span class="er">//</span>shinyapp.example.com<span class="op">/</span><span class="st"> </span><span class="op">--</span>workers <span class="dv">5</span> <span class="op">--</span>loaded<span class="op">-</span>duration<span class="op">-</span>minutes <span class="dv">2</span> <span class="op">--</span>output<span class="op">-</span>dir run1</span></code></pre></div>
 <p>See <a href="https://rstudio.github.io/shinyloadtest/articles/shinycannon.html#recording">the shinycannon article</a> for details.</p>
 </div>
-<div id="step-3-analyze-the-results" class="section level3">
-<h3 class="hasAnchor">
-<a href="#step-3-analyze-the-results" class="anchor"></a>Step 3: Analyze the Results</h3>
+<div class="section level3">
+<h3 id="step-3-analyze-the-results">Step 3: Analyze the Results<a class="anchor" aria-label="anchor" href="#step-3-analyze-the-results"></a>
+</h3>
 <p>Now we can analyse our results by reading the data into <code><a href="reference/load_runs.html">shinyloadtest::load_runs()</a></code> and create a report with <code><a href="reference/shinyloadtest_report.html">shinyloadtest_report()</a></code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">shinyloadtest</span><span class="fu">::</span><span class="fu"><a href="reference/load_runs.html">load_runs</a></span><span class="op">(</span><span class="st">"run1"</span><span class="op">)</span>
 <span class="fu">shinyloadtest</span><span class="fu">::</span><span class="fu"><a href="reference/shinyloadtest_report.html">shinyloadtest_report</a></span><span class="op">(</span><span class="va">df</span>, <span class="st">"run1.html"</span><span class="op">)</span></code></pre></div>
 <p>This self contained html report will be opened in your browser for inspection. For further analysis explanation, please visit <a href="https://rstudio.github.io/shinyloadtest/articles/analyzing-load-test-logs.html">Analysing load test logs</a>.</p>
-<p><img src="reference/figures/slt_report_screenshot.png" alt="Analysis Example"></p>
+<div class="figure">
+<img src="reference/figures/slt_report_screenshot.png" alt=""><p class="caption">Analysis Example</p>
+</div>
 </div>
 </div>
 </div>
@@ -173,49 +172,59 @@
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=shinyloadtest">https://​cloud.r-project.org/​package=shinyloadtest</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/rstudio/shinyloadtest/">https://​github.com/​rstudio/​shinyloadtest/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/rstudio/shinyloadtest/issues">https://​github.com/​rstudio/​shinyloadtest/​issues</a>
-</li>
-</ul>
-</div>
-<div class="license">
-<h2>License</h2>
-<ul class="list-unstyled">
-<li><a href="https://www.r-project.org/Licenses/GPL-3">GPL-3</a></li>
-</ul>
-</div>
-<div class="developers">
-<h2>Developers</h2>
-<ul class="list-unstyled">
-<li>Barret Schloerke <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0001-9986-114X" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>Alan Dipert <br><small class="roles"> Author </small>  </li>
-<li>Barbara Borges <br><small class="roles"> Author </small>  </li>
-<li>
-<a href="https://www.rstudio.com"><img src="https://www.tidyverse.org/rstudio-logo.svg" alt="RStudio" height="24"></a> <br><small class="roles"> Copyright holder, funder </small>  </li>
+<li><a href="https://cloud.r-project.org/package=shinyloadtest" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/rstudio/shinyloadtest/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/rstudio/shinyloadtest/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="license">
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/rstudio/shinyloadtest/actions"><img src="https://github.com/rstudio/shinyloadtest/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://www.r-project.org/Licenses/GPL-3" class="external-link">GPL-3</a></li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing shinyloadtest</a></li>
+</ul>
 </div>
+
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
+<ul class="list-unstyled">
+<li>Barret Schloerke <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0001-9986-114X" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Alan Dipert <br><small class="roles"> Author </small>  </li>
+<li>Barbara Borges <br><small class="roles"> Author </small>  </li>
+<li>
+<a href="https://www.rstudio.com" class="external-link"><img src="https://www.tidyverse.org/rstudio-logo.svg" alt="RStudio" width="72"></a> <br><small class="roles"> Copyright holder, funder </small>  </li>
+</ul>
+</div>
+
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/rstudio/shinyloadtest/actions" class="external-link"><img src="https://github.com/rstudio/shinyloadtest/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+</ul>
+</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Barret Schloerke, Alan Dipert, Barbara Borges, <a href="https://www.rstudio.com"><img src="https://www.tidyverse.org/rstudio-logo.svg" alt="RStudio" height="24"></a>.</p>
+  <p></p>
+<p>Developed by Barret Schloerke, Alan Dipert, Barbara Borges, <a href="https://www.rstudio.com" class="external-link"><img src="https://www.tidyverse.org/rstudio-logo.svg" alt="RStudio" width="72"></a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
