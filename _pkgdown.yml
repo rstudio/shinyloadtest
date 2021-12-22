@@ -12,6 +12,7 @@ template:
       api_key: '993bbaa8141e65ce07013c0f54fc3277'
       index_name: 'shinyloadtest'
 
+
 navbar:
   type: inverse
 
