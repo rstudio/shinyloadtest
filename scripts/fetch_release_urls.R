@@ -8,50 +8,67 @@
 
 
 library(httr)
-library(jsonlite)
 library(readr)
+library(gh)
 
-release_version <- function(release) {
-  sub(".", "", release$name)
-}
-
-release_sha <- function(release) {
-  tag <- release$tag_name
-  tags <- jsonlite::parse_json(httr::GET('https://api.github.com/repos/rstudio/shinycannon/tags'))
-  sha <- Find(function(x) x$name == tag, tags)$commit$sha
-  gsub("(.{7}).*", "\\1", sha)
-}
-
-asset_platform <- function(asset) {
-  if (grepl("\\.deb$", asset$name)) {
+asset_platform <- function(asset_name) {
+  if (grepl("\\.deb$", asset_name)) {
     "deb"
-  } else if (grepl("-suse-", asset$name)) {
+  } else if (grepl("-suse-", asset_name)) {
     "rpm_suse"
-  } else if (grepl("\\.rpm$", asset$name)) {
+  } else if (grepl("\\.rpm$", asset_name)) {
     "rpm_rh"
   } else {
-    tools::file_ext(asset$name)
+    tools::file_ext(asset_name)
   }
 }
 
-asset_df <- function(release) {
-  version <- release_version(release)
-  sha <- release_sha(release)
-  do.call(rbind, lapply(latest$assets, function(asset) {
+asset_df <- function(query_result) {
+  recent_release <- query_result$data$repository$releases$nodes[[1]]
+  assets <- recent_release$releaseAssets$nodes
+  do.call(rbind, lapply(assets, function(asset) {
     data.frame(
-      version = version,
-      sha = sha,
-      platform = asset_platform(asset),
+      platform = asset_platform(asset$name),
       file = asset$name,
-      url = asset$browser_download_url
+      url = asset$downloadUrl
     )
   }))
 }
 
-url <- 'https://api.github.com/repos/rstudio/shinycannon/releases'
-json <- jsonlite::parse_json(httr::GET(url))
-latest <- json[[1]]
-df <- asset_df(latest)
+## Not authenticated. Failes on GHA
+# url <- 'https://api.github.com/repos/rstudio/shinycannon/releases'
+# json <- jsonlite::parse_json(httr::GET(url))
+# latest <- json[[1]]
+# str(latest)
+# df <- asset_df(latest)
+
+# Test out at https://docs.github.com/en/graphql/overview/explorer
+query <- '
+query {
+  repository(owner:"rstudio", name:"shinycannon") {
+    releases(first:1) {
+      nodes {
+        tagName
+        releaseAssets(first:100) {
+          nodes {
+            name
+            downloadUrl
+            # release {
+            #   id
+            # }
+            # url
+          }
+        }
+      }
+    }
+  }
+}
+'
+# Performs authenticated GraphQL queries
+query_result <- gh::gh_gql(query)
+str(query_result[1]) # Subset to first entry (only entry) to quickly remove attributes
+df <- asset_df(query_result)
+
 
 save_file <- rprojroot::find_package_root_file("vignettes/RELEASE_URLS.csv")
 cat(
