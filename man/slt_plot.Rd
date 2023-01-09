@@ -54,27 +54,27 @@ Many different plotting routines to display different loadtest information.
 }
 \section{Functions}{
 \itemize{
-\item \code{slt_time_boxplot}: Box plot of load times for each event in each run
+\item \code{slt_time_boxplot()}: Box plot of load times for each event in each run
 
-\item \code{slt_time_concurrency}: Time on concurrency for each event for each run
+\item \code{slt_time_concurrency()}: Time on concurrency for each event for each run
 
-\item \code{slt_waterfall}: Event waterfall for each session within each run
+\item \code{slt_waterfall()}: Event waterfall for each session within each run
 
-\item \code{slt_hist_loadtimes}: Histogram of page load times
+\item \code{slt_hist_loadtimes()}: Histogram of page load times
 
-\item \code{slt_user}: Gantt chart of event duration for each user within each run
+\item \code{slt_user()}: Gantt chart of event duration for each user within each run
 
-\item \code{slt_session}: Event gantt chart of each user session within each run
+\item \code{slt_session()}: Event gantt chart of each user session within each run
 
-\item \code{slt_session_duration}: Event gantt chart of fastest to slowest session times within each run
+\item \code{slt_session_duration()}: Event gantt chart of fastest to slowest session times within each run
 
-\item \code{slt_session_latency}: Stacked bar chart of event duration for each session within each run
+\item \code{slt_session_latency()}: Stacked bar chart of event duration for each session within each run
 
-\item \code{slt_http_latency}: Bar chart of total HTTP latency for each session within each run
+\item \code{slt_http_latency()}: Bar chart of total HTTP latency for each session within each run
 
-\item \code{slt_websocket_latency}: Bar chart of maximum calculation (websocket) latency for each session within each run
+\item \code{slt_websocket_latency()}: Bar chart of maximum calculation (websocket) latency for each session within each run
+
 }}
-
 \examples{
 \donttest{slt_user(slt_demo_data_4)
 slt_session(slt_demo_data_4)

@@ -57,7 +57,7 @@ Suggests:
     rmarkdown,
     testthat,
     spelling
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 SystemRequirements:
     pandoc (>= 2.2) - http://pandoc.org
