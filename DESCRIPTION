@@ -64,7 +64,8 @@ SystemRequirements:
 Language: en-US
 Config/Needs/website:
     devtools,
-    readr
+    readr,
+    gh
 Config/Needs/routine:
     devtools,
     readr,
