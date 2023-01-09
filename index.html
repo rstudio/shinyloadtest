@@ -49,7 +49,7 @@
   <a href="reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -111,7 +111,6 @@
 <div class="page-header"><h1 id="load-testing-shiny-applications">Load Testing Shiny Applications<a class="anchor" aria-label="anchor" href="#load-testing-shiny-applications"></a>
 </h1></div>
 <!-- badges: start -->
-
 <p>The <a href="https://rstudio.github.io/shinyloadtest/"><code>shinyloadtest</code> package</a> and the accompanying <a href="https://github.com/rstudio/shinycannon" class="external-link"><code>shinycannon</code></a> command line tool make it possible to <strong>load test</strong> deployed Shiny apps. Load testing helps developers and administrators estimate how many users their application can support. If an application requires tuning, load testing and load test result analysis can be used to identify performance bottlenecks and to guide changes to infrastructure, configuration, or code.</p>
 <p>Scientific load testing helps put to rest the common misconception that <strong>"</strong>Shiny doesn’t scale". As rstudio::conf(2018) Sean Lopp presented on <a href="https://rstudio.com/resources/rstudioconf-2018/scaling-shiny/" class="external-link">Scaling Shiny</a> which shows how to to horizontally scale an app to handle tens of thousands of users.</p>
 <div class="section level2">
@@ -143,7 +142,7 @@
 </h3>
 <p>Record a session using <code><a href="reference/record_session.html">shinyloadtest::record_session()</a></code>, which takes the URL of the <strong>deployed</strong> application as an argument:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">shinyloadtest</span><span class="fu">::</span><span class="fu"><a href="reference/record_session.html">record_session</a></span><span class="op">(</span><span class="st">'https://shinyapp.example.com/'</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">shinyloadtest</span><span class="fu">::</span><span class="fu"><a href="reference/record_session.html">record_session</a></span><span class="op">(</span><span class="st">'https://shinyapp.example.com/'</span><span class="op">)</span></span></code></pre></div>
 <p>Running the function will open a browser displaying the app. Once open, interact with the application as a typical user might then close the browser. After closing the app, a file (<code>recording.log</code> by default) will be created that contains a recording of the session. This recording will serve as the basis for the load test.</p>
 <p>If your application requires authentication, consult the <a href="https://rstudio.github.io/shinyloadtest/articles/load-testing-authenticated-apps.html">authentication article</a>. Also be aware that <a href="https://rstudio.github.io/shinyloadtest/articles/limitations-of-shinyloadtest.html">certain Shiny features</a> are not compatible with shinyloadtest.</p>
 </div>
@@ -159,8 +158,8 @@
 </h3>
 <p>Now we can analyse our results by reading the data into <code><a href="reference/load_runs.html">shinyloadtest::load_runs()</a></code> and create a report with <code><a href="reference/shinyloadtest_report.html">shinyloadtest_report()</a></code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">shinyloadtest</span><span class="fu">::</span><span class="fu"><a href="reference/load_runs.html">load_runs</a></span><span class="op">(</span><span class="st">"run1"</span><span class="op">)</span>
-<span class="fu">shinyloadtest</span><span class="fu">::</span><span class="fu"><a href="reference/shinyloadtest_report.html">shinyloadtest_report</a></span><span class="op">(</span><span class="va">df</span>, <span class="st">"run1.html"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">shinyloadtest</span><span class="fu">::</span><span class="fu"><a href="reference/load_runs.html">load_runs</a></span><span class="op">(</span><span class="st">"run1"</span><span class="op">)</span></span>
+<span><span class="fu">shinyloadtest</span><span class="fu">::</span><span class="fu"><a href="reference/shinyloadtest_report.html">shinyloadtest_report</a></span><span class="op">(</span><span class="va">df</span>, <span class="st">"run1.html"</span><span class="op">)</span></span></code></pre></div>
 <p>This self contained html report will be opened in your browser for inspection. For further analysis explanation, please visit <a href="https://rstudio.github.io/shinyloadtest/articles/analyzing-load-test-logs.html">Analysing load test logs</a>.</p>
 <div class="figure">
 <img src="reference/figures/slt_report_screenshot.png" alt=""><p class="caption">Analysis Example</p>
@@ -201,17 +200,11 @@
 <li>Barret Schloerke <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0001-9986-114X" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Alan Dipert <br><small class="roles"> Author </small>  </li>
 <li>Barbara Borges <br><small class="roles"> Author </small>  </li>
-<li>
-<a href="https://www.rstudio.com" class="external-link"><img src="https://www.tidyverse.org/rstudio-logo.svg" alt="RStudio" width="72"></a> <br><small class="roles"> Copyright holder, funder </small>  </li>
+<li>RStudio <br><small class="roles"> Copyright holder, funder </small>  </li>
 </ul>
 </div>
 
-<div class="dev-status">
-<h2 data-toc-skip>Dev status</h2>
-<ul class="list-unstyled">
-<li><a href="https://github.com/rstudio/shinyloadtest/actions" class="external-link"><img src="https://github.com/rstudio/shinyloadtest/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
-</ul>
-</div>
+
 
   </div>
 </div>
@@ -219,12 +212,12 @@
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by Barret Schloerke, Alan Dipert, Barbara Borges, <a href="https://www.rstudio.com" class="external-link"><img src="https://www.tidyverse.org/rstudio-logo.svg" alt="RStudio" width="72"></a>.</p>
+<p>Developed by Barret Schloerke, Alan Dipert, Barbara Borges, RStudio.</p>
 </div>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

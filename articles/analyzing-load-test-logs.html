@@ -45,7 +45,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -117,39 +117,40 @@
     
 <p>This vignette shows you how to analyse the results of your load tests, explaining the plots produced in the report, and giving a few tips on interpretation.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/shinyloadtest/">shinyloadtest</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/shinyloadtest/">shinyloadtest</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="loading-data">Loading data<a class="anchor" aria-label="anchor" href="#loading-data"></a>
 </h2>
 <p>Start by loading the <code>shinycannon</code> results into R with <code><a href="../reference/load_runs.html">load_runs()</a></code>. If you have a single run, just give it the directory of the results:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_runs.html">load_runs</a></span><span class="op">(</span><span class="st">"test_sessions/demo1"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_runs.html">load_runs</a></span><span class="op">(</span><span class="st">"test_sessions/demo1"</span><span class="op">)</span></span></code></pre></div>
 <p>If you have multiple runs, give it multiple directories, optionally providing informative labels. Here I’m loading three runs that replay the same script simulating 1, 4, and 16 simultaneous uses:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_runs.html">load_runs</a></span><span class="op">(</span>
-  `1 user` <span class="op">=</span> <span class="st">"test_sessions/demo1"</span>,
-  `4 users` <span class="op">=</span> <span class="st">"test_sessions/demo4"</span>,
-  `16 users` <span class="op">=</span> <span class="st">"test_sessions/demo16"</span>
-<span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_runs.html">load_runs</a></span><span class="op">(</span></span>
+<span>  `1 user` <span class="op">=</span> <span class="st">"test_sessions/demo1"</span>,</span>
+<span>  `4 users` <span class="op">=</span> <span class="st">"test_sessions/demo4"</span>,</span>
+<span>  `16 users` <span class="op">=</span> <span class="st">"test_sessions/demo16"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><code><a href="../reference/load_runs.html">load_runs()</a></code> returns a tidy tibble:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">df</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 11,729 × 13</span></span>
-<span class="co">#&gt;    run   user_id session_id iteration input_line_numb… event start   end    time</span>
-<span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;ord&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 1 us…       0          0         0                1 REQ_… 0     0.308 0.308  </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 1 us…       0          0         0                2 REQ_… 0.309 0.316 0.007<span style="text-decoration: underline;">00</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 1 us…       0          0         0                3 REQ_… 0.316 0.323 0.007<span style="text-decoration: underline;">00</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 1 us…       0          0         0                4 REQ_… 0.323 0.33  0.007<span style="text-decoration: underline;">00</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 1 us…       0          0         0                5 REQ_… 0.33  0.339 0.009<span style="text-decoration: underline;">00</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 1 us…       0          0         0                6 REQ_… 0.339 0.351 0.012<span style="text-decoration: underline;">0</span> </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 1 us…       0          0         0                7 REQ_… 0.351 0.361 0.010<span style="text-decoration: underline;">0</span> </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 1 us…       0          0         0                8 REQ_… 0.361 0.365 0.004<span style="text-decoration: underline;">00</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 1 us…       0          0         0                9 REQ_… 0.366 0.373 0.007<span style="text-decoration: underline;">00</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 1 us…       0          0         0               10 REQ_… 0.373 0.382 0.009<span style="text-decoration: underline;">00</span></span>
-<span class="co">#&gt; <span style="color: #949494;"># … with 11,719 more rows, and 4 more variables: concurrency &lt;dbl&gt;,</span></span>
-<span class="co">#&gt; <span style="color: #949494;">#   maintenance &lt;lgl&gt;, label &lt;ord&gt;, json &lt;list&gt;</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">df</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 11,729 × 13</span></span></span>
+<span><span class="co">#&gt;    run    user_id session_id iteration input…¹ event start   end    time concu…²</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;ord&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 1 user       0          0         0       1 REQ_… 0     0.308 0.308         0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 1 user       0          0         0       2 REQ_… 0.309 0.316 0.007<span style="text-decoration: underline;">00</span>       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 1 user       0          0         0       3 REQ_… 0.316 0.323 0.007<span style="text-decoration: underline;">00</span>       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 1 user       0          0         0       4 REQ_… 0.323 0.33  0.007<span style="text-decoration: underline;">00</span>       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 1 user       0          0         0       5 REQ_… 0.33  0.339 0.009<span style="text-decoration: underline;">00</span>       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 1 user       0          0         0       6 REQ_… 0.339 0.351 0.012<span style="text-decoration: underline;">0</span>        0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 1 user       0          0         0       7 REQ_… 0.351 0.361 0.010<span style="text-decoration: underline;">0</span>        0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 1 user       0          0         0       8 REQ_… 0.361 0.365 0.004<span style="text-decoration: underline;">00</span>       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 1 user       0          0         0       9 REQ_… 0.366 0.373 0.007<span style="text-decoration: underline;">00</span>       0</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 1 user       0          0         0      10 REQ_… 0.373 0.382 0.009<span style="text-decoration: underline;">00</span>       0</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with 11,719 more rows, 3 more variables: maintenance &lt;lgl&gt;, label &lt;ord&gt;,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   json &lt;list&gt;, and abbreviated variable names ¹​input_line_number,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   ²​concurrency</span></span></span></code></pre></div>
 <p>The first three variables identify each simulated session:</p>
 <ul>
 <li>
@@ -166,7 +167,7 @@
 </h2>
 <p>You won’t generally work with this data directly — instead, you’ll usually start by creating a standalone HTML report:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/shinyloadtest_report.html">shinyloadtest_report</a></span><span class="op">(</span><span class="va">df</span>, <span class="st">"report.html"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/shinyloadtest_report.html">shinyloadtest_report</a></span><span class="op">(</span><span class="va">df</span>, <span class="st">"report.html"</span><span class="op">)</span></span></code></pre></div>
 <p>This report contains six pages of diagnostic information: sessions, session duration, event waterfall, latency, event duration, and event concurrency. I describe each page below.</p>
 </div>
 <div class="section level2">
@@ -259,12 +260,12 @@
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by Barret Schloerke, Alan Dipert, Barbara Borges, <a href="https://www.rstudio.com" class="external-link"><img src="https://www.tidyverse.org/rstudio-logo.svg" alt="RStudio" width="72"></a>.</p>
+<p>Developed by Barret Schloerke, Alan Dipert, Barbara Borges, RStudio.</p>
 </div>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

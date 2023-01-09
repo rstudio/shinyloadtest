@@ -26,7 +26,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -85,83 +85,94 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">slt_time_boxplot</span><span class="op">(</span><span class="va">df</span>, labels <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">slt_time_concurrency</span><span class="op">(</span><span class="va">df</span>, labels <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">slt_waterfall</span><span class="op">(</span><span class="va">df</span>, limits <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">slt_hist_loadtimes</span><span class="op">(</span><span class="va">df</span>, max_load_time <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
-
-<span class="fu">slt_user</span><span class="op">(</span><span class="va">df</span><span class="op">)</span>
-
-<span class="fu">slt_session</span><span class="op">(</span><span class="va">df</span><span class="op">)</span>
-
-<span class="fu">slt_session_duration</span><span class="op">(</span><span class="va">df</span>, cutoff <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>
-
-<span class="fu">slt_session_latency</span><span class="op">(</span><span class="va">df</span><span class="op">)</span>
-
-<span class="fu">slt_http_latency</span><span class="op">(</span><span class="va">df</span>, cutoff <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>
-
-<span class="fu">slt_websocket_latency</span><span class="op">(</span><span class="va">df</span>, cutoff <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">slt_time_boxplot</span><span class="op">(</span><span class="va">df</span>, labels <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">slt_time_concurrency</span><span class="op">(</span><span class="va">df</span>, labels <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">slt_waterfall</span><span class="op">(</span><span class="va">df</span>, limits <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">slt_hist_loadtimes</span><span class="op">(</span><span class="va">df</span>, max_load_time <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">slt_user</span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">slt_session</span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">slt_session_duration</span><span class="op">(</span><span class="va">df</span>, cutoff <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">slt_session_latency</span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">slt_http_latency</span><span class="op">(</span><span class="va">df</span>, cutoff <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">slt_websocket_latency</span><span class="op">(</span><span class="va">df</span>, cutoff <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>df</dt>
 <dd><p>data frame returned from <code><a href="load_runs.html">load_runs</a></code></p></dd>
+
+
 <dt>labels</dt>
 <dd><p>A vector of labels to include.  If none are supplied, all labels will be used.</p></dd>
+
+
 <dt>limits</dt>
 <dd><p>passed into <code><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_colour_gradientn</a></code></p></dd>
+
+
 <dt>max_load_time</dt>
 <dd><p>The amount of time users will wait for the page to load
 when first requesting the app.</p></dd>
+
+
 <dt>cutoff</dt>
 <dd><p>Where to draw a horizontal or vertical line to display a reasonable cutoff line for requests.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></code> plot object</p>
+    
+
+<p>A <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></code> plot object</p>
     </div>
     <div id="functions">
     <h2>Functions</h2>
     
-<ul><li><p><code>slt_time_boxplot</code>: Box plot of load times for each event in each run</p></li>
-<li><p><code>slt_time_concurrency</code>: Time on concurrency for each event for each run</p></li>
-<li><p><code>slt_waterfall</code>: Event waterfall for each session within each run</p></li>
-<li><p><code>slt_hist_loadtimes</code>: Histogram of page load times</p></li>
-<li><p><code>slt_user</code>: Gantt chart of event duration for each user within each run</p></li>
-<li><p><code>slt_session</code>: Event gantt chart of each user session within each run</p></li>
-<li><p><code>slt_session_duration</code>: Event gantt chart of fastest to slowest session times within each run</p></li>
-<li><p><code>slt_session_latency</code>: Stacked bar chart of event duration for each session within each run</p></li>
-<li><p><code>slt_http_latency</code>: Bar chart of total HTTP latency for each session within each run</p></li>
-<li><p><code>slt_websocket_latency</code>: Bar chart of maximum calculation (websocket) latency for each session within each run</p></li>
+<ul><li><p><code>slt_time_boxplot()</code>: Box plot of load times for each event in each run</p></li>
+<li><p><code>slt_time_concurrency()</code>: Time on concurrency for each event for each run</p></li>
+<li><p><code>slt_waterfall()</code>: Event waterfall for each session within each run</p></li>
+<li><p><code>slt_hist_loadtimes()</code>: Histogram of page load times</p></li>
+<li><p><code>slt_user()</code>: Gantt chart of event duration for each user within each run</p></li>
+<li><p><code>slt_session()</code>: Event gantt chart of each user session within each run</p></li>
+<li><p><code>slt_session_duration()</code>: Event gantt chart of fastest to slowest session times within each run</p></li>
+<li><p><code>slt_session_latency()</code>: Stacked bar chart of event duration for each session within each run</p></li>
+<li><p><code>slt_http_latency()</code>: Bar chart of total HTTP latency for each session within each run</p></li>
+<li><p><code>slt_websocket_latency()</code>: Bar chart of maximum calculation (websocket) latency for each session within each run</p></li>
 </ul></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu">slt_user</span><span class="op">(</span><span class="va">slt_demo_data_4</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">slt_user</span><span class="op">(</span><span class="va">slt_demo_data_4</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="slt_plot-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu">slt_session</span><span class="op">(</span><span class="va">slt_demo_data_4</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">slt_session</span><span class="op">(</span><span class="va">slt_demo_data_4</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="slt_plot-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu">slt_session_duration</span><span class="op">(</span><span class="va">slt_demo_data_4</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">slt_session_duration</span><span class="op">(</span><span class="va">slt_demo_data_4</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="slt_plot-3.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">slt_waterfall</span><span class="op">(</span><span class="va">slt_demo_data_4</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">slt_waterfall</span><span class="op">(</span><span class="va">slt_demo_data_4</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="slt_plot-4.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu">slt_time_boxplot</span><span class="op">(</span><span class="va">slt_demo_data_4</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">slt_time_boxplot</span><span class="op">(</span><span class="va">slt_demo_data_4</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="slt_plot-5.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu">slt_time_concurrency</span><span class="op">(</span><span class="va">slt_demo_data_4</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">slt_time_concurrency</span><span class="op">(</span><span class="va">slt_demo_data_4</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="slt_plot-6.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="fu">slt_session_latency</span><span class="op">(</span><span class="va">slt_demo_data_4</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">slt_session_latency</span><span class="op">(</span><span class="va">slt_demo_data_4</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="slt_plot-7.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu">slt_http_latency</span><span class="op">(</span><span class="va">slt_demo_data_4</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">slt_http_latency</span><span class="op">(</span><span class="va">slt_demo_data_4</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="slt_plot-8.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu">slt_websocket_latency</span><span class="op">(</span><span class="va">slt_demo_data_4</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">slt_websocket_latency</span><span class="op">(</span><span class="va">slt_demo_data_4</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="slt_plot-9.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu">slt_hist_loadtimes</span><span class="op">(</span><span class="va">slt_demo_data_4</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="fu">slt_hist_loadtimes</span><span class="op">(</span><span class="va">slt_demo_data_4</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span>
 <span class="r-plt img"><img src="slt_plot-10.png" alt="" width="700" height="433"></span>
 </code></pre></div>
@@ -174,11 +185,11 @@ when first requesting the app.</p></dd>
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Barret Schloerke, Alan Dipert, Barbara Borges, <a href="https://www.rstudio.com" class="external-link"><img src="https://www.tidyverse.org/rstudio-logo.svg" alt="RStudio" width="72"></a>.</p>
+  <p></p><p>Developed by Barret Schloerke, Alan Dipert, Barbara Borges, RStudio.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>
