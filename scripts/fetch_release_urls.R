@@ -51,6 +51,7 @@ asset_df <- function(release) {
 url <- 'https://api.github.com/repos/rstudio/shinycannon/releases'
 json <- jsonlite::parse_json(httr::GET(url))
 latest <- json[[1]]
+str(latest)
 df <- asset_df(latest)
 
 save_file <- rprojroot::find_package_root_file("vignettes/RELEASE_URLS.csv")
