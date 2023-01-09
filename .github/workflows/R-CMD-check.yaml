@@ -16,8 +16,7 @@ jobs:
   website:
     uses: rstudio/shiny-workflows/.github/workflows/website.yaml@v1
     with:
-      extra-check-args: 'macos-latest'
-
+      runs-on: 'macos-latest'
   routine:
     uses: rstudio/shiny-workflows/.github/workflows/routine.yaml@v1
   R-CMD-check:
