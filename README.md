@@ -17,7 +17,7 @@ bottlenecks and to guide changes to infrastructure, configuration, or
 code.
 
 Scientific load testing helps put to rest the common misconception that
-**"**Shiny doesn’t scale". As rstudio::conf(2018) Sean Lopp presented on
+**“**Shiny doesn’t scale”. As rstudio::conf(2018) Sean Lopp presented on
 [Scaling
 Shiny](https://rstudio.com/resources/rstudioconf-2018/scaling-shiny/)
 which shows how to to horizontally scale an app to handle tens of
@@ -27,16 +27,15 @@ thousands of users.
 
 To perform a load test you’ll need two pieces of software:
 
-  - `shinyloadtest` is an R package used to generate recordings and
-    analyze results. You should install it on your development machine
-    with `install.packages("shinyloadtest")`.
-  - `shinycannon` is a command-line used to replay recordings in
-    parallel. You can install it on your development machine for
-    testing, but for best results we recommend installing it on a
-    server, and preferably not the one the application under test is
-    also on. See [installation
-    instructions](https://rstudio.github.io/shinyloadtest/articles/shinycannon.html#installation)
-    for operating specific install instructions..
+- `shinyloadtest` is an R package used to generate recordings and
+  analyze results. You should install it on your development machine
+  with `install.packages("shinyloadtest")`.
+- `shinycannon` is a command-line used to replay recordings in parallel.
+  You can install it on your development machine for testing, but for
+  best results we recommend installing it on a server, and preferably
+  not the one the application under test is also on. See [installation
+  instructions](https://rstudio.github.io/shinyloadtest/articles/shinycannon.html#installation)
+  for operating specific install instructions..
 
 ## Quick Start
 
