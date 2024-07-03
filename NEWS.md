@@ -2,6 +2,8 @@
 
 ### Bug Fixes
 
+* Fixed #168: Remove deprecated usage of `dplyr::summarise` during `shinyloadtest_report`.
+
 ### Improvements
 
 
