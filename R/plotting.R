@@ -369,7 +369,7 @@ maintenance_vline <- function(data, type = c("time", "session")) {
   summary <- data %>%
     group_by(run) %>%
     filter(maintenance) %>%
-    summarise(
+    reframe(
       event = "Warm up / Cooldown",
       time = if (type == "time") {
         c(min(start), max(end))
