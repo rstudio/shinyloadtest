@@ -36,7 +36,7 @@ Imports:
     R6,
     curl,
     dplyr (>= 1.0.0),
-    ggplot2,
+    ggplot2 (>= 3.4.0),
     httpuv (>= 1.5.2),
     jsonlite,
     magrittr,
