@@ -382,18 +382,26 @@ save_svg <- function(p, output, width = 15, height = 10, units = "in", ...) {
 }
 
 
-extract_legend <- function(p) {
-  first_grob <- function(x) {
-    x$grobs[[1]]
+find_legend_grob <- function(gtbl) {
+  # Find the legend grob; tested on ggplot2 3.4.4 and 3.5.1, which have different grob layouts.
+  # On 3.4.4 it's guide-box > guides, on 3.5.1 it's guide-box-bottom > guides.
+
+  guide_box_grobs <- gtbl$grobs[grep("^guide-box", gtbl$layout$name)]
+  nonzero_grobs <- guide_box_grobs[!vapply(guide_box_grobs, inherits, logical(1), what = "zeroGrob")]
+  if (length(nonzero_grobs) != 1) {
+    stop("Couldn't find legend grob (searched for 'guide-box*')! Perhaps ggplot2's grob layout has changed?")
   }
+  guides <- gtable::gtable_filter(nonzero_grobs[[1]], "^guides$")
+  if (nrow(guides$layout) != 1) {
+    stop("Couldn't find legend grob (searched for 'guides')! Perhaps ggplot2's grob layout has changed?")
+  }
+  guides$grobs[[1]]
+}
+
+extract_legend <- function(p) {
   legend_grob <- ggplot2::ggplot_build(p) %>%
     ggplot2::ggplot_gtable() %>%
-    gtable::gtable_filter("guide-box") %>%
-    first_grob() %>%
-    gtable::gtable_filter("guides") %>%
-    first_grob()
-    # %>%
-    # gtable::gtable_filter("key|label")
+    find_legend_grob()
 
   list(
     legend_grob = legend_grob,
