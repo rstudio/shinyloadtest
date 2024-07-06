@@ -14,7 +14,7 @@ The [`shinyloadtest` package](https://rstudio.github.io/shinyloadtest/) and the 
 Load testing helps developers and administrators estimate how many users their application can support.
 If an application requires tuning, load testing and load test result analysis can be used to identify performance bottlenecks and to guide changes to infrastructure, configuration, or code.
 
-Scientific load testing helps put to rest the common misconception that **"**Shiny doesn't scale".
+Scientific load testing helps put to rest the common misconception that "Shiny doesn't scale".
 As rstudio::conf(2018) Sean Lopp presented on [Scaling Shiny](https://rstudio.com/resources/rstudioconf-2018/scaling-shiny/) which shows how to to horizontally scale an app to handle tens of thousands of users.
 
 ## Installation
@@ -59,6 +59,8 @@ You can run it using your system's terminal or console program, or you can run i
 A typical run looks like this:
 
     shinycannon recording.log https://shinyapp.example.com/ --workers 5 --loaded-duration-minutes 2 --output-dir run1
+
+(On Windows, you will need to replace "`shinycannon`" with `java -jar shinycannon-VERSION.jar`.)
 
 See [the shinycannon article](https://rstudio.github.io/shinyloadtest/articles/shinycannon.html#recording) for details.
 
