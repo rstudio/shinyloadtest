@@ -4,6 +4,8 @@
 
 * Fixed #168: Remove deprecated usage of `dplyr::summarise` during `shinyloadtest_report`.
 
+* Fixed #163: `gtable_trim` error during `shinyloadtest_report` with newer versions of ggplot2.
+
 ### Improvements
 
 

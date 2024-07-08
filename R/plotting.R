@@ -100,7 +100,7 @@ slt_waterfall <- function(df, limits = NULL) {
     mutate(label = fct_rev(str_trunc(label, 50)))
 
   ggplot(df1, aes(end, label, group = session_id, color = concurrency)) +
-    geom_line(size = 0.5) +
+    geom_line(linewidth = 0.5) +
     maintenance_vline(df1, "time") +
     scale_colour_gradientn(
       colours = c("#413554", "#75aadb", "#9efa9e", "#fdc086"),
@@ -381,7 +381,7 @@ maintenance_vline <- function(data, type = c("time", "session")) {
   geom_vline(
     aes(xintercept = time),
     data = summary,
-    size = 0.5,
+    linewidth = 0.5,
     linetype = "dashed",
     colour = alpha("black", 0.70)
   )
