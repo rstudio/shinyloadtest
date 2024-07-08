@@ -394,11 +394,7 @@ find_legend_grob <- function(gtbl) {
   if (length(nonzero_grobs) > 1) {
     warn("Found legends at multiple positions. Picking the first legend.")
   }
-  guides <- gtable::gtable_filter(nonzero_grobs[[1]], "^guides$")
-  if (nrow(guides$layout) > 1) {
-    warn("Found multiple legends. Picking the first legend.")
-  }
-  guides$grobs[[1]]
+  gtable::gtable_filter(nonzero_grobs[[1]], "^guides$")
 }
 
 extract_legend <- function(p) {
