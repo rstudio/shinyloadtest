@@ -388,12 +388,15 @@ find_legend_grob <- function(gtbl) {
 
   guide_box_grobs <- gtbl$grobs[grep("^guide-box", gtbl$layout$name)]
   nonzero_grobs <- guide_box_grobs[!vapply(guide_box_grobs, inherits, logical(1), what = "zeroGrob")]
-  if (length(nonzero_grobs) != 1) {
-    stop("Couldn't find legend grob (searched for 'guide-box*')! Perhaps ggplot2's grob layout has changed?")
+  if (length(nonzero_grobs) == 0) {
+    return(ggplot2::zeroGrob())
+  }
+  if (length(nonzero_grobs) > 1) {
+    warn("Found legends at multiple positions. Picking the first legend.")
   }
   guides <- gtable::gtable_filter(nonzero_grobs[[1]], "^guides$")
-  if (nrow(guides$layout) != 1) {
-    stop("Couldn't find legend grob (searched for 'guides')! Perhaps ggplot2's grob layout has changed?")
+  if (nrow(guides$layout) > 1) {
+    warn("Found multiple legends. Picking the first legend.")
   }
   guides$grobs[[1]]
 }
