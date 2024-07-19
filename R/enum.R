@@ -7,6 +7,7 @@ enum_value <- function(x, enum_id, all_val) {
   )
 }
 
+#' @export
 `==.shinyloadtest_enum_value` <- function(x, y) {
   if (class(y) != "shinyloadtest_enum_value") {
     return(FALSE)
@@ -28,11 +29,14 @@ enum <- function(...) {
   )
 }
 
+#' @export
 `$.shinyloadtest_enum` <- function(x, i) {
   if (!(i %in% names(x))) stop("Unknown enum value")
   NextMethod()
 }
+#' @export
 `[[.shinyloadtest_enum` <- `$.shinyloadtest_enum`
+#' @export
 `==.shinyloadtest_enum` <- function(x, y) {
   identical(x, y)
 }

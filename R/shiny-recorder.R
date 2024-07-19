@@ -155,10 +155,12 @@ makeWSEvent <- function(type, begin = Sys.time(), ...) {
   structure(list(type = type, begin = makeTimestamp(begin), ...), class = "WS")
 }
 
+#' @export
 format.REQ <- function(httpEvt) {
   jsonlite::toJSON(unclass(httpEvt), auto_unbox = TRUE)
 }
 
+#' @export
 format.WS <- function(wsEvt) {
   jsonlite::toJSON(unclass(wsEvt), auto_unbox = TRUE)
 }

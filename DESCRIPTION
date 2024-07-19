@@ -29,6 +29,7 @@ Collate:
   'make_report.R'
   'plotting.R'
   'shiny-recorder.R'
+  'shinyloadtest-package.R'
   'url.R'
   'util.R'
   'util-pipe.R'
