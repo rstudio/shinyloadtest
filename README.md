@@ -20,10 +20,9 @@ code.
 
 Scientific load testing helps put to rest the common misconception that
 “Shiny doesn’t scale”. As rstudio::conf(2018) Sean Lopp presented on
-[Scaling
-Shiny](https://rstudio.com/resources/rstudioconf-2018/scaling-shiny/)
-which shows how to to horizontally scale an app to handle tens of
-thousands of users.
+[Scaling Shiny](https://posit.co/resources/videos/scaling-shiny/) which
+shows how to to horizontally scale an app to handle tens of thousands of
+users.
 
 ## Installation
 
