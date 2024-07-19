@@ -42,6 +42,6 @@ servedBy <- function(appUrl) {
   } else if (hasShinyJs(rawToChar(resp$content))) {
     return(SERVER_TYPE$SHN)
   } else {
-    stop(paste("Target URL", appUrl$build(), "does not appear to be a Shiny application."))
+    cli::cli_abort(paste("Target URL", appUrl$build(), "does not appear to be a Shiny application."))
   }
 }

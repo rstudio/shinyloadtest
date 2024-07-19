@@ -31,7 +31,7 @@ enum <- function(...) {
 
 #' @export
 `$.shinyloadtest_enum` <- function(x, i) {
-  if (!(i %in% names(x))) stop("Unknown enum value")
+  if (!(i %in% names(x))) cli::cli_abort("Unknown enum value")
   NextMethod()
 }
 #' @export
@@ -48,12 +48,12 @@ enum_case <- function(field, ...) {
 
   unknown_values <- base::setdiff(names(cases), all_val)
   if (length(unknown_values)) {
-    stop(paste("Unknown enum value", paste(unknown_values, collapse = ", ")), call. = FALSE)
+    cli::cli_abort(paste("Unknown enum value", paste(unknown_values, collapse = ", ")), call = NULL)
   }
 
   missing_values <- base::setdiff(all_val, names(cases))
   if (length(missing_values)) {
-    stop(paste("Missing enum value", paste(missing_values, collapse = ", ")), call. = FALSE)
+    cli::cli_abort(paste("Missing enum value", paste(missing_values, collapse = ", ")), call = NULL)
   }
 
   rlang::eval_tidy(cases[[field]])

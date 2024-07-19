@@ -82,7 +82,7 @@ parseMessage <- function(msg) {
   if (!is.na(encodedMsg)) {
     if (res[1, 4] != "0") {
       # If the regex succeeded but the subapp id was nonzero, crash with a helpful message.
-      stop("Subapp id was != 0 and subapp recording is not supported")
+      cli::cli_abort("Subapp id was != 0 and subapp recording is not supported")
     } else {
       # If the regex succeeded subapp id = 0, we have the payload as an almost-double-JSON-encoded
       # object - it just needs to be wrapped in a set of double-quotes.
@@ -201,7 +201,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$targetURL <- URLBuilder$new(targetAppUrl)
       private$targetType <- servedBy(private$targetURL)
       if (private$targetType == SERVER_TYPE$SAI) {
-        stop("Recording shinyapps.io apps is not supported")
+        cli::cli_abort("Recording shinyapps.io apps is not supported")
       }
       private$localHost <- host
       private$localPort <- port
@@ -213,7 +213,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
         }
         # check if the solo url was not provided
         if (grepl("#", targetAppUrl, fixed = TRUE)) {
-          stop("Please provide the content URL (solo mode) of this RStudio Connect Shiny app")
+          cli::cli_abort("Please provide the content URL (solo mode) of this RStudio Connect Shiny app")
         }
       }
 
@@ -275,9 +275,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
         }
         assert_is_available("getPass")
         username <- getPass::getPass("Enter your username: ")
-        if (is.null(username)) stop("Login aborted (username not provided)")
+        if (is.null(username)) cli::cli_abort("Login aborted (username not provided)")
         password <- getPass::getPass("Enter your password: ")
-        if (is.null(password)) stop("Login aborted (password not provided)")
+        if (is.null(password)) cli::cli_abort("Login aborted (password not provided)")
         cookies <- postLogin(private$targetURL, private$targetType, username, password)
       }
       private$sessionCookies <- cookies
@@ -374,7 +374,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
     },
     handleCall = function(req) {
       handler <- private[[paste0("handle_", req$REQUEST_METHOD)]]
-      if (is.null(handler)) stop("No handler for ", req$REQUEST_METHOD)
+      if (is.null(handler)) cli::cli_abort(paste0("No handler for ", req$REQUEST_METHOD))
       handler(req)
     },
     handleWSOpen = function(clientWS) {

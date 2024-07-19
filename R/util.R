@@ -58,7 +58,7 @@ is_available <- function(package, version = NULL) {
 
 assert_is_available <- function(package, version = NULL) {
   if (!is_available(package, version)) {
-    stop(paste0(
+    cli::cli_abort(paste0(
       "Please install the `", package, "` package and try again."
     ))
   }

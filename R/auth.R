@@ -32,7 +32,7 @@ loginUrlFor <- function(appUrl, appServer) {
   if (appServer %in% c(SERVER_TYPE$RSC, SERVER_TYPE$SSP)) {
     appUrl$appendPath("__login__")
   } else {
-    stop(paste0("Unknown appServer:", appServer))
+    cli::cli_abort(paste0("Unknown appServer:", appServer))
   }
 }
 
@@ -48,7 +48,7 @@ handlePost <- function(handle, loginUrl, postfields, cookies, cookieName) {
   )
 
   resp <- curl::curl_fetch_memory(loginUrl$build(), handle = handle)
-  if (!(resp$status_code %in% c(200, 302))) stop("Authentication failed")
+  if (!(resp$status_code %in% c(200, 302))) cli::cli_abort("Authentication failed")
 
   curl::handle_cookies(handle)[, c("name", "value")]
 }
@@ -89,8 +89,8 @@ postLogin <- function(appUrl, appServer, username, password) {
       cookies = cookies,
       cookieName = "session_state"
     ),
-    SAI = stop("Logging in to shinyapps.io is unsupported"),
-    SHN = stop("Plain Shiny apps don't support authentication")
+    SAI = cli::cli_abort("Logging in to shinyapps.io is unsupported"),
+    SHN = cli::cli_abort("Plain Shiny apps don't support authentication")
   )
 }
 

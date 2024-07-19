@@ -14,7 +14,7 @@ strip_suffix <- function(str) {
 read_log_dir <- function(dir, name = basename(dirname(dir)), verbose = vroom::vroom_progress()) {
   files <- list.files(dir, pattern = "*.csv", full.names = TRUE)
   if (length(files) == 0) {
-    stop("No files found for run dir: ", dir, call. = FALSE)
+    cli::cli_abort(paste0("No files found for run dir: ", dir), call = NULL)
   }
 
   df <- vroom::vroom(files,
@@ -297,11 +297,11 @@ load_runs <- function(..., verbose = vroom::vroom_progress()) {
           } else {
             recording <- readLines(recording_path)
             if (!identical(recording, first_recording$lines)) {
-              stop(
+              cli::cli_abort(paste0(
                 "Recording for `", run, "` does not equal the recording for `", first_recording$name, "`.\n",
-                "Please use the same recording when calling load_runs()",
-                call. = FALSE
-              )
+                "Please use the same recording when calling `load_runs()`",
+                call = NULL
+              ))
             }
           }
           df_recording <- first_recording$data

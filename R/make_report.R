@@ -30,7 +30,7 @@ shinyloadtest_report <- function(
     self_contained = TRUE,
     verbose = TRUE) {
   if (!grepl(".html$", output)) {
-    stop("'output' should end in '.html'", call. = FALSE)
+    cli::cli_abort("'output' should end in '.html'", call = NULL)
   }
 
   assert_is_available("gtable")
@@ -44,7 +44,7 @@ shinyloadtest_report <- function(
   if (self_contained) {
     assert_is_available("rmarkdown")
     if (rmarkdown::pandoc_version() < "2.2") {
-      stop("Please upgrade your pandoc version to be at least v2.2", call. = FALSE)
+      cli::cli_abort("Please upgrade your pandoc version to be at least v2.2", call = NULL)
     }
   }
 
