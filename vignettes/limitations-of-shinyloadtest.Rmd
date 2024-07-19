@@ -19,9 +19,9 @@ knitr::opts_chunk$set(
 
 ## Deployment limitations
 
-1. **WebSockets are required**: On RStudio Connect and Shiny Server Pro, [SockJS](https://github.com/sockjs/sockjs-client) is used instead of plain WebSockets in order to support browsers and load balancers that don't support WebSockets. Even though Shiny works in the absence of WebSocket support, `shinyloadtest` does not.
-1. **shinyapps.io unsupported**: Applications deployed on [http://www.shinyapps.io/](http://www.shinyapps.io/) can't be recorded or load tested.
-1. **Recordings are server-dependent**: Recordings made with a particular server type &mdash; Connect, Shiny Server, local &mdash; may only be played back by `shinycannon` against an application deployed using that same type of server. So, for example, a recording made of an application running on Connect will not work correctly if it's run with `shinycannon` on the same target application deployed using a different server like Shiny Server Pro.
+1. **WebSockets are required**: On Posit Connect and Shiny Server, [SockJS](https://github.com/sockjs/sockjs-client) is used instead of plain WebSockets in order to support browsers and load balancers that don't support WebSockets. Even though Shiny works in the absence of WebSocket support, `shinyloadtest` does not.
+2. **shinyapps.io unsupported**: Applications deployed on [http://www.shinyapps.io/](http://www.shinyapps.io/) can't be recorded or load tested.
+3. **Recordings are server-dependent**: Recordings made with a particular server type &mdash; Connect, Shiny Server, local &mdash; may only be played back by `shinycannon` against an application deployed using that same type of server. So, for example, a recording made of an application running on Connect will not work correctly if it's run with `shinycannon` on the same target application deployed using a different server like Shiny Server Pro.
 
 ## Application limitations
 

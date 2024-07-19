@@ -3,12 +3,16 @@ CMD
 Cheng
 DT
 Gantt
+IDE's
 JS
 JSON
 LDAP
 Lopp
+ORCID
 OpenSSL
-RStudio's
+PBC
+Posit's
+RStudio
 SSL
 Sed
 Shiny's
@@ -32,9 +36,9 @@ cooldown
 cranwhales
 css
 dialogs
-dir
 durations
 emphasises
+funder
 gantt
 ggplot
 hostname
@@ -60,4 +64,3 @@ vroom
 warmup
 websocket
 websockets
-www

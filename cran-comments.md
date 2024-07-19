@@ -1,8 +1,8 @@
 ## Comments
 
-#### 2021-02-10 1.1.0
+#### 2024-07-19 1.2.0
 
-Big bug fixes and a couple enhancements.
+Bug fixes, removed the check note, and general name updates for RStudio -> Posit.
 
 Please let me know if there is any more information I can provide.
 
@@ -14,15 +14,14 @@ Barret
 
 * 0 errors | 0 warnings | 1 note
 
-   Maintainer: ‘Barret Schloerke <barret@rstudio.com>’
+    Maintainer: ‘Barret Schloerke <barret@posit.co>’
 
-   New maintainer:
-     Barret Schloerke <barret@rstudio.com>
-   Old maintainer(s):
-     Alan Dipert <alan@rstudio.com>
+    New maintainer:
+      Barret Schloerke <barret@posit.co>
+    Old maintainer(s):
+      Barret Schloerke <barret@rstudio.com>
 
-The previous maintainer, Alan Dipert (alan@rstudio.com), no longer works at RStudio, and his email address has been deactivated.
-I’d like to be the maintainer of this package from now on. If you need further information to confirm, please let me know.
+Finally updating my email address (maintaining the same ORCID value) and renaming funder from RStudio to Posit.
 
 ## revdepcheck results
 

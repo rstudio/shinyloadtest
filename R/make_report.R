@@ -1,7 +1,5 @@
-if (getRversion() >= "2.15.1") {
-  # TODO remove and upgrade the dplyr fns to FN_()
-  utils::globalVariables(c("max_error", "min_time", "max_time", "mean_time", "lm", "model", "coef", "residuals", "slope", "intercept", "slope_pos", "intercept_pos", "max_error_pos"))
-}
+# TODO remove and upgrade the dplyr fns to FN_()
+utils::globalVariables(c("max_error", "min_time", "max_time", "mean_time", "lm", "model", "coef", "residuals", "slope", "intercept", "slope_pos", "intercept_pos", "max_error_pos"))
 
 
 #' Make shinyloadtest Report
@@ -404,7 +402,9 @@ find_legend_grob <- function(gtbl) {
     return(ggplot2::zeroGrob())
   }
   if (length(nonzero_grobs) > 1) {
-    warn("Found legends at multiple positions. Picking the first legend.")
+    cli::cli_warn(
+      "Found legends at multiple positions. Picking the first legend."
+    )
   }
   gtable::gtable_filter(nonzero_grobs[[1]], "^guides$")
 }

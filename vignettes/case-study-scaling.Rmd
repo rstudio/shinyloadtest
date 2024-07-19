@@ -35,22 +35,22 @@ The optimization loop is a general methodology for approaching optimization work
 
 1. **Benchmark**: Pick a number *n*, how many users your application must concurrently support. Simulate *n* users interacting with your application and collect latency metrics. Use `shinyloadtest::record_session` to record a realistic interaction, and the `shinycannon` tool to simulate *n* users performing the recorded interaction.
 1. **Analyze**: Visualize and interpret the metrics. `shinyloadtest::load_runs` is used for this part. If it looks like *n* users can be supported, stop here. Otherwise, go to the next step.
-1. **Recommend**: Based on analysis, propose a way for the capacity of the application to be increased. Patterns in the metrics can help you identify what change in the application or its configuration would be most beneficial. It could be a code change, like [converting the app to async](https://rstudio.github.io/promises/articles/casestudy.html), or a configuration change, like increasing the number of R processes allocated to the application in RStudio Connect or Shiny Server Pro.
-1. **Optimize**: Implement one or more of the recommendations and benchmark again. Repeat the process until the application supports *n* users to your satisfaction.
+2. **Recommend**: Based on analysis, propose a way for the capacity of the application to be increased. Patterns in the metrics can help you identify what change in the application or its configuration would be most beneficial. It could be a code change, like [converting the app to async](https://rstudio.github.io/promises/articles/casestudy.html), or a configuration change, like increasing the number of R processes allocated to the application in Posit Connect.
+3. **Optimize**: Implement one or more of the recommendations and benchmark again. Repeat the process until the application supports *n* users to your satisfaction.
 
 ## The cranwhales demo app
 
-For the purposes of this case study, we'll pretend that [cranwhales](https://github.com/rstudio/cranwhales) is an app we wrote and that we're interested in ensuring it can support a minimum number of concurrent users. In a nutshell, cranwhales is a way to visualize anonymized download statistics from RStudio's `0-Cloud` CRAN mirror. For more on the app's features, see [the tour](https://rstudio.github.io/promises/articles/casestudy.html#a-tour-of-the-app).
+For the purposes of this case study, we'll pretend that [cranwhales](https://github.com/rstudio/cranwhales) is an app we wrote and that we're interested in ensuring it can support a minimum number of concurrent users. In a nutshell, cranwhales is a way to visualize anonymized download statistics from Posit's `0-Cloud` CRAN mirror. For more on the app's features, see [the tour](https://rstudio.github.io/promises/articles/casestudy.html#a-tour-of-the-app).
 
 ![](./images/cranwhales.png)
 
-cranwhales was written by [Joe Cheng](https://twitter.com/jcheng) to demonstrate Shiny's [async capabilities](https://blog.rstudio.com/2018/06/26/shiny-1-1-0/). We use it here because it's close to a typical Shiny app in size and scope, and because it's already given an optimization treatment in [Joe's async case study](https://rstudio.github.io/promises/articles/casestudy.html).
+cranwhales was written by [Joe Cheng](https://twitter.com/jcheng) to demonstrate Shiny's [async capabilities](https://posit.co/blog/shiny-1-1-0/). We use it here because it's close to a typical Shiny app in size and scope, and because it's already given an optimization treatment in [Joe's async case study](https://rstudio.github.io/promises/articles/casestudy.html).
 
 Joe's case study focuses on the **optimize** step and the mechanics of improving performance with an emphasis on using async to do so. Here, we'll instead focus on the **benchmark** and **analyze** steps as enabled by `shinyloadtest` and `shinycannon`.
 
 ## Deployment
 
-cranwhales is currently [deployed on shinyapps.io](https://gallery.shinyapps.io/cranwhales/), but we'll assume for this case study that you've deployed cranwhales to your own [RStudio Connect](https://www.rstudio.com/products/connect/) instance with default runtime/scheduler settings. `shinyloadtest` is capable of benchmarking and generating load against apps that [require authentication](load-testing-authenticated-apps.Rmd) but we'll assume your deployment of cranwhales is accessible without authentication.
+cranwhales is currently [deployed on shinyapps.io](https://gallery.shinyapps.io/cranwhales/), but we'll assume for this case study that you've deployed cranwhales to your own [Posit Connect](https://posit.co/products/enterprise/connect/) instance with default runtime/scheduler settings. `shinyloadtest` is capable of benchmarking and generating load against apps that [require authentication](load-testing-authenticated-apps.Rmd) but we'll assume your deployment of cranwhales is accessible without authentication.
 
 ## Benchmark
 
@@ -69,7 +69,7 @@ First you should install the `shinyloadtest` R package if you haven't yet:
 devtools::install_github("rstudio/shinyloadtest")
 ```
 
-Next, obtain the "solo" URL of the deployed app in RStudio Connect. You can do this by navigating to the application from the list of published content, clicking the circular button at the top right of the screen, and then clicking "Open Solo". This will open a new window. Copy the URL from this new window.
+Next, obtain the "solo" URL of the deployed app in Posit Connect. You can do this by navigating to the application from the list of published content, clicking the circular button at the top right of the screen, and then clicking "Open Solo". This will open a new window. Copy the URL from this new window.
 
 ![](./images/rsc_open_solo.png)
 
@@ -80,7 +80,7 @@ library(shinyloadtest)
 record_session("https://rsc.example.com/content/1234/")
 ```
 
-This starts a local web server listening on `http://127.0.0.1:8600/` and should also open a new browser window to this URL. This local web server is a proxy that relays content to and from your RStudio Connect instance, recording interactions so that they can be played back later. It's in this window that you should model what you imagine would be a typical user interaction. Click around, change things, and observe new outputs.
+This starts a local web server listening on `http://127.0.0.1:8600/` and should also open a new browser window to this URL. This local web server is a proxy that relays content to and from your Posit Connect instance, recording interactions so that they can be played back later. It's in this window that you should model what you imagine would be a typical user interaction. Click around, change things, and observe new outputs.
 
 Do this for 1-2 minutes. When you're done, close the browser tab. You should notice the function return in the R console.
 
@@ -92,7 +92,7 @@ Together, these files constitute a **recording**. They are the input to `shinyca
 
 Now that you've made a recording, you're ready for your first `shinycannon` run. For the first run, you should just test with 1 user. This will generate metrics analogous to those you experienced when you made your recording, and will serve as a baseline for subsequent runs.
 
-> Note: It's best to run shinycannon on a machine close to the target machine on the network. We don't want RStudio Connect and shinycannon to contend for resources on the same machine.
+> Note: It's best to run shinycannon on a machine close to the target machine on the network. We don't want Posit Connect and shinycannon to contend for resources on the same machine.
 
 In the directory where your `recording.log*` files are, run `shinycannon` like this:
 
@@ -177,22 +177,22 @@ If your target number **n** is very large, you may find it easier to start by lo
 
 The application doesn't seem to have performed well with 5 concurrent users, but it's important to keep in mind that performance is relative to the kind of application you're optimizing and to the needs of your users. If we do decide the app is too slow and we want to try to improve it, there are two courses of action we can consider:
 
-1. We could [tune the app's RStudio Connect configuration](https://support.rstudio.com/hc/en-us/articles/231874748-Scaling-and-Performance-Tuning-in-RStudio-Connect). In this case, the easiest way to improve the performance in the 5-user case is to modify the app's scheduler settings, dedicating 1 process per user and limiting the number of processes to 5.
+1. We could [tune the app's Posit Connect configuration](https://support.posit.co/hc/en-us/articles/231874748-Scaling-and-Performance-Tuning-in-Posit-RStudio-Connect). In this case, the easiest way to improve the performance in the 5-user case is to modify the app's scheduler settings, dedicating 1 process per user and limiting the number of processes to 5.
 1. We could improve the performance of the application at the code level.
 
 Dedicating more resources to the app is the easiest way to improve its performance, but it's also the most costly resource-wise, and depending on what's slow, might not even help. Dedicating your developer time is potentially costly in terms of your time, but improves the scalability of your app in the long run.
 
 Throwing hardware at the problem is an easy fix in our case, but there's usually a strong chance that it's really easy to make your app dramatically faster with only small code changes. For example, you might just need to do some work once when your app starts instead of every time a reactive changes. Here are some resources for learning more about Shiny app performance:
 
-1. `profvis`: In [this webinar](https://www.rstudio.com/resources/webinars/profvis-profiling-tools-for-faster-r-code/), Winston Chang demonstrates using the profvis package to efficiently identify and improve slow paths in code.
-1. In [this rstudio::conf talk](https://resources.rstudio.com/rstudio-conf-2018/make-shiny-fast-by-doing-as-little-work-as-possible-alan-dipert), Alan Dipert describes the Shiny team's efforts to improve the scalability of another demo app, CRAN explorer.
-1. In [this other rstudio::conf talk](https://resources.rstudio.com/rstudio-conf-2018/scaling-shiny-apps-with-async-programming-joe-cheng), Joe Cheng describes how async can be used to improve the scalability of Shiny apps.
+1. `profvis`: In [this webinar](https://posit.co/resources/videos/how-to-profile-and-optimize-code-using-profvis-a-new-package-for-exploring-profiling-data/), Winston Chang demonstrates using the profvis package to efficiently identify and improve slow paths in code.
+1. In [this rstudio::conf talk](https://posit.co/resources/videos/make-shiny-fast-by-doing-as-little-work-as-possible/), Alan Dipert describes the Shiny team's efforts to improve the scalability of another demo app, CRAN explorer.
+1. In [this other rstudio::conf talk](https://posit.co/resources/videos/scaling-shiny-apps-with-async-programming/), Joe Cheng describes how async can be used to improve the scalability of Shiny apps.
 
 For the purposes of this case study, let's say that we're really busy, and it makes sense for us to just crank up the scheduler settings now, and investigate the code later.
 
 ## Optimize
 
-In the "Runtime" tab of the application's settings in RStudio Connect, let's "Specify custom settings":
+In the "Runtime" tab of the application's settings in Posit Connect, let's "Specify custom settings":
 
 - Max processes: 5
 - Min processes: 1

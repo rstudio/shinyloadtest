@@ -15,14 +15,10 @@ knitr::opts_chunk$set(
 )
 ```
 
-`shinyloadtest` supports load testing applications served by [RStudio Connect](https://www.rstudio.com/products/connect/) or [Shiny Server Pro](https://www.rstudio.com/products/shiny-server-pro/) with the following authentication configurations:
+`shinyloadtest` supports load testing applications served by [Posit Connect](https://posit.co/products/enterprise/connect/) with the following authentication configurations:
 
 * Connect
     * Password
-    * LDAP and Active Directory
-    * PAM
-* Shiny Server Pro
-    * Flat-File
     * LDAP and Active Directory
     * PAM
 
@@ -36,7 +32,7 @@ The supplied username and password are used for the duration of the recording to
 
 ## Load testing
 
-Because credentials are not stored in recordings, a username and password or RStudio Connect API Key must be supplied to `shinycannon` in order to load test authenticated applications.
+Because credentials are not stored in recordings, a username and password or Posit Connect API Key must be supplied to `shinycannon` in order to load test authenticated applications.
 
 `shinycannon` does not have `--user`, `--password`, or `--connect-api-key` arguments for security reasons, so that these strings will not appear in a process list. Instead, the `SHINYCANNON_USER`, `SHINYCANNON_PASS`, and `SHINYCANNON_CONNECT_API_KEY` environment variables must be set. `SHINYCANNON_CONNECT_API_KEY` will take preference over `SHINYCANNON_USER` and `SHINYCANNON_PASS`.
 

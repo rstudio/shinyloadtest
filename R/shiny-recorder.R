@@ -156,13 +156,13 @@ makeWSEvent <- function(type, begin = Sys.time(), ...) {
 }
 
 #' @export
-format.REQ <- function(httpEvt) {
-  jsonlite::toJSON(unclass(httpEvt), auto_unbox = TRUE)
+format.REQ <- function(x, ...) {
+  jsonlite::toJSON(unclass(x), auto_unbox = TRUE)
 }
 
 #' @export
-format.WS <- function(wsEvt) {
-  jsonlite::toJSON(unclass(wsEvt), auto_unbox = TRUE)
+format.WS <- function(x, ...) {
+  jsonlite::toJSON(unclass(x), auto_unbox = TRUE)
 }
 
 shouldIgnore <- function(msg) {
@@ -213,7 +213,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
         }
         # check if the solo url was not provided
         if (grepl("#", targetAppUrl, fixed = TRUE)) {
-          cli::cli_abort("Please provide the content URL (solo mode) of this RStudio Connect Shiny app")
+          cli::cli_abort("Please provide the content URL (solo mode) of this Posit Connect Shiny app")
         }
       }
 
@@ -271,7 +271,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
       # if auth is required and are not using the connectApiKey...
       if (isProtected(private$targetURL) && is.null(private$connectApiKey)) {
         if (private$targetType == SERVER_TYPE$RSC) {
-          message("An RStudio Connect API key was not provided to `record_session(connect_api_key=)`. Asking for login information...")
+          message("An Posit Connect API key was not provided to `record_session(connect_api_key=)`. Asking for login information...")
         }
         assert_is_available("getPass")
         username <- getPass::getPass("Enter your username: ")
@@ -540,7 +540,7 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #'   or not (`FALSE`).
 #' @param port The port for the reverse proxy. Default is 8600. Change this
 #'   default if port 8600 is used by another service.
-#' @param connect_api_key An RStudio Connect api key. It may be useful to use
+#' @param connect_api_key An Posit Connect api key. It may be useful to use
 #'  `Sys.getenv("CONNECT_API_KEY")`.
 #'
 #' @return Creates a recording file that can be used as input to the
