@@ -62,10 +62,7 @@ Roxygen: list(markdown = TRUE)
 SystemRequirements:
     pandoc (>= 2.2) - http://pandoc.org
 Language: en-US
-Config/Needs/website:
-    devtools,
-    readr,
-    gh
+Config/Needs/website:devtools, readr, gh, tidyverse/tidytemplate
 Config/Needs/routine:
     devtools,
     readr,
