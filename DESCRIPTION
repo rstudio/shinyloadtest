@@ -3,10 +3,10 @@ Type: Package
 Title: Load Test Shiny Applications
 Version: 1.1.0.9000
 Authors@R: c(
-            person("Barret", "Schloerke", role = c("aut", "cre"), email = "barret@rstudio.com", comment = c(ORCID = "0000-0001-9986-114X")),
+            person("Barret", "Schloerke", role = c("aut", "cre"), email = "barret@posit.co", comment = c(ORCID = "0000-0001-9986-114X")),
             person("Alan", "Dipert", role = c("aut")),
             person("Barbara", "Borges", role = c("aut")),
-            person("RStudio", role = c("cph", "fnd"))
+            person("Posit Software, PBC", role = c("cph", "fnd"))
             )
 Description: Assesses the number of concurrent users 'shiny'
   applications are capable of supporting, and for directing application changes
@@ -29,11 +29,13 @@ Collate:
   'make_report.R'
   'plotting.R'
   'shiny-recorder.R'
+  'shinyloadtest-package.R'
   'url.R'
   'util.R'
   'util-pipe.R'
 Imports:
     R6,
+    cli,
     curl,
     dplyr (>= 1.0.0),
     ggplot2 (>= 3.4.0),
@@ -55,17 +57,14 @@ Suggests:
     lubridate,
     progress,
     rmarkdown,
-    testthat,
+    testthat (>= 3.2.0),
     spelling
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Roxygen: list(markdown = TRUE)
 SystemRequirements:
     pandoc (>= 2.2) - http://pandoc.org
 Language: en-US
-Config/Needs/website:
-    devtools,
-    readr,
-    gh
+Config/Needs/website: devtools, readr, gh, tidyverse/tidytemplate
 Config/Needs/routine:
     devtools,
     readr,
@@ -74,3 +73,4 @@ Config/Needs/routine:
     rprojroot,
     usethis,
     stringr
+Config/testthat/edition: 3

@@ -8,7 +8,6 @@
 ^index\.md$
 ^Makefile
 ^RELEASE_URLS\.txt$
-^_pkgdown.yml$
 ^scripts/
 ^doc$
 ^RELEASE_URLS\.csv$
@@ -20,5 +19,7 @@
 ^cran-comments\.md$
 ^data-raw$
 ^\.github$
-README.Rmd
 ^revdep$
+^README\.Rmd$
+^_pkgdown\.yml$
+^pkgdown$

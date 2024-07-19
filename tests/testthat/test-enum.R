@@ -1,5 +1,3 @@
-context("test enums")
-
 test_that("Enum values are equal only to themselves", {
   e1 <- enum(X, Y, Z)
   e2 <- enum(X, Y, Z)
@@ -28,7 +26,7 @@ test_that("enum_case does not evaluate other branches", {
   fun <- function(val) {
     enum_case(val,
       FOO = 123,
-      BAR = (x <<- x+1)
+      BAR = (x <<- x + 1)
     )
   }
   expect_equal(123, fun(e1$FOO))

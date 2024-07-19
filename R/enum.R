@@ -7,8 +7,11 @@ enum_value <- function(x, enum_id, all_val) {
   )
 }
 
+#' @export
 `==.shinyloadtest_enum_value` <- function(x, y) {
-  if (class(y) != "shinyloadtest_enum_value") return(FALSE)
+  if (class(y) != "shinyloadtest_enum_value") {
+    return(FALSE)
+  }
   identical(x, y) && (attr(x, "enum_id") == attr(y, "enum_id"))
 }
 
@@ -26,11 +29,14 @@ enum <- function(...) {
   )
 }
 
+#' @export
 `$.shinyloadtest_enum` <- function(x, i) {
-  if (!(i %in% names(x))) stop("Unknown enum value")
+  if (!(i %in% names(x))) cli::cli_abort("Unknown enum value")
   NextMethod()
 }
+#' @export
 `[[.shinyloadtest_enum` <- `$.shinyloadtest_enum`
+#' @export
 `==.shinyloadtest_enum` <- function(x, y) {
   identical(x, y)
 }
@@ -41,12 +47,14 @@ enum_case <- function(field, ...) {
   all_val <- attr(field, "all_val")
 
   unknown_values <- base::setdiff(names(cases), all_val)
-  if (length(unknown_values))
-    stop(paste("Unknown enum value", paste(unknown_values, collapse = ", ")), call. = FALSE)
+  if (length(unknown_values)) {
+    cli::cli_abort(paste("Unknown enum value", paste(unknown_values, collapse = ", ")), call = NULL)
+  }
 
   missing_values <- base::setdiff(all_val, names(cases))
-  if (length(missing_values))
-    stop(paste("Missing enum value", paste(missing_values, collapse = ", ")), call. = FALSE)
+  if (length(missing_values)) {
+    cli::cli_abort(paste("Missing enum value", paste(missing_values, collapse = ", ")), call = NULL)
+  }
 
   rlang::eval_tidy(cases[[field]])
 }

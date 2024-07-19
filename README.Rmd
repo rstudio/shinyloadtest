@@ -4,6 +4,17 @@ editor_options:
   chunk_output_type: console
 ---
 
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
 # Load Testing Shiny Applications
 
 <!-- badges: start -->
@@ -15,7 +26,7 @@ Load testing helps developers and administrators estimate how many users their a
 If an application requires tuning, load testing and load test result analysis can be used to identify performance bottlenecks and to guide changes to infrastructure, configuration, or code.
 
 Scientific load testing helps put to rest the common misconception that "Shiny doesn't scale".
-As rstudio::conf(2018) Sean Lopp presented on [Scaling Shiny](https://rstudio.com/resources/rstudioconf-2018/scaling-shiny/) which shows how to to horizontally scale an app to handle tens of thousands of users.
+As rstudio::conf(2018) Sean Lopp presented on [Scaling Shiny](https://posit.co/resources/videos/scaling-shiny/) which shows how to to horizontally scale an app to handle tens of thousands of users.
 
 ## Installation
 
@@ -40,7 +51,7 @@ Each step is described below.
 Record a session using `shinyloadtest::record_session()`, which takes the URL of the **deployed** application as an argument:
 
 ```{r, eval = FALSE}
-shinyloadtest::record_session('https://shinyapp.example.com/')
+shinyloadtest::record_session("https://shinyapp.example.com/")
 ```
 
 Running the function will open a browser displaying the app.

@@ -76,7 +76,8 @@ Many different plotting routines to display different loadtest information.
 
 }}
 \examples{
-\donttest{slt_user(slt_demo_data_4)
+\donttest{
+slt_user(slt_demo_data_4)
 slt_session(slt_demo_data_4)
 slt_session_duration(slt_demo_data_4)
 
@@ -87,5 +88,6 @@ slt_time_concurrency(slt_demo_data_4)
 slt_session_latency(slt_demo_data_4)
 slt_http_latency(slt_demo_data_4)
 slt_websocket_latency(slt_demo_data_4)
-slt_hist_loadtimes(slt_demo_data_4)}
+slt_hist_loadtimes(slt_demo_data_4)
+}
 }

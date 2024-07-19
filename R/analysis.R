@@ -14,7 +14,7 @@ strip_suffix <- function(str) {
 read_log_dir <- function(dir, name = basename(dirname(dir)), verbose = vroom::vroom_progress()) {
   files <- list.files(dir, pattern = "*.csv", full.names = TRUE)
   if (length(files) == 0) {
-    stop("No files found for run dir: ", dir, call. = FALSE)
+    cli::cli_abort(paste0("No files found for run dir: ", dir), call = NULL)
   }
 
   df <- vroom::vroom(files,
@@ -68,10 +68,11 @@ read_recording <- function(file_name) {
       tibble(
         event = info$type,
         start = as.numeric(difftime(info$begin, startTime, units = "secs")),
-        end = if (!is.null(info$end))
-            as.numeric(difftime(info$end, startTime, units = "secs"))
-          else
-            as.numeric(difftime(info$begin, startTime, units = "secs")) + 0.001,
+        end = if (!is.null(info$end)) {
+          as.numeric(difftime(info$end, startTime, units = "secs"))
+        } else {
+          as.numeric(difftime(info$begin, startTime, units = "secs")) + 0.001
+        },
         json = list(info),
       )
     }) %>%
@@ -256,13 +257,12 @@ get_times <- function(df) {
 #' @export
 #' @examples
 #' \dontrun{
-#'   load_runs(
-#'      `1 core` = 'results/run-1/',
-#'      `2 cores` = 'results/run-2/'
-#'   )
+#' load_runs(
+#'   `1 core` = "results/run-1/",
+#'   `2 cores` = "results/run-2/"
+#' )
 #' }
 load_runs <- function(..., verbose = vroom::vroom_progress()) {
-
   # TODO: Validate input directories and fail intelligently!
   verbose <- isTRUE(verbose)
 
@@ -297,10 +297,11 @@ load_runs <- function(..., verbose = vroom::vroom_progress()) {
           } else {
             recording <- readLines(recording_path)
             if (!identical(recording, first_recording$lines)) {
-              stop(
+              cli::cli_abort(paste0(
                 "Recording for `", run, "` does not equal the recording for `", first_recording$name, "`.\n",
-                "Please use the same recording when calling load_runs()", call. = FALSE
-              )
+                "Please use the same recording when calling `load_runs()`",
+                call = NULL
+              ))
             }
           }
           df_recording <- first_recording$data
@@ -339,13 +340,10 @@ load_runs <- function(..., verbose = vroom::vroom_progress()) {
 
 
 
-maintenance_df_ids <- function(
-  df
-) {
+maintenance_df_ids <- function(df) {
   lapply(
     unique(df$run),
     function(runVal) {
-
       df_run <- df %>% filter(run == runVal)
 
       # if there is only one iteration... return the whole data frame

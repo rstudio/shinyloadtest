@@ -1,5 +1,3 @@
-context("SockJS message identification")
-
 test_that("SockJS init messages are identified", {
   # Pre sub-app version of SSP
   expect_true(isSockjsInitMessage("[\"0|o|\"]"))

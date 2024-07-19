@@ -208,7 +208,9 @@ The **Event Duration** page helps understand the variability of individual event
 Each event is summarised with a boxplot, with run on the x-axis and time on the y-axis:
 
 ```{r, echo = FALSE}
-df %>% filter(input_line_number == 1) %>% slt_time_boxplot()
+df %>%
+  filter(input_line_number == 1) %>%
+  slt_time_boxplot()
 ```
 
 Since there are typically many events, and most are uninteresting, the report gives you three ways to find interesting events:
@@ -228,7 +230,9 @@ The points are coloured by run.
 Each run also gets a line of best fit, which gives a sense for how the event respond to increasing concurrency.
 
 ```{r, echo = FALSE}
-df %>% filter(input_line_number == 16) %>% slt_time_concurrency()
+df %>%
+  filter(input_line_number == 16) %>%
+  slt_time_concurrency()
 ```
 
 Like **Event Duration**, most events are uninteresting, so the report gives you three ways of sorting to find interesting events:

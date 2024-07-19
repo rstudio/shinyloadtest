@@ -78,9 +78,9 @@ form of the SockJS's JSON message content.
 
 \examples{
 \dontrun{
-  load_runs(
-     `1 core` = 'results/run-1/',
-     `2 cores` = 'results/run-2/'
-  )
+load_runs(
+  `1 core` = "results/run-1/",
+  `2 cores` = "results/run-2/"
+)
 }
 }

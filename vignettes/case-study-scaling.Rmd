@@ -66,7 +66,7 @@ The first step is benchmarking, and we'll do it in several sub-steps:
 First you should install the `shinyloadtest` R package if you haven't yet:
 
 ```{r, eval = FALSE}
-devtools::install_github('rstudio/shinyloadtest')
+devtools::install_github("rstudio/shinyloadtest")
 ```
 
 Next, obtain the "solo" URL of the deployed app in RStudio Connect. You can do this by navigating to the application from the list of published content, clicking the circular button at the top right of the screen, and then clicking "Open Solo". This will open a new window. Copy the URL from this new window.

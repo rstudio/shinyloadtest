@@ -1,11 +1,12 @@
-
 getInputs <- function(html, server) {
   if (server == SERVER_TYPE$SSP) {
     inputs <- xml2::xml_find_all(html, "//input[@type='hidden']")
     attrs <- xml2::xml_attrs(inputs)
     attrs <- lapply(attrs, function(vec) c(name = vec[["name"]], value = vec[["value"]]))
     as.data.frame(do.call(rbind, attrs), stringsAsFactors = FALSE)
-  } else data.frame()
+  } else {
+    data.frame()
+  }
 }
 
 pasteParams <- function(df, collapse) {
@@ -31,7 +32,7 @@ loginUrlFor <- function(appUrl, appServer) {
   if (appServer %in% c(SERVER_TYPE$RSC, SERVER_TYPE$SSP)) {
     appUrl$appendPath("__login__")
   } else {
-    stop(paste0("Unknown appServer:", appServer))
+    cli::cli_abort(paste0("Unknown appServer:", appServer))
   }
 }
 
@@ -47,16 +48,15 @@ handlePost <- function(handle, loginUrl, postfields, cookies, cookieName) {
   )
 
   resp <- curl::curl_fetch_memory(loginUrl$build(), handle = handle)
-  if (!(resp$status_code %in% c(200, 302))) stop("Authentication failed")
+  if (!(resp$status_code %in% c(200, 302))) cli::cli_abort("Authentication failed")
 
-  curl::handle_cookies(handle)[,c("name", "value")]
+  curl::handle_cookies(handle)[, c("name", "value")]
 }
 
 # Returns the cookies that should be attached to all subsequent HTTP requests,
 # including the initial websocket request. Currently implemented for SSP and RSC
 # with LDAP/AD, PAM, or password auth. Don't need for RSC if using API key.
 postLogin <- function(appUrl, appServer, username, password) {
-
   loginUrl <- loginUrlFor(appUrl, appServer)
 
   h <- curl::new_handle()
@@ -64,39 +64,40 @@ postLogin <- function(appUrl, appServer, username, password) {
   resp <- curl::curl_fetch_memory(appUrl$build(), handle = h)
   login_html <- xml2::read_html(rawToChar(resp$content))
   inputs <- rbind(getInputs(login_html, appServer), data.frame(
-    name = c("username", "password"), value = c(username, password))
-  )
-  cookies <- curl::handle_cookies(h)[,c("name", "value")]
+    name = c("username", "password"), value = c(username, password)
+  ))
+  cookies <- curl::handle_cookies(h)[, c("name", "value")]
 
   enum_case(appServer,
     RSC = handlePost(
-            handle = curl::new_handle(),
-            loginUrl = loginUrl,
-            postfields = jsonlite::toJSON(
-              list(
-                username = username,
-                password = password
-              ),
-              auto_unbox = TRUE
-            ),
-            cookies = cookies,
-            cookieName = "rsconnect"
-          ),
+      handle = curl::new_handle(),
+      loginUrl = loginUrl,
+      postfields = jsonlite::toJSON(
+        list(
+          username = username,
+          password = password
+        ),
+        auto_unbox = TRUE
+      ),
+      cookies = cookies,
+      cookieName = "rsconnect"
+    ),
     SSP = handlePost(
-            handle = curl::new_handle(),
-            loginUrl = loginUrl,
-            postfields = utils::URLencode(pasteParams(inputs, "&")),
-            cookies = cookies,
-            cookieName = "session_state"
-          ),
-    SAI = stop("Logging in to shinyapps.io is unsupported"),
-    SHN = stop("Plain Shiny apps don't support authentication")
+      handle = curl::new_handle(),
+      loginUrl = loginUrl,
+      postfields = utils::URLencode(pasteParams(inputs, "&")),
+      cookies = cookies,
+      cookieName = "session_state"
+    ),
+    SAI = cli::cli_abort("Logging in to shinyapps.io is unsupported"),
+    SHN = cli::cli_abort("Plain Shiny apps don't support authentication")
   )
 }
 
 getApp <- function(appUrl, cookie) {
   h <- curl::new_handle()
-  curl::handle_setopt(h, ssl_verifyhost = 0, ssl_verifypeer = 0,
+  curl::handle_setopt(h,
+    ssl_verifyhost = 0, ssl_verifypeer = 0,
     cookie = pasteParams(cookie, "; ")
   )
 

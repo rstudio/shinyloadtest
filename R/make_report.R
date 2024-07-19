@@ -17,21 +17,20 @@ if (getRversion() >= "2.15.1") {
 #' @return The path to the report, invisibly
 #' @examples
 #' \dontrun{
-#'   shinyloadtest_report(slt_demo_data_1)
+#' shinyloadtest_report(slt_demo_data_1)
 #' }
 #' @export
 shinyloadtest_report <- function(
-  df,
-  output = "shinyloadtest_report.html",
-  duration_cutoff = c(attr(df, "recording_duration"), 60)[1],
-  http_latency_cutoff = 5,
-  max_websocket_cutoff = 20,
-  open_browser = TRUE,
-  self_contained = TRUE,
-  verbose = TRUE
-) {
-  if(!grepl(".html$", output)) {
-    stop("'output' should end in '.html'", call. = FALSE)
+    df,
+    output = "shinyloadtest_report.html",
+    duration_cutoff = c(attr(df, "recording_duration"), 60)[1],
+    http_latency_cutoff = 5,
+    max_websocket_cutoff = 20,
+    open_browser = TRUE,
+    self_contained = TRUE,
+    verbose = TRUE) {
+  if (!grepl(".html$", output)) {
+    cli::cli_abort("'output' should end in '.html'", call = NULL)
   }
 
   assert_is_available("gtable")
@@ -45,7 +44,7 @@ shinyloadtest_report <- function(
   if (self_contained) {
     assert_is_available("rmarkdown")
     if (rmarkdown::pandoc_version() < "2.2") {
-      stop("Please upgrade your pandoc version to be at least v2.2", call. = FALSE)
+      cli::cli_abort("Please upgrade your pandoc version to be at least v2.2", call = NULL)
     }
   }
 
@@ -117,10 +116,10 @@ shinyloadtest_report <- function(
   df_maintenance <- df %>% filter(maintenance == TRUE)
 
   latency_height <- 10 * (
-      (
-        (210.61 + 5.48) * length(unique(df$run))
-      ) + 71.73
-    ) / 720
+    (
+      (210.61 + 5.48) * length(unique(df$run))
+    ) + 71.73
+  ) / 720
   tick("HTTP Latency")
   src_http <- df %>%
     slt_http_latency(cutoff = http_latency_cutoff) %>%
@@ -152,19 +151,22 @@ shinyloadtest_report <- function(
       filter(run == run_val)
 
     tick(paste0(run_val, " Session Gantt"))
-    src_gantt <- {
+    src_gantt <-
+      {
         slt_user(df_run) + xlim(min_gantt_time, max_gantt_time)
       } %>%
       save_run_svg(run_val_clean, "gantt", height = 7 * (26.625 * length(unique(df_run$user_id)) + 78) / 504)
 
     tick(paste0(run_val, " Session Duration"))
-    src_duration <- {
+    src_duration <-
+      {
         slt_session_duration(df_run, cutoff = duration_cutoff) + xlim(0, max_duration)
       } %>%
       save_run_svg(run_val_clean, "duration")
 
     tick(paste0(run_val, " Event Waterfall"))
-    src_waterfall <- {
+    src_waterfall <-
+      {
         slt_waterfall(df_run, limits = c(0, max(df_maintenance$concurrency, na.rm = TRUE))) + xlim(min_gantt_time, max_gantt_time)
       } %>%
       save_run_svg(
@@ -174,9 +176,9 @@ shinyloadtest_report <- function(
         height = 7 * (
           (
             340 / 37 * length(levels(df$label)) +
-            5.48
+              5.48
           ) +
-          86.17
+            86.17
         ) / 430
       )
 
@@ -215,7 +217,9 @@ shinyloadtest_report <- function(
 
 
   format_num <- function(x, ...) {
-    if (is.infinite(x) && x < 0) return("")
+    if (is.infinite(x) && x < 0) {
+      return("")
+    }
     formatC(x, format = "f", digits = 3, ...)
   }
 
@@ -247,9 +251,15 @@ shinyloadtest_report <- function(
       model = list(lm(time ~ concurrency))
     ) %>%
     mutate(
-      slope = vapply(model, function(mod){ coef(mod)[2] }, numeric(1)),
-      intercept = vapply(model, function(mod){ coef(mod)[1] }, numeric(1)),
-      max_error = vapply(model, function(mod){ max(abs(c(residuals(mod), 0)), na.rm = TRUE) }, numeric(1)),
+      slope = vapply(model, function(mod) {
+        coef(mod)[2]
+      }, numeric(1)),
+      intercept = vapply(model, function(mod) {
+        coef(mod)[1]
+      }, numeric(1)),
+      max_error = vapply(model, function(mod) {
+        max(abs(c(residuals(mod), 0)), na.rm = TRUE)
+      }, numeric(1)),
     ) %>%
     group_by(label, input_line_number) %>%
     summarise(
@@ -298,7 +308,7 @@ shinyloadtest_report <- function(
     } %>%
     extract_legend() %>%
     {
-      legend_info  <- .
+      legend_info <- .
       # ratio <- legend_info$width_inches / legend_info$height_inches
       save_svg_file(
         legend_info$legend_grob,
@@ -360,7 +370,9 @@ to_svgz <- function(in_path, out_path = tempfile()) {
   invisible(out_path)
 }
 save_svg <- function(p, output, width = 15, height = 10, units = "in", ...) {
-  if (file.exists(output)) return(output)
+  if (file.exists(output)) {
+    return(output)
+  }
   output_tmp <- tempfile(fileext = ".svg")
   on.exit({
     unlink(output_tmp)

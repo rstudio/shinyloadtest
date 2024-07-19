@@ -1,8 +1,9 @@
 `%OR%` <- function(x, y) {
-  if (is.null(x) || isTRUE(is.na(x)))
+  if (is.null(x) || isTRUE(is.na(x))) {
     y
-  else
+  } else {
     x
+  }
 }
 
 
@@ -57,7 +58,7 @@ is_available <- function(package, version = NULL) {
 
 assert_is_available <- function(package, version = NULL) {
   if (!is_available(package, version)) {
-    stop(paste0(
+    cli::cli_abort(paste0(
       "Please install the `", package, "` package and try again."
     ))
   }

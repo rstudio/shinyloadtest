@@ -1,4 +1,6 @@
 
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
 # Load Testing Shiny Applications
 
 <!-- badges: start -->
@@ -18,10 +20,9 @@ code.
 
 Scientific load testing helps put to rest the common misconception that
 “Shiny doesn’t scale”. As rstudio::conf(2018) Sean Lopp presented on
-[Scaling
-Shiny](https://rstudio.com/resources/rstudioconf-2018/scaling-shiny/)
-which shows how to to horizontally scale an app to handle tens of
-thousands of users.
+[Scaling Shiny](https://posit.co/resources/videos/scaling-shiny/) which
+shows how to to horizontally scale an app to handle tens of thousands of
+users.
 
 ## Installation
 
@@ -56,7 +57,7 @@ Record a session using `shinyloadtest::record_session()`, which takes
 the URL of the **deployed** application as an argument:
 
 ``` r
-shinyloadtest::record_session('https://shinyapp.example.com/')
+shinyloadtest::record_session("https://shinyapp.example.com/")
 ```
 
 Running the function will open a browser displaying the app. Once open,
@@ -104,4 +105,8 @@ inspection. For further analysis explanation, please visit [Analysing
 load test
 logs](https://rstudio.github.io/shinyloadtest/articles/analyzing-load-test-logs.html).
 
-![Analysis Example](man/figures/slt_report_screenshot.png)
+<figure>
+<img src="man/figures/slt_report_screenshot.png"
+alt="Analysis Example" />
+<figcaption aria-hidden="true">Analysis Example</figcaption>
+</figure>

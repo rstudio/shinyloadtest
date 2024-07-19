@@ -40,6 +40,6 @@ Make shinyloadtest Report
 }
 \examples{
 \dontrun{
-  shinyloadtest_report(slt_demo_data_1)
+shinyloadtest_report(slt_demo_data_1)
 }
 }
