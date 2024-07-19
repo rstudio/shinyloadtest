@@ -6,7 +6,6 @@
 
 * Fixed #163: `gtable_trim` error during `shinyloadtest_report` with newer versions of ggplot2.
 
-### Improvements
 
 
 # shinyloadtest 1.1.0
