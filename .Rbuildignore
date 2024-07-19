@@ -20,5 +20,5 @@
 ^cran-comments\.md$
 ^data-raw$
 ^\.github$
-README.Rmd
 ^revdep$
+^README\.Rmd$
