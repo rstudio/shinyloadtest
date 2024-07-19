@@ -77,8 +77,8 @@ are not compatible with shinyloadtest.
 With the recording in hand, we’re ready to run the load test. The actual
 test is conducted outside of R using the `shinycannon` command-line
 tool. You can run it using your system’s terminal or console program, or
-you can run it from the RStudio terminal tab. A typical run looks like
-this:
+you can run it from the RStudio IDE’s terminal tab. A typical run looks
+like this:
 
     shinycannon recording.log https://shinyapp.example.com/ --workers 5 --loaded-duration-minutes 2 --output-dir run1
 
