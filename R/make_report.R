@@ -1,7 +1,5 @@
-if (getRversion() >= "2.15.1") {
-  # TODO remove and upgrade the dplyr fns to FN_()
-  utils::globalVariables(c("max_error", "min_time", "max_time", "mean_time", "lm", "model", "coef", "residuals", "slope", "intercept", "slope_pos", "intercept_pos", "max_error_pos"))
-}
+# TODO remove and upgrade the dplyr fns to FN_()
+utils::globalVariables(c("max_error", "min_time", "max_time", "mean_time", "lm", "model", "coef", "residuals", "slope", "intercept", "slope_pos", "intercept_pos", "max_error_pos"))
 
 
 #' Make shinyloadtest Report
