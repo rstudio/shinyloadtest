@@ -1,9 +1,11 @@
-context("report generation")
-
 test_that("reports are generated", {
   skip_on_cran()
   html_file <- sprintf("%s.html", tempfile("report"))
-  shinyloadtest_report(slt_demo_data_1, output = html_file, open_browser = FALSE)
+  shinyloadtest_report(
+    slt_demo_data_1,
+    output = html_file,
+    open_browser = FALSE
+  )
   expect_true(file.exists(html_file))
 })
 
@@ -13,5 +15,8 @@ test_that("legend extraction works", {
     ggplot2::geom_point() +
     ggplot2::theme(legend.position = "bottom") +
     ggplot2::labs(fill = "", color = "")
-  extract_legend(p)
+
+  testthat::expect_no_error(
+    extract_legend(p)
+  )
 })

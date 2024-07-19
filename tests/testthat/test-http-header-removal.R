@@ -1,5 +1,3 @@
-context("test-http-headers")
-
 test_that("hop-by-hop headers removed from Rook requests", {
   rook_req <-
     list(

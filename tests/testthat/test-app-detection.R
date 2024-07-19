@@ -1,5 +1,3 @@
-context("test Shiny app type detection")
-
 slurp <- function(file) {
   readChar(file, file.info(file)$size, useBytes = TRUE)
 }

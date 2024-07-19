@@ -1,5 +1,3 @@
-context("test enums")
-
 test_that("Enum values are equal only to themselves", {
   e1 <- enum(X, Y, Z)
   e2 <- enum(X, Y, Z)

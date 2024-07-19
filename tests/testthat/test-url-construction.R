@@ -1,5 +1,3 @@
-context("test URL construction")
-
 test_that("basic URL without path is created", {
   url <- "http://example.com/"
   expect_equal(url, URLBuilder$new(url)$build())
