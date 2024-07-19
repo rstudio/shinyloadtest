@@ -68,7 +68,7 @@ when the recording is played back with the \code{shinycannon} tool.
 
 \examples{
 \dontrun{
-  record_session("https://example.com/your-shiny-app/")
+record_session("https://example.com/your-shiny-app/")
 }
 }
 \seealso{
