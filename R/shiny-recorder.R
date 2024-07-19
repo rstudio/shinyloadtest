@@ -156,13 +156,13 @@ makeWSEvent <- function(type, begin = Sys.time(), ...) {
 }
 
 #' @export
-format.REQ <- function(httpEvt) {
-  jsonlite::toJSON(unclass(httpEvt), auto_unbox = TRUE)
+format.REQ <- function(x, ...) {
+  jsonlite::toJSON(unclass(x), auto_unbox = TRUE)
 }
 
 #' @export
-format.WS <- function(wsEvt) {
-  jsonlite::toJSON(unclass(wsEvt), auto_unbox = TRUE)
+format.WS <- function(x, ...) {
+  jsonlite::toJSON(unclass(x), auto_unbox = TRUE)
 }
 
 shouldIgnore <- function(msg) {

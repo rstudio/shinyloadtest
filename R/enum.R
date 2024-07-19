@@ -9,7 +9,7 @@ enum_value <- function(x, enum_id, all_val) {
 
 #' @export
 `==.shinyloadtest_enum_value` <- function(x, y) {
-  if (class(y) != "shinyloadtest_enum_value") {
+  if (!inherits(y, "shinyloadtest_enum_value")) {
     return(FALSE)
   }
   identical(x, y) && (attr(x, "enum_id") == attr(y, "enum_id"))

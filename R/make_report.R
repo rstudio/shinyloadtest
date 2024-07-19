@@ -402,7 +402,9 @@ find_legend_grob <- function(gtbl) {
     return(ggplot2::zeroGrob())
   }
   if (length(nonzero_grobs) > 1) {
-    warn("Found legends at multiple positions. Picking the first legend.")
+    cli::cli_warn(
+      "Found legends at multiple positions. Picking the first legend."
+    )
   }
   gtable::gtable_filter(nonzero_grobs[[1]], "^guides$")
 }
