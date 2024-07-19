@@ -9,19 +9,6 @@ Please let me know if there is any more information I can provide.
 Thank you,
 Barret
 
-## Test environments and R CMD check results
-
-* local macOS install 10.15.7
-  * R 4.0
-* GitHub Actions - https://github.com/rstudio/shinyloadtest/pull/141
-  * macOS, windows - R devel
-  * macOS, windows, ubuntu 16, ubuntu 18, ubuntu 20 - R 4.0
-  * ubuntu 16 - R 3.6, 3.4, 3.3
-
-* win-builder
-  * oldrelease
-  * release
-  * devel
 
 #### R CMD check results
 
