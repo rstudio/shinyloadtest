@@ -8,7 +8,9 @@ enum_value <- function(x, enum_id, all_val) {
 }
 
 `==.shinyloadtest_enum_value` <- function(x, y) {
-  if (class(y) != "shinyloadtest_enum_value") return(FALSE)
+  if (class(y) != "shinyloadtest_enum_value") {
+    return(FALSE)
+  }
   identical(x, y) && (attr(x, "enum_id") == attr(y, "enum_id"))
 }
 
@@ -41,12 +43,14 @@ enum_case <- function(field, ...) {
   all_val <- attr(field, "all_val")
 
   unknown_values <- base::setdiff(names(cases), all_val)
-  if (length(unknown_values))
+  if (length(unknown_values)) {
     stop(paste("Unknown enum value", paste(unknown_values, collapse = ", ")), call. = FALSE)
+  }
 
   missing_values <- base::setdiff(all_val, names(cases))
-  if (length(missing_values))
+  if (length(missing_values)) {
     stop(paste("Missing enum value", paste(missing_values, collapse = ", ")), call. = FALSE)
+  }
 
   rlang::eval_tidy(cases[[field]])
 }

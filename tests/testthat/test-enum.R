@@ -28,7 +28,7 @@ test_that("enum_case does not evaluate other branches", {
   fun <- function(val) {
     enum_case(val,
       FOO = 123,
-      BAR = (x <<- x+1)
+      BAR = (x <<- x + 1)
     )
   }
   expect_equal(123, fun(e1$FOO))

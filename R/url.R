@@ -20,11 +20,11 @@ URLBuilder <- R6::R6Class("URLBuilder",
         stopifnot(length(str) == 1)
         parsed <- xml2::url_parse(str)
         self$length <- nrow(parsed)
-        self$scheme <- parsed[,"scheme"]
-        self$host <- parsed[,"server"]
-        self$port <- strtoi(parsed[,"port"])
-        self$path <- parsed[,"path"]
-        self$query <- parsed[,"query"]
+        self$scheme <- parsed[, "scheme"]
+        self$host <- parsed[, "server"]
+        self$port <- strtoi(parsed[, "port"])
+        self$path <- parsed[, "path"]
+        self$query <- parsed[, "query"]
       }
     },
     setScheme = function(scheme) {

@@ -23,7 +23,8 @@ NULL
 #' @rdname slt_plot
 #' @return A \code{\link[ggplot2]{ggplot}} plot object
 #' @examples
-#' \donttest{slt_user(slt_demo_data_4)
+#' \donttest{
+#' slt_user(slt_demo_data_4)
 #' slt_session(slt_demo_data_4)
 #' slt_session_duration(slt_demo_data_4)
 #'
@@ -34,7 +35,8 @@ NULL
 #' slt_session_latency(slt_demo_data_4)
 #' slt_http_latency(slt_demo_data_4)
 #' slt_websocket_latency(slt_demo_data_4)
-#' slt_hist_loadtimes(slt_demo_data_4)}
+#' slt_hist_loadtimes(slt_demo_data_4)
+#' }
 NULL
 
 #' @describeIn slt_plot Box plot of load times for each event in each run
@@ -223,7 +225,7 @@ latency_df <- function(df) {
 }
 
 gantt_latency <- function(df) {
- df_lat <- latency_df(df) %>%
+  df_lat <- latency_df(df) %>%
     spread(event, total_latency) %>%
     mutate(
       perc_http = HTTP / (HTTP + WebSocket)
@@ -259,7 +261,6 @@ gantt_latency <- function(df) {
       type = factor(type, levels = c("mean", "95%", "max"))
     ) %>%
     spread(type, val)
-
 }
 
 #' @describeIn slt_plot Stacked bar chart of event duration for each session within each run
@@ -430,7 +431,7 @@ run_fill_colors <- c(
   "#967250", # very dark orange
   "#8a433f", # very dark red
   "#467362", # very dark teal
-  "#3d5973"  # very dark blue
+  "#3d5973" # very dark blue
 )
 run_accent_color_map <- c(
   # Accent colors only to be used as accents
@@ -439,7 +440,7 @@ run_accent_color_map <- c(
   green = "#144714",
 
   # for use with data colors: 02, 08, 14, 18
-  purple =  "#413554",
+  purple = "#413554",
 
   # for use with data colors: 03, 09, 19
   orange = "#7a4920",

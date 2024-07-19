@@ -11,4 +11,3 @@ test_that("Shiny example app detected", {
 test_that("Non-Shiny app not considered a Shiny app", {
   testthat::expect_false(hasShinyJs(slurp("r_project.html")))
 })
-
