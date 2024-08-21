@@ -157,12 +157,12 @@ makeWSEvent <- function(type, begin = Sys.time(), ...) {
 
 #' @export
 format.REQ <- function(x, ...) {
-  jsonlite::toJSON(unclass(x), auto_unbox = TRUE)
+  to_json(x)
 }
 
 #' @export
 format.WS <- function(x, ...) {
-  jsonlite::toJSON(unclass(x), auto_unbox = TRUE)
+  to_json(x)
 }
 
 shouldIgnore <- function(msg) {
@@ -263,8 +263,10 @@ RecordingSession <- R6::R6Class("RecordingSession",
     clientWsState = CLIENT_WS_STATE$UNOPENED,
     postFiles = character(0),
     writeEvent = function(evt) {
-      writeLines(format(evt), private$outputFile)
-      flush(private$outputFile)
+      try({
+        writeLines(format(evt), private$outputFile)
+        flush(private$outputFile)
+      })
     },
     initializeSessionCookies = function() {
       cookies <- data.frame()

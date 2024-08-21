@@ -1,0 +1,72 @@
+# version: 1
+# target_url: http://127.0.0.1:5064
+# target_type: R/Shiny
+{"type":"REQ_HOME","begin":"2024-08-21T16:20:29.838Z","end":"2024-08-21T16:20:29.903Z","status":200,"url":"/"}
+{"type":"REQ_GET","begin":"2024-08-21T16:20:29.936Z","end":"2024-08-21T16:20:29.944Z","status":200,"url":"/shiny-javascript-1.9.1/shiny.min.js"}
+{"type":"REQ_GET","begin":"2024-08-21T16:20:29.956Z","end":"2024-08-21T16:20:29.957Z","status":200,"url":"/bslib-component-css-0.8.0/components.css"}
+{"type":"REQ_GET","begin":"2024-08-21T16:20:29.962Z","end":"2024-08-21T16:20:29.962Z","status":200,"url":"/shiny-sass-1.9.1/shiny-sass.css"}
+{"type":"REQ_GET","begin":"2024-08-21T16:20:29.964Z","end":"2024-08-21T16:20:29.968Z","status":200,"url":"/bootstrap-5.3.1/bootstrap.min.css"}
+{"type":"REQ_GET","begin":"2024-08-21T16:20:29.970Z","end":"2024-08-21T16:20:29.972Z","status":200,"url":"/bootstrap-5.3.1/bootstrap.bundle.min.js"}
+{"type":"REQ_GET","begin":"2024-08-21T16:20:29.996Z","end":"2024-08-21T16:20:29.997Z","status":200,"url":"/bootstrap-5.3.1/font.css"}
+{"type":"REQ_GET","begin":"2024-08-21T16:20:30.026Z","end":"2024-08-21T16:20:30.027Z","status":200,"url":"/bootstrap-5.3.1/fonts/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS-muw.woff2"}
+{"type":"REQ_GET","begin":"2024-08-21T16:20:30.030Z","end":"2024-08-21T16:20:30.030Z","status":200,"url":"/bootstrap-5.3.1/fonts/HI_SiYsKILxRpg3hIP6sJ7fM7PqlPevW.woff2"}
+{"type":"WS_OPEN","begin":"2024-08-21T16:20:30.036Z","url":"/websocket/"}
+{"type":"WS_RECV_INIT","begin":"2024-08-21T16:20:30.040Z","message":"{\"config\":{\"workerId\":\"\",\"sessionId\":\"${SESSION}\",\"user\":null}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:30.043Z","message":"{\"method\":\"init\",\"data\":{\"file1:shiny.file\":null,\"tabs\":null,\"showhide_tabs\":\"A\",\"btn_error:shiny.action\":0,\"btn_shinyjsToggle:shiny.action\":0,\"btn_freezeReactiveValue:shiny.action\":0,\"btn_notification_show:shiny.action\":0,\"btn_modal_show:shiny.action\":0,\"btn_insert_ui:shiny.action\":0,\"btn_insert_tab:shiny.action\":0,\"btn_toggle_tab:shiny.action\":0,\"btn_update_query_string:shiny.action\":0,\"btn_reset_brush:shiny.action\":0,\"btn_reload:shiny.action\":0,\"freeze_bxs\":[\"A\"],\"txt\":\"Click toggle button to make me disappear\",\".clientdata_output_file_output_hidden\":false,\".clientdata_output_error_output_hidden\":false,\".clientdata_output_freeze_bxs_txt_hidden\":false,\".clientdata_pixelratio\":1,\".clientdata_url_protocol\":\"http:\",\".clientdata_url_hostname\":\"127.0.0.1\",\".clientdata_url_port\":\"8600\",\".clientdata_url_pathname\":\"/\",\".clientdata_url_search\":\"\",\".clientdata_url_hash_initial\":\"\",\".clientdata_url_hash\":\"\",\".clientdata_singletons\":\"add739c82ab207ed2c80be4b7e4b181525eb7a75\"}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:30.063Z","message":"{\"errors\":{\"error_output\":{\"message\":\"0\",\"call\":\"renderText()\",\"type\":null}},\"values\":{\"freeze_bxs_txt\":\"Selected boxes: A\",\"file_output\":\"(No file uploaded)\"},\"inputMessages\":[]}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:35.470Z","message":"{\"method\":\"uploadInit\",\"args\":[[{\"name\":\"py-shiny.png\",\"size\":193371,\"type\":\"image/png\"}]],\"tag\":0}"}
+{"type":"WS_RECV_BEGIN_UPLOAD","begin":"2024-08-21T16:20:35.478Z","message":"{\"response\":{\"tag\":0,\"value\":{\"jobId\":\"${UPLOAD_JOB_ID}\",\"uploadUrl\":\"session/${SESSION}/upload/${UPLOAD_JOB_ID}?w=\"}}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:37.182Z","message":"{\"method\":\"update\",\"data\":{\"btn_error:shiny.action\":1}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:37.206Z","message":"{\"errors\":{\"error_output\":{\"message\":\"1\",\"call\":\"renderText()\",\"type\":null}},\"values\":{},\"inputMessages\":[]}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:38.065Z","message":"{\"method\":\"update\",\"data\":{\"btn_shinyjsToggle:shiny.action\":1}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:38.077Z","message":"{\"custom\":{\"shinyjs-toggle\":{\"id\":\"txt\",\"anim\":false,\"animType\":\"slide\",\"time\":0.5,\"selector\":null,\"condition\":null,\"asis\":false}}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:38.634Z","message":"{\"method\":\"update\",\"data\":{\"btn_freezeReactiveValue:shiny.action\":1}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:38.642Z","message":"{\"frozen\":{\"ids\":[\"cols\"]}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:38.649Z","message":"{\"errors\":{},\"values\":{},\"inputMessages\":[{\"id\":\"freeze_bxs\",\"message\":{\"options\":\"<div class=\\\"shiny-options-group\\\">\\n  <div class=\\\"checkbox\\\">\\n    <label>\\n      <input type=\\\"checkbox\\\" name=\\\"freeze_bxs\\\" value=\\\"X\\\" checked=\\\"checked\\\"/>\\n      <span>X<\\/span>\\n    <\\/label>\\n  <\\/div>\\n  <div class=\\\"checkbox\\\">\\n    <label>\\n      <input type=\\\"checkbox\\\" name=\\\"freeze_bxs\\\" value=\\\"Y\\\"/>\\n      <span>Y<\\/span>\\n    <\\/label>\\n  <\\/div>\\n  <div class=\\\"checkbox\\\">\\n    <label>\\n      <input type=\\\"checkbox\\\" name=\\\"freeze_bxs\\\" value=\\\"Z\\\"/>\\n      <span>Z<\\/span>\\n    <\\/label>\\n  <\\/div>\\n<\\/div>\",\"value\":\"X\"}}]}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:38.652Z","message":"{\"method\":\"update\",\"data\":{\"freeze_bxs\":[\"X\"]}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:38.660Z","message":"{\"errors\":{},\"values\":{\"freeze_bxs_txt\":\"Selected boxes: X\"},\"inputMessages\":[]}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:39.265Z","message":"{\"method\":\"update\",\"data\":{\"btn_notification_show:shiny.action\":1}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:39.274Z","message":"{\"notification\":{\"type\":\"show\",\"message\":{\"html\":\"Notification\\n<br/>\\n<button id=\\\"btn_notification_close\\\" type=\\\"button\\\" class=\\\"btn btn-default action-button\\\">Close notification<\\/button>\",\"action\":\"\",\"deps\":[],\"duration\":null,\"closeButton\":false,\"id\":\"0f2bf8aa597c84cc\",\"type\":\"default\"}}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:39.275Z","message":"{\"custom\":{\"shinyjs-disable\":{\"id\":\"btn_notification_show\",\"selector\":null,\"asis\":false}}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:39.278Z","message":"{\"method\":\"update\",\"data\":{\"btn_notification_close:shiny.action\":0}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:41.914Z","message":"{\"method\":\"update\",\"data\":{\"btn_notification_close:shiny.action\":1}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:41.921Z","message":"{\"notification\":{\"type\":\"remove\",\"message\":\"0f2bf8aa597c84cc\"}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:41.922Z","message":"{\"custom\":{\"shinyjs-enable\":{\"id\":\"btn_notification_show\",\"selector\":null,\"asis\":false}}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:42.898Z","message":"{\"method\":\"update\",\"data\":{\"btn_modal_show:shiny.action\":1}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:42.907Z","message":"{\"modal\":{\"type\":\"show\",\"message\":{\"html\":\"<div class=\\\"modal fade\\\" id=\\\"shiny-modal\\\" tabindex=\\\"-1\\\">\\n  <div class=\\\"modal-dialog\\\">\\n    <div class=\\\"modal-content\\\">\\n      <div class=\\\"modal-body\\\">\\n        Modal contents\\n        <br/>\\n        <button id=\\\"btn_modal_close\\\" type=\\\"button\\\" class=\\\"btn btn-default action-button\\\">Close modal<\\/button>\\n      <\\/div>\\n    <\\/div>\\n  <\\/div>\\n  <script>if (window.bootstrap && !window.bootstrap.Modal.VERSION.match(/^4\\\\./)) {\\n         var modal = new bootstrap.Modal(document.getElementById('shiny-modal'));\\n         modal.show();\\n      } else {\\n         $('#shiny-modal').modal().focus();\\n      }<\\/script>\\n<\\/div>\",\"deps\":[]}}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:42.911Z","message":"{\"method\":\"update\",\"data\":{\"btn_modal_close:shiny.action\":0}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:44.098Z","message":"{\"method\":\"update\",\"data\":{\"btn_modal_close:shiny.action\":1}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:44.105Z","message":"{\"modal\":{\"type\":\"remove\",\"message\":null}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:44.882Z","message":"{\"method\":\"update\",\"data\":{\"btn_insert_ui:shiny.action\":1}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:44.892Z","message":"{\"custom\":{\"shinyjs-disable\":{\"id\":\"btn_insert_ui\",\"selector\":null,\"asis\":false}}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:44.897Z","message":"{\"shiny-insert-ui\":{\"selector\":\"#add\",\"multiple\":false,\"where\":\"afterEnd\",\"content\":{\"html\":\"<div class=\\\"form-group shiny-input-container\\\">\\n  <label class=\\\"control-label\\\" id=\\\"txt-label\\\" for=\\\"txt\\\">Insert some text<\\/label>\\n  <input id=\\\"txt\\\" type=\\\"text\\\" class=\\\"shiny-input-text form-control\\\" value=\\\"\\\"/>\\n<\\/div>\",\"deps\":[]}}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:44.897Z","message":"{\"shiny-insert-ui\":{\"selector\":\"#ui_anchor\",\"multiple\":false,\"where\":\"beforeEnd\",\"content\":{\"html\":\"<button id=\\\"btn_remove_ui\\\" type=\\\"button\\\" class=\\\"btn btn-default action-button\\\">Remove UI<\\/button>\",\"deps\":[]}}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:44.899Z","message":"{\"method\":\"update\",\"data\":{\"btn_remove_ui:shiny.action\":0}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:45.915Z","message":"{\"method\":\"update\",\"data\":{\"btn_remove_ui:shiny.action\":1}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:45.922Z","message":"{\"custom\":{\"shinyjs-enable\":{\"id\":\"btn_insert_ui\",\"selector\":null,\"asis\":false}}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:45.924Z","message":"{\"shiny-remove-ui\":{\"selector\":\"#ui_anchor > *\",\"multiple\":false}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:47.065Z","message":"{\"method\":\"update\",\"data\":{\"btn_insert_tab:shiny.action\":1}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:47.074Z","message":"{\"custom\":{\"shinyjs-disable\":{\"id\":\"btn_insert_tab\",\"selector\":null,\"asis\":false}}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:47.078Z","message":"{\"shiny-insert-tab\":{\"inputId\":\"tabs\",\"liTag\":{\"html\":\"<li class=\\\"nav-item\\\">\\n  <a href=\\\"#tab-tsid-id\\\" data-toggle=\\\"tab\\\" data-bs-toggle=\\\"tab\\\" data-value=\\\"tab\\\" class=\\\"nav-link\\\">tab<\\/a>\\n<\\/li>\",\"deps\":[]},\"divTag\":{\"html\":\"<div class=\\\"tab-pane\\\" data-value=\\\"tab\\\" id=\\\"tab-tsid-id\\\">\\n  <button id=\\\"btn_remove_tab\\\" type=\\\"button\\\" class=\\\"btn btn-default action-button\\\">Remove Tab<\\/button>\\n<\\/div>\",\"deps\":[]},\"menuName\":null,\"target\":null,\"position\":\"after\",\"select\":true}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:47.084Z","message":"{\"method\":\"update\",\"data\":{\"btn_remove_tab:shiny.action\":0,\"tabs\":\"tab\"}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:47.085Z","message":"{\"method\":\"update\",\"data\":{}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:48.064Z","message":"{\"method\":\"update\",\"data\":{\"btn_remove_tab:shiny.action\":1}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:48.071Z","message":"{\"custom\":{\"shinyjs-enable\":{\"id\":\"btn_insert_tab\",\"selector\":null,\"asis\":false}}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:48.073Z","message":"{\"shiny-remove-tab\":{\"inputId\":\"tabs\",\"target\":\"tab\"}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:48.075Z","message":"{\"method\":\"update\",\"data\":{\"tabs\":null}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:48.914Z","message":"{\"method\":\"update\",\"data\":{\"btn_toggle_tab:shiny.action\":1}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:48.918Z","message":"{\"shiny-change-tab-visibility\":{\"inputId\":\"showhide_tabs\",\"target\":\"B\",\"type\":\"hide\"}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:48.919Z","message":"{\"errors\":{},\"values\":{},\"inputMessages\":[{\"id\":\"btn_toggle_tab\",\"message\":{\"label\":\"Show Tab B\"}}]}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:49.631Z","message":"{\"method\":\"update\",\"data\":{\"btn_toggle_tab:shiny.action\":2}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:49.639Z","message":"{\"shiny-change-tab-visibility\":{\"inputId\":\"showhide_tabs\",\"target\":\"B\",\"type\":\"show\"}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:49.640Z","message":"{\"errors\":{},\"values\":{},\"inputMessages\":[{\"id\":\"btn_toggle_tab\",\"message\":{\"label\":\"Hide Tab B\"}}]}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:50.264Z","message":"{\"method\":\"update\",\"data\":{\"btn_update_query_string:shiny.action\":1}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:50.270Z","message":"{\"updateQueryString\":{\"queryString\":\"#foo=1\",\"mode\":\"push\"}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:50.272Z","message":"{\"method\":\"update\",\"data\":{\".clientdata_url_hash\":\"#foo=1\"}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:51.032Z","message":"{\"method\":\"update\",\"data\":{\"btn_reset_brush:shiny.action\":1}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:51.039Z","message":"{\"resetBrush\":{\"brushId\":\"does_not_exist\"}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:51.040Z","message":"{\"method\":\"update\",\"data\":{\"does_not_exist\":null}}"}
+{"type":"WS_SEND","begin":"2024-08-21T16:20:52.164Z","message":"{\"method\":\"update\",\"data\":{\"btn_reload:shiny.action\":1}}"}
+{"type":"WS_RECV","begin":"2024-08-21T16:20:52.171Z","message":"{\"reload\":true}"}
+{"type":"REQ_HOME","begin":"2024-08-21T16:20:52.181Z","end":"2024-08-21T16:20:52.284Z","status":200,"url":"/"}
+{"type":"WS_CLOSE","begin":"2024-08-21T16:20:52.299Z"}

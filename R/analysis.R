@@ -7,6 +7,10 @@ strip_suffix <- function(str) {
   sub("(.*)_.*", "\\1", str)
 }
 
+comma_collapse <- function(...) {
+  paste0(..., collapse = ", ")
+}
+
 
 # Read a "sessions/" directory full of .log files
 read_log_dir <- function(dir, name = basename(dirname(dir)), verbose = vroom::vroom_progress()) {
@@ -137,7 +141,8 @@ recording_item_labels <- function(x_list) {
   for (i in seq_along(x_list)) {
     x <- x_list[[i]]
 
-    new_label <- switch(x$type,
+    new_label <- switch(
+      x$type,
       "REQ_HOME" = "Get: Homepage",
       "REQ_GET" = paste0("Get: ", shorten_url(x$url)),
       "REQ_TOK" = "Get: Shiny Token",
@@ -161,7 +166,11 @@ recording_item_labels <- function(x_list) {
             } else {
               name_vals <- names(message$data)
               visible_name_vals <- name_vals[!grepl("^\\.", name_vals)]
-              paste0("Set: ", paste0(visible_name_vals, collapse = ", "))
+              if (length(visible_name_vals) == 0) {
+                "(Empty update)"
+              } else {
+                paste0("Set: ", comma_collapse(visible_name_vals))
+              }
             }
           }
         }
@@ -170,12 +179,7 @@ recording_item_labels <- function(x_list) {
         if (x$message == "o") {
           "Start Connection"
         } else {
-          message <- x$message_parsed
-          if (!is.null(message$response$tag)) {
-            "Completed File Upload"
-          } else {
-            paste0("Updated: ", paste0(names(message$values), collapse = ", "))
-          }
+          ws_recv_label(x$message_parsed)
         }
       },
       "WS_CLOSE" = WS_CLOSE_LABEL,
@@ -379,4 +383,185 @@ maintenance_df_ids <- function(df) {
     }
   ) %>%
     unlist()
+}
+
+
+ws_recv_label <- function(message) {
+  # When the day comes that multiple messages can be sent at once, we will need
+  # to rewright this function to handle that case. Until then, we can assume
+  # that only one message style is sent at a time and can return early.
+
+  # Seach for usage of `$sendMessage(` in https://github.com/rstudio/shiny/blob/d84aa94762b4ffaf7533a007b6cb92c40f4f29af/R/shiny.R
+
+  # Config handler is handled in `WS_RECV_INIT`
+  # `recalculating` is not to be shown
+  # `progress` is not to be shown
+  # `busy` is not to be shown
+
+  # File upload complete
+  if (!is.null(message$response$tag)) {
+    return("Completed File Upload")
+  }
+
+  # Update outputs, Input messages, Output errors (skipped)
+  if (!is.null(message$values)) {
+    # (choice): Do not display errors or input values
+    if (!is.null(message$errors)) {
+      paste0("Errors: ", comma_collapse(message$errors))
+    }
+
+    has_input_msgs <-
+      !is.null(message$inputMessages) &&
+      length(message$inputMessages) > 0
+    has_values <- length(message$values) > 0
+    errors <- message$errors
+    has_errors <- length(errors) > 0
+    if (has_errors) {
+      is_not_silent_error <- vapply(errors, function(err) {
+        ! ("shiny.silent.error" %in% err$type)
+      }, logical(1))
+      errors <- errors[is_not_silent_error]
+      has_errors <- length(errors) > 0
+    }
+
+    if (!(has_errors || has_values || has_input_msgs)) {
+      return("(Empty values)")
+    }
+
+    error_msgs <- NULL
+    if (has_errors) {
+      error_msgs <- paste0(
+        "Errors: ", comma_collapse(names(errors))
+      )
+    }
+
+    input_msgs <- NULL
+    if (has_input_msgs) {
+      input_msgs <- paste0(
+        "Input message: ", comma_collapse(as.list(message$inputMessages)$id)
+      )
+    }
+
+    updated_msgs <- NULL
+    if (has_values) {
+      updated_msgs <- paste0(
+        "Updated: ", comma_collapse(names(message$values))
+      )
+    }
+
+    return(
+      paste0(c(input_msgs, updated_msgs, error_msgs), collapse = "; ")
+    )
+  }
+
+  # Custom message handler
+  if (!is.null(message$custom)) {
+    custom_names <-
+      unlist(Map(
+        names(message$custom),
+        message$custom,
+        f = function(name, value) {
+          if (is.list(value) && !is.null(value$id)) {
+            paste0(name, "[", value$id, "]")
+          } else {
+            name
+          }
+        }
+      ))
+    return(paste0("Custom: ", comma_collapse(custom_names)))
+  }
+
+  # Frozen message
+  if (!is.null(message$frozen)) {
+    return(paste0("Freeze: ", comma_collapse(message$frozen$ids)))
+  }
+
+  # Unique Request/Response handler (`window.Shiny.shinyapp.makeRequest()` response)
+  if (!is.null(message$response)) {
+    # TODO future; Keep a map of request `tag` values to `method` values
+    # This would allow for the (typically discriptive) request method
+    # `Request: <method:str>` to be displayed, and not just `Request: <tag:int>`
+    return(paste0("Request: ", message$response$tag))
+  }
+
+  # Notification handler
+  if (!is.null(message$notification)) {
+    return(switch(
+      message$notification$type,
+      "show" = paste0("Show notification: ", message$notification$message$id),
+      "remove" = paste0("Remove notification: ", message$notification$message),
+      "Notification: (Unknown)"
+    ))
+  }
+
+  # Modal handler
+  if (!is.null(message$modal)) {
+    return(switch(
+      message$modal$type,
+      "show" = "Show modal",
+      "remove" = "Hide modal",
+      "Modal: (Unknown)"
+    ))
+  }
+
+  # Reload handler
+  if (!is.null(message$reload)) {
+    return("Reload app")
+  }
+
+  # # shiny-insert-ui handler
+  if (!is.null(message$`shiny-insert-ui`)) {
+    return(paste0("Insert UI: ", message$`shiny-insert-ui`$selector))
+  }
+
+  # # shiny-remove-ui handler
+  if (!is.null(message$`shiny-remove-ui`)) {
+    return(paste0("Remove UI: ", message$`shiny-remove-ui`$selector))
+  }
+
+  # # shiny-insert-tab handler
+  if (!is.null(message$`shiny-insert-tab`)) {
+    return(paste0("Insert tab: ", message$`shiny-insert-tab`$inputId))
+  }
+
+  # # shiny-remove-tab handler
+  if (!is.null(message$`shiny-remove-tab`)) {
+    return(paste0("Remove tab: ", message$`shiny-remove-tab`$inputId))
+  }
+
+  # # shiny-change-tab-visibility handler
+  if (!is.null(message$`shiny-change-tab-visibility`)) {
+
+    tab_vis <- message$`shiny-change-tab-visibility`
+    return(switch(
+      tab_vis$type,
+      "show" = paste0("Show tab: ", tab_vis$inputId),
+      "hide" = paste0("Hide tab: ", tab_vis$inputId),
+      "Tab visibility: (Unknown)"
+    ))
+  }
+
+  # # updateQueryString handler
+  if (!is.null(message$updateQueryString)) {
+    # Contents are too large. We should not display them
+    return("Update query string")
+  }
+
+  # # resetBrush handler
+  if (!is.null(message$resetBrush)) {
+    return(paste0("Reset brush: ", message$resetBrush$brushId))
+  }
+
+
+  msg_json <- to_json(message)
+  issue_url <- "https://github.com/rstudio/shinyloadtest/issues/new"
+  cli::cli_warn(
+    c(
+      "!" = "Unknown WS_RECV message",
+      "i" = "Please report this issue to {.url {issue_url} }",
+      "i" = paste0("{.code {msg_json} }")
+    ),
+  )
+
+  "(Unknown)"
 }

@@ -72,12 +72,11 @@ postLogin <- function(appUrl, appServer, username, password) {
     RSC = handlePost(
       handle = curl::new_handle(),
       loginUrl = loginUrl,
-      postfields = jsonlite::toJSON(
+      postfields = to_json(
         list(
           username = username,
           password = password
-        ),
-        auto_unbox = TRUE
+        )
       ),
       cookies = cookies,
       cookieName = "rsconnect"
