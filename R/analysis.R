@@ -475,7 +475,7 @@ ws_recv_label <- function(message) {
     return(paste0("Freeze: ", comma_collapse(message$frozen$ids)))
   }
 
-  # Unique Request/Response handler (`window.shiny.makeRequest()` response)
+  # Unique Request/Response handler (`window.Shiny.shinyapp.makeRequest()` response)
   if (!is.null(message$response)) {
     # TODO future; Keep a map of request `tag` values to `method` values
     # This would allow for the (typically discriptive) request method
@@ -559,7 +559,7 @@ ws_recv_label <- function(message) {
 
   # # resetBrush handler
   if (!is.null(message$resetBrush)) {
-    return("Reset brush")
+    return(paste0("Reset brush: ", message$resetBrush$brushId))
   }
 
 
@@ -571,9 +571,6 @@ ws_recv_label <- function(message) {
       "i" = "Please report this issue to {.url {issue_url} }",
       "i" = paste0("{.code {msg_json} }")
     ),
-    # use_cli_format = TRUE,
-    # .frequency = "once",
-    # .frequency_id = paste0("ws_recv_label", names(message))
   )
 
   "(Unknown)"
