@@ -63,3 +63,11 @@ assert_is_available <- function(package, version = NULL) {
     ))
   }
 }
+
+
+to_json <- function(x, ..., auto_unbox = TRUE, unclass_x = TRUE) {
+  if (unclass_x) {
+    x <- unclass(x)
+  }
+  jsonlite::toJSON(x, ..., auto_unbox = auto_unbox)
+}
