@@ -1,3 +1,5 @@
+# shinyloadtest (development version)
+
 # shinyloadtest 1.2.0
 
 ### Bug Fixes
