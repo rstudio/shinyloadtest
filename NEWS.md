@@ -1,5 +1,9 @@
 # shinyloadtest (development version)
 
+### Bug Fixes
+
+* Fixed #179: Waterfall plot labels now support all message types as of {shiny} v1.9.1. This will remove the empty `Set: ` and `Updated: ` labels from the waterfall plot and replace them with an appropriate label.
+
 # shinyloadtest 1.2.0
 
 ### Bug Fixes
@@ -7,8 +11,6 @@
 * Fixed #168: Remove deprecated usage of `dplyr::summarise` during `shinyloadtest_report`.
 
 * Fixed #163: `gtable_trim` error during `shinyloadtest_report` with newer versions of ggplot2.
-
-
 
 # shinyloadtest 1.1.0
 
