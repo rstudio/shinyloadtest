@@ -1,0 +1,85 @@
+
+
+ex_labels <- c(
+  "Event 1) Get: Homepage",
+  "Event 2) Get: shiny.min.js",
+  "Event 3) Get: components.css",
+  "Event 4) Get: shiny-sass.css",
+  "Event 5) Get: bootstrap.min.css",
+  "Event 6) Get: bootstrap.bundle.min.js",
+  "Event 7) Get: font.css",
+  "Event 8) Get: memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS-muw.woff2",
+  "Event 9) Get: HI_SiYsKILxRpg3hIP6sJ7fM7PqlPevW.woff2",
+  "Event 10) Start Session",
+  "Event 11) Initialize Session",
+  "Event 12) Initialize Inputs",
+  "Event 13) Updated: freeze_bxs_txt, file_output; Errors: error_output",
+  "Event 14) Start File Upload",
+  "Event 15) File Upload",
+  "Event 16) Set: btn_error:shiny.action",
+  "Event 17) Errors: error_output",
+  "Event 18) Set: btn_shinyjsToggle:shiny.action",
+  "Event 19) Custom: shinyjs-toggle[txt]",
+  "Event 20) Set: btn_freezeReactiveValue:shiny.action",
+  "Event 21) Freeze: cols",
+  "Event 22) Input message: freeze_bxs",
+  "Event 23) Set: freeze_bxs",
+  "Event 24) Updated: freeze_bxs_txt",
+  "Event 25) Set: btn_notification_show:shiny.action",
+  "Event 26) Show notification: 0f2bf8aa597c84cc",
+  "Event 27) Custom: shinyjs-disable[btn_notification_show]",
+  "Event 28) Set: btn_notification_close:shiny.action",
+  "Event 29) Set: btn_notification_close:shiny.action",
+  "Event 30) Remove notification: 0f2bf8aa597c84cc",
+  "Event 31) Custom: shinyjs-enable[btn_notification_show]",
+  "Event 32) Set: btn_modal_show:shiny.action",
+  "Event 33) Show modal",
+  "Event 34) Set: btn_modal_close:shiny.action",
+  "Event 35) Set: btn_modal_close:shiny.action",
+  "Event 36) Hide modal",
+  "Event 37) Set: btn_insert_ui:shiny.action",
+  "Event 38) Custom: shinyjs-disable[btn_insert_ui]",
+  "Event 39) Insert UI: #add",
+  "Event 40) Insert UI: #ui_anchor",
+  "Event 41) Set: btn_remove_ui:shiny.action",
+  "Event 42) Set: btn_remove_ui:shiny.action",
+  "Event 43) Custom: shinyjs-enable[btn_insert_ui]",
+  "Event 44) Remove UI: #ui_anchor > *",
+  "Event 45) Set: btn_insert_tab:shiny.action",
+  "Event 46) Custom: shinyjs-disable[btn_insert_tab]",
+  "Event 47) Insert tab: tabs",
+  "Event 48) Set: btn_remove_tab:shiny.action, tabs",
+  "Event 49) (Empty update)",
+  "Event 50) Set: btn_remove_tab:shiny.action",
+  "Event 51) Custom: shinyjs-enable[btn_insert_tab]",
+  "Event 52) Remove tab: tabs",
+  "Event 53) Set: tabs",
+  "Event 54) Set: btn_toggle_tab:shiny.action",
+  "Event 55) Hide tab: showhide_tabs",
+  "Event 56) Input message: btn_toggle_tab",
+  "Event 57) Set: btn_toggle_tab:shiny.action",
+  "Event 58) Show tab: showhide_tabs",
+  "Event 59) Input message: btn_toggle_tab",
+  "Event 60) Set: btn_update_query_string:shiny.action",
+  "Event 61) Update query string",
+  "Event 62) (Empty update)",
+  "Event 63) Set: btn_reset_brush:shiny.action",
+  "Event 64) Reset brush",
+  "Event 65) Set: does_not_exist",
+  "Event 66) Set: btn_reload:shiny.action",
+  "Event 67) Reload app",
+  "Event 68) Get: Homepage",
+  "Event 69) Stop Session"
+)
+
+
+test_that("Many labels are supported", {
+
+  runs <- load_runs(test="label-out")
+  expect_equal(
+    levels(runs$label),
+    ex_labels
+  )
+
+
+})
