@@ -141,7 +141,8 @@ recording_item_labels <- function(x_list) {
   for (i in seq_along(x_list)) {
     x <- x_list[[i]]
 
-    new_label <- switch(x$type,
+    new_label <- switch(
+      x$type,
       "REQ_HOME" = "Get: Homepage",
       "REQ_GET" = paste0("Get: ", shorten_url(x$url)),
       "REQ_TOK" = "Get: Shiny Token",
@@ -483,16 +484,12 @@ ws_recv_label <- function(message) {
     return(paste0("Request: ", message$response$tag))
   }
 
-
   # Notification handler
   if (!is.null(message$notification)) {
-    return(switch(message$notification$type,
-      "show" = {
-        paste0("Show notification: ", message$notification$message$id)
-      },
-      "remove" = {
-        paste0("Remove notification: ", message$notification$message)
-      },
+    return(switch(
+      message$notification$type,
+      "show" = paste0("Show notification: ", message$notification$message$id),
+      "remove" = paste0("Remove notification: ", message$notification$message),
       "Notification: (Unknown)"
     ))
   }
@@ -501,12 +498,8 @@ ws_recv_label <- function(message) {
   if (!is.null(message$modal)) {
     return(switch(
       message$modal$type,
-      "show" = {
-        paste0("Show modal")
-      },
-      "remove" = {
-        paste0("Hide modal")
-      },
+      "show" = "Show modal",
+      "remove" = "Hide modal",
       "Modal: (Unknown)"
     ))
   }
@@ -540,13 +533,10 @@ ws_recv_label <- function(message) {
   if (!is.null(message$`shiny-change-tab-visibility`)) {
 
     tab_vis <- message$`shiny-change-tab-visibility`
-    return(switch(tab_vis$type,
-      "show" = {
-        paste0("Show tab: ", tab_vis$inputId)
-      },
-      "hide" = {
-        paste0("Hide tab: ", tab_vis$inputId)
-      },
+    return(switch(
+      tab_vis$type,
+      "show" = paste0("Show tab: ", tab_vis$inputId),
+      "hide" = paste0("Hide tab: ", tab_vis$inputId),
       "Tab visibility: (Unknown)"
     ))
   }
