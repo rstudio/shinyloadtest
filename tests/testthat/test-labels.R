@@ -64,7 +64,7 @@ ex_labels <- c(
   "Event 61) Update query string",
   "Event 62) (Empty update)",
   "Event 63) Set: btn_reset_brush:shiny.action",
-  "Event 64) Reset brush",
+  "Event 64) Reset brush: does_not_exist",
   "Event 65) Set: does_not_exist",
   "Event 66) Set: btn_reload:shiny.action",
   "Event 67) Reload app",
