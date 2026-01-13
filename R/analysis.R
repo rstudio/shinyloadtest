@@ -312,8 +312,8 @@ load_runs <- function(..., verbose = vroom::vroom_progress()) {
           df_maintenance_ids <- maintenance_df_ids(df_run)
 
           df_run <- df_run %>%
-            mutate(maintenance = id %in% df_maintenance_ids) %>%
-            select(-id)
+            mutate(maintenance = .data$id %in% df_maintenance_ids) %>%
+            select(-"id")
 
           min_maintenance_time <- df_run %>%
             filter(maintenance == TRUE) %>%
