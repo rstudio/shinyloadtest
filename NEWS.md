@@ -2,7 +2,7 @@
 
 ### Bug Fixes
 
-* R CMD check NOTE about undefined global variable `id` in dplyr code (#182).
+* R CMD check NOTE about undefined global variable `id` in `{dplyr}` code (#182).
 
 * Fixed #179: Waterfall plot labels now support all message types as of {shiny} v1.9.1. This will remove the empty `Set: ` and `Updated: ` labels from the waterfall plot and replace them with an appropriate label.
 
