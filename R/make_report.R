@@ -1,5 +1,19 @@
 # TODO remove and upgrade the dplyr fns to FN_()
-utils::globalVariables(c("max_error", "min_time", "max_time", "mean_time", "lm", "model", "coef", "residuals", "slope", "intercept", "slope_pos", "intercept_pos", "max_error_pos"))
+utils::globalVariables(c(
+  "max_error",
+  "min_time",
+  "max_time",
+  "mean_time",
+  "lm",
+  "model",
+  "coef",
+  "residuals",
+  "slope",
+  "intercept",
+  "slope_pos",
+  "intercept_pos",
+  "max_error_pos"
+))
 
 
 #' Make shinyloadtest Report
@@ -19,14 +33,15 @@ utils::globalVariables(c("max_error", "min_time", "max_time", "mean_time", "lm",
 #' }
 #' @export
 shinyloadtest_report <- function(
-    df,
-    output = "shinyloadtest_report.html",
-    duration_cutoff = c(attr(df, "recording_duration"), 60)[1],
-    http_latency_cutoff = 5,
-    max_websocket_cutoff = 20,
-    open_browser = TRUE,
-    self_contained = TRUE,
-    verbose = TRUE) {
+  df,
+  output = "shinyloadtest_report.html",
+  duration_cutoff = c(attr(df, "recording_duration"), 60)[1],
+  http_latency_cutoff = 5,
+  max_websocket_cutoff = 20,
+  open_browser = TRUE,
+  self_contained = TRUE,
+  verbose = TRUE
+) {
   if (!grepl(".html$", output)) {
     cli::cli_abort("'output' should end in '.html'", call = NULL)
   }
@@ -42,7 +57,10 @@ shinyloadtest_report <- function(
   if (self_contained) {
     assert_is_available("rmarkdown")
     if (rmarkdown::pandoc_version() < "2.2") {
-      cli::cli_abort("Please upgrade your pandoc version to be at least v2.2", call = NULL)
+      cli::cli_abort(
+        "Please upgrade your pandoc version to be at least v2.2",
+        call = NULL
+      )
     }
   }
 
@@ -79,17 +97,28 @@ shinyloadtest_report <- function(
     base_output_name <- file.path(
       tempdir(),
       paste0("shinyloadtest", floor(stats::runif(1, 1, 10000))),
-      basename(sub(paste0(".", tools::file_ext(output)), "", output, fixed = TRUE))
+      basename(sub(
+        paste0(".", tools::file_ext(output)),
+        "",
+        output,
+        fixed = TRUE
+      ))
     )
   } else {
-    base_output_name <- sub(paste0(".", tools::file_ext(output)), "", output, fixed = TRUE)
+    base_output_name <- sub(
+      paste0(".", tools::file_ext(output)),
+      "",
+      output,
+      fixed = TRUE
+    )
   }
   tick("Copy Files")
   svg_folder <- "svg"
   # make sure output location exists
   dir.create(
     file.path(base_output_name, svg_folder),
-    recursive = TRUE, showWarnings = FALSE
+    recursive = TRUE,
+    showWarnings = FALSE
   )
 
   # copy js and css files
@@ -113,11 +142,9 @@ shinyloadtest_report <- function(
 
   df_maintenance <- df %>% filter(maintenance == TRUE)
 
-  latency_height <- 10 * (
-    (
-      (210.61 + 5.48) * length(unique(df$run))
-    ) + 71.73
-  ) / 720
+  latency_height <- 10 *
+    (((210.61 + 5.48) * length(unique(df$run))) + 71.73) /
+    720
   tick("HTTP Latency")
   src_http <- df %>%
     slt_http_latency(cutoff = http_latency_cutoff) %>%
@@ -153,31 +180,37 @@ shinyloadtest_report <- function(
       {
         slt_user(df_run) + xlim(min_gantt_time, max_gantt_time)
       } %>%
-      save_run_svg(run_val_clean, "gantt", height = 7 * (26.625 * length(unique(df_run$user_id)) + 78) / 504)
+      save_run_svg(
+        run_val_clean,
+        "gantt",
+        height = 7 * (26.625 * length(unique(df_run$user_id)) + 78) / 504
+      )
 
     tick(paste0(run_val, " Session Duration"))
     src_duration <-
       {
-        slt_session_duration(df_run, cutoff = duration_cutoff) + xlim(0, max_duration)
+        slt_session_duration(df_run, cutoff = duration_cutoff) +
+          xlim(0, max_duration)
       } %>%
       save_run_svg(run_val_clean, "duration")
 
     tick(paste0(run_val, " Event Waterfall"))
     src_waterfall <-
       {
-        slt_waterfall(df_run, limits = c(0, max(df_maintenance$concurrency, na.rm = TRUE))) + xlim(min_gantt_time, max_gantt_time)
+        slt_waterfall(
+          df_run,
+          limits = c(0, max(df_maintenance$concurrency, na.rm = TRUE))
+        ) +
+          xlim(min_gantt_time, max_gantt_time)
       } %>%
       save_run_svg(
         run_val_clean,
         "waterfall",
         width = 15,
-        height = 7 * (
-          (
-            340 / 37 * length(levels(df$label)) +
-              5.48
-          ) +
-            86.17
-        ) / 430
+        height = 7 *
+          ((340 / 37 * length(levels(df$label)) + 5.48) +
+            86.17) /
+          430
       )
 
     list(
@@ -213,7 +246,6 @@ shinyloadtest_report <- function(
     arrange(input_line_number) %>%
     ungroup()
 
-
   format_num <- function(x, ...) {
     if (is.infinite(x) && x < 0) {
       return("")
@@ -229,7 +261,8 @@ shinyloadtest_report <- function(
     src_boxplot <- df_event %>%
       slt_time_boxplot() %>%
       save_run_svg(input_line_val, "boxplot", height = 4, width = 4)
-    df_boxplot_event <- df_boxplot %>% filter(input_line_number == input_line_val)
+    df_boxplot_event <- df_boxplot %>%
+      filter(input_line_number == input_line_val)
     list(
       label = htmltools::htmlEscape(df_boxplot_event$label[[1]]),
       src = src_boxplot,
@@ -249,15 +282,27 @@ shinyloadtest_report <- function(
       model = list(lm(time ~ concurrency))
     ) %>%
     mutate(
-      slope = vapply(model, function(mod) {
-        coef(mod)[2]
-      }, numeric(1)),
-      intercept = vapply(model, function(mod) {
-        coef(mod)[1]
-      }, numeric(1)),
-      max_error = vapply(model, function(mod) {
-        max(abs(c(residuals(mod), 0)), na.rm = TRUE)
-      }, numeric(1)),
+      slope = vapply(
+        model,
+        function(mod) {
+          coef(mod)[2]
+        },
+        numeric(1)
+      ),
+      intercept = vapply(
+        model,
+        function(mod) {
+          coef(mod)[1]
+        },
+        numeric(1)
+      ),
+      max_error = vapply(
+        model,
+        function(mod) {
+          max(abs(c(residuals(mod), 0)), na.rm = TRUE)
+        },
+        numeric(1)
+      ),
     ) %>%
     group_by(label, input_line_number) %>%
     summarise(
@@ -283,7 +328,8 @@ shinyloadtest_report <- function(
         slt_time_concurrency(.) + theme(legend.position = "none")
       } %>%
       save_run_svg(input_line_val, "concurrency", height = 4, width = 4)
-    df_concurrency_event <- df_model %>% filter(input_line_number == input_line_val)
+    df_concurrency_event <- df_model %>%
+      filter(input_line_number == input_line_val)
     list(
       label = htmltools::htmlEscape(df_concurrency_event$label[[1]]),
       src = src_boxplot,
@@ -311,10 +357,10 @@ shinyloadtest_report <- function(
       save_svg_file(
         legend_info$legend_grob,
         "concurrency_legend",
-        height = legend_info$height_inches, width = legend_info$width_inches
+        height = legend_info$height_inches,
+        width = legend_info$width_inches
       )
     }
-
 
   tick("Generate HTML")
   output_txt <- glue_index(list(
@@ -347,14 +393,19 @@ shinyloadtest_report <- function(
     dir.create(dirname(output), recursive = TRUE, showWarnings = FALSE)
     cat("", file = output)
     output_path <- normalizePath(output)
-    rmarkdown::pandoc_convert(input = tmp_file, output = output_path, options = c("--self-contained", "--template", tmp_file))
+    rmarkdown::pandoc_convert(
+      input = tmp_file,
+      output = output_path,
+      options = c("--self-contained", "--template", tmp_file)
+    )
   } else {
     writeLines(output_txt, output)
   }
 
-
   tick(basename(output))
-  if (open_browser) utils::browseURL(output)
+  if (open_browser) {
+    utils::browseURL(output)
+  }
   invisible(output)
 }
 
@@ -397,7 +448,9 @@ find_legend_grob <- function(gtbl) {
   # On 3.4.4 it's guide-box > guides, on 3.5.1 it's guide-box-bottom > guides.
 
   guide_box_grobs <- gtbl$grobs[grep("^guide-box", gtbl$layout$name)]
-  nonzero_grobs <- guide_box_grobs[!vapply(guide_box_grobs, inherits, logical(1), what = "zeroGrob")]
+  nonzero_grobs <- guide_box_grobs[
+    !vapply(guide_box_grobs, inherits, logical(1), what = "zeroGrob")
+  ]
   if (length(nonzero_grobs) == 0) {
     return(ggplot2::zeroGrob())
   }
@@ -416,8 +469,14 @@ extract_legend <- function(p) {
 
   list(
     legend_grob = legend_grob,
-    height_inches = legend_grob$heights %>% grid::convertUnit("inches") %>% as.numeric() %>% sum(),
-    width_inches = legend_grob$widths %>% grid::convertUnit("inches") %>% as.numeric() %>% sum()
+    height_inches = legend_grob$heights %>%
+      grid::convertUnit("inches") %>%
+      as.numeric() %>%
+      sum(),
+    width_inches = legend_grob$widths %>%
+      grid::convertUnit("inches") %>%
+      as.numeric() %>%
+      sum()
   )
 }
 

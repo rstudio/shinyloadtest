@@ -4,11 +4,11 @@ library(magrittr)
 
 ui <- page_fluid(
   title = "Reactive Functions Demo",
-  shinyjs::useShinyjs(),  # Set up shinyjs
+  shinyjs::useShinyjs(), # Set up shinyjs
   card(
     card_header("Reactive Functions in Shiny"),
     layout_column_wrap(
-      width = 1/2,
+      width = 1 / 2,
       card(
         # Input file
         fileInput("file1", "Choose a file"),
@@ -53,7 +53,6 @@ ui <- page_fluid(
 )
 
 server <- function(input, output, session) {
-
   # Upload a file to the server
   output$file_output <- renderText({
     if (is.null(input$file1)) {
@@ -64,12 +63,14 @@ server <- function(input, output, session) {
     paste0("Temp file base name: ", input$file1$name)
   })
 
-
   # shinyjs custom message
-  observe({
-    req(input$btn_shinyjsToggle)
-    shinyjs::toggle("txt")
-  }, label = "shinyjs toggle - observe")
+  observe(
+    {
+      req(input$btn_shinyjsToggle)
+      shinyjs::toggle("txt")
+    },
+    label = "shinyjs toggle - observe"
+  )
 
   # Freeze
   observe({
@@ -136,14 +137,12 @@ server <- function(input, output, session) {
     removeModal()
   })
 
-
   # Insert UI
   observeEvent(input$btn_insert_ui, {
     insertUI(
       selector = "#add",
       where = "afterEnd",
-      ui = textInput(paste0("txt", input$add),
-                     "Insert some text")
+      ui = textInput(paste0("txt", input$add), "Insert some text")
     )
 
     insertUI(
@@ -209,12 +208,10 @@ server <- function(input, output, session) {
     session$resetBrush("does_not_exist")
   })
 
-
   # Reload
   observeEvent(input$btn_reload, {
     session$reload()
   })
-
 
   # Error counter
   # Put at end due to odd error handling
@@ -225,8 +222,6 @@ server <- function(input, output, session) {
     })
     stop(input$btn_error)
   })
-
-
 }
 
 shinyApp(ui, server)

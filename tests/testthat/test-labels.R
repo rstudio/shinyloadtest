@@ -1,5 +1,3 @@
-
-
 ex_labels <- c(
   "Event 1) Get: Homepage",
   "Event 2) Get: shiny.min.js",
@@ -74,12 +72,9 @@ ex_labels <- c(
 
 
 test_that("Many labels are supported", {
-
-  runs <- load_runs(test="label-out")
+  runs <- load_runs(test = "label-out")
   expect_equal(
     levels(runs$label),
     ex_labels
   )
-
-
 })

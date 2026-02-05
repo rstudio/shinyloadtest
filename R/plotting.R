@@ -1,5 +1,26 @@
 # TODO remove and upgrade the dplyr fns to FN_()
-utils::globalVariables(c("start", "end", "ready", "begin", "label", "time", "maintenance", "quantile", "spread", "HTTP", "WebSocket", "val", "name", "max_latency", "colorCol", "xmin", "xmax", "ymin", "ymax", "fill"))
+utils::globalVariables(c(
+  "start",
+  "end",
+  "ready",
+  "begin",
+  "label",
+  "time",
+  "maintenance",
+  "quantile",
+  "spread",
+  "HTTP",
+  "WebSocket",
+  "val",
+  "name",
+  "max_latency",
+  "colorCol",
+  "xmin",
+  "xmax",
+  "ymin",
+  "ymax",
+  "fill"
+))
 
 #' @rawNamespace import(ggplot2, except = vars)
 #' @importFrom stats reorder
@@ -252,7 +273,8 @@ gantt_latency <- function(df) {
   bind_rows(
     info(df_lat$HTTP, "HTTP") %>% mutate(val = fmt(val)),
     info(df_lat$Calculate, "Calculate") %>% mutate(val = fmt(val)),
-    info(df_lat$perc_http, "percentage") %>% mutate(val = paste0(fmt(100 * val, 1, 1), "%")),
+    info(df_lat$perc_http, "percentage") %>%
+      mutate(val = paste0(fmt(100 * val, 1, 1), "%")),
   ) %>%
     mutate(
       name = as.factor(name),

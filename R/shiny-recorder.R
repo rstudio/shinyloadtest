@@ -47,7 +47,11 @@ req_rook_to_curl <- function(req, domain, port) {
 
 resp_httr_to_rook <- function(resp) {
   # TODO Look into HTTP/2.0 support
-  status <- as.integer(sub("^HTTP\\S+ (\\d+).*", "\\1", curl::parse_headers(resp$headers)[1]))
+  status <- as.integer(sub(
+    "^HTTP\\S+ (\\d+).*",
+    "\\1",
+    curl::parse_headers(resp$headers)[1]
+  ))
   headers <- curl::parse_headers_list(resp$headers)
   headers[headers_to_remove(headers$connection)] <- NULL
   headers[["content-encoding"]] <- NULL
@@ -113,20 +117,25 @@ replaceTokens <- function(str, tokens) {
 
 makeHTTPEvent_GET <- function(tokens, req, resp_curl, begin, end) {
   makeReq <- function(type) {
-    structure(list(
-      type = type,
-      begin = makeTimestamp(begin),
-      end = makeTimestamp(end),
-      status = resp_curl$status_code,
-      url = replaceTokens(paste0(req$PATH_INFO, req$QUERY_STRING), tokens)
-    ), class = "REQ")
+    structure(
+      list(
+        type = type,
+        begin = makeTimestamp(begin),
+        end = makeTimestamp(end),
+        status = resp_curl$status_code,
+        url = replaceTokens(paste0(req$PATH_INFO, req$QUERY_STRING), tokens)
+      ),
+      class = "REQ"
+    )
   }
 
   # ShinyHomeRequestEvent
   if (grepl("(\\/|\\.rmd)($|\\?)", req$PATH_INFO, ignore.case = TRUE)) {
     page <- rawToChar(resp_curl$content)
     workerId <- getWorkerId(page)
-    if (!is.na(workerId)) tokens[[workerId]] <- "${WORKER}"
+    if (!is.na(workerId)) {
+      tokens[[workerId]] <- "${WORKER}"
+    }
     return(makeReq("REQ_HOME"))
   }
 
@@ -171,7 +180,9 @@ shouldIgnore <- function(msg) {
     return(TRUE)
   }
   parsed <- parseMessage(msg)
-  if (length(intersect(names(parsed), c("busy", "progress", "recalculating"))) > 0) {
+  if (
+    length(intersect(names(parsed), c("busy", "progress", "recalculating"))) > 0
+  ) {
     return(TRUE)
   }
   if (identical(names(parsed), c("custom"))) {
@@ -195,9 +206,16 @@ shouldIgnoreGET <- function(path) {
 
 CLIENT_WS_STATE <- enum(UNOPENED, OPEN, CLOSED)
 
-RecordingSession <- R6::R6Class("RecordingSession",
+RecordingSession <- R6::R6Class(
+  "RecordingSession",
   public = list(
-    initialize = function(targetAppUrl, host, port, outputFileName, connectApiKey) {
+    initialize = function(
+      targetAppUrl,
+      host,
+      port,
+      outputFileName,
+      connectApiKey
+    ) {
       private$targetURL <- URLBuilder$new(targetAppUrl)
       private$targetType <- servedBy(private$targetURL)
       if (private$targetType == SERVER_TYPE$SAI) {
@@ -213,7 +231,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
         }
         # check if the solo url was not provided
         if (grepl("#", targetAppUrl, fixed = TRUE)) {
-          cli::cli_abort("Please provide the content URL (solo mode) of this Posit Connect Shiny app")
+          cli::cli_abort(
+            "Please provide the content URL (solo mode) of this Posit Connect Shiny app"
+          )
         }
       }
 
@@ -242,7 +262,10 @@ RecordingSession <- R6::R6Class("RecordingSession",
         close(private$outputFile)
         if (length(private$postFiles)) {
           fileList <- paste(sprintf("\t%s", private$postFiles), collapse = "\n")
-          message("Note: uploaded files to keep with recording file:\n", fileList)
+          message(
+            "Note: uploaded files to keep with recording file:\n",
+            fileList
+          )
         }
       }
     },
@@ -273,14 +296,25 @@ RecordingSession <- R6::R6Class("RecordingSession",
       # if auth is required and are not using the connectApiKey...
       if (isProtected(private$targetURL) && is.null(private$connectApiKey)) {
         if (private$targetType == SERVER_TYPE$RSC) {
-          message("An Posit Connect API key was not provided to `record_session(connect_api_key=)`. Asking for login information...")
+          message(
+            "An Posit Connect API key was not provided to `record_session(connect_api_key=)`. Asking for login information..."
+          )
         }
         assert_is_available("getPass")
         username <- getPass::getPass("Enter your username: ")
-        if (is.null(username)) cli::cli_abort("Login aborted (username not provided)")
+        if (is.null(username)) {
+          cli::cli_abort("Login aborted (username not provided)")
+        }
         password <- getPass::getPass("Enter your password: ")
-        if (is.null(password)) cli::cli_abort("Login aborted (password not provided)")
-        cookies <- postLogin(private$targetURL, private$targetType, username, password)
+        if (is.null(password)) {
+          cli::cli_abort("Login aborted (password not provided)")
+        }
+        cookies <- postLogin(
+          private$targetURL,
+          private$targetType,
+          username,
+          password
+        )
       }
       private$sessionCookies <- cookies
     },
@@ -295,7 +329,8 @@ RecordingSession <- R6::R6Class("RecordingSession",
       private$targetURL$appendPath(req$PATH_INFO)$setQuery(query)$build()
     },
     makeCurlHandle = function(req) {
-      port <- private$targetURL$port %OR% if (private$targetURL$scheme == "https") 443 else 80
+      port <- private$targetURL$port %OR%
+        if (private$targetURL$scheme == "https") 443 else 80
       req_curl <- req_rook_to_curl(req, private$targetURL$host, port)
       h <- curl::new_handle()
 
@@ -321,11 +356,22 @@ RecordingSession <- R6::R6Class("RecordingSession",
       dataFileName <- NULL
       # See if there is data to upload
       # TODO: Detect chunked transfer encoding and error out
-      if (!is.null(req$HTTP_CONTENT_LENGTH) && as.integer(req$HTTP_CONTENT_LENGTH) > 0) {
+      if (
+        !is.null(req$HTTP_CONTENT_LENGTH) &&
+          as.integer(req$HTTP_CONTENT_LENGTH) > 0
+      ) {
         # TODO Figure out how to use CURL_INFILESIZE_LARGE to upload files
         # larger than 2GB.
-        curl::handle_setopt(h, post = TRUE, infilesize = as.integer(req$HTTP_CONTENT_LENGTH))
-        dataFileName <- sprintf("%s.post.%d", private$outputFileName, length(private$postFiles))
+        curl::handle_setopt(
+          h,
+          post = TRUE,
+          infilesize = as.integer(req$HTTP_CONTENT_LENGTH)
+        )
+        dataFileName <- sprintf(
+          "%s.post.%d",
+          private$outputFileName,
+          length(private$postFiles)
+        )
         writeCon <- file(dataFileName, "wb")
         curl::handle_setopt(h, readfunction = function(n) {
           data <- req$rook.input$read(n)
@@ -350,7 +396,10 @@ RecordingSession <- R6::R6Class("RecordingSession",
         begin = makeTimestamp(begin),
         end = makeTimestamp(end),
         status = resp_curl$status_code,
-        url = replaceTokens(paste0(req$PATH_INFO, req$QUERY_STRING), self$tokens)
+        url = replaceTokens(
+          paste0(req$PATH_INFO, req$QUERY_STRING),
+          self$tokens
+        )
       )
 
       if (!is.null(dataFileName)) {
@@ -370,26 +419,40 @@ RecordingSession <- R6::R6Class("RecordingSession",
 
       event <- makeHTTPEvent_GET(self$tokens, req, resp_curl, begin, end)
 
-      if (!shouldIgnoreGET(req$PATH_INFO)) private$writeEvent(event)
+      if (!shouldIgnoreGET(req$PATH_INFO)) {
+        private$writeEvent(event)
+      }
 
       resp_httr_to_rook(resp_curl)
     },
     handleCall = function(req) {
       handler <- private[[paste0("handle_", req$REQUEST_METHOD)]]
-      if (is.null(handler)) cli::cli_abort(paste0("No handler for ", req$REQUEST_METHOD))
+      if (is.null(handler)) {
+        cli::cli_abort(paste0("No handler for ", req$REQUEST_METHOD))
+      }
       handler(req)
     },
     handleWSOpen = function(clientWS) {
       message("Client connected")
       private$clientWsState <- CLIENT_WS_STATE$OPEN
 
-      match <- stringr::str_match(clientWS$request$PATH_INFO, "/(\\w+/\\w+)/websocket$")
-      if (!is.na(match[[1]])) self$tokens[[match[[2]]]] <- "${SOCKJSID}"
+      match <- stringr::str_match(
+        clientWS$request$PATH_INFO,
+        "/(\\w+/\\w+)/websocket$"
+      )
+      if (!is.na(match[[1]])) {
+        self$tokens[[match[[2]]]] <- "${SOCKJSID}"
+      }
 
-      private$writeEvent(makeWSEvent("WS_OPEN", url = replaceTokens(clientWS$request$PATH_INFO, self$tokens)))
+      private$writeEvent(makeWSEvent(
+        "WS_OPEN",
+        url = replaceTokens(clientWS$request$PATH_INFO, self$tokens)
+      ))
 
       wsScheme <- if (private$targetURL$scheme == "https") "wss" else "ws"
-      wsUrl <- private$targetURL$setScheme(wsScheme)$appendPath(clientWS$request$PATH_INFO)$build()
+      wsUrl <- private$targetURL$setScheme(wsScheme)$appendPath(
+        clientWS$request$PATH_INFO
+      )$build()
 
       headers <- list()
       if (nrow(private$sessionCookies) > 0) {
@@ -429,7 +492,10 @@ RecordingSession <- R6::R6Class("RecordingSession",
         # WS_RECV_INIT
         if ("config" %in% names(parsed)) {
           self$tokens[[parsed$config$sessionId]] <- "${SESSION}"
-          private$writeEvent(makeWSEvent("WS_RECV_INIT", message = replaceTokens(msgFromServer, self$tokens)))
+          private$writeEvent(makeWSEvent(
+            "WS_RECV_INIT",
+            message = replaceTokens(msgFromServer, self$tokens)
+          ))
           clientWS$send(msgFromServer)
           return()
         }
@@ -438,7 +504,10 @@ RecordingSession <- R6::R6Class("RecordingSession",
         if (!is.null(parsed$response$value$jobId)) {
           self$tokens[[parsed$response$value$uploadUrl]] <- "${UPLOAD_URL}"
           self$tokens[[parsed$response$value$jobId]] <- "${UPLOAD_JOB_ID}"
-          private$writeEvent(makeWSEvent("WS_RECV_BEGIN_UPLOAD", message = replaceTokens(msgFromServer, self$tokens)))
+          private$writeEvent(makeWSEvent(
+            "WS_RECV_BEGIN_UPLOAD",
+            message = replaceTokens(msgFromServer, self$tokens)
+          ))
           clientWS$send(msgFromServer)
           return()
         }
@@ -481,7 +550,10 @@ RecordingSession <- R6::R6Class("RecordingSession",
           serverSend(msgFromClient)
           return()
         }
-        private$writeEvent(makeWSEvent("WS_SEND", message = replaceTokens(msgFromClient, self$tokens)))
+        private$writeEvent(makeWSEvent(
+          "WS_SEND",
+          message = replaceTokens(msgFromClient, self$tokens)
+        ))
         serverSend(msgFromClient)
       })
       clientWS$onClose(function() {
@@ -495,7 +567,8 @@ RecordingSession <- R6::R6Class("RecordingSession",
     },
     startServer = function() {
       private$localServer <- httpuv::startServer(
-        private$localHost, private$localPort,
+        private$localHost,
+        private$localPort,
         list(call = private$handleCall, onWSOpen = private$handleWSOpen)
       )
     }
@@ -554,21 +627,33 @@ RecordingSession <- R6::R6Class("RecordingSession",
 #' }
 #' @export
 record_session <- function(
-    target_app_url, host = "127.0.0.1", port = 8600,
-    output_file = "recording.log", open_browser = TRUE,
-    connect_api_key = NULL) {
+  target_app_url,
+  host = "127.0.0.1",
+  port = 8600,
+  output_file = "recording.log",
+  open_browser = TRUE,
+  connect_api_key = NULL
+) {
   if (!is.null(connect_api_key)) {
     stopifnot(length(connect_api_key) == 1)
     stopifnot(is.character(connect_api_key))
     stopifnot(nchar(connect_api_key) > 0)
   }
 
-  session <- RecordingSession$new(target_app_url, host, port, output_file, connect_api_key)
+  session <- RecordingSession$new(
+    target_app_url,
+    host,
+    port,
+    output_file,
+    connect_api_key
+  )
   on.exit(session$stop())
   message("Listening on ", host, ":", port)
 
   if (open_browser) {
-    navUrl <- URLBuilder$new(target_app_url)$setHost(host)$setPort(port)$setScheme("http")$setPath("")$build()
+    navUrl <- URLBuilder$new(target_app_url)$setHost(host)$setPort(
+      port
+    )$setScheme("http")$setPath("")$build()
     message("Navigating to: ", navUrl)
     utils::browseURL(navUrl)
   }
