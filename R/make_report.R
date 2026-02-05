@@ -302,7 +302,7 @@ shinyloadtest_report <- function(
     {
       slt_time_concurrency(.) +
         theme(legend.position = "bottom") +
-        labs(fill = "", color = "")
+        labs(fill = NULL, color = NULL)
     } %>%
     extract_legend() %>%
     {
