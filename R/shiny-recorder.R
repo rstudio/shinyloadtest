@@ -325,6 +325,9 @@ RecordingSession <- R6::R6Class("RecordingSession",
         # TODO Figure out how to use CURL_INFILESIZE_LARGE to upload files
         # larger than 2GB.
         curl::handle_setopt(h, post = TRUE, infilesize = as.integer(req$HTTP_CONTENT_LENGTH))
+        # Provide total postfieldsize to libcurl so it does not activate chunked
+        # Transfer-Encoding.
+        curl::handle_setopt(h, postfieldsize = as.integer(req$HTTP_CONTENT_LENGTH))
         dataFileName <- sprintf("%s.post.%d", private$outputFileName, length(private$postFiles))
         writeCon <- file(dataFileName, "wb")
         curl::handle_setopt(h, readfunction = function(n) {
