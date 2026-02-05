@@ -2,7 +2,7 @@
 
 #### 2026-02-05
 
-I have made a fix for the dplyr update and my other cosmetic fixes.
+I have made a fix for the dplyr update and many other cosmetic fixes.
 
 Please let me know if there is any more information I can provide.
 
