@@ -7,7 +7,8 @@ Authors@R: c(
            comment = c(ORCID = "0000-0001-9986-114X")),
     person("Alan", "Dipert", role = "aut"),
     person("Barbara", "Borges", role = "aut"),
-    person("Posit Software, PBC", role = c("cph", "fnd"))
+    person("Posit Software, PBC", role = c("cph", "fnd"),
+           comment = c(ROR = "03wc8by49"))
   )
 Description: Assesses the number of concurrent users 'shiny' applications
     are capable of supporting, and for directing application changes in
@@ -50,6 +51,7 @@ Config/Needs/routine: devtools, readr, httr, jsonlite, rprojroot, usethis,
     stringr
 Config/Needs/website: devtools, httr, readr, gh, tidyverse/tidytemplate
 Config/testthat/edition: 3
+Config/usethis/last-upkeep: 2026-02-05
 Encoding: UTF-8
 Language: en-US
 LazyData: true

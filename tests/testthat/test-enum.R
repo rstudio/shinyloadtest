@@ -14,20 +14,14 @@ test_that("Enums values cannot be partially matched or missing", {
 
 test_that("enum_case dispatches to the appropriate branch", {
   e1 <- enum(FOO, BAR)
-  expect_equal(123, enum_case(e1$FOO,
-    FOO = 123,
-    BAR = 321
-  ))
+  expect_equal(123, enum_case(e1$FOO, FOO = 123, BAR = 321))
 })
 
 test_that("enum_case does not evaluate other branches", {
   e1 <- enum(FOO, BAR)
   x <- 0
   fun <- function(val) {
-    enum_case(val,
-      FOO = 123,
-      BAR = (x <<- x + 1)
-    )
+    enum_case(val, FOO = 123, BAR = (x <<- x + 1))
   }
   expect_equal(123, fun(e1$FOO))
   expect_equal(x, 0)
@@ -38,19 +32,13 @@ test_that("enum_case does not evaluate other branches", {
 test_that("enum_case complains about unmatched values", {
   e1 <- enum(FOO, BAR)
   expect_error({
-    enum_case(val,
-      FOO = 123,
-    )
+    enum_case(val, FOO = 123, )
   })
 })
 
 test_that("enum_case complains about unknown values", {
   e1 <- enum(FOO, BAR)
   expect_error({
-    enum_case(val,
-      FOO = 123,
-      BAR = 321,
-      BAZ = 99
-    )
+    enum_case(val, FOO = 123, BAR = 321, BAZ = 99)
   })
 })

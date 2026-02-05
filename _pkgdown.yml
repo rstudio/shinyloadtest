@@ -7,14 +7,13 @@ development:
 
 template:
   package: tidytemplate
-  params:
-    bootswatch: cosmo
-    docsearch:
-      api_key: '993bbaa8141e65ce07013c0f54fc3277'
-      index_name: 'shinyloadtest'
+  bootstrap: 5
 
-navbar:
-  type: inverse
+  bslib:
+    primary: "#2780e3"
+    # https://mdigi.tools/lighten-color/#2780e3 @ 85%
+    navbar-background: "#dfecfb"
+  trailing_slash_redirect: true
 
 articles:
 - title: Getting started

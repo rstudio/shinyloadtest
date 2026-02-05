@@ -1,5 +1,7 @@
 test_that("reports are generated", {
   skip_on_cran()
+  skip_if_not_installed("htmltools")
+
   html_file <- sprintf("%s.html", tempfile("report"))
   shinyloadtest_report(
     slt_demo_data_1,

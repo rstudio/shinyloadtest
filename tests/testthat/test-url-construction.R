@@ -16,13 +16,19 @@ test_that("basic URL with non-standard port is created", {
 test_that("setting raw path works", {
   url <- "http://example.com/foo/bar"
   builder <- URLBuilder$new(url)
-  expect_equal("http://example.com/foop/barp", builder$setPath("foop/barp")$build())
+  expect_equal(
+    "http://example.com/foop/barp",
+    builder$setPath("foop/barp")$build()
+  )
 })
 
 test_that("appending path works", {
   url <- "http://example.com/foo/bar"
   builder <- URLBuilder$new(url)
-  expect_equal("http://example.com/foo/bar/foop/barp", builder$appendPath("foop/barp")$build())
+  expect_equal(
+    "http://example.com/foo/bar/foop/barp",
+    builder$appendPath("foop/barp")$build()
+  )
 })
 
 test_that("handles URL scheme properly", {

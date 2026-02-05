@@ -21,11 +21,21 @@ glue_inst_file <- function(file, data, ...) {
 }
 
 glue_component <- function(file, data, ...) {
-  glue_inst_file(file.path("dist", "components", paste0(file, ".html")), data, ...)
+  glue_inst_file(
+    file.path("dist", "components", paste0(file, ".html")),
+    data,
+    ...
+  )
 }
 
 glue_multi_component <- function(file, datas, ..., collapse = "") {
-  ret <- vapply(datas, glue_component, file = file, ..., FUN.VALUE = character(1))
+  ret <- vapply(
+    datas,
+    glue_component,
+    file = file,
+    ...,
+    FUN.VALUE = character(1)
+  )
   paste0(ret, collapse = collapse)
 }
 
@@ -59,7 +69,9 @@ is_available <- function(package, version = NULL) {
 assert_is_available <- function(package, version = NULL) {
   if (!is_available(package, version)) {
     cli::cli_abort(paste0(
-      "Please install the `", package, "` package and try again."
+      "Please install the `",
+      package,
+      "` package and try again."
     ))
   }
 }

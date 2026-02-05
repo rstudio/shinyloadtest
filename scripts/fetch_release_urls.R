@@ -6,7 +6,6 @@
 # To run:
 # source(rprojroot::find_package_root_file("scripts/fetch_release_urls.R"))
 
-
 library(httr)
 library(readr)
 library(gh)
@@ -26,13 +25,16 @@ asset_platform <- function(asset_name) {
 asset_df <- function(query_result) {
   recent_release <- query_result$data$repository$releases$nodes[[1]]
   assets <- recent_release$releaseAssets$nodes
-  do.call(rbind, lapply(assets, function(asset) {
-    data.frame(
-      platform = asset_platform(asset$name),
-      file = asset$name,
-      url = asset$downloadUrl
-    )
-  }))
+  do.call(
+    rbind,
+    lapply(assets, function(asset) {
+      data.frame(
+        platform = asset_platform(asset$name),
+        file = asset$name,
+        url = asset$downloadUrl
+      )
+    })
+  )
 }
 
 ## Not authenticated. Failes on GHA
