@@ -12,7 +12,8 @@ joinPaths <- function(p1, p2) {
   }
 }
 
-URLBuilder <- R6::R6Class("URLBuilder",
+URLBuilder <- R6::R6Class(
+  "URLBuilder",
   public = list(
     initialize = function(str) {
       if (!missing(str)) {
@@ -58,7 +59,10 @@ URLBuilder <- R6::R6Class("URLBuilder",
     },
     build = function() {
       scheme <- paste0(ifelse(self$scheme == "", "http", self$scheme), "://")
-      host_port <- paste0(self$host, ifelse(is.na(self$port), "", paste0(":", self$port)))
+      host_port <- paste0(
+        self$host,
+        ifelse(is.na(self$port), "", paste0(":", self$port))
+      )
       query <- ifelse(self$query == "", "", paste0("?", self$query))
       paste0(scheme, joinPaths(host_port, self$path), query)
     },

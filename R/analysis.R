@@ -1,5 +1,26 @@
 # TODO remove and upgrade the dplyr fns to FN_()
-utils::globalVariables(c("input_line_number", "run", "session_id", "user_id", "iteration", "event", "timestamp", "concurrency", "center", "event_class", "total_latency", ".", "type", "min_start", "max_end", "worker_id", "json", "eventLabel", "duration", "id"))
+utils::globalVariables(c(
+  "input_line_number",
+  "run",
+  "session_id",
+  "user_id",
+  "iteration",
+  "event",
+  "timestamp",
+  "concurrency",
+  "center",
+  "event_class",
+  "total_latency",
+  ".",
+  "type",
+  "min_start",
+  "max_end",
+  "worker_id",
+  "json",
+  "eventLabel",
+  "duration",
+  "id"
+))
 
 # Utility functions -------------------------------------------------------
 
@@ -13,13 +34,18 @@ comma_collapse <- function(...) {
 
 
 # Read a "sessions/" directory full of .log files
-read_log_dir <- function(dir, name = basename(dirname(dir)), verbose = vroom::vroom_progress()) {
+read_log_dir <- function(
+  dir,
+  name = basename(dirname(dir)),
+  verbose = vroom::vroom_progress()
+) {
   files <- list.files(dir, pattern = "*.csv", full.names = TRUE)
   if (length(files) == 0) {
     cli::cli_abort(paste0("No files found for run dir: ", dir), call = NULL)
   }
 
-  df <- vroom::vroom(files,
+  df <- vroom::vroom(
+    files,
     col_types = vroom::cols(
       session_id = vroom::col_integer(),
       worker_id = vroom::col_integer(),
@@ -61,7 +87,9 @@ read_recording <- function(file_name) {
     lapply(jsonlite::fromJSON) %>%
     lapply(function(item) {
       item$begin <- lubridate::as_datetime(item$begin)
-      if (!is.null(item$end)) item$end <- lubridate::as_datetime(item$end)
+      if (!is.null(item$end)) {
+        item$end <- lubridate::as_datetime(item$end)
+      }
       item
     })
   startTime <- baselineInfo[[1]]$begin
@@ -102,7 +130,9 @@ read_recording <- function(file_name) {
       # session_id, user_id, iteration,
       input_line_number,
       event,
-      start, end, time,
+      start,
+      end,
+      time,
       # concurrency,
       label,
       json
@@ -209,7 +239,6 @@ get_times <- function(df) {
 }
 
 
-
 # Tidying functions -------------------------------------------------------
 
 #' Create Tidy Load Test Results
@@ -274,7 +303,11 @@ load_runs <- function(..., verbose = vroom::vroom_progress()) {
   } else {
     is_missing_name <- names(run_dirs) == ""
     if (any(is_missing_name)) {
-      names(run_dirs)[is_missing_name] <- vapply(run_dirs[is_missing_name], basename, character(1))
+      names(run_dirs)[is_missing_name] <- vapply(
+        run_dirs[is_missing_name],
+        basename,
+        character(1)
+      )
     }
   }
 
@@ -283,10 +316,16 @@ load_runs <- function(..., verbose = vroom::vroom_progress()) {
   df <- run_dirs %>%
     {
       mapply(
-        ., names(.),
-        USE.NAMES = FALSE, SIMPLIFY = FALSE,
+        .,
+        names(.),
+        USE.NAMES = FALSE,
+        SIMPLIFY = FALSE,
         FUN = function(recording_path, run) {
-          raw <- read_log_dir(file.path(recording_path, "sessions"), run, verbose = verbose)
+          raw <- read_log_dir(
+            file.path(recording_path, "sessions"),
+            run,
+            verbose = verbose
+          )
           df_run <- get_times(raw)
 
           recording_path <- file.path(recording_path, "recording.log")
@@ -294,13 +333,18 @@ load_runs <- function(..., verbose = vroom::vroom_progress()) {
             first_recording$name <<- run
             first_recording$lines <<- readLines(recording_path)
             recording <- read_recording(recording_path)
-            first_recording$data <<- recording %>% select(input_line_number, label, json)
+            first_recording$data <<- recording %>%
+              select(input_line_number, label, json)
             first_recording$max_end <<- max(recording$end)
           } else {
             recording <- readLines(recording_path)
             if (!identical(recording, first_recording$lines)) {
               cli::cli_abort(paste0(
-                "Recording for `", run, "` does not equal the recording for `", first_recording$name, "`.\n",
+                "Recording for `",
+                run,
+                "` does not equal the recording for `",
+                first_recording$name,
+                "`.\n",
                 "Please use the same recording when calling `load_runs()`",
                 call = NULL
               ))
@@ -339,7 +383,6 @@ load_runs <- function(..., verbose = vroom::vroom_progress()) {
   attr(df, "recording_duration") <- max(first_recording$max_end)
   df
 }
-
 
 
 maintenance_df_ids <- function(df) {
@@ -417,9 +460,13 @@ ws_recv_label <- function(message) {
     errors <- message$errors
     has_errors <- length(errors) > 0
     if (has_errors) {
-      is_not_silent_error <- vapply(errors, function(err) {
-        ! ("shiny.silent.error" %in% err$type)
-      }, logical(1))
+      is_not_silent_error <- vapply(
+        errors,
+        function(err) {
+          !("shiny.silent.error" %in% err$type)
+        },
+        logical(1)
+      )
       errors <- errors[is_not_silent_error]
       has_errors <- length(errors) > 0
     }
@@ -431,21 +478,24 @@ ws_recv_label <- function(message) {
     error_msgs <- NULL
     if (has_errors) {
       error_msgs <- paste0(
-        "Errors: ", comma_collapse(names(errors))
+        "Errors: ",
+        comma_collapse(names(errors))
       )
     }
 
     input_msgs <- NULL
     if (has_input_msgs) {
       input_msgs <- paste0(
-        "Input message: ", comma_collapse(as.list(message$inputMessages)$id)
+        "Input message: ",
+        comma_collapse(as.list(message$inputMessages)$id)
       )
     }
 
     updated_msgs <- NULL
     if (has_values) {
       updated_msgs <- paste0(
-        "Updated: ", comma_collapse(names(message$values))
+        "Updated: ",
+        comma_collapse(names(message$values))
       )
     }
 
@@ -531,7 +581,6 @@ ws_recv_label <- function(message) {
 
   # # shiny-change-tab-visibility handler
   if (!is.null(message$`shiny-change-tab-visibility`)) {
-
     tab_vis <- message$`shiny-change-tab-visibility`
     return(switch(
       tab_vis$type,
@@ -551,7 +600,6 @@ ws_recv_label <- function(message) {
   if (!is.null(message$resetBrush)) {
     return(paste0("Reset brush: ", message$resetBrush$brushId))
   }
-
 
   msg_json <- to_json(message)
   issue_url <- "https://github.com/rstudio/shinyloadtest/issues/new"

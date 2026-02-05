@@ -24,14 +24,19 @@ enum <- function(...) {
   val_sym <- rlang::ensyms(...)
   val_str <- vapply(val_sym, as.character, character(1))
   structure(
-    stats::setNames(lapply(val_str, enum_value, enum_counter(), val_str), val_str),
+    stats::setNames(
+      lapply(val_str, enum_value, enum_counter(), val_str),
+      val_str
+    ),
     class = "shinyloadtest_enum"
   )
 }
 
 #' @export
 `$.shinyloadtest_enum` <- function(x, i) {
-  if (!(i %in% names(x))) cli::cli_abort("Unknown enum value")
+  if (!(i %in% names(x))) {
+    cli::cli_abort("Unknown enum value")
+  }
   NextMethod()
 }
 #' @export
@@ -48,12 +53,18 @@ enum_case <- function(field, ...) {
 
   unknown_values <- base::setdiff(names(cases), all_val)
   if (length(unknown_values)) {
-    cli::cli_abort(paste("Unknown enum value", paste(unknown_values, collapse = ", ")), call = NULL)
+    cli::cli_abort(
+      paste("Unknown enum value", paste(unknown_values, collapse = ", ")),
+      call = NULL
+    )
   }
 
   missing_values <- base::setdiff(all_val, names(cases))
   if (length(missing_values)) {
-    cli::cli_abort(paste("Missing enum value", paste(missing_values, collapse = ", ")), call = NULL)
+    cli::cli_abort(
+      paste("Missing enum value", paste(missing_values, collapse = ", ")),
+      call = NULL
+    )
   }
 
   rlang::eval_tidy(cases[[field]])

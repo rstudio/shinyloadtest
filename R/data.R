@@ -35,9 +35,19 @@ roxygen_gen_demo <- function(rda_file) {
   c(
     sprintf("Example metrics for a %s-user load test", users),
     "",
-    sprintf("An example dataset like that returned by \\code{\\link{load_runs}}, but without the \\code{json} variable for portability. Contains latency data for %s \\code{shinycannon} events suitable for passing to \\code{\\link{shinyloadtest_report}}.", rows),
+    sprintf(
+      "An example dataset like that returned by \\code{\\link{load_runs}}, but without the \\code{json} variable for portability. Contains latency data for %s \\code{shinycannon} events suitable for passing to \\code{\\link{shinyloadtest_report}}.",
+      rows
+    ),
     "",
-    roxygen_gen_df_desc(sprintf("@format A data frame with %s rows and %s variables:", rows, cols), FALSE)
+    roxygen_gen_df_desc(
+      sprintf(
+        "@format A data frame with %s rows and %s variables:",
+        rows,
+        cols
+      ),
+      FALSE
+    )
   )
 }
 
