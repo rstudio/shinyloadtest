@@ -47,7 +47,7 @@ Suggests:
     rmarkdown,
     spelling,
     testthat (>= 3.2.0)
-Config/Needs/routine:devtools, readr, httr, jsonlite, rprojroot, usethis,
+Config/Needs/routine: devtools, readr, httr, jsonlite, rprojroot, usethis,
     stringr
 Config/Needs/website: devtools, httr, readr, gh, tidyverse/tidytemplate
 Config/testthat/edition: 3
@@ -56,8 +56,8 @@ Encoding: UTF-8
 Language: en-US
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
-SystemRequirements:pandoc (>= 2.2) - http://pandoc.org
+RoxygenNote: 7.3.3
+SystemRequirements: pandoc (>= 2.2) - http://pandoc.org
 Collate:
     'enum.R'
     'data.R'
