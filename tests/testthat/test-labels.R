@@ -72,6 +72,8 @@ ex_labels <- c(
 
 
 test_that("Many labels are supported", {
+  skip_if_not_installed("lubridate")
+
   runs <- load_runs(test = "label-out")
   expect_equal(
     levels(runs$label),
