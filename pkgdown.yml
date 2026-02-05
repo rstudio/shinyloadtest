@@ -1,5 +1,5 @@
-pandoc: 3.1.11
-pkgdown: 2.1.0
+pandoc: 3.8.3
+pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   analyzing-load-test-logs: analyzing-load-test-logs.html
@@ -8,7 +8,7 @@ articles:
   load-testing-authenticated-apps: load-testing-authenticated-apps.html
   shinycannon: shinycannon.html
   troubleshooting-ssl: troubleshooting-ssl.html
-last_built: 2024-08-21T18:51Z
+last_built: 2026-02-05T15:36Z
 urls:
   reference: https://rstudio.github.io/shinyloadtest/reference
   article: https://rstudio.github.io/shinyloadtest/articles
