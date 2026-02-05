@@ -19,6 +19,7 @@
 ^cran-comments\.md$
 ^data-raw$
 ^\.github$
+^\.claude$
 ^revdep$
 ^README\.Rmd$
 ^_pkgdown\.yml$
