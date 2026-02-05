@@ -1,7 +1,7 @@
 Type: Package
 Package: shinyloadtest
 Title: Load Test Shiny Applications
-Version: 1.2.0.9000
+Version: 1.2.1
 Authors@R: c(
     person("Barret", "Schloerke", , "barret@posit.co", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-9986-114X")),
