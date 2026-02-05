@@ -1,40 +1,26 @@
-Package: shinyloadtest
 Type: Package
+Package: shinyloadtest
 Title: Load Test Shiny Applications
 Version: 1.2.0.9000
 Authors@R: c(
-            person("Barret", "Schloerke", role = c("aut", "cre"), email = "barret@posit.co", comment = c(ORCID = "0000-0001-9986-114X")),
-            person("Alan", "Dipert", role = c("aut")),
-            person("Barbara", "Borges", role = c("aut")),
-            person("Posit Software, PBC", role = c("cph", "fnd"))
-            )
-Description: Assesses the number of concurrent users 'shiny'
-  applications are capable of supporting, and for directing application changes
-  in order to support a higher number of users. Provides facilities for recording
-  'shiny' application sessions, playing recorded sessions against a target
-  server at load, and analyzing the resulting metrics.
+    person("Barret", "Schloerke", , "barret@posit.co", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-9986-114X")),
+    person("Alan", "Dipert", role = "aut"),
+    person("Barbara", "Borges", role = "aut"),
+    person("Posit Software, PBC", role = c("cph", "fnd"))
+  )
+Description: Assesses the number of concurrent users 'shiny' applications
+    are capable of supporting, and for directing application changes in
+    order to support a higher number of users. Provides facilities for
+    recording 'shiny' application sessions, playing recorded sessions
+    against a target server at load, and analyzing the resulting metrics.
 License: GPL-3
-Depends:
-  R (>= 2.10)
-Encoding: UTF-8
-LazyData: true
-URL: https://rstudio.github.io/shinyloadtest/, https://github.com/rstudio/shinyloadtest
+URL: https://rstudio.github.io/shinyloadtest/,
+    https://github.com/rstudio/shinyloadtest
 BugReports: https://github.com/rstudio/shinyloadtest/issues
-Collate:
-  'enum.R'
-  'data.R'
-  'analysis.R'
-  'detect.R'
-  'auth.R'
-  'make_report.R'
-  'plotting.R'
-  'shiny-recorder.R'
-  'shinyloadtest-package.R'
-  'url.R'
-  'util.R'
-  'util-pipe.R'
+Depends:
+    R (>= 2.10)
 Imports:
-    R6,
     cli,
     curl,
     dplyr (>= 1.0.0),
@@ -42,6 +28,7 @@ Imports:
     httpuv (>= 1.5.2),
     jsonlite,
     magrittr,
+    R6,
     rlang (>= 0.1.2),
     scales,
     stringr,
@@ -57,20 +44,28 @@ Suggests:
     lubridate,
     progress,
     rmarkdown,
-    testthat (>= 3.2.0),
-    spelling
-RoxygenNote: 7.3.2
-Roxygen: list(markdown = TRUE)
-SystemRequirements:
-    pandoc (>= 2.2) - http://pandoc.org
-Language: en-US
-Config/Needs/website: devtools, httr, readr, gh, tidyverse/tidytemplate
-Config/Needs/routine:
-    devtools,
-    readr,
-    httr,
-    jsonlite,
-    rprojroot,
-    usethis,
+    spelling,
+    testthat (>= 3.2.0)
+Config/Needs/routine:devtools, readr, httr, jsonlite, rprojroot, usethis,
     stringr
+Config/Needs/website: devtools, httr, readr, gh, tidyverse/tidytemplate
 Config/testthat/edition: 3
+Encoding: UTF-8
+Language: en-US
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+SystemRequirements:pandoc (>= 2.2) - http://pandoc.org
+Collate:
+    'enum.R'
+    'data.R'
+    'analysis.R'
+    'detect.R'
+    'auth.R'
+    'make_report.R'
+    'plotting.R'
+    'shiny-recorder.R'
+    'shinyloadtest-package.R'
+    'url.R'
+    'util.R'
+    'util-pipe.R'
