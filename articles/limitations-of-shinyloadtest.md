@@ -1,0 +1,55 @@
+# Limitations of shinyloadtest
+
+`shinyloadtest` is designed to work with a wide variety of application
+types and deployments, but there are certain types of application and
+deployment configurations that it is known not to support.
+
+## Deployment limitations
+
+1.  **WebSockets are required**: On Posit Connect and Shiny Server,
+    [SockJS](https://github.com/sockjs/sockjs-client) is used instead of
+    plain WebSockets in order to support browsers and load balancers
+    that don’t support WebSockets. Even though Shiny works in the
+    absence of WebSocket support, `shinyloadtest` does not.
+2.  **shinyapps.io unsupported**: Applications deployed on
+    <http://www.shinyapps.io/> can’t be recorded or load tested.
+3.  **Recordings are server-dependent**: Recordings made with a
+    particular server type — Connect, Shiny Server, local — may only be
+    played back by `shinycannon` against an application deployed using
+    that same type of server. So, for example, a recording made of an
+    application running on Connect will not work correctly if it’s run
+    with `shinycannon` on the same target application deployed using a
+    different server like Shiny Server Pro.
+
+## Application limitations
+
+1.  **Apps must be deterministic**: The recording file made by
+    `record_session` contains messages from the server in the order they
+    were received. If messages are received in a different order by
+    `shinycannon` when it’s playing the recording back, that session
+    will be considered a failure. If the same change in inputs does not
+    always lead to outputs being updated in the same order,
+    shinyloadtest will not work.
+    - Apps with high latency — either because they are geographically
+      distant from you, or because they perform long-running
+      computations — are likelier to exhibit non-determinism. High
+      latency can cause messages sent from the browser and received from
+      the server to be likelier to interleave in different ways, which
+      can cause `shinycannon` to fail. The telltale sign of such a
+      problem is a message like
+      `WS_RECV line 66: Haven't received message after 30 seconds` in
+      `shinycannon` output.
+    - One way to mitigate the effect of high latency is to take more
+      time between interacting with inputs when you’re making your
+      recording. The longer the amount of time between messages your
+      browser sends, the less likely it is that messages received from
+      the server will interleave with them in a different way in the
+      future, when `shinycannon` is replaying them.
+    - In testing, we’ve observed intermittent problems with the
+      `selectize()` input, particularly when `server = TRUE`. More
+      information can be found at
+      <https://github.com/rstudio/shinyloadtest/issues/121>
+2.  **R Markdown documents with `runtime: shiny` unsupported**: R
+    Markdown documents that [embed Shiny
+    applications](https://bookdown.org/yihui/rmarkdown/shiny-start.html)
+    are currently unsupported.

@@ -1,0 +1,75 @@
+# Troubleshooting SSL
+
+If you ran `shinycannon` and received an error like the following:
+
+    javax.net.ssl.SSLHandshakeException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+
+…the target server’s SSL certificate was not recognized by the
+installation of Java that `shinycannon` is running in.
+
+The first thing you should try is upgrading Java on your machine. Newer
+versions of Java come with updated certificate stores.
+
+If that doesn’t work, and if you are confident the target server is
+legitimate (for example, it’s run from within your organization) you can
+rectify the problem by adding the target server’s certificate to Java’s
+certificate store using the steps below.
+
+Otherwise, you should consider contacting the target server’s
+administrator because **the machine may have been compromised**.
+
+## Add Certificate
+
+### Download
+
+Download the certificate to the machine running `shinycannon` using the
+following command, substituting `example.com` for the hostname or
+address of the target server:
+
+*If the target host is an IP address, you should omit the `-servername`
+parameter.*
+
+**Linux**:
+
+    openssl s_client -connect example.com:443 -servername example.com:443 < /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > public.crt
+
+**Windows**:
+
+*If you haven’t, you should install [Sed for
+Windows](http://gnuwin32.sourceforge.net/packages/sed.htm) and
+[OpenSSL](https://www.openssl.org/)*
+
+    openssl s_client -connect google.com:443 -servername google.com:443 < NUL | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > public.crt
+
+### Find `JAVA_HOME`
+
+Determine your system’s JAVA_HOME location with the following command:
+
+*On Linux, the \$JAVA_HOME environment variable may already be set. If
+it is, use it instead.*
+
+    jrunscript -e 'java.lang.System.out.println(java.lang.System.getProperty("java.home"));'
+
+### Install Certificate
+
+Install the certificate with the following command, substituting
+`<JAVA_HOME>` for your system’s `JAVA_HOME` value, and `<server_name>`
+for some name of your choosing:
+
+*On Linux, you must be root or use `sudo`.*
+
+    <JAVA_HOME>/bin/keytool -import -alias <server_name> -keystore <JAVA_HOME>/jre/lib/security/cacerts -file public.crt
+
+You may be prompted for a password. By default it is `changeit`.
+
+You may be prompted about whether to trust the certificate. Type `yes`
+and hit enter.
+
+### Try again
+
+Try `shinycannon` again, ensuring `SHINYCANNON_USER` and
+`SHINYCANNON_PASS` are set if your target application requires
+authentication.
+
+*These instructions were adapted from the following document:
+<https://confluence.atlassian.com/kb/how-to-import-a-public-ssl-certificate-into-a-jvm-867025849.html>*

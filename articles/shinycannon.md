@@ -1,0 +1,114 @@
+# Installing and running shinycannon
+
+``` r
+
+library(shinyloadtest)
+```
+
+## Installation
+
+`shinycannon` requires custom installation that differs from platform to
+platform.
+
+### Linux
+
+Depending on your distribution, `shinycannon` can be installed using one
+of the following packages.
+
+| Distribution | Download Link | Install Command |
+|:---|:---|:---|
+| SUSE | [shinycannon-1.2.0-suse-85f280d.x86_64.rpm](https://github.com/rstudio/shinycannon/releases/download/v1.2.0-alpha/shinycannon-1.2.0-suse-85f280d.x86_64.rpm) | `zypper —-no-gpg-checks install -y shinycannon-1.2.0-suse-85f280d.x86_64.rpm` |
+| Redhat/Fedora/CentOS | [shinycannon-1.2.0-85f280d.x86_64.rpm](https://github.com/rstudio/shinycannon/releases/download/v1.2.0-alpha/shinycannon-1.2.0-85f280d.x86_64.rpm) | `sudo yum install -y shinycannon-1.2.0-85f280d.x86_64.rpm` |
+| Ubuntu/Debian | [shinycannon_1.2.0-85f280d_amd64.deb](https://github.com/rstudio/shinycannon/releases/download/v1.2.0-alpha/shinycannon_1.2.0-85f280d_amd64.deb) | `sudo dpkg -i shinycannon_1.2.0-85f280d_amd64.deb` |
+
+### macOS
+
+1.  Install [Java](https://www.java.com/en/download/)
+2.  Download
+    [shinycannon-1.2.0-85f280d.sh](https://github.com/rstudio/shinycannon/releases/download/v1.2.0-alpha/shinycannon-1.2.0-85f280d.sh)
+3.  Install with
+    `sudo cp shinycannon-1.2.0-85f280d.sh /usr/local/bin/shinycannon; sudo chmod +x /usr/local/bin/shinycannon`
+4.  Run `shinycannon -h` to see help output, or
+    `shinycannon [RECORDING-PATH] [APP-URL]` to generate load.
+
+### Windows
+
+1.  Install [Java](https://www.java.com/en/download/)
+2.  Download
+    [shinycannon-1.2.0-85f280d.jar](https://github.com/rstudio/shinycannon/releases/download/v1.2.0-alpha/shinycannon-1.2.0-85f280d.jar)
+    to the directory you wish to run it in
+3.  Run `java -jar shinycannon-1.2.0-85f280d.jar -h` to see help output,
+    or
+    `java -jar shinycannon-1.2.0-85f280d.jar [RECORDING-PATH] [APP-URL]`
+    to generate load.
+
+## Recording
+
+`shinycannon` accepts two required positional arguments:
+
+1.  **\[RECORDING-PATH\]**: path to the file produced by
+    [`shinyloadtest::record_session`](https://rstudio.github.io/shinyloadtest/reference/record_session.md)
+2.  **\[APP-URL\]**: URL of the target Shiny application
+
+In addition to these two required arguments, `shinycannon` accepts a
+number of optional arguments that can be specified with flags. Of these,
+the most interesting are:
+
+1.  `--workers`: The number of concurrent users to simulate.
+    `shinycannon` uses threads to represent each user. It defaults to 1.
+2.  `--loaded-duration-minutes`: The duration of the load test, in
+    minutes. This does not include “warmup time”, which is the time
+    shinycannon spends gradually increasing the number of workers, or
+    “cooldown time”, which is the time spent decreasing the number of
+    workers. It defaults to 0, meaning that after all workers have
+    “warmed up”, they will immediately begin to “cool down”. Generally,
+    you’ll want to set this to a duration greater than 0. `shinycannon`
+    will re-run the recording as necessary to fill the time.
+3.  `--output-dir`: Name of the directory to create and store timing
+    information in.
+
+As an example, to run a load test simulating 5 concurrent users for at
+least 2 minutes, outputting to the directory `run1`:
+
+``` bash
+$ shinycannon recording.log https://shinyapp.example.com/ --workers 5 --loaded-duration-minutes 2 --output-dir run1
+2018-08-29 15:06:14.191 INFO [progress] - Running: 0, Failed: 0, Done: 0
+2018-08-29 15:06:14.193 INFO [thread01] - Warming up
+2018-08-29 15:06:14.195 INFO [thread00] - Waiting for warmup to complete
+2018-08-29 15:06:19.193 INFO [progress] - Running: 1, Failed: 0, Done: 0
+2018-08-29 15:06:24.194 INFO [progress] - Running: 1, Failed: 0, Done: 0
+2018-08-29 15:06:29.083 INFO [thread02] - Warming up
+2018-08-29 15:06:29.195 INFO [progress] - Running: 1, Failed: 0, Done: 0
+2018-08-29 15:06:34.195 INFO [progress] - Running: 2, Failed: 0, Done: 0
+2018-08-29 15:06:39.196 INFO [progress] - Running: 2, Failed: 0, Done: 0
+2018-08-29 15:06:43.973 INFO [thread03] - Warming up
+2018-08-29 15:06:44.196 INFO [progress] - Running: 2, Failed: 0, Done: 0
+2018-08-29 15:06:49.196 INFO [progress] - Running: 3, Failed: 0, Done: 0
+2018-08-29 15:06:54.201 INFO [progress] - Running: 3, Failed: 0, Done: 0
+2018-08-29 15:06:58.862 INFO [thread04] - Warming up
+2018-08-29 15:06:59.201 INFO [progress] - Running: 3, Failed: 0, Done: 0
+2018-08-29 15:07:04.201 INFO [progress] - Running: 4, Failed: 0, Done: 0
+2018-08-29 15:07:09.202 INFO [progress] - Running: 4, Failed: 0, Done: 0
+2018-08-29 15:07:13.751 INFO [thread05] - Warming up
+2018-08-29 15:07:13.752 INFO [thread00] - Maintaining for 2 minutes (120000 ms)
+2018-08-29 15:07:14.202 INFO [progress] - Running: 4, Failed: 0, Done: 0
+2018-08-29 15:07:19.202 INFO [progress] - Running: 5, Failed: 0, Done: 0
+2018-08-29 15:07:24.202 INFO [progress] - Running: 5, Failed: 0, Done: 0
+...
+```
+
+`shinycannon` includes detailed help documentation explaining the other
+arguments:
+
+``` bash
+shinycannon -h
+```
+
+During the test, `shinycannon` reports the progress and number of
+simulated users. The result of the test is an output directory (`run1`
+in the example above) which includes timing information for each
+session. Inside that directory you’ll find:
+
+- `recording.log`: a copy of the original recording used.
+- `detail.log`: log output, to help debug errors.
+- `./sessions/*.csv`: one file for each simulated user session.
