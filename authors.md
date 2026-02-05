@@ -16,16 +16,16 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/rstudio/shinyloadtest/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/rstudio/shinyloadtest/blob/rc-v1.2.1/DESCRIPTION)
 
 Schloerke B, Dipert A, Borges B (2026). *shinyloadtest: Load Test Shiny
-Applications*. R package version 1.2.0.9000,
+Applications*. R package version 1.2.1,
 <https://rstudio.github.io/shinyloadtest/>.
 
     @Manual{,
       title = {shinyloadtest: Load Test Shiny Applications},
       author = {Barret Schloerke and Alan Dipert and Barbara Borges},
       year = {2026},
-      note = {R package version 1.2.0.9000},
+      note = {R package version 1.2.1},
       url = {https://rstudio.github.io/shinyloadtest/},
     }
