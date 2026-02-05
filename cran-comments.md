@@ -1,8 +1,8 @@
 ## Comments
 
-#### 2024-07-19 1.2.0
+#### 2026-02-05
 
-Bug fixes, removed the check note, and general name updates for RStudio -> Posit.
+I have made a fix for the dplyr update and many other cosmetic fixes.
 
 Please let me know if there is any more information I can provide.
 
@@ -10,18 +10,26 @@ Thank you,
 Barret
 
 
+#### 2026-02-04
+
+Dear maintainer,
+
+Please see the problems shown on
+<https://cran.r-project.org/web/checks/check_results_shinyloadtest.html>.
+
+Specifically, please see the "no visible binding for global variable"
+NOTEs in the "R code for possible problems" check: these are from the
+recent upgrade of package dplyr.
+
+Please correct before 2026-02-25 to safely retain your package on CRAN.
+
+Best wishes,
+The CRAN Team
+
+
 #### R CMD check results
 
-* 0 errors | 0 warnings | 1 note
-
-    Maintainer: ‘Barret Schloerke <barret@posit.co>’
-
-    New maintainer:
-      Barret Schloerke <barret@posit.co>
-    Old maintainer(s):
-      Barret Schloerke <barret@rstudio.com>
-
-Finally updating my email address (maintaining the same ORCID value) and renaming funder from RStudio to Posit.
+* 0 errors | 0 warnings | 0 notes
 
 ## revdepcheck results
 
