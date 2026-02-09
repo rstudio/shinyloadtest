@@ -1,5 +1,7 @@
 # Changelog
 
+## shinyloadtest (development version)
+
 ## shinyloadtest 1.2.1
 
 CRAN release: 2026-02-05
