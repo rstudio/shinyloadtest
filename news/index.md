@@ -2,6 +2,8 @@
 
 ## shinyloadtest 1.2.1
 
+CRAN release: 2026-02-05
+
 ### Bug fixes and minor improvements
 
 - Fixed R CMD check NOTE about undefined global variable `id` in `dplyr`

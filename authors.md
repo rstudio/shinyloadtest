@@ -16,7 +16,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/rstudio/shinyloadtest/blob/rc-v1.2.1/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/rstudio/shinyloadtest/blob/main/DESCRIPTION)
 
 Schloerke B, Dipert A, Borges B (2026). *shinyloadtest: Load Test Shiny
 Applications*. R package version 1.2.1,
